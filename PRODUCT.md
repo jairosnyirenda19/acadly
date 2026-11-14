@@ -24,7 +24,7 @@ React 19 + TypeScript (strict), Vite, pnpm workspace with three apps (`console` 
 
 ## Product Purpose
 
-Acadly IQ-X is a multi-institution education management platform for Early Childhood Development centres, primary schools, secondary schools and colleges. It replaces paper registers, spreadsheets and informal messaging groups with one trusted record of each learner: admission, enrolment, guardians, attendance, assessments, results, notices and library reading.
+Acadly IQ-X is an education management platform, deployed once per school, for Early Childhood Development centres, primary schools, secondary schools and colleges. It replaces paper registers, spreadsheets and informal messaging groups with one trusted record of each learner: admission, enrolment, guardians, attendance, assessments, results, notices and library reading.
 
 Success is that an institution runs a real academic period through Acadly: registers are taken in it every day, results are published from it, and guardians see both without asking the school.
 

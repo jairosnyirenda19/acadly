@@ -31,7 +31,7 @@
 | `pushChannel()` matches on event-name prefixes | Urgency and category are declared on the notice | No string matching |
 | English only; one wording | Locale files from day one (`en`, `ny`); vocabulary tokens per division | Chichewa; "Student" vs "Pupil" vs "Child" |
 | Mail and in-app (push by ride-along) | Adds SMS and later WhatsApp through adapters, with **metering and caps** | Parents are reached by SMS; SMS costs money |
-| No tenant | Every row is tenant-scoped; wording and subscriptions are per institution | Multi-tenant |
+| One office and region model | Subscriptions are scoped by division and campus | Several levels and sites in one school |
 
 ## 3. A notice
 
@@ -178,8 +178,8 @@ interface ChannelAdapter
 ```
 
 - MVP: `InApp`, `Email`, `Sms`. `Push` rides with `InApp` when the person has a device. `WhatsApp` is a later adapter.
-- `notification_routes` picks the provider per tenant and channel. The product is not tied to one SMS company.
-- Every paid send writes `notification_usage`. A quota check stops non-urgent paid sends at the tenant's cap and raises a system notice to the administrator.
+- `notification_routes` picks the provider per channel for this deployment. The product is not tied to one SMS company.
+- Every paid send writes `notification_usage`. A quota check stops non-urgent paid sends at the licence's allowance and raises a system notice to the administrator.
 - Addresses that cannot be reached (reserved test domains, invalid numbers) are filtered before a delivery row is written for that channel.
 
 ## 9. Keeping code and database the same
@@ -205,7 +205,7 @@ interface ChannelAdapter
 | `notice_wordings` | Institution × event × locale: subject, lines, short, action label, updated by |
 | `notification_deliveries` | One row per recipient × channel: event, audience, recipient snapshot, rendered subject and body, subject reference, scope, status, failure reason, settled at, dedupe key |
 | `notification_usage` | Metering for paid channels |
-| `notification_routes` | Tenant × channel → provider |
+| `notification_routes` | Channel → provider |
 | `in_app_notifications` | The bell |
 
 Delivery statuses: `queued`, `sent`, `delivered`, `failed`, `suppressed`, `unaddressed`.

@@ -12,15 +12,15 @@
 | Rule | Detail |
 |---|---|
 | Names | `snake_case`, plural, prefixed by owning module: `attendance_sessions`, `library_resources` |
-| Tenant column | Every tenant-owned table: `tenant_id uuid NOT NULL`, created by `$table->tenantOwned()` (adds column, `UNIQUE (tenant_id, id)`, index, RLS policy) |
+| Ownership | One database per school. No `tenant_id` column. Tables are created by `acadly_owner`; the application reads and writes as `acadly_app` |
 | Scope columns | `institution_id` on institution-owned rows. `division_id` / `campus_id` where the record is bound to one (03 §2) |
-| Foreign keys | Always declared. Composite with `tenant_id` between tenant-owned tables |
+| Foreign keys | Always declared |
 | Time | `timestamptz`, stored in UTC. Institution timezone is applied at the edge. Dates that are school-local facts (attendance date) are `date` |
 | Enums | `varchar` + PHP backed enum + `CHECK` constraint. No PostgreSQL enum types (hard to change) |
 | Money | `bigint` minor units + `char(3)` currency. Never float |
 | JSONB | Only for genuinely variable data: settings, provider payload snapshots, compiled blueprints. Never for relationships |
 | Deletion | Lifecycle status first (`archived`, `withdrawn`). Soft delete only with a stated purpose. Hard delete only through a retention job |
-| Indexes | Lead with `tenant_id`. Standard path: `(tenant_id, institution_id, period_id, learner_id)` |
+| Indexes | Standard path: `(division_id, campus_id, period_id, learner_id)` |
 | Uniqueness | Business rules as database constraints where possible (partial unique index for "one active enrolment per learner per period") |
 
 ## 3. Three planes of data
@@ -43,7 +43,7 @@ Attendance is the model case (PRD §6.7): the original event is never changed. A
 
 The full design is in [10-audit-trail.md](10-audit-trail.md). Summary:
 
-`audit_events` (append-only): `id`, `tenant_id`, scope ids, `actor_user_id`, `actor_kind` (user, system, support, integration), `support_grant_id`, `action` (`learner.updated`), subject (type + id), `before` / `after` (changed fields only, sensitive fields masked), `reason`, `request_id`, `ip`, `occurred_at`.
+`audit_events` (append-only): `id`, scope ids, `actor_user_id`, `actor_kind` (user, system, support, integration), `support_grant_id`, `action` (`learner.updated`), subject (type + id), `before` / `after` (changed fields only, sensitive fields masked), `reason`, `request_id`, `ip`, `occurred_at`.
 
 - Written by the kernel from Actions (`Audit::record()`), inside the same transaction as the change.
 - Journey steps, role changes, guardian link changes, result publication, exports and support access are always audited.
@@ -87,8 +87,8 @@ final class RecordAttendance                       // Application/Actions
 | Topic | Rule |
 |---|---|
 | Base | `/api/v1`. Breaking change → `/api/v2`. Additive changes stay in v1 |
-| Shape | `/api/v1/institutions/{institution}/…` for institution work · `/api/v1/me/…` for portal and self · `/api/v1/platform/…` for IQ-X operations |
-| Scope | The `{institution}` segment is a selector. The server checks it against memberships. Campus and division are filters and fields, validated against the user's scope |
+| Shape | `/api/v1/…` for staff work · `/api/v1/me/…` for portal and self. There is no institution segment: a deployment is one school |
+| Scope | Campus and division are filters and fields, validated against the user's scope on the server |
 | Format | JSON. `snake_case` fields. ISO 8601 timestamps with offset |
 | Errors | RFC 9457 `application/problem+json` with a stable `code`, plus `errors` per field for validation. Journey blocks return `code: step_not_admissible` with `reason` and `remedy` |
 | Lists | Cursor pagination. `?filter[status]=active&sort=-created_at`. Hard maximum page size |
@@ -110,7 +110,7 @@ Attendance capture may be queued on a device. The contract is fixed from day one
 
 ## 9. Files
 
-- Private bucket only. Object keys are random; they never contain names or tenant slugs in readable form.
+- Private bucket only. Object keys are random; they never contain names in readable form.
 - Upload pipeline: size limit → extension → MIME sniffing → format integrity check (PDF/EPUB parse) → malware scan job → only then `available`.
 - Library file access goes through the Library module's access rule check on every request for a new URL. A leaked URL expires in minutes.
 

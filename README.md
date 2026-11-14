@@ -2,10 +2,12 @@
 
 Education management for nurseries, primary schools, secondary schools and colleges. A product of IQ-X Technologies.
 
+Each school runs its own deployment: its own application, database and storage.
+
 | Folder | What it is |
 |---|---|
 | `app.backend/` | Laravel API. A modular monolith: `kernel/`, `core/`, `modules/` |
-| `app.frontend/` | React + TypeScript + Tailwind workspace: `apps/console`, `apps/portal`, `apps/platform`, `packages/ui`, `packages/api-client`, `packages/kernel` |
+| `app.frontend/` | React + TypeScript + Tailwind workspace: `apps/console`, `apps/portal`, `packages/ui`, `packages/api-client`, `packages/kernel` |
 | `contracts/openapi.json` | The contract between the two. Generated from the API. Committed |
 | `docs/architecture/` | The system design. Start at its `README.md` |
 | `docs/product/` | The product requirements |
@@ -18,6 +20,12 @@ You need Laravel Herd (PHP 8.4 and Composer), Node 24 and pnpm (through `corepac
 
 ```bash
 cd app.backend && composer install
+```
+
+PostgreSQL holds two roles: `acadly_owner` runs migrations and `acadly_app` runs the application. Set their names and passwords in `app.backend/.env` (see `.env.example`), then create the tables:
+
+```bash
+cd app.backend && composer migrate
 ```
 
 Laravel Herd serves the API at https://api.acadly-iq-x.test. Set it up once:

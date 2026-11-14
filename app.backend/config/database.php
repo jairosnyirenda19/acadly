@@ -84,14 +84,37 @@ return [
             ]) : [],
         ],
 
+        /*
+        | The application role. It cannot bypass row-level security and it
+        | cannot change the schema. Under APP_ENV=testing both PostgreSQL
+        | connections use the test database.
+        */
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DB_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),
-            'database' => env('DB_DATABASE', 'laravel'),
-            'username' => env('DB_USERNAME', 'root'),
+            'database' => env('APP_ENV') === 'testing' ? env('DB_TEST_DATABASE', 'acadly_test') : env('DB_DATABASE', 'acadly'),
+            'username' => env('DB_USERNAME', 'acadly_app'),
             'password' => env('DB_PASSWORD', ''),
+            'charset' => env('DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => env('DB_SSLMODE', 'prefer'),
+        ],
+
+        /*
+        | The owner role. It runs migrations and owns the tables. The
+        | application never serves a request on this connection.
+        */
+        'pgsql_owner' => [
+            'driver' => 'pgsql',
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '5432'),
+            'database' => env('APP_ENV') === 'testing' ? env('DB_TEST_DATABASE', 'acadly_test') : env('DB_DATABASE', 'acadly'),
+            'username' => env('DB_OWNER_USERNAME', 'acadly_owner'),
+            'password' => env('DB_OWNER_PASSWORD', ''),
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,

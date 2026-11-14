@@ -8,8 +8,7 @@ React, TypeScript, no admin framework. The design is ours to shape. The structur
 app.frontend/                                pnpm workspace
 ├── apps/
 │   ├── console/                    Staff: admins, officers, teachers, librarians. Desktop-first, works on tablet
-│   ├── portal/                     Guardians and learners. Mobile-first, small bundle, PWA
-│   └── platform/                   IQ-X operators: tenants, plans, support grants, health
+│   └── portal/                     Guardians and learners. Mobile-first, small bundle, PWA
 └── packages/
     ├── api-client/                 GENERATED from contracts/openapi.json. Never edited by hand
     ├── kernel/                     Auth, context, capabilities, vocabulary, journey UI, query setup, i18n
@@ -17,7 +16,7 @@ app.frontend/                                pnpm workspace
     └── config/                     Shared tsconfig, ESLint, Tailwind preset
 ```
 
-Three apps, not one. The portal must stay light for low-end phones and weak networks; the console can be richer. They share the kernel, the UI system and the API client, so they stay coherent.
+Two apps, not one. The portal must stay light for low-end phones and weak networks; the console can be richer. They share the kernel, the UI system and the API client, so they stay coherent.
 
 ## 2. Libraries
 
@@ -61,7 +60,7 @@ apps/console/src/
 
 ## 4. The app is built from the context payload
 
-On sign-in the SPA calls `GET /api/v1/me/context` and gets: memberships, the selected institution, its divisions and campuses, active modules, vocabulary, permissions per scope and navigation (03 §5.8). The kernel package turns that into hooks:
+On sign-in the SPA calls `GET /api/v1/me/context` and gets: the institution, its divisions and campuses, active modules, vocabulary, permissions per scope and navigation (03 §5.8). The kernel package turns that into hooks:
 
 ```tsx
 const { institution, division, campus, switchCampus } = useScope();

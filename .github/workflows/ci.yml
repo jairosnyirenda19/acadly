@@ -16,8 +16,39 @@ jobs:
     defaults:
       run:
         working-directory: app.backend
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: ci-admin
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: acadly_db
+      DB_TEST_DATABASE: acadly_test_db
+      DB_USERNAME: acadly_app
+      DB_PASSWORD: ci-app
+      DB_OWNER_USERNAME: acadly_owner
+      DB_OWNER_PASSWORD: ci-owner
+      PGPASSWORD: ci-admin
     steps:
       - uses: actions/checkout@v4
+
+      - name: Database roles and databases
+        run: |
+          psql -h 127.0.0.1 -U postgres -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE acadly_owner LOGIN PASSWORD 'ci-owner' NOSUPERUSER NOBYPASSRLS;
+          CREATE ROLE acadly_app LOGIN PASSWORD 'ci-app' NOSUPERUSER NOBYPASSRLS;
+          CREATE DATABASE acadly_db OWNER acadly_owner;
+          CREATE DATABASE acadly_test_db OWNER acadly_owner;
+          SQL
+          for db in acadly_db acadly_test_db; do
+            psql -h 127.0.0.1 -U postgres -d "$db" -v ON_ERROR_STOP=1 -c "CREATE EXTENSION IF NOT EXISTS pg_trgm; CREATE EXTENSION IF NOT EXISTS unaccent; CREATE EXTENSION IF NOT EXISTS btree_gin; ALTER SCHEMA public OWNER TO acadly_owner; GRANT USAGE ON SCHEMA public TO acadly_app;"
+          done
 
       - uses: shivammathur/setup-php@v2
         with:

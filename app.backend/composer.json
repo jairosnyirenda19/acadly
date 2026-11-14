@@ -50,6 +50,9 @@
             "@php vendor/bin/phpstan analyse --no-progress --memory-limit=1G",
             "@php artisan acadly:lint"
         ],
+        "migrate": [
+            "@php artisan migrate --database=pgsql_owner"
+        ],
         "contract": [
             "@php artisan scramble:export --path=../contracts/openapi.json"
         ],

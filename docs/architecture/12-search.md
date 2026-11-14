@@ -74,7 +74,7 @@ Added by Acadly:
 
 - Each searchable table has a `search_text` column: lower case, unaccented, the list-visible fields only (for a learner: names, student number). It is a generated column or is kept by the Action that writes the row.
 - Index: `GIN (search_text gin_trgm_ops)`, created by the migration helper `$table->searchable([...])`, which also records the table in the search linter's list. Reference columns keep a plain B-tree index for exact and prefix matches.
-- Row-level security applies as on every query; the planner combines the tenant filter with the trigram index. Where a tenant is very large, the helper can build the index with `btree_gin` so `tenant_id` leads.
+- Where a filter column (division, campus) must combine with the trigram index, the helper can build the index with `btree_gin`.
 - Extensions used: `pg_trgm`, `unaccent`, optionally `btree_gin`. No external search engine in the MVP. The seam allows one later without changing any source's rules.
 - Library content (the text inside a PDF or EPUB) is **not** searched in the MVP. Titles, authors, subjects and levels are.
 
@@ -82,8 +82,8 @@ Added by Acadly:
 
 | Endpoint | Answer |
 |---|---|
-| `GET /api/v1/institutions/{i}/search?q=&in=&limit=&cursor=` | `{ groups: [{ key, label, hits: [...], more }], failed: [{ key, label }] }` |
-| `GET /api/v1/institutions/{i}/search/places` | The sources this reader may search, with their labels. Drives the hint under an empty bar |
+| `GET /api/v1/search?q=&in=&limit=&cursor=` | `{ groups: [{ key, label, hits: [...], more }], failed: [{ key, label }] }` |
+| `GET /api/v1/search/places` | The sources this reader may search, with their labels. Drives the hint under an empty bar |
 
 - Rate limited per user. The client waits 200 ms after the last keystroke and cancels the earlier request.
 - The scope selector (division, campus) of the page applies; the response says which scope was searched.
@@ -107,7 +107,7 @@ The audit trail is not a source. It has its own filtered screen and its own perm
 
 ## 7. Tests
 
-- **A generated harness runs every registered source** against the rules: module off → not asked; no permission → absent; another tenant's rows → nothing; another campus's rows → nothing; each hidden field typed exactly → nothing; a hit has only `SearchHit` fields.
+- **A generated harness runs every registered source** against the rules: module off → not asked; no permission → absent; another campus's rows → nothing; another class's rows → nothing; each hidden field typed exactly → nothing; a hit has only `SearchHit` fields.
 - **The search walk:** one test file lists, per kind of reader (class teacher, subject teacher, admissions officer, academic officer, librarian, head teacher, campus administrator, guardian, learner), exactly which groups they may search. It goes red when a place opens to somebody, so opening one is always a deliberate change.
 - **Speed budget:** the 95th percentile of a search with all sources is under 400 ms on the pilot data volume.
 

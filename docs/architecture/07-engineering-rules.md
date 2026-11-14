@@ -44,11 +44,11 @@ Short, numbered, enforceable. Each rule names the check that guards it. A rule w
 
 | # | Rule | Guard |
 |---|---|---|
-| D1 | Every tenant-owned table is created with `tenantOwned()` and has an RLS policy | `acadly:lint` (schema inspection) |
-| D2 | Foreign keys between tenant-owned tables include `tenant_id` | `acadly:lint` |
+| D1 | The application connects as `acadly_app`: not a superuser, cannot change the schema | Feature tests against PostgreSQL |
+| D2 | Migrations run as `acadly_owner`; a deployment holds one institution row | Feature tests; migration linter |
 | D3 | Scope is resolved on the server. A client-sent id is only a selector | Isolation test suite |
 | D4 | Every route declares its permission and module guard, or is explicitly marked public | Route linter |
-| D5 | Every route has a generated cross-tenant and cross-scope test | CI fails on an uncovered route |
+| D5 | Every route has a generated cross-scope test (other campus, other division, other class) | CI fails on an uncovered route |
 | D6 | Permissions are enum cases from a manifest. No string literals | Lint |
 | D7 | Entitlement and permission are separate checks. Both must pass | `Access::check()` is the only gate; architecture test forbids `Gate::` / `->can()` elsewhere |
 | D8 | Guardian access exists only through an approved relationship row | Feature tests (PRD scenario C) |
@@ -150,6 +150,6 @@ web:   tsc --noEmit (strict) · eslint · vitest · bundle budget · playwright 
 | **Menu Security** | Hiding a button and calling it access control |
 | **Call-Site Audience** | Passing recipients into a notification call |
 | **Presentation Ladder** | A hardcoded progress list in the UI |
-| **Client-Trusted Scope** | Using a tenant or institution id from the request without a membership check |
+| **Client-Trusted Scope** | Using a division, campus or class id from the request without checking it against the user's scope |
 | **Mutable History** | Updating an attendance event or a published result in place |
 | **JSON Drawer** | Core relationships hidden in a JSONB column |

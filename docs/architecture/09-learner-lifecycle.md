@@ -12,7 +12,7 @@ A child may join at nursery and leave after Form 4. That is one learner, one ide
 ## 2. The model: identity, enrolment, placement
 
 ```
-Learner            who the person is                      one per tenant, for life
+Learner            who the person is                      one record, for life
 └── Enrolment      the learner's stay at an institution   one per stay (admission → completion / leaving)
     └── Placement  where the learner is right now         one row per (year × division × campus × level × class) spell
 ```

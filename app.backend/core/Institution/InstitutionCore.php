@@ -9,7 +9,7 @@ use Acadly\Kernel\Module\Tier;
 
 /**
  * Tenants, institutions, divisions and campuses
- * (docs/architecture/03-tenancy-campus-access.md §1). Stage 0 holds the
+ * (docs/architecture/03-deployment-campus-access.md §1). Stage 0 holds the
  * manifest only; the domain arrives in stage 2.
  */
 final class InstitutionCore implements Module

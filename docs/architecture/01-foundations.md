@@ -7,7 +7,7 @@
 | Backend language | PHP 8.4+, `declare(strict_types=1)` everywhere | Owner's strongest stack. Enums, readonly classes and first-class callable syntax are enough to make the declarations typed |
 | Backend framework | Laravel 13 (API only, no Blade UI, no Filament, no Livewire) | Mature queues, mail, storage, auth. Used as a toolbox, not as an architecture |
 | Frontend | React 19 + TypeScript (strict), Vite, pnpm workspace | Full control of the design. One contract with the API |
-| Database | PostgreSQL 17+ | Row-level security, partial indexes, JSONB, exclusion constraints |
+| Database | PostgreSQL 17+, one database per school | Role separation, partial indexes, JSONB, exclusion constraints, trigram search |
 | Cache / queue | Redis + Laravel Horizon | Queues, rate limits, short-lived tokens |
 | Files | S3-compatible private bucket | Library files, documents. Never public |
 | Realtime | Laravel Reverb, only where a screen truly needs it (pickup queue) | Not a default |
@@ -32,7 +32,7 @@ acadly-iq-x/
 │   ├── tests/                    Architecture, isolation and cross-module tests
 │   └── …
 ├── app.frontend/                          pnpm workspace (see 06)
-│   ├── apps/console · apps/portal · apps/platform
+│   ├── apps/console · apps/portal
 │   └── packages/ui · packages/api-client · packages/kernel
 ├── contracts/
 │   └── openapi.json              Generated. Committed. CI fails if it drifts
@@ -59,7 +59,8 @@ KERNEL    may import → Laravel, PHP. Nothing else
 
 | Component | Owns |
 |---|---|
-| `Tenancy` | Scope value object, scope resolution, tenant-aware base model, RLS session variables |
+| `Database` | Role separation (owner and application roles), append-only protection, migration helpers |
+| `Scope` | Scope value object (institution, division, campus, class) and its resolution from role assignments |
 | `Identity` | Users (login accounts), sessions, MFA, password reset, `IdentityProvider` socket for SSO |
 | `Access` | Permission catalogue, roles, scoped role assignments, the `Access::check()` pipeline, entitlements |
 | `Blueprint` | Profile and Journey definition classes, registries, the Journey engine, linter, conformance suite |
@@ -74,8 +75,8 @@ KERNEL    may import → Laravel, PHP. Nothing else
 
 | Domain | Owns |
 |---|---|
-| `Institution` | Tenants, institutions, divisions, campuses, settings, academic terminology overrides |
-| `People` | The person record (one human, once per tenant), contact points |
+| `Institution` | The institution (one row), divisions, campuses, offerings, settings, licence, terminology overrides |
+| `People` | The person record (one human, once), contact points |
 | `Academics` | Academic years, periods, levels, classes/streams/cohorts, subjects/courses, teaching assignments |
 | `Enrolment` | Learners, learner identifiers, enrolments, status history |
 | `Guardians` | Guardian profiles, learner–guardian relationships, verification, access scope |
@@ -163,7 +164,7 @@ A module is active for a request only when **all four** are true:
 ```
 installed            the code is in the build
 ∧ offered            the division's Profile Blueprint lists it as required or allowed
-∧ entitled           the tenant's subscription includes it
+∧ licensed           the deployment's signed licence includes it
 ∧ enabled            the institution administrator switched it on (required modules are always on)
 ```
 
@@ -207,7 +208,7 @@ Dependencies must form a directed acyclic graph. A cycle means a concept is in t
 1. Create the folder with the standard shape.
 2. Write the manifest. Declare dependencies, slots, permissions, topics, journeys.
 3. Add the module to the Profile Blueprints that offer it (new blueprint version if any division is already pinned).
-4. Migrations with `tenant_id` and RLS policy (document 05).
+4. Migrations, run as the owner role; `AppendOnly::protect()` on history tables (document 05).
 5. Actions, Queries, thin controllers, routes under the `module:` guard.
 6. Tests: unit, feature, isolation (generated), journey conformance (generated).
 7. Frontend module folder with the same key (document 06).

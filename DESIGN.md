@@ -167,7 +167,7 @@ Cool paper and navy ink, with three working colours that each mean one thing.
 - **Done Teal** (`teal`): the present stroke, the primary action, a finished step, a submitted register. On ink it becomes `teal-bright`. `teal-mid` and `teal-wash` exist only as steps of a scale (attendance heat, nursery steps).
 
 ### Secondary
-- **Marigold** (`marigold`): "look here". Offline, in progress, waiting for you, the place where a new item lands, a sight permission. `marigold-wash` tints a whole row.
+- **Marigold** (`marigold`): attention required. Offline, in progress, waiting for you, the place where a new item lands, a sight permission. `marigold-wash` tints a whole row.
 
 ### Tertiary
 - **Red Pen** (`red-pen`): the absent circle, the margin line, a blocked or refused thing, a value that is wrong. Text on a tint uses `red-text`; the tint is `red-wash`.
@@ -180,7 +180,7 @@ Cool paper and navy ink, with three working colours that each mean one thing.
 - **Muted text** (`text-muted`): supporting text and labels on paper or sheet.
 
 ### Named Rules
-**The One Job Rule.** Teal means done. Marigold means look here. Red means absent, blocked or wrong. None of them is ever decoration, and none borrows another's job.
+**The One Job Rule.** Teal means done. Marigold means attention required. Red means absent, blocked or wrong. None of them is ever decoration, and none borrows another's job.
 
 **The Mark Plus Word Rule.** A state is never shown by colour alone. It has a drawn mark, a letter or a word as well.
 

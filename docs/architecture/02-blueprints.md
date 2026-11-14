@@ -124,7 +124,7 @@ Three layers, strictly ordered:
 ```
 Profile Blueprint   product-defined, versioned, in the repo          "what a secondary school is"
 Institution settings customer-defined, in the database, validated     "we call it Grade, not Form; 2 terms"
-Feature entitlement  commercial, in the database                      "this tenant bought Library"
+Licence              commercial, signed, installed per deployment     "this school has Library"
 ```
 
 Settings may only vary what the blueprint marks as overridable (`->term(..., overridable: true)`). Settings never fork logic.
@@ -145,7 +145,6 @@ Use a journey when a record has **three or more states and a rule about who or w
 | `attendance.correction` | Correction request | requested → approved / declined |
 | `results.*` | Result set for class × subject × period | draft → submitted → reviewed → published → correction_open → republished |
 | `library.resource` | Library resource | draft → published → withdrawn → archived |
-| `tenant.lifecycle` | Tenant | pending_setup → active ⇄ suspended → closed |
 | `saferelease.pickup` (P1) | Pickup request | announced → verified → released / disputed / cancelled |
 
 ### 3.2 The four questions
@@ -256,7 +255,7 @@ interface JourneySubject            // implemented by the model that travels
 {
     public function journeyRef(): JourneyRef;
     public function journeyState(): string;
-    public function scope(): Scope;               // tenant / institution / division / campus
+    public function scope(): Scope;               // institution / division / campus
 }
 
 interface Gate                       // pure, cheap, explains itself

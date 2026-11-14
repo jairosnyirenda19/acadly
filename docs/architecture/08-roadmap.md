@@ -19,7 +19,7 @@ The target of stages 0–4 is the PRD's vertical slice (§21): institution → c
 ## Stage 1 — Kernel
 
 1. `Support`: Ids (UUIDv7), Clock, Money, idempotency keys.
-2. `Tenancy`: Scope, `TenantModel`, `tenantOwned()` / `appendOnly()` migration helpers, RLS session handling, the isolation test generator.
+2. `Database` and `Scope`: owner and application roles, `AppendOnly::protect()`, the Scope value object, the cross-scope test generator. *(Roles and append-only protection: built 14 November 2026.)*
 3. `Identity`: users, sessions, password reset, MFA, `IdentityProvider` socket.
 4. `Access`: permission catalogue sync, roles, scoped assignments, `Access::check()`, entitlements, support grants.
 5. `Audit` and `Events` (outbox, idempotent consumers).
@@ -32,13 +32,13 @@ The target of stages 0–4 is the PRD's vertical slice (§21): institution → c
 
 ## Stage 2 — Core domains and the first two profiles
 
-- `Institution`: tenant lifecycle journey, institutions, divisions, campuses, offerings, settings.
+- `Institution`: the institution row, licence, divisions, campuses, offerings, settings.
 - `People`, `Staff`: persons, invitations, activation, duty assignments.
 - `Academics`: years, periods, levels, classes/streams, subjects, teaching assignments — driven by the profile's `structure`.
 - Profile Blueprints: `SCHOOL_BASE`, `PRIMARY@…`, `SECONDARY@…`.
 - Console: onboarding wizard, scope switcher (institution / division / campus), user and role management.
 
-**Exit:** PRD scenario A (institution setup) and scenario H (tenant isolation) pass end to end, for a two-campus school with a primary and a secondary division.
+**Exit:** PRD scenario A (institution setup) passes end to end for a two-campus school with a primary and a secondary division, and the cross-scope tests pass.
 
 ## Stage 3 — Learners and families
 
@@ -78,7 +78,7 @@ The target of stages 0–4 is the PRD's vertical slice (§21): institution → c
 
 ## What is deliberately not built early
 
-- Tenant-defined roles and custom fields (the model allows them; the UI waits for real demand).
+- School-defined roles and custom fields (the model allows them; the UI waits for real demand).
 - Webhooks and public API keys (the outbox is ready for them).
-- Dedicated database per tenant (the scope model does not prevent it; it is a deployment option later).
+- Fleet tooling for IQ-X: provisioning a new school, rolling out a release to many deployments, licence issue. It lives outside the application.
 - Any predictive analytics.

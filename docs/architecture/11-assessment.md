@@ -34,7 +34,7 @@ Seeds by profile (a school may rename, add or retire kinds):
 
 ## 3. The assessment
 
-`assessments`: `id`, `tenant_id`, scope ids, `class_subject_id` (class × subject), `academic_period_id`, `kind_id`, `title`, `held_on`, `scale_id`, `max_mark` (null for descriptive scales), `counts` (boolean), `plan_part_key` (null when it does not count), `created_by`, journey state.
+`assessments`: `id`, scope ids, `class_subject_id` (class × subject), `academic_period_id`, `kind_id`, `title`, `held_on`, `scale_id`, `max_mark` (null for descriptive scales), `counts` (boolean), `plan_part_key` (null when it does not count), `created_by`, journey state.
 
 Journey `assessment.marks`:
 

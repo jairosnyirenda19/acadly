@@ -4,7 +4,7 @@ The full law is in `docs/architecture/`. Read `README.md` there first. This file
 
 ## What this is
 
-Multi-tenant education platform (ECD, primary, secondary, tertiary). Laravel API-only modular monolith in `app.backend/`. React + TypeScript SPA workspace in `app.frontend/`. PostgreSQL. UUIDv7 keys. No Filament, no Livewire, no Inertia.
+Education platform (ECD, primary, secondary, tertiary). **One deployment per school**: its own application, database and storage. There is no tenant column. Laravel API-only modular monolith in `app.backend/`. React + TypeScript SPA workspace in `app.frontend/`. PostgreSQL. UUIDv7 keys. No Filament, no Livewire, no Inertia.
 
 ## Rules you must not break
 
@@ -14,7 +14,7 @@ Multi-tenant education platform (ECD, primary, secondary, tertiary). Laravel API
 4. **Never branch on education level or profile.** Declare a binding slot in the module and bind it in the Profile Blueprint.
 5. **Multi-state processes are Journeys.** State changes only through `JourneyEngine::perform()`. Gates are facts, not permissions. Outcomes are named, not boolean.
 6. **Released blueprint versions are immutable.** Make a new version.
-7. **Every tenant table uses `$table->tenantOwned()`** (tenant column, composite keys, RLS). Scope is resolved on the server.
+7. **The application runs as `acadly_app`**, which cannot change the schema. Migrations run as `acadly_owner`. Scope (division, campus, class) is resolved on the server.
 8. **All access goes through `Access::check()`** with a permission enum case. No string permissions. No role-name checks.
 9. **History is append-only.** Corrections are new rows.
 10. **Notifications:** `Notifier::send(new Topic(...))`. Never pass recipients or channels at the call site.
@@ -24,7 +24,7 @@ Multi-tenant education platform (ECD, primary, secondary, tertiary). Laravel API
 ## Design
 
 - `PRODUCT.md` says who the product is for and how it speaks. `DESIGN.md` is the visual law ("The Register Book"). Read both before any UI work.
-- Radius 0. No shadows. Two rule weights. Teal means done, marigold means look here, red means absent, blocked or wrong. A state always has a mark or a word as well as a colour.
+- Radius 0. No shadows. Two rule weights. Teal means done, marigold means attention required, red means absent, blocked or wrong. A state always has a mark or a word as well as a colour.
 - A new screen is designed on the design canvas and approved before it is coded.
 - **Wording:** professional, clean terms on serious matters (status, security, access, audit, results, attendance, safeguarding, errors). No conversational phrasing. See `PRODUCT.md`, Brand Commitments.
 - **Disclose nothing about the build:** no framework, language, server, file path, module list, release identifier or developer command in any screen, response, header or error message.

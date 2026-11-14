@@ -23,13 +23,13 @@
 | e-voucher today | Acadly | Why |
 |---|---|---|
 | "Quiet on failure": an exception while auditing is swallowed | A state change and its audit line are written **in the same transaction**. If the line cannot be written, the change does not happen | An action with no record is worse than a refused action |
-| Nothing proves the log was not edited | **Hash chain** per tenant, **append-only** by database trigger and by privilege, **nightly seal** kept off the database, `audit:verify`, and a tamper notice (§5) | The log must be evidence, not a claim |
+| Nothing proves the log was not edited | **Hash chain** for the deployment, **append-only** by database trigger and by privilege, **nightly seal** kept off the database, `audit:verify`, and a tamper notice (§5) | The log must be evidence, not a claim |
 | Actions are free strings; the module is guessed from the prefix | Actions are **enum cases** declared by each module, each with a plain sentence | Typos fail in the editor; the screen never prints a raw code |
 | Subject label guessed from a list of attribute names | The subject implements `Auditable::auditLabel()` | No guessing |
 | Snapshot kept in a static array | The Action takes the snapshot (`$audit->watch($model)`) and passes a typed `Diff` | No hidden state between requests |
 | Only writes are audited | **Sensitive reads** are audited too: welfare notes, any use of a sight permission, exports, library file opens, support access | Child data: who looked matters as much as who changed |
 | First role name only | All roles held **at the scope of the action**, plus `acting_for` and `support_grant_id` | Scoped roles, cover and support access |
-| No tenant | Every line carries tenant and scope; viewing is scoped like any other data | Multi-tenant |
+| No scope | Every line carries division and campus; viewing is scoped like any other data | Several levels and sites |
 | No watchers | Detectors raise notices (§6) | Someone must be told |
 | Personal values sit in the row for ever | Personal values live in an encrypted side record that can be erased without breaking the chain (§4) | Erasure requests and retention |
 
@@ -39,9 +39,9 @@
 
 | Group | Columns |
 |---|---|
-| Identity | `id` (UUIDv7), `seq` (per tenant, no gaps), `prev_hash`, `hash` |
+| Identity | `id` (UUIDv7), `seq` (no gaps), `prev_hash`, `hash` |
 | When | `occurred_at` (UTC, set by the app), `recorded_at` |
-| Where | `tenant_id`, `institution_id`, `division_id`, `campus_id` |
+| Where | `division_id`, `campus_id` |
 | What | `module`, `action` (enum value), `outcome` (`done` / `failed` / `refused`), `refusal` (which check refused: permission, scope, module, gate + gate name) |
 | Who | `actor_user_id` (no FK), `actor_kind` (`user`, `system`, `support`, `integration`), `actor_label`, `actor_roles` (snapshot), `acting_for_user_id`, `support_grant_id` |
 | How | `session_id`, `request_id`, `device_id`, `ip`, `user_agent`, `channel` (`console`, `portal`, `app.backend`, `job`) |
@@ -59,10 +59,10 @@ Every audited model declares a class per field. The diff builder obeys it.
 | Class | In the diff | Example |
 |---|---|---|
 | `secret` | Masked both sides. Only the fact of change is kept | Password, MFA secret, tokens |
-| `personal` | Stored in `audit_payloads`, encrypted with the tenant's key. The event keeps only the payload's hash | Date of birth, phone, address, welfare notes, marks |
+| `personal` | Stored in `audit_payloads`, encrypted with the deployment's key. The event keeps only the payload's hash | Date of birth, phone, address, welfare notes, marks |
 | `plain` | Stored in `changes` | Class, status, campus, role name |
 
-Because the chain covers the payload **hash**, not the payload, a personal payload can be erased later (retention, a lawful erasure request, or destroying the tenant key) and the chain still verifies. The line then reads: *detail erased on 12 March 2031 under retention rule R-3*. That erasure is itself an audit event.
+Because the chain covers the payload **hash**, not the payload, a personal payload can be erased later (retention, a lawful erasure request, or destroying the key) and the chain still verifies. The line then reads: *detail erased on 12 March 2031 under retention rule R-3*. That erasure is itself an audit event.
 
 ## 5. Tamper evidence
 
@@ -70,10 +70,10 @@ Four locks on one door.
 
 1. **Append-only by trigger.** `UPDATE` and `DELETE` on `audit_events` raise an error.
 2. **Append-only by privilege.** The application's database role has `INSERT` and `SELECT` on the table and nothing else. The migration role is separate and is not used at run time.
-3. **Hash chain.** Per tenant: `hash = sha256(prev_hash ‖ canonical(event))`, with a gapless `seq`. The writer takes a transaction-level advisory lock for the tenant, so order is exact. A removed line breaks `seq`; a changed line breaks `hash`.
-4. **Nightly seal, kept elsewhere.** `audit_seals`: tenant, date, last `seq`, head hash, line count, signed with the platform key. The seal is written to object storage with a retention lock, and mailed to the tenant owner (`system.audit_sealed`). A later seal with fewer lines, or a head that does not extend the earlier one, proves removal even if someone with full database access rewrote the chain.
+3. **Hash chain.** One chain per deployment: `hash = sha256(prev_hash ‖ canonical(event))`, with a gapless `seq`. The writer takes a transaction-level advisory lock, so order is exact. A removed line breaks `seq`; a changed line breaks `hash`.
+4. **Nightly seal, kept elsewhere.** `audit_seals`: date, last `seq`, head hash, line count, signed with the deployment's key. The seal is written to object storage with a retention lock, and mailed to the institution administrator (`system.audit_sealed`). A later seal with fewer lines, or a head that does not extend the earlier one, proves removal even if someone with full database access rewrote the chain.
 
-`php artisan audit:verify {tenant?}` walks the chain and checks it against the stored seals. It runs nightly before sealing. A failure raises `system.audit_tampered` to the tenant owner and to platform operations, and marks the tenant's audit screen in red until a platform operator records an investigation.
+`php artisan audit:verify` walks the chain and checks it against the stored seals. It runs nightly before sealing. A failure raises `system.audit_tampered` to the institution administrator, and marks the audit screen in red until an investigation is recorded.
 
 ## 6. Watchers
 

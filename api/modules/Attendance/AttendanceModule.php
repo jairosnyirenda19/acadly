@@ -1,0 +1,31 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acadly\Modules\Attendance;
+
+use Acadly\Core\Institution\InstitutionCore;
+use Acadly\Kernel\Module\Module;
+use Acadly\Kernel\Module\Tier;
+
+/**
+ * Registers, attendance events and corrections. Stage 0 holds the manifest
+ * only, so the layer checks have a real optional module to guard.
+ */
+final class AttendanceModule implements Module
+{
+    public function key(): string
+    {
+        return 'attendance';
+    }
+
+    public function tier(): Tier
+    {
+        return Tier::Optional;
+    }
+
+    public function requires(): array
+    {
+        return [InstitutionCore::class];
+    }
+}

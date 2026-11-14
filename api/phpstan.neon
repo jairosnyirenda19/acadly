@@ -1,0 +1,10 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: max
+    paths:
+        - kernel
+        - core
+        - modules
+    tmpDir: storage/framework/phpstan

@@ -1,0 +1,75 @@
+{
+    "openapi": "3.1.2",
+    "info": {
+        "title": "Acadly IQ-X",
+        "version": "0.0.1"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api"
+        }
+    ],
+    "paths": {
+        "/v1/health": {
+            "get": {
+                "operationId": "kernel.health",
+                "description": "Says that the API answers, which release it is, and which modules are in\nthis build. It reads no tenant data and needs no sign-in.",
+                "summary": "Health of the API",
+                "tags": [
+                    "Health"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "service": {
+                                            "type": "string"
+                                        },
+                                        "version": {
+                                            "type": "string"
+                                        },
+                                        "modules": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "tier": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "core",
+                                                            "optional"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "tier"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "status",
+                                        "service",
+                                        "version",
+                                        "modules"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

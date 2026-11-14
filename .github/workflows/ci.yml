@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: API · style, types, structure, tests, contract
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, pdo_sqlite, redis, intl, sodium, zip
+          coverage: none
+
+      - run: composer install --no-interaction --prefer-dist --no-progress
+
+      - run: cp .env.example .env && php artisan key:generate
+
+      - name: Style
+        run: vendor/bin/pint --test
+
+      - name: Static analysis
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
+      - name: Structure (acadly:lint)
+        run: php artisan acadly:lint
+
+      - name: Tests (features and layer rules)
+        run: php artisan test
+
+      - name: The contract is up to date
+        run: |
+          php artisan scramble:export --path=../contracts/openapi.json
+          git diff --exit-code -- ../contracts/openapi.json
+
+  web:
+    name: Web · client, types, lint, tests, build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - run: corepack enable pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Client, types, lint, tests, build
+        run: pnpm check
+
+      - name: The generated client is up to date
+        run: git diff --exit-code -- packages/api-client/src/schema.d.ts

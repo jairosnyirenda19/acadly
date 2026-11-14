@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "acadly-api",
+      "runtimeExecutable": "php",
+      "runtimeArgs": ["api/artisan", "serve", "--host=127.0.0.1", "--port=8000"],
+      "port": 8000
+    },
+    {
+      "name": "acadly-console",
+      "runtimeExecutable": "corepack",
+      "runtimeArgs": ["pnpm", "--dir", "web", "dev"],
+      "port": 5173
+    }
+  ]
+}

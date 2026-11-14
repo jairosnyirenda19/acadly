@@ -1,0 +1,29 @@
+{
+  "name": "acadly-web",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.14.0",
+  "scripts": {
+    "dev": "vite apps/console --port 5173",
+    "dev:portal": "vite apps/portal --port 5174",
+    "dev:platform": "vite apps/platform --port 5175",
+    "client": "openapi-typescript ../contracts/openapi.json -o packages/api-client/src/schema.d.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "build": "vite build apps/console && vite build apps/portal && vite build apps/platform",
+    "check": "openapi-typescript ../contracts/openapi.json -o packages/api-client/src/schema.d.ts && tsc --noEmit -p tsconfig.json && eslint . && vitest run && vite build apps/console && vite build apps/portal && vite build apps/platform"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.6",
+    "eslint": "^10.14.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
+  }
+}

@@ -1,0 +1,123 @@
+/* ── Tokens ──────────────────────────────────────────────────────────────────
+   ONE source for the design system's values, imported by every app.
+   The names and values are the frontmatter of /DESIGN.md ("The Register
+   Book"). Change them there first, then here, in the same pull request.
+
+   Tailwind v4 reads this @theme block, so every token is a utility:
+   bg-ink, text-teal, border-rule, font-display …                              */
+@theme {
+  /* Reset Tailwind's own palette: only the register book's colours exist. */
+  --color-*: initial;
+
+  --color-ink: #0c2340;
+  --color-paper: #f1f4f6;
+  --color-sheet: #ffffff;
+  --color-field: #e2e8ee;
+  --color-rule: #c7d5e3;
+  --color-rule-dashed: #8496ac;
+  --color-text-muted: #4b5d75;
+  --color-on-ink-soft: #c9d6e4;
+  --color-on-ink-muted: #a9bbd1;
+  --color-ink-rule: #3a5173;
+
+  /* Done. */
+  --color-teal: #0a7775;
+  --color-teal-bright: #2fd6cf;
+  --color-teal-mid: #8fd6d2;
+  --color-teal-wash: #ddf3f1;
+
+  /* Look here. */
+  --color-marigold: #ffb703;
+  --color-marigold-wash: #fff6dc;
+
+  /* The red pen: absent, blocked, refused, wrong. Nothing else. */
+  --color-red-pen: #d12b1f;
+  --color-red-text: #b0231a;
+  --color-red-wash: #fdf1ef;
+
+  --color-disabled: #d5dde6;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --font-sans: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Radius 0 everywhere. A rule of the system, not a preference. */
+  --radius-*: initial;
+  --radius-none: 0px;
+
+  /* Nothing floats. */
+  --shadow-*: initial;
+}
+
+/* ── Idioms ──────────────────────────────────────────────────────────────────
+   The few repeating pieces of the register book, defined once.               */
+@layer components {
+  /* Narrow, heavy capitals: a screen's one name, a section, a tile. */
+  .type-display {
+    font-weight: 800;
+    font-stretch: 62%;
+    text-transform: uppercase;
+    line-height: 0.86;
+    letter-spacing: -0.01em;
+  }
+
+  /* The loud number. */
+  .type-numeral {
+    font-weight: 800;
+    font-stretch: 62%;
+    line-height: 0.86;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* What a thing is, above the thing. */
+  .label-caps {
+    font-size: 0.625rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* Student numbers, times, hashes, codes. */
+  .ref {
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+
+  /* A ruled sheet with the red margin line. Put --margin on the element. */
+  .ledger {
+    position: relative;
+    background: var(--color-sheet);
+  }
+  .ledger::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--margin, 52px);
+    width: 2px;
+    background: var(--color-red-pen);
+  }
+}
+
+@layer base {
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+}

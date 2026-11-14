@@ -1,0 +1,42 @@
+# Acadly IQ-X — contributor rule sheet
+
+The full law is in `docs/architecture/`. Read `README.md` there first. This file is the short version.
+
+## What this is
+
+Multi-tenant education platform (ECD, primary, secondary, tertiary). Laravel API-only modular monolith in `api/`. React + TypeScript SPA workspace in `web/`. PostgreSQL. UUIDv7 keys. No Filament, no Livewire, no Inertia.
+
+## Rules you must not break
+
+1. **Layers:** Modules → Core → Kernel. Never the other way. Kernel names no module and no education level.
+2. **Sealed modules:** import another module only through its `Contracts/`. No cross-module Eloquent relations.
+3. **Actions are the only writers.** Controllers, jobs and listeners call Actions. No business logic in model events.
+4. **Never branch on education level or profile.** Declare a binding slot in the module and bind it in the Profile Blueprint.
+5. **Multi-state processes are Journeys.** State changes only through `JourneyEngine::perform()`. Gates are facts, not permissions. Outcomes are named, not boolean.
+6. **Released blueprint versions are immutable.** Make a new version.
+7. **Every tenant table uses `$table->tenantOwned()`** (tenant column, composite keys, RLS). Scope is resolved on the server.
+8. **All access goes through `Access::check()`** with a permission enum case. No string permissions. No role-name checks.
+9. **History is append-only.** Corrections are new rows.
+10. **Notifications:** `Notifier::send(new Topic(...))`. Never pass recipients or channels at the call site.
+11. **External I/O after commit**, on the queue, idempotent.
+12. **Frontend:** generated API client only. Check permissions, modules and bindings — never roles, levels or state literals. No string literals for user-facing text. Semantic tokens only.
+
+## Design
+
+- `PRODUCT.md` says who the product is for and how it speaks. `DESIGN.md` is the visual law ("The Register Book"). Read both before any UI work.
+- Radius 0. No shadows. Two rule weights. Teal means done, marigold means look here, red means absent, blocked or wrong. A state always has a mark or a word as well as a colour.
+- A new screen is designed on the design canvas and approved before it is coded.
+
+## Before opening a pull request
+
+```
+cd api && php artisan acadly:lint && vendor/bin/pint --test && vendor/bin/phpstan && php artisan test
+cd web && pnpm lint && pnpm typecheck && pnpm test
+```
+
+## When unsure
+
+- New capability → is it a new module, or a binding on an existing one? See `01-foundations.md` §7 and `02-blueprints.md` §2.4.
+- New process → is it a Journey? See `02-blueprints.md` §3.
+- New table → `05-data-and-api.md` §2.
+- An architectural choice → add a row to `docs/architecture/DECISIONS.md` in the same pull request.

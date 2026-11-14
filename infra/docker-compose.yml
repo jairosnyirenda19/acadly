@@ -1,0 +1,52 @@
+# Local services for development. Start with:
+#   docker compose -f infra/docker-compose.yml up -d
+#
+# The API and the web apps run on the host (php artisan serve, pnpm dev).
+# Passwords here are for a developer's own machine only.
+name: acadly
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: acadly
+      POSTGRES_USER: acadly
+      POSTGRES_PASSWORD: acadly-local
+    ports:
+      - '54329:5432'
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U acadly -d acadly']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7
+    ports:
+      - '63799:6379'
+
+  # S3-compatible private storage for library files and documents.
+  minio:
+    image: minio/minio
+    command: server /data --console-address ':9001'
+    environment:
+      MINIO_ROOT_USER: acadly
+      MINIO_ROOT_PASSWORD: acadly-local
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio:/data
+
+  # Catches every mail the API sends. Read it at http://localhost:8025
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
+volumes:
+  postgres:
+  minio:

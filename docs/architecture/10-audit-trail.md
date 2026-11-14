@@ -44,7 +44,7 @@
 | Where | `tenant_id`, `institution_id`, `division_id`, `campus_id` |
 | What | `module`, `action` (enum value), `outcome` (`done` / `failed` / `refused`), `refusal` (which check refused: permission, scope, module, gate + gate name) |
 | Who | `actor_user_id` (no FK), `actor_kind` (`user`, `system`, `support`, `integration`), `actor_label`, `actor_roles` (snapshot), `acting_for_user_id`, `support_grant_id` |
-| How | `session_id`, `request_id`, `device_id`, `ip`, `user_agent`, `channel` (`console`, `portal`, `api`, `job`) |
+| How | `session_id`, `request_id`, `device_id`, `ip`, `user_agent`, `channel` (`console`, `portal`, `app.backend`, `job`) |
 | On what | `subject_type`, `subject_id`, `subject_label`; **`learner_id`** when the event concerns one learner |
 | Detail | `changes` (plain fields), `payload_id` (encrypted personal fields), `reason`, `journey_ref`, `journey_step`, `journey_outcome`, `meta` |
 

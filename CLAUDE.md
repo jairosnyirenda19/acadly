@@ -4,7 +4,7 @@ The full law is in `docs/architecture/`. Read `README.md` there first. This file
 
 ## What this is
 
-Multi-tenant education platform (ECD, primary, secondary, tertiary). Laravel API-only modular monolith in `api/`. React + TypeScript SPA workspace in `web/`. PostgreSQL. UUIDv7 keys. No Filament, no Livewire, no Inertia.
+Multi-tenant education platform (ECD, primary, secondary, tertiary). Laravel API-only modular monolith in `app.backend/`. React + TypeScript SPA workspace in `app.frontend/`. PostgreSQL. UUIDv7 keys. No Filament, no Livewire, no Inertia.
 
 ## Rules you must not break
 
@@ -26,12 +26,14 @@ Multi-tenant education platform (ECD, primary, secondary, tertiary). Laravel API
 - `PRODUCT.md` says who the product is for and how it speaks. `DESIGN.md` is the visual law ("The Register Book"). Read both before any UI work.
 - Radius 0. No shadows. Two rule weights. Teal means done, marigold means look here, red means absent, blocked or wrong. A state always has a mark or a word as well as a colour.
 - A new screen is designed on the design canvas and approved before it is coded.
+- **Wording:** professional, clean terms on serious matters (status, security, access, audit, results, attendance, safeguarding, errors). No conversational phrasing. See `PRODUCT.md`, Brand Commitments.
+- **Disclose nothing about the build:** no framework, language, server, file path, module list, release identifier or developer command in any screen, response, header or error message.
 
 ## Before opening a pull request
 
 ```
-cd api && php artisan acadly:lint && vendor/bin/pint --test && vendor/bin/phpstan && php artisan test
-cd web && pnpm lint && pnpm typecheck && pnpm test
+cd app.backend && php artisan acadly:lint && vendor/bin/pint --test && vendor/bin/phpstan && php artisan test
+cd app.frontend && pnpm lint && pnpm typecheck && pnpm test
 ```
 
 ## When unsure

@@ -42,7 +42,7 @@ A Profile is **shape**. A Journey is **motion**. A Profile points at the Journey
 ### 2.2 Example
 
 ```php
-// api/blueprints/profiles/Secondary/V2027_1.php
+// app.backend/blueprints/profiles/Secondary/V2027_1.php
 return ProfileBlueprint::make('SECONDARY@2027.1')
     ->title('Secondary school')
     ->extends('SCHOOL_BASE@2027.1')
@@ -115,7 +115,7 @@ $mode = $profile->binding(AttendanceSlot::Mode);          // an AttendanceMode
 $strategy = $this->sessions->for($mode);                  // DailySessions | SubjectSessions | CourseSessions
 ```
 
-**The rule:** code switches on a binding value from its own module's vocabulary. Code never switches on the education level. *Ask the blueprint what. Never ask the level who.* An architecture test fails the build if `ProfileKey` or a profile name appears outside `api/blueprints/`.
+**The rule:** code switches on a binding value from its own module's vocabulary. Code never switches on the education level. *Ask the blueprint what. Never ask the level who.* An architecture test fails the build if `ProfileKey` or a profile name appears outside `app.backend/blueprints/`.
 
 ### 2.5 Customer configuration is not a blueprint
 
@@ -162,7 +162,7 @@ Every step answers them in this order. They are never fused.
 ### 3.3 Example
 
 ```php
-// api/modules/Admissions/Journeys/School/V2027_1.php
+// app.backend/modules/Admissions/Journeys/School/V2027_1.php
 use Acadly\Modules\Admissions\Journeys\School\{State as St, StepId as S, OutcomeId as O};
 
 return JourneyBlueprint::make('admission.school@2027.1')

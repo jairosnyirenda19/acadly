@@ -191,7 +191,7 @@ Studied in `e-office-iq-x` (`app.backend/app/Core/Auth/PermissionsCatalog.php`, 
 
 **The interface**
 
-14. **The SPA gates on `can(code)` only.** A search of `web/` for a role-name comparison must return nothing; CI runs it.
+14. **The SPA gates on `can(code)` only.** A search of `app.frontend/` for a role-name comparison must return nothing; CI runs it.
 15. **A refusal says it is a refusal.** A screen the user may not open says so in words. It never shows a loading state for ever.
 16. **The roles screen is a matrix:** permissions down the side, grouped by module, each with its name, its sentence and its code; roles across the top, each with its holder count and how much of the matrix it covers; frozen row and column heads; a padlock on system roles. Every code must have a translated name, or `acadly:lint` fails (eOffice shipped nineteen codes that printed raw).
 

@@ -27,13 +27,13 @@ This folder is the law of the codebase. If code and these documents disagree, on
 ## The system on one page
 
 ```
-┌──────────────────────────── web/ (React + TypeScript) ────────────────────────────┐
+┌──────────────────────────── app.frontend/ (React + TypeScript) ────────────────────────────┐
 │  apps/console (staff)     apps/portal (guardian, learner)     apps/platform (IQ-X) │
 │  packages/ui (design system) · packages/api-client (generated) · packages/kernel   │
 └───────────────────────────────────────┬───────────────────────────────────────────┘
                                         │  /api/v1  (OpenAPI is the contract)
 ┌───────────────────────────────────────┴───────────────────────────────────────────┐
-│ api/ (Laravel, modular monolith)                                                    │
+│ app.backend/ (Laravel, modular monolith)                                                    │
 │                                                                                     │
 │  MODULES   Admissions · Attendance · Assessment · Library · SafeRelease · …         │
 │            optional, enabled per division, talk through Contracts + events          │

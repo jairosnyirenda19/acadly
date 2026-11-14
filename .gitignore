@@ -13,4 +13,4 @@ Thumbs.db
 .claude/skills/impeccable/scripts/bin/
 
 # PHPStan cache.
-api/storage/framework/phpstan/
+app.backend/storage/framework/phpstan/

@@ -1,6 +1,6 @@
 # 04 — Notification catalogue
 
-**Lineage:** the Notice Catalogue in `mnr-forestry-me` (`web/app/Support/Notifications/`: `NoticeCatalogue`, `Notice`, `Wordings`, `TopicSync`, `NotificationDispatcher`) and its earlier form in MCRS. Acadly keeps that design and hardens it.
+**Lineage:** the Notice Catalogue in `mnr-forestry-me` (`app.frontend/app/Support/Notifications/`: `NoticeCatalogue`, `Notice`, `Wordings`, `TopicSync`, `NotificationDispatcher`) and its earlier form in MCRS. Acadly keeps that design and hardens it.
 
 ## 1. What is kept from the Forestry catalogue
 
@@ -36,7 +36,7 @@
 ## 3. A notice
 
 ```php
-// api/modules/Attendance/Notifications/LearnerMarkedAbsent.php
+// app.backend/modules/Attendance/Notifications/LearnerMarkedAbsent.php
 final class LearnerMarkedAbsent implements Topic
 {
     public function __construct(

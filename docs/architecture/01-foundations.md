@@ -23,7 +23,7 @@ One repository. Two deployables. One contract between them.
 
 ```
 acadly-iq-x/
-├── api/                          Laravel application (API only)
+├── app.backend/                          Laravel application (API only)
 │   ├── app/                      Thin shell: bootstrap, providers, HTTP kernel. No business logic
 │   ├── kernel/                   Namespace Acadly\Kernel\…   (shared machinery)
 │   ├── core/                     Namespace Acadly\Core\…     (always-on domains)
@@ -31,7 +31,7 @@ acadly-iq-x/
 │   ├── blueprints/               Declarations: profiles/ and lock file (see 02)
 │   ├── tests/                    Architecture, isolation and cross-module tests
 │   └── …
-├── web/                          pnpm workspace (see 06)
+├── app.frontend/                          pnpm workspace (see 06)
 │   ├── apps/console · apps/portal · apps/platform
 │   └── packages/ui · packages/api-client · packages/kernel
 ├── contracts/

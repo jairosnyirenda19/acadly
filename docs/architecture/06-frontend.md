@@ -5,7 +5,7 @@ React, TypeScript, no admin framework. The design is ours to shape. The structur
 ## 1. Workspace
 
 ```
-web/                                pnpm workspace
+app.frontend/                                pnpm workspace
 ├── apps/
 │   ├── console/                    Staff: admins, officers, teachers, librarians. Desktop-first, works on tablet
 │   ├── portal/                     Guardians and learners. Mobile-first, small bundle, PWA
@@ -49,7 +49,7 @@ apps/console/src/
     ├── attendance/
     │   ├── routes/           Route components (thin)
     │   ├── components/       Module-private components
-    │   ├── api/              Query and mutation hooks built on api-client
+    │   ├── app.backend/              Query and mutation hooks built on api-client
     │   ├── model/            Types, zod schemas, pure helpers
     │   └── index.ts          The module's public surface: its route tree and nav contribution
     ├── admissions/ …

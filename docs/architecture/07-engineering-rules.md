@@ -12,7 +12,7 @@ Short, numbered, enforceable. Each rule names the check that guards it. A rule w
 | A4 | Module dependencies are declared in the manifest and form an acyclic graph | `acadly:lint` |
 | A5 | No Eloquent relation crosses a module boundary | Architecture test |
 | A6 | Every module has the standard folder shape | `acadly:lint` |
-| A7 | `api/app/` holds bootstrap only. No business logic | Architecture test |
+| A7 | `app.backend/app/` holds bootstrap only. No business logic | Architecture test |
 
 ## B. Writing behaviour
 
@@ -31,7 +31,7 @@ Short, numbered, enforceable. Each rule names the check that guards it. A rule w
 
 | # | Rule | Guard |
 |---|---|---|
-| C1 | No code branches on education level or profile key. Use a binding | Architecture test (`ProfileKey` usable only under `api/blueprints/`) |
+| C1 | No code branches on education level or profile key. Use a binding | Architecture test (`ProfileKey` usable only under `app.backend/blueprints/`) |
 | C2 | A multi-state process with rules is a Journey. Its state changes only through `JourneyEngine::perform()` | Database trigger on state columns + architecture test |
 | C3 | Gates are pure and return a reason and a remedy | Conformance suite |
 | C4 | Effects are idempotent and declare their boundary | Conformance suite |
@@ -92,6 +92,16 @@ Short, numbered, enforceable. Each rule names the check that guards it. A rule w
 | S7 | Every Action declares its audit action or `#[NotAudited('why')]` | Architecture test |
 | S8 | A state change and its audit line are written in one transaction | Conformance test |
 | S9 | Audit lines are never updated or deleted | Database trigger and role privileges; `audit:verify` in CI on the test database |
+
+## P. Disclosure and wording
+
+| # | Rule | Guard |
+|---|---|---|
+| P1 | The public health endpoint returns `{"status":"ok"}` and nothing else | Feature test (exact JSON) |
+| P2 | No response discloses the framework, language or server: no default pages, no `X-Powered-By`, every error is JSON | Feature test; web server configuration for the `Server` header |
+| P3 | No screen shows release identifiers, module lists, file paths or developer commands to an end user | (review) |
+| P4 | API documentation is not served outside local development | Scramble access gate; deployment check |
+| P5 | Serious matters use professional terms; no conversational phrasing | (review) against `PRODUCT.md` |
 
 ## G. API and frontend
 

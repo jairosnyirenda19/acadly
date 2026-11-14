@@ -8,7 +8,7 @@ The target of stages 0–4 is the PRD's vertical slice (§21): institution → c
 
 > **Built on 14 November 2026.** API: 13 tests, Pint, PHPStan max, `acadly:lint`, contract export. Web: generated client, type check, ESLint, 4 token tests, three app builds. Proven: a kernel file that used a module failed the layer test and the lint; a raw colour and a raw `fetch` failed ESLint. Not yet done: the first commit, a run of the CI file on GitHub, and Docker (not installed on the first developer machine; the API uses SQLite until stage 1 moves it to PostgreSQL).
 
-- Monorepo: `api/`, `web/`, `contracts/`, `infra/`, Docker Compose (PostgreSQL, Redis, object storage, mail catcher).
+- Monorepo: `app.backend/`, `app.frontend/`, `contracts/`, `infra/`, Docker Compose (PostgreSQL, Redis, object storage, mail catcher).
 - Laravel shell with the three namespaces (`Kernel`, `Core`, `Modules`) and module auto-discovery.
 - pnpm workspace with the three apps and four packages; design tokens and the first primitives.
 - CI with every gate from document 07, even while most have nothing to check.

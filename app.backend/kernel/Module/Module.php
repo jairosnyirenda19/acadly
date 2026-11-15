@@ -6,6 +6,8 @@ namespace Acadly\Kernel\Module;
 
 use Acadly\Kernel\Access\Permission;
 use Acadly\Kernel\Audit\AuditAction;
+use Acadly\Kernel\Events\DomainEvent;
+use Acadly\Kernel\Events\EventConsumer;
 
 /**
  * The manifest of one Core domain or one Module (docs/architecture/01-foundations.md §5).
@@ -41,4 +43,18 @@ interface Module
      * @return list<AuditAction>
      */
     public function auditActions(): array;
+
+    /**
+     * The domain events this module publishes. Each name starts with the module key.
+     *
+     * @return list<class-string<DomainEvent>>
+     */
+    public function events(): array;
+
+    /**
+     * The events this module reacts to, each with its consumers.
+     *
+     * @return array<class-string<DomainEvent>, list<class-string<EventConsumer>>>
+     */
+    public function subscriptions(): array;
 }

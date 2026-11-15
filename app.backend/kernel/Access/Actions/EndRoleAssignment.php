@@ -6,10 +6,12 @@ namespace Acadly\Kernel\Access\Actions;
 
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\AccessPermission;
+use Acadly\Kernel\Access\Events\RoleEnded;
 use Acadly\Kernel\Access\Role;
 use Acadly\Kernel\Access\RoleAssignment;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Audit\KernelAudit;
+use Acadly\Kernel\Events\Outbox;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +29,7 @@ final class EndRoleAssignment
         private readonly Access $access,
         private readonly Clock $clock,
         private readonly Audit $audit,
+        private readonly Outbox $outbox,
     ) {}
 
     public function handle(User $by, RoleAssignment $assignment, string $reason): void
@@ -60,6 +63,9 @@ final class EndRoleAssignment
 
             $this->audit->record(KernelAudit::RoleEnded, subject: $locked, changes: $watch->diff(), reason: $reason,
                 actor: $this->audit->actorFor($by), at: $locked->scope());
+
+            $role = Role::query()->find($locked->role_id);
+            $this->outbox->record(new RoleEnded($locked->id, $locked->user_id, $role !== null ? $role->key : '', $by->id));
         });
 
         $user = User::query()->find($assignment->user_id);

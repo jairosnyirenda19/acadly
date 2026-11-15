@@ -13,7 +13,10 @@ use Acadly\Kernel\Audit\AuditCatalogue;
 use Acadly\Kernel\Console\AuditSealCommand;
 use Acadly\Kernel\Console\AuditVerifyCommand;
 use Acadly\Kernel\Console\CreateAdministratorCommand;
+use Acadly\Kernel\Console\PublishEventsCommand;
 use Acadly\Kernel\Console\SyncCommand;
+use Acadly\Kernel\Events\EventCatalogue;
+use Acadly\Kernel\Events\Outbox;
 use Acadly\Kernel\Module\ModuleRegistry;
 use Acadly\Kernel\Support\Clock;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -43,6 +46,13 @@ final class KernelServiceProvider extends ServiceProvider
 
         $this->app->singleton(Audit::class);
 
+        $this->app->singleton(
+            EventCatalogue::class,
+            fn (Application $app): EventCatalogue => new EventCatalogue($app->make(ModuleRegistry::class)),
+        );
+
+        $this->app->singleton(Outbox::class);
+
         $this->app->bindIf(ScopeHierarchy::class, FlatScopeHierarchy::class, true);
 
         // One instance per request: it remembers the grants it has loaded.
@@ -55,6 +65,7 @@ final class KernelServiceProvider extends ServiceProvider
             __DIR__.'/Identity/Database/migrations',
             __DIR__.'/Access/Database/migrations',
             __DIR__.'/Audit/Database/migrations',
+            __DIR__.'/Events/Database/migrations',
         ]);
 
         Password::defaults(fn (): Password => Password::min(12)->max(255));
@@ -73,12 +84,15 @@ final class KernelServiceProvider extends ServiceProvider
         });
 
         if ($this->app->runningInConsole()) {
-            $this->commands([SyncCommand::class, CreateAdministratorCommand::class, AuditVerifyCommand::class, AuditSealCommand::class]);
+            $this->commands([SyncCommand::class, CreateAdministratorCommand::class, AuditVerifyCommand::class, AuditSealCommand::class, PublishEventsCommand::class]);
         }
 
         // Every night: verify the audit trail, then seal its head.
         $this->callAfterResolving(Schedule::class, function (Schedule $schedule): void {
             $schedule->command('audit:seal')->dailyAt('01:00')->withoutOverlapping()->onOneServer();
+
+            // Events are published after each commit; this catches anything a stopped worker left.
+            $schedule->command('events:publish')->everyMinute()->withoutOverlapping()->onOneServer();
         });
     }
 }

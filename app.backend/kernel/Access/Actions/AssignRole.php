@@ -6,6 +6,7 @@ namespace Acadly\Kernel\Access\Actions;
 
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\AccessPermission;
+use Acadly\Kernel\Access\Events\RoleAssigned;
 use Acadly\Kernel\Access\PermissionCatalogue;
 use Acadly\Kernel\Access\Role;
 use Acadly\Kernel\Access\RoleAssignment;
@@ -14,6 +15,7 @@ use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Audit\KernelAudit;
 use Acadly\Kernel\Audit\Outcome;
 use Acadly\Kernel\Audit\Watch;
+use Acadly\Kernel\Events\Outbox;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Carbon\CarbonImmutable;
@@ -37,6 +39,7 @@ final class AssignRole
         private readonly PermissionCatalogue $catalogue,
         private readonly Clock $clock,
         private readonly Audit $audit,
+        private readonly Outbox $outbox,
     ) {}
 
     public function handle(
@@ -83,11 +86,27 @@ final class AssignRole
             $this->audit->record(KernelAudit::RoleAssigned, subject: $assignment, changes: Watch::created($assignment)->diff(),
                 reason: $reason, actor: $this->audit->actorFor($by), at: $at, meta: ['to' => $to->id, 'role' => $role->key]);
 
+            $this->outbox->record(new RoleAssigned(
+                $assignment->id, $to->id, $role->key, $at->type->value, $at->id,
+                $this->includesSight($role), $by->id,
+            ));
+
             return $assignment;
         });
 
         $this->access->forget($to);
 
         return $assignment;
+    }
+
+    private function includesSight(Role $role): bool
+    {
+        foreach ($role->permissionKeys() as $key) {
+            if ($this->catalogue->has($key) && $this->catalogue->get($key)->isSight()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

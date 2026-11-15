@@ -38,4 +38,14 @@ final class InstitutionCore implements Module
     {
         return [];
     }
+
+    public function events(): array
+    {
+        return [];
+    }
+
+    public function subscriptions(): array
+    {
+        return [];
+    }
 }

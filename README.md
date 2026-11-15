@@ -34,6 +34,16 @@ Bring permissions and the administrator role into line with the code. Run this a
 cd app.backend && php artisan acadly:sync
 ```
 
+Run the background worker and the scheduler. Events, seals and other after-commit work need both:
+
+```bash
+cd app.backend && php artisan queue:work
+```
+
+```bash
+cd app.backend && php artisan schedule:work
+```
+
 Create the first administrator of a new deployment. It asks for a password and runs only once:
 
 ```bash

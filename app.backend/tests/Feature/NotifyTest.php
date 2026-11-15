@@ -210,6 +210,11 @@ describe('the catalogue', function (): void {
             {
                 return [$this->topic];
             }
+
+            public function documentKinds(): array
+            {
+                return [];
+            }
         };
 
         useToyBuild([$module]);

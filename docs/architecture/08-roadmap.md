@@ -26,9 +26,9 @@ The target of stages 0–4 is the PRD's vertical slice (§21): institution → c
 6. `Module`: manifest contract, registry, activation check, `/me/context`. *(Built 16 November 2026: activation check with the offering socket, signed licence, switches with history, `module:` route guard, read-only mode, `/me/context`, web context hooks. Not yet: per-division switching, navigation entries, the modules screen.)*
 7. `Blueprint`: definitions, compiler, lock file, linter, journey engine, conformance suite, projections. *(Journeys built 16 November 2026: typed declarations, canonical compiled form, lock and release, linter in `acadly:lint`, the engine with gates, capability, four eyes, idempotent internal and after-commit effects, guarded state column, step completions, events and audit lines, milestones, projections and diagrams, and a toy module with one journey that passes them all. Not yet: Profile Blueprints (stage 2, with divisions), `blueprint:diff`, `blueprint:migrate`, SLA clocks, cure windows, obligations, the HTTP endpoint for performing a step.)*
 8. `Notify`: topic contract, compiled catalogue, audiences, dispatcher, in-app + email + SMS adapters (SMS against a fake provider first), delivery ledger, sync + readiness hash. *(Built 16 November 2026: typed topics and the catalogue, the linter in `acadly:lint`, party, desk and named-people audiences, seeded desk subscriptions, preferences and opt-out, the request outbox, resolution, the delivery ledger, in-app, email and SMS through a development provider, metering and the licence allowance, the urgent fallback, `notify:sweep`, the bell endpoints, sync and the readiness probe, and `->notify()` on journey outcomes. Not yet: quiet hours, institution topic settings, school wording, translations, provider callbacks, the settings and delivery-log screens.)*
-9. `Files`: private storage, upload validation, signed access. *(Build it so that a later document management capability can sit on top: one file may link to many records, and storage must scale to many documents per learner. See "Document management" under Open in `DECISIONS.md`.)*
+9. `Files`: private storage, upload validation, signed access. *(Built 16 November 2026 as `kernel/Documents`: one documents table and one files table with one owner each, links to other records, document kinds declared by modules, encrypted storage stored once per content and streamed, the upload gate with virus scanning, the licence's storage limit with warnings, versions, trash, holds and purge, and the document endpoints. Not yet: page previews, text search, bulk scanning, retention classes, share links.)*
 
-**Exit:** a toy module with one journey and one topic passes isolation, conformance and catalogue tests. *(Met on 16 November 2026 by the test module in `tests/Fixtures/Toy`, except item 9.)*
+**Exit:** a toy module with one journey and one topic passes isolation, conformance and catalogue tests. *(Met on 16 November 2026 by the test module in `tests/Fixtures/Toy`, which also keeps documents.)*
 
 ## Stage 2 — Core domains and the first two profiles
 
@@ -43,6 +43,7 @@ The target of stages 0–4 is the PRD's vertical slice (§21): institution → c
 ## Stage 3 — Learners and families
 
 - `Enrolment`: learners, Acadly Learner ID, identifiers, enrolments, **placements** (the timeline, document 09), duplicate flags.
+- Learner photo (owner request, 16 November 2026): an optional passport-style photo shown as the learner's picture on the profile. A document kind of the Enrolment module, an image only, small, classified personal, so every view of it is governed by the learner's access rules.
 - `learner.campus_transfer` and `learner.exit` journeys. (`learner.progression` lands in stage 4, when results exist to gate it.)
 - `Admissions`: `admission.school` journey, idempotent conversion to learner and enrolment.
 - `Guardians`: relationships and the `guardian.link` journey.

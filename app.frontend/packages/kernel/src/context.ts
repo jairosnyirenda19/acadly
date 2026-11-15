@@ -13,7 +13,7 @@ export interface ScopeTarget {
 }
 
 /** Areas of the kernel itself. Always on. */
-const KERNEL_AREAS = new Set(['identity', 'access', 'audit', 'modules', 'journeys', 'notify'])
+const KERNEL_AREAS = new Set(['identity', 'access', 'audit', 'modules', 'journeys', 'notify', 'documents'])
 
 /** The context for the signed-in account, or null when there is none or it cannot be read. */
 export async function getContext(): Promise<AppContext | null> {

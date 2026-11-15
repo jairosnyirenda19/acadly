@@ -59,4 +59,9 @@ final class BadPrefixModule implements Module
     {
         return [];
     }
+
+    public function documentKinds(): array
+    {
+        return [];
+    }
 }

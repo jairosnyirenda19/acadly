@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Acadly\Kernel\Access;
 
+use Acadly\Kernel\Documents\DocumentPermission;
 use Acadly\Kernel\Module\ModulePermission;
 use Acadly\Kernel\Module\ModuleRegistry;
 use Acadly\Kernel\Notify\NotifyPermission;
@@ -32,6 +33,7 @@ final class PermissionCatalogue
         $this->addAll(self::KERNEL_OWNER, AccessPermission::cases());
         $this->addAll('modules', ModulePermission::cases());
         $this->addAll('notify', NotifyPermission::cases());
+        $this->addAll('documents', DocumentPermission::cases());
 
         foreach ($modules->all() as $module) {
             $this->addAll($module->key(), $module->permissions());

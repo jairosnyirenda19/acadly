@@ -64,4 +64,9 @@ final class AttendanceModule implements Module
     {
         return [];
     }
+
+    public function documentKinds(): array
+    {
+        return [];
+    }
 }

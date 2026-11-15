@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Acadly\Kernel\Documents\Http\DocumentsController;
 use Acadly\Kernel\Http\HealthController;
 use Acadly\Kernel\Http\ReadinessController;
 use Acadly\Kernel\Http\SchoolController;
@@ -30,6 +31,13 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/me/context', ContextController::class)->name('me.context');
     Route::get('/me/notifications', [NotificationsController::class, 'index'])->name('me.notifications');
     Route::post('/me/notifications/{id}/read', [NotificationsController::class, 'read'])->whereUuid('id')->name('me.notifications.read');
+
+    Route::post('/documents', [DocumentsController::class, 'store'])->name('documents.store');
+    Route::get('/documents/{id}', [DocumentsController::class, 'show'])->whereUuid('id')->name('documents.show');
+    Route::get('/documents/{id}/content', [DocumentsController::class, 'content'])->whereUuid('id')->name('documents.content');
+    Route::post('/documents/{id}/versions', [DocumentsController::class, 'addVersion'])->whereUuid('id')->name('documents.versions.store');
+    Route::delete('/documents/{id}', [DocumentsController::class, 'trash'])->whereUuid('id')->name('documents.trash');
+    Route::post('/documents/trash/{batch}/restore', [DocumentsController::class, 'restore'])->whereUuid('batch')->name('documents.restore');
     Route::get('/modules', [ModulesController::class, 'index'])->name('modules.index');
     Route::put('/modules/{key}', [ModulesController::class, 'update'])->where('key', '[a-z][a-z0-9_]*')->name('modules.update');
 });

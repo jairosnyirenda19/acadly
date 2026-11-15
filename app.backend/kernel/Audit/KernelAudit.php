@@ -23,6 +23,18 @@ enum KernelAudit: string implements AuditAction
     case Subscribed = 'notify.subscribed';
     case Unsubscribed = 'notify.unsubscribed';
     case PreferenceChanged = 'notify.preference_changed';
+    case DocumentStored = 'documents.stored';
+    case VersionAdded = 'documents.version_added';
+    case VersionRestored = 'documents.version_restored';
+    case DocumentLinked = 'documents.linked';
+    case DocumentUnlinked = 'documents.unlinked';
+    case DocumentTrashed = 'documents.trashed';
+    case DocumentRestored = 'documents.restored';
+    case DocumentPurged = 'documents.purged';
+    case DocumentHeld = 'documents.held';
+    case HoldReleased = 'documents.hold_released';
+    case DocumentRead = 'documents.read';
+    case UploadRefused = 'documents.upload_refused';
     case Sealed = 'audit.sealed';
     case ChainBroken = 'audit.chain_broken';
 
@@ -50,6 +62,18 @@ enum KernelAudit: string implements AuditAction
             self::Subscribed => 'Subscribed to a notice.',
             self::Unsubscribed => 'Ended a subscription to a notice.',
             self::PreferenceChanged => 'Changed how a notice is received.',
+            self::DocumentStored => 'Added a document.',
+            self::VersionAdded => 'Added a new version of a document.',
+            self::VersionRestored => 'Restored an earlier version of a document.',
+            self::DocumentLinked => 'Linked a document to a record.',
+            self::DocumentUnlinked => 'Removed the link between a document and a record.',
+            self::DocumentTrashed => 'Moved a document to the trash.',
+            self::DocumentRestored => 'Restored a document from the trash.',
+            self::DocumentPurged => 'Emptied a document from the trash.',
+            self::DocumentHeld => 'Placed a hold on a document.',
+            self::HoldReleased => 'Released the hold on a document.',
+            self::DocumentRead => 'Opened a document.',
+            self::UploadRefused => 'Attempted to upload a file that was refused.',
             self::Sealed => 'Sealed the audit trail.',
             self::ChainBroken => 'Found that the audit trail does not verify.',
         };
@@ -57,6 +81,6 @@ enum KernelAudit: string implements AuditAction
 
     public function requiresReason(): bool
     {
-        return in_array($this, [self::RoleEnded, self::ModuleSwitched], true);
+        return in_array($this, [self::RoleEnded, self::ModuleSwitched, self::DocumentTrashed, self::DocumentHeld, self::HoldReleased], true);
     }
 }

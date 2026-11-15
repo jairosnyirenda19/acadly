@@ -30,6 +30,15 @@ return [
 
     'disks' => [
 
+        // Encrypted document bytes. Never served directly: the API decrypts and streams them.
+        'documents' => [
+            'driver' => 'local',
+            'root' => storage_path('app/documents'),
+            'serve' => false,
+            'throw' => true,
+            'report' => false,
+        ],
+
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),

@@ -217,6 +217,11 @@ it('refuses a subscription to an event that is not in the build', function (): v
         {
             return [];
         }
+
+        public function documentKinds(): array
+        {
+            return [];
+        }
     };
 
     new EventCatalogue(new ModuleRegistry([new InstitutionCore, $module]));

@@ -9,6 +9,7 @@ use Acadly\Kernel\Module\Tier;
 use Tests\Fixtures\Toy\Contracts\ErrandApproved;
 use Tests\Fixtures\Toy\Contracts\ErrandCompleted;
 use Tests\Fixtures\Toy\Contracts\ErrandEscalated;
+use Tests\Fixtures\Toy\Contracts\ToyDocument;
 use Tests\Fixtures\Toy\Contracts\ToyPermission;
 
 /** A toy module with one journey and one topic, for the engine, conformance and catalogue tests (08, stage 1 exit). */
@@ -62,5 +63,10 @@ final class ToyModule implements Module
     public function topics(): array
     {
         return [ErrandApproved::class, ErrandEscalated::class];
+    }
+
+    public function documentKinds(): array
+    {
+        return ToyDocument::cases();
     }
 }

@@ -6,6 +6,7 @@ namespace Acadly\Kernel\Module;
 
 use Acadly\Kernel\Access\Permission;
 use Acadly\Kernel\Audit\AuditAction;
+use Acadly\Kernel\Documents\DocumentKind;
 use Acadly\Kernel\Events\DomainEvent;
 use Acadly\Kernel\Events\EventConsumer;
 use Acadly\Kernel\Notify\Topic;
@@ -77,4 +78,13 @@ interface Module
      * @return list<class-string<Topic>>
      */
     public function topics(): array;
+
+    /**
+     * The kinds of document this module keeps. Each key starts with the
+     * module key. The kernel stores them; the module never makes its own
+     * document or file tables.
+     *
+     * @return list<DocumentKind>
+     */
+    public function documentKinds(): array;
 }

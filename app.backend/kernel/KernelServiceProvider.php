@@ -27,6 +27,16 @@ use Acadly\Kernel\Console\CreateAdministratorCommand;
 use Acadly\Kernel\Console\InstallLicenceCommand;
 use Acadly\Kernel\Console\PublishEventsCommand;
 use Acadly\Kernel\Console\SyncCommand;
+use Acadly\Kernel\Documents\Console\DocumentsPurgeCommand;
+use Acadly\Kernel\Documents\Console\DocumentsStorageCommand;
+use Acadly\Kernel\Documents\DocumentAccess;
+use Acadly\Kernel\Documents\DocumentCatalogue;
+use Acadly\Kernel\Documents\DocumentReader;
+use Acadly\Kernel\Documents\Scanning\ClamavScanner;
+use Acadly\Kernel\Documents\Scanning\MissingScanner;
+use Acadly\Kernel\Documents\Scanning\NoScanner;
+use Acadly\Kernel\Documents\Scanning\VirusScanner;
+use Acadly\Kernel\Documents\Storage\StorageMeter;
 use Acadly\Kernel\Events\EventCatalogue;
 use Acadly\Kernel\Events\Outbox;
 use Acadly\Kernel\Module\Http\RequireModule;
@@ -55,7 +65,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
-/** Identity, access, audit, events, modules, blueprints and notices: the kernel services every module relies on. */
+/** Identity, access, audit, events, modules, blueprints, notices and documents: the kernel services every module relies on. */
 final class KernelServiceProvider extends ServiceProvider
 {
     public function register(): void
@@ -129,6 +139,25 @@ final class KernelServiceProvider extends ServiceProvider
             ]),
         );
         $this->app->scoped(NoticeDispatcher::class);
+
+        // Documents: one table, one owner each. Scanning is clamd when set up, off only on purpose.
+        $this->app->singleton(
+            DocumentCatalogue::class,
+            fn (Application $app): DocumentCatalogue => new DocumentCatalogue($app->make(ModuleRegistry::class)),
+        );
+        $this->app->bindIf(VirusScanner::class, function (Application $app): VirusScanner {
+            $scan = config('acadly.documents.scan');
+
+            return match (true) {
+                $scan === 'clamav' => new ClamavScanner(config()->string('acadly.documents.clamav.host'),
+                    config()->integer('acadly.documents.clamav.port'), config()->integer('acadly.documents.clamav.timeout')),
+                $scan === 'off' && $app->environment(['local', 'testing']) => new NoScanner,
+                default => new MissingScanner,
+            };
+        });
+        $this->app->scoped(DocumentAccess::class);
+        $this->app->scoped(DocumentReader::class);
+        $this->app->scoped(StorageMeter::class);
     }
 
     public function boot(): void
@@ -141,6 +170,7 @@ final class KernelServiceProvider extends ServiceProvider
             __DIR__.'/Module/Database/migrations',
             __DIR__.'/Blueprint/Database/migrations',
             __DIR__.'/Notify/Database/migrations',
+            __DIR__.'/Documents/Database/migrations',
         ]);
 
         $this->app->make('router')->aliasMiddleware('module', RequireModule::class);
@@ -163,7 +193,7 @@ final class KernelServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([SyncCommand::class, CreateAdministratorCommand::class, AuditVerifyCommand::class, AuditSealCommand::class, PublishEventsCommand::class, InstallLicenceCommand::class,
                 BlueprintCompileCommand::class, BlueprintLintCommand::class, BlueprintReleaseCommand::class, BlueprintDiagramCommand::class,
-                NotifySweepCommand::class]);
+                NotifySweepCommand::class, DocumentsPurgeCommand::class, DocumentsStorageCommand::class]);
         }
 
         // Every night: verify the audit trail, then seal its head.
@@ -175,6 +205,10 @@ final class KernelServiceProvider extends ServiceProvider
 
             // Notices a stopped worker left unresolved, and deliveries waiting too long.
             $schedule->command('notify:sweep')->everyMinute()->withoutOverlapping()->onOneServer();
+
+            // Empty the document trash past its period; measure storage against the licence.
+            $schedule->command('documents:purge')->dailyAt('02:00')->withoutOverlapping()->onOneServer();
+            $schedule->command('documents:storage')->hourly()->withoutOverlapping()->onOneServer();
         });
     }
 }

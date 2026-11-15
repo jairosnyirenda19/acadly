@@ -63,4 +63,9 @@ final class InstitutionCore implements Module
     {
         return [];
     }
+
+    public function documentKinds(): array
+    {
+        return [];
+    }
 }

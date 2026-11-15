@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Acadly\Kernel\Console;
 
+use Acadly\Kernel\Access\PermissionCatalogue;
 use Acadly\Kernel\Blueprint\BlueprintCompiler;
+use Acadly\Kernel\Documents\DocumentCatalogue;
 use Acadly\Kernel\Module\ModuleRegistry;
 use Acadly\Kernel\Notify\NoticeLinter;
 use Illuminate\Console\Command;
@@ -15,7 +17,8 @@ use Throwable;
  * The one command that runs every structural check
  * (docs/architecture/07-engineering-rules.md). It grows with each stage;
  * it checks the module graph, strict types, that the kernel names no
- * domain and no education level, the blueprints and the notices.
+ * domain and no education level, the blueprints, the notices and the
+ * document kinds.
  */
 final class LintCommand extends Command
 {
@@ -37,6 +40,7 @@ final class LintCommand extends Command
             ...$this->kernelNamesNoDomain(),
             ...$this->blueprints(),
             ...$this->notices(),
+            ...$this->documentKinds(),
         ];
 
         if ($problems === []) {
@@ -91,6 +95,18 @@ final class LintCommand extends Command
         }
 
         return array_map(fn (string $problem): string => 'Notices: '.$problem, $problems);
+    }
+
+    /** @return list<string> */
+    private function documentKinds(): array
+    {
+        try {
+            $problems = app(DocumentCatalogue::class)->problems(app(PermissionCatalogue::class));
+        } catch (Throwable $e) {
+            return ['Documents: '.$e->getMessage()];
+        }
+
+        return array_map(fn (string $problem): string => 'Documents: '.$problem, $problems);
     }
 
     /** @return list<string> */

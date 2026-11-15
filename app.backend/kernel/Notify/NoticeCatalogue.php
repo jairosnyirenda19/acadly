@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acadly\Kernel\Notify;
 
 use Acadly\Kernel\Blueprint\Canonical;
+use Acadly\Kernel\Documents\Topics\StorageFilling;
 use Acadly\Kernel\Module\ModuleRegistry;
 use Acadly\Kernel\Notify\Topics\DeliveriesWaiting;
 use LogicException;
@@ -20,10 +21,8 @@ use LogicException;
  */
 final class NoticeCatalogue
 {
-    public const string KERNEL_OWNER = 'notify';
-
-    /** @var list<class-string<Topic>> */
-    public const array KERNEL_TOPICS = [DeliveriesWaiting::class];
+    /** @var array<class-string<Topic>, string> the kernel's own topics, with the area that owns each */
+    public const array KERNEL_TOPICS = [DeliveriesWaiting::class => 'notify', StorageFilling::class => 'documents'];
 
     /** @var array<string, class-string<Topic>> */
     private array $topics = [];
@@ -36,8 +35,8 @@ final class NoticeCatalogue
 
     public function __construct(ModuleRegistry $modules)
     {
-        foreach (self::KERNEL_TOPICS as $topic) {
-            $this->add(self::KERNEL_OWNER, $topic);
+        foreach (self::KERNEL_TOPICS as $topic => $owner) {
+            $this->add($owner, $topic);
         }
 
         foreach ($modules->all() as $module) {

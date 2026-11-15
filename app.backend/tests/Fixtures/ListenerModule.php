@@ -60,4 +60,9 @@ final class ListenerModule implements Module
     {
         return [];
     }
+
+    public function documentKinds(): array
+    {
+        return [];
+    }
 }

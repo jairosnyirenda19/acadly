@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use Acadly\Kernel\Identity\User;
 
 return [
 

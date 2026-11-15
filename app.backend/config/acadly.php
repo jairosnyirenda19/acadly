@@ -7,7 +7,12 @@ use Acadly\Modules\Attendance\AttendanceModule;
 
 return [
 
-    'version' => env('ACADLY_VERSION', '0.0.0-stage0'),
+    'version' => env('ACADLY_VERSION', '0.0.0-stage1'),
+
+    /*
+    | Where people use the console. Password reset links point here.
+    */
+    'frontend_url' => env('ACADLY_FRONTEND_URL', 'http://localhost:5173'),
 
     /*
     | Every Core domain and every Module in this build, by manifest class.

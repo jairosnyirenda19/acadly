@@ -101,6 +101,9 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
+            // The application writes every time in UTC. The session must read
+            // and write in UTC too, or a timestamp moves by the server's offset.
+            'timezone' => 'UTC',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
@@ -119,6 +122,9 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
+            // The application writes every time in UTC. The session must read
+            // and write in UTC too, or a timestamp moves by the server's offset.
+            'timezone' => 'UTC',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 

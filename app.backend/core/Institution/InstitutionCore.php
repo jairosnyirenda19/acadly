@@ -28,4 +28,9 @@ final class InstitutionCore implements Module
     {
         return [];
     }
+
+    public function permissions(): array
+    {
+        return [];
+    }
 }

@@ -14,6 +14,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(RemoveServerSignature::class);
+
+        // The web apps sign in with a session cookie (Sanctum, stateful).
+        $middleware->statefulApi();
+
+        // An API has no sign-in page: a guest gets 401, never a redirect.
+        $middleware->redirectGuestsTo(fn (): ?string => null);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Every error is a problem document. It never discloses internals.

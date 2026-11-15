@@ -28,6 +28,18 @@ PostgreSQL holds two roles: `acadly_owner` runs migrations and `acadly_app` runs
 cd app.backend && composer migrate
 ```
 
+Bring permissions and the administrator role into line with the code. Run this after every deploy:
+
+```bash
+cd app.backend && php artisan acadly:sync
+```
+
+Create the first administrator of a new deployment. It asks for a password and runs only once:
+
+```bash
+cd app.backend && php artisan acadly:administrator head@example.org --name="Full Name"
+```
+
 Laravel Herd serves the API at https://api.acadly-iq-x.test. Set it up once:
 
 ```bash

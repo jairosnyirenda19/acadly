@@ -80,6 +80,11 @@ it('refuses a core domain that requires an optional module', function (): void {
         {
             return [AttendanceModule::class];
         }
+
+        public function permissions(): array
+        {
+            return [];
+        }
     };
 
     new ModuleRegistry([new InstitutionCore, new AttendanceModule, $core]);

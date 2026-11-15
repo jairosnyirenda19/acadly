@@ -20,8 +20,8 @@ The target of stages 0–4 is the PRD's vertical slice (§21): institution → c
 
 1. `Support`: Ids (UUIDv7), Clock, Money, idempotency keys.
 2. `Database` and `Scope`: owner and application roles, `AppendOnly::protect()`, the Scope value object, the cross-scope test generator. *(Roles and append-only protection: built 14 November 2026.)*
-3. `Identity`: users, sessions, password reset, MFA, `IdentityProvider` socket.
-4. `Access`: permission catalogue sync, roles, scoped assignments, `Access::check()`, entitlements, support grants.
+3. `Identity`: users, sessions, password reset, MFA, `IdentityProvider` socket. *(Built 15 November 2026: accounts, sign-in, sign-out, password reset, `/me`. Not yet: two-step sign-in, the `IdentityProvider` socket, the sign-in screens.)*
+4. `Access`: permission catalogue sync, roles, scoped assignments, `Access::check()`, entitlements, support grants. *(Built 15 November 2026: catalogue, sync, roles, scoped assignments with periods, `Access::check()`, assignment guard rails, first-administrator command. Not yet: record-level rules, the licence, support grants, audit of access changes.)*
 5. `Audit` and `Events` (outbox, idempotent consumers).
 6. `Module`: manifest contract, registry, activation check, `/me/context`.
 7. `Blueprint`: definitions, compiler, lock file, linter, journey engine, conformance suite, projections.

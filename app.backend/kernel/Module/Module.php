@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Acadly\Kernel\Module;
 
+use Acadly\Kernel\Access\Permission;
+
 /**
  * The manifest of one Core domain or one Module (docs/architecture/01-foundations.md §5).
  *
@@ -24,4 +26,11 @@ interface Module
      * @return list<class-string<Module>>
      */
     public function requires(): array;
+
+    /**
+     * The permissions this module declares. Each key starts with the module key.
+     *
+     * @return list<Permission>
+     */
+    public function permissions(): array;
 }

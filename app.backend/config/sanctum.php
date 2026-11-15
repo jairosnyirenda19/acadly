@@ -20,7 +20,7 @@ return [
 
     'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
         '%s%s',
-        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
+        'localhost,localhost:3000,localhost:5173,localhost:5174,127.0.0.1,127.0.0.1:8000,::1',
         Sanctum::currentApplicationUrlWithPort(),
         // Sanctum::currentRequestHost(),
     ))),
@@ -38,6 +38,12 @@ return [
     */
 
     'guard' => ['web'],
+
+    /*
+    | The CSRF cookie route sits under the API, at /api/v1/auth/csrf-cookie,
+    | so the web apps reach it through the same path as every other call.
+    */
+    'prefix' => 'api/v1/auth',
 
     /*
     |--------------------------------------------------------------------------

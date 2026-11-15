@@ -43,6 +43,12 @@ const RECORD_ROUTES = [
     'documents.restore' => 'DocumentsTest: trashes with a reason, restores a batch together',
 ];
 
+/**
+ * Lists that answer every viewer with only what is inside the viewer's reach.
+ * For these the test checks that nothing of campus B is in the answer.
+ */
+const LIST_ROUTES = ['people.index'];
+
 uses(DatabaseTransactions::class);
 
 /** @return list<Route> */
@@ -75,7 +81,18 @@ it('refuses every place-bound route to an account that holds everything, but onl
     RoleAssignment::query()->create(['user_id' => $user->id, 'role_id' => $everything->id, 'scope_type' => ScopeType::Campus,
         'scope_id' => $school->id('campus_a'), 'starts_at' => now()->subMinute()]);
 
-    // Values that point at campus B, for route parameters and request bodies alike.
+    // A member of staff at campus B, with a role there.
+    $clerk = Role::query()->create(['key' => 'clerk_b', 'name' => 'Clerk']);
+    $atB = User::factory()->create(['name' => 'Chimwemwe Blantyre', 'email' => 'chimwemwe.b@example.test']);
+    $heldAtB = RoleAssignment::query()->create(['user_id' => $atB->id, 'role_id' => $clerk->id, 'scope_type' => ScopeType::Campus,
+        'scope_id' => $school->id('campus_b'), 'starts_at' => now()->subMinute()]);
+
+    // Values that point at campus B, for route parameters and request bodies alike;
+    // a route's own values come first.
+    $own = [
+        'people.' => ['id' => $atB->id, 'assignment' => $heldAtB->id],
+        'roles.' => ['id' => $clerk->id],
+    ];
     $b = [
         'id' => $school->id('campus_b'),
         'key' => 'attendance',
@@ -86,7 +103,9 @@ it('refuses every place-bound route to an account that holds everything, but onl
         'terms' => [['name' => 'Term 1', 'starts_on' => '2026-09-07', 'ends_on' => '2026-12-11']],
         'starts_on' => '2026-09-07', 'ends_on' => '2027-07-23', 'levels' => [['profile' => 'SECONDARY']],
         'email' => 'someone@example.test', 'role' => 'class_teacher', 'place_type' => 'campus', 'place_id' => $school->id('campus_b'),
-        'enabled' => true, 'reason' => 'Cross-scope test.'];
+        'enabled' => true, 'reason' => 'Cross-scope test.', 'role_id' => $clerk->id, 'scope_type' => 'campus',
+        'scope_id' => $school->id('campus_b'), 'permissions' => [], 'send' => false];
+    $secrets = [$school->id('campus_b'), $atB->email, $atB->name, 'Blantyre'];
 
     $checked = 0;
 
@@ -97,17 +116,34 @@ it('refuses every place-bound route to an account that holds everything, but onl
             continue;
         }
 
-        $uri = '/'.preg_replace_callback('/\{(\w+)\??\}/', function (array $m) use ($b, $name): string {
-            return $b[$m[1]] ?? throw new LogicException("Give the cross-scope test a campus B value for {{$m[1]}} in route {$name}.");
+        $values = $b;
+
+        foreach ($own as $prefix => $overrides) {
+            if (str_starts_with($name, $prefix)) {
+                $values = [...$b, ...$overrides];
+            }
+        }
+
+        $uri = '/'.preg_replace_callback('/\{(\w+)\??\}/', function (array $m) use ($values, $name): string {
+            return $values[$m[1]] ?? throw new LogicException("Give the cross-scope test a campus B value for {{$m[1]}} in route {$name}.");
         }, $route->uri());
 
         foreach (array_diff($route->methods(), ['HEAD']) as $method) {
             // A full body pointing at campus B, and an empty one: neither may get past the refusal.
             foreach ($method === 'GET' ? [[]] : [$body, []] as $sent) {
                 app()->forgetScopedInstances();
-                $status = $this->actingAs($user)->json($method, $uri, $sent)->status();
+                $response = $this->actingAs($user)->json($method, $uri, $sent);
+                $status = $response->status();
 
-                expect($status)->toBeIn([403, 404], "{$method} {$uri} ({$name}) answered {$status} to an account scoped to another campus.");
+                if (in_array($name, LIST_ROUTES, true)) {
+                    expect($status)->toBe(200);
+
+                    foreach ($secrets as $secret) {
+                        expect(str_contains((string) $response->getContent(), $secret))->toBeFalse("{$uri} ({$name}) showed campus B data ({$secret}) to an account scoped to campus A.");
+                    }
+                } else {
+                    expect($status)->toBeIn([403, 404], "{$method} {$uri} ({$name}) answered {$status} to an account scoped to another campus.");
+                }
                 $checked++;
             }
         }

@@ -13,6 +13,7 @@ use Acadly\Kernel\Identity\InvitationMail;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\School\SchoolProfile;
 use Acadly\Kernel\Support\Clock;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
@@ -33,7 +34,12 @@ final class SendInvitation
 
     public function handle(User $by, User $to): void
     {
-        $this->access->check($by, AccessPermission::AssignRoles);
+        // Only someone who can give roles at every place the person holds one.
+        if (! $this->access->reaches($by, AccessPermission::AssignRoles, $to)) {
+            $this->access->check($by, AccessPermission::AssignRoles);
+
+            throw new AuthorizationException('Access is refused.');
+        }
 
         if ($to->status !== AccountStatus::Invited) {
             throw ValidationException::withMessages(['user' => ['The account has already been set up.']]);

@@ -16,4 +16,14 @@ final class FlatScopeHierarchy implements ScopeHierarchy
     {
         return true;
     }
+
+    public function label(ScopeRef $scope): string
+    {
+        return $scope->type === ScopeType::Institution ? ScopeTree::WHOLE_SCHOOL : ucfirst($scope->type->value);
+    }
+
+    public function places(): array
+    {
+        return [['scope' => ScopeRef::institution(), 'label' => ScopeTree::WHOLE_SCHOOL]];
+    }
 }

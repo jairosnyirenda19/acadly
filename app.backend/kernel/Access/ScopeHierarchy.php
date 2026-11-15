@@ -20,4 +20,14 @@ interface ScopeHierarchy
 
     /** Whether the place is in force: a role can be given there. */
     public function exists(ScopeRef $scope): bool;
+
+    /** What people call the place. */
+    public function label(ScopeRef $scope): string;
+
+    /**
+     * Every place in force, the whole school first.
+     *
+     * @return list<array{scope: ScopeRef, label: string}>
+     */
+    public function places(): array;
 }

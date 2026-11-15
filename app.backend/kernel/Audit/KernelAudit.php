@@ -16,9 +16,13 @@ enum KernelAudit: string implements AuditAction
     case AccountInvited = 'identity.account_invited';
     case InvitationSent = 'identity.invitation_sent';
     case InvitationAccepted = 'identity.invitation_accepted';
+    case AccountDisabled = 'identity.account_disabled';
+    case ResetSent = 'identity.reset_sent';
     case FirstAdministrator = 'access.first_administrator';
     case RoleAssigned = 'access.role_assigned';
     case RoleEnded = 'access.role_ended';
+    case RoleCreated = 'access.role_created';
+    case RoleChanged = 'access.role_changed';
     case Refused = 'access.refused';
     case ModuleSwitched = 'modules.switched';
     case LicenceInstalled = 'modules.licence_installed';
@@ -58,9 +62,13 @@ enum KernelAudit: string implements AuditAction
             self::AccountInvited => 'Made an account for a member of staff.',
             self::InvitationSent => 'Sent an invitation to set a password.',
             self::InvitationAccepted => 'Set a first password with an invitation link.',
+            self::AccountDisabled => 'Disabled an account.',
+            self::ResetSent => 'Sent a password reset link to a member of staff.',
             self::FirstAdministrator => 'Created the first administrator of the deployment.',
             self::RoleAssigned => 'Gave a role.',
             self::RoleEnded => 'Ended a role.',
+            self::RoleCreated => 'Created a role.',
+            self::RoleChanged => 'Changed the name or the permissions of a role.',
             self::Refused => 'Attempted an action without the required permission.',
             self::ModuleSwitched => 'Switched a module on or off.',
             self::LicenceInstalled => 'Installed a licence.',
@@ -87,6 +95,6 @@ enum KernelAudit: string implements AuditAction
 
     public function requiresReason(): bool
     {
-        return in_array($this, [self::RoleEnded, self::ModuleSwitched, self::DocumentTrashed, self::DocumentHeld, self::HoldReleased], true);
+        return in_array($this, [self::RoleEnded, self::AccountDisabled, self::ModuleSwitched, self::DocumentTrashed, self::DocumentHeld, self::HoldReleased], true);
     }
 }

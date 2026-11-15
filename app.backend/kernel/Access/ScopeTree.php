@@ -19,6 +19,11 @@ final class ScopeTree implements ScopeHierarchy
     /** The container tag a domain registers its ScopeParents under. */
     public const string PARENTS = 'acadly.scope-parents';
 
+    public const string WHOLE_SCHOOL = 'Whole school';
+
+    /** @var list<ScopeParents> in the order they were registered */
+    private array $sources = [];
+
     /** @var array<string, ScopeParents> scope type => the one that answers for it */
     private array $answers = [];
 
@@ -32,6 +37,8 @@ final class ScopeTree implements ScopeHierarchy
             if (! $source instanceof ScopeParents) {
                 continue;
             }
+
+            $this->sources[] = $source;
 
             foreach ($source->types() as $type) {
                 $this->answers[$type->value] = $source;
@@ -73,6 +80,28 @@ final class ScopeTree implements ScopeHierarchy
         }
 
         return $this->parents($scope) !== null;
+    }
+
+    public function label(ScopeRef $scope): string
+    {
+        if ($scope->type === ScopeType::Institution) {
+            return self::WHOLE_SCHOOL;
+        }
+
+        $source = $this->answers[$scope->type->value] ?? null;
+
+        return ($source !== null ? $source->label($scope) : null) ?? 'Ended '.$scope->type->value;
+    }
+
+    public function places(): array
+    {
+        $places = [['scope' => ScopeRef::institution(), 'label' => self::WHOLE_SCHOOL]];
+
+        foreach ($this->sources as $source) {
+            array_push($places, ...$source->places());
+        }
+
+        return $places;
     }
 
     /** @return list<ScopeRef>|null */

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Acadly\Kernel\Access;
 
+use Acadly\Kernel\Audit\Auditable;
+use Acadly\Kernel\Audit\FieldClass;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +20,7 @@ use Illuminate\Support\Facades\DB;
  * @property string|null $description
  * @property bool $is_system
  */
-final class Role extends Model
+final class Role extends Model implements Auditable
 {
     use HasUuids;
 
@@ -32,6 +34,26 @@ final class Role extends Model
     protected $table = 'access_roles';
 
     protected $fillable = ['key', 'name', 'description', 'is_system'];
+
+    public function auditType(): string
+    {
+        return 'role';
+    }
+
+    public function auditId(): string
+    {
+        return $this->id;
+    }
+
+    public function auditLabel(): string
+    {
+        return $this->name;
+    }
+
+    public function auditFields(): array
+    {
+        return ['name' => FieldClass::Plain, 'description' => FieldClass::Plain];
+    }
 
     /** @return list<string> */
     public function permissionKeys(): array

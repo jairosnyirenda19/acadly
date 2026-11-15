@@ -121,14 +121,26 @@ final class Access
      * roles for the whole school" is asked.
      *
      * @param  string|null  $except  an assignment to leave out, as if it had ended
+     * @param  string|null  $exceptRole  a role to leave out, as if it no longer held the permission
+     * @param  string|null  $exceptUser  an account to leave out, as if it were disabled
      */
-    public function holders(Permission $permission, ?ScopeRef $at = null, ?string $except = null): int
+    public function holders(Permission $permission, ?ScopeRef $at = null, ?string $except = null, ?string $exceptRole = null, ?string $exceptUser = null): int
+    {
+        return count($this->holderIds($permission, $at, $except, $exceptRole, $exceptUser));
+    }
+
+    /**
+     * The active accounts that hold a permission at a scope. See holders().
+     *
+     * @return list<string> account ids
+     */
+    public function holderIds(Permission $permission, ?ScopeRef $at = null, ?string $except = null, ?string $exceptRole = null, ?string $exceptUser = null): array
     {
         $at ??= ScopeRef::institution();
         $places = [$at, ...$this->hierarchy->ancestors($at)];
         $now = $this->clock->now();
 
-        return DB::table('access_role_assignments as a')
+        $ids = DB::table('access_role_assignments as a')
             ->join('access_role_permissions as rp', 'rp.role_id', '=', 'a.role_id')
             ->join('users as u', 'u.id', '=', 'a.user_id')
             ->where('rp.permission_key', $permission->key())
@@ -136,6 +148,8 @@ final class Access
             ->where('a.starts_at', '<=', $now)
             ->where(fn (Builder $q): Builder => $q->whereNull('a.ends_at')->orWhere('a.ends_at', '>', $now))
             ->when($except !== null, fn (Builder $q): Builder => $q->where('a.id', '!=', $except))
+            ->when($exceptRole !== null, fn (Builder $q): Builder => $q->where('a.role_id', '!=', $exceptRole))
+            ->when($exceptUser !== null, fn (Builder $q): Builder => $q->where('a.user_id', '!=', $exceptUser))
             ->where(function (Builder $q) use ($places): void {
                 foreach ($places as $place) {
                     $q->orWhere(fn (Builder $one): Builder => $one->where('a.scope_type', $place->type->value)
@@ -143,7 +157,56 @@ final class Access
                 }
             })
             ->distinct()
-            ->count('a.user_id');
+            ->orderBy('a.user_id')
+            ->pluck('a.user_id')
+            ->all();
+
+        return array_values(array_filter($ids, is_string(...)));
+    }
+
+    /**
+     * Whether $by holds the permission at every place where $person holds a
+     * role now. A person with no role in force can be reached only from the
+     * whole school. This is how far one account may act on another.
+     */
+    public function reaches(User $by, Permission $permission, User $person): bool
+    {
+        $now = $this->clock->now();
+        $scopes = RoleAssignment::query()->activeAt($now)->where('user_id', $person->id)->get()
+            ->map(fn (RoleAssignment $a): ScopeRef => $a->scope())->all();
+
+        if ($scopes === []) {
+            return $this->allows($by, $permission, ScopeRef::institution());
+        }
+
+        foreach ($scopes as $scope) {
+            if (! $this->allows($by, $permission, $scope)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * The places a role can be given at, the whole school first.
+     *
+     * @return list<array{scope: ScopeRef, label: string}>
+     */
+    public function places(): array
+    {
+        return $this->hierarchy->places();
+    }
+
+    public function label(ScopeRef $scope): string
+    {
+        return $this->hierarchy->label($scope);
+    }
+
+    /** @return list<ScopeRef> the scopes that contain $scope, nearest first */
+    public function ancestors(ScopeRef $scope): array
+    {
+        return $this->hierarchy->ancestors($scope);
     }
 
     /** Drop what this request remembers about an account, after its roles change. */

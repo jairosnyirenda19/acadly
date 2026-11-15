@@ -483,6 +483,126 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/people": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The people the viewer can see, with what they hold and where */
+        get: operations["people.index"];
+        put?: never;
+        /** Invites a person with a role at a place: `{name, email, role_id, scope_type, scope_id, send}` */
+        post: operations["people.invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/people/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One person: roles held and ended, what they can do, and the means to give */
+        get: operations["people.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/people/{id}/invitation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sends the invitation again: the earlier link stops working */
+        post: operations["people.resend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/people/{id}/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Gives a role: `{role_id, scope_type, scope_id, starts_on?, ends_on?, reason}` */
+        post: operations["people.give"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/people/{id}/roles/{assignment}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ends a role now: `{reason}` */
+        post: operations["people.end"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/people/{id}/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Disables the account: `{reason}` */
+        post: operations["people.disable"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/people/{id}/password-reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sends the person a link to set a new password */
+        post: operations["people.password-reset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/ready": {
         parameters: {
             query?: never;
@@ -498,6 +618,40 @@ export interface paths {
          */
         get: operations["kernel.ready"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["roles.index"];
+        put?: never;
+        /** Creates a role: `{name, description?, permissions: [keys]}` */
+        post: operations["roles.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/roles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Changes a role: `{name, description?, permissions: [keys]}` */
+        put: operations["roles.update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1767,6 +1921,489 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
+    "people.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        people: {
+                            id: string;
+                            name: string;
+                            email: string;
+                            /** @enum {string} */
+                            state: "active" | "ready" | "invited" | "expired" | "no_role" | "disabled";
+                            last_signed_in_at: string | null;
+                            invitation_sent_at: string | null;
+                            disabled: {
+                                at: string | null;
+                                reason: string | null;
+                            } | null;
+                            roles: {
+                                role: string;
+                                where: string;
+                                ends_at: string | null;
+                            }[];
+                        }[];
+                        totals: {
+                            with_access: number;
+                            invited: number;
+                            expired: number;
+                            no_role: number;
+                            disabled: number;
+                            whole_school_givers: string[];
+                        };
+                        giving: {
+                            roles: {
+                                id: string;
+                                name: string;
+                                permissions: string[];
+                            }[];
+                            places: {
+                                /** @enum {string} */
+                                type: "institution" | "division" | "campus" | "offering" | "class";
+                                id: string | null;
+                                label: string;
+                                within: string[];
+                            }[];
+                            yours: {
+                                permission: string;
+                                place: string;
+                            }[];
+                            labels: {
+                                [key: string]: string;
+                            };
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "people.invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    email: string;
+                    /** Format: uuid */
+                    role_id: string;
+                    send?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        person: {
+                            id: string;
+                            name: string;
+                            email: string;
+                            /** @enum {string} */
+                            state: "active" | "no_role" | "expired" | "invited" | "ready" | "disabled";
+                            last_signed_in_at: string | null;
+                            invitation_sent_at: string | null;
+                            disabled: {
+                                at: string | null;
+                                reason: string | null;
+                            } | null;
+                        };
+                        can_act: boolean;
+                        held: unknown[];
+                        ended: unknown[];
+                        can_do: {
+                            group: string;
+                            permissions: string;
+                        }[];
+                        giving: {
+                            roles: unknown[];
+                            places: {
+                                type: string;
+                                id: string;
+                                label: string;
+                                within: unknown[];
+                            }[];
+                            yours: unknown[];
+                            labels: string;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "people.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        person: {
+                            id: string;
+                            name: string;
+                            email: string;
+                            /** @enum {string} */
+                            state: "active" | "ready" | "invited" | "expired" | "no_role" | "disabled";
+                            last_signed_in_at: string | null;
+                            invitation_sent_at: string | null;
+                            disabled: {
+                                at: string | null;
+                                reason: string | null;
+                            } | null;
+                        };
+                        can_act: boolean;
+                        held: {
+                            id: string;
+                            role: string;
+                            where: string;
+                            scope_type: string;
+                            scope_id: string | null;
+                            starts_at: string;
+                            ends_at: string | null;
+                            reason: string | null;
+                            given_by: string | null;
+                            ended_by: string | null;
+                            end_reason: string | null;
+                            can_end: boolean;
+                        }[];
+                        ended: {
+                            id: string;
+                            role: string;
+                            where: string;
+                            scope_type: string;
+                            scope_id: string | null;
+                            starts_at: string;
+                            ends_at: string | null;
+                            reason: string | null;
+                            given_by: string | null;
+                            ended_by: string | null;
+                            end_reason: string | null;
+                        }[];
+                        can_do: {
+                            group: string;
+                            permissions: {
+                                key: string;
+                                label: string;
+                                sight: boolean;
+                                where: string[];
+                            }[];
+                        }[];
+                        giving: {
+                            roles: {
+                                id: string;
+                                name: string;
+                                permissions: string[];
+                            }[];
+                            places: {
+                                /** @enum {string} */
+                                type: "institution" | "division" | "campus" | "offering" | "class";
+                                id: string | null;
+                                label: string;
+                                within: string[];
+                            }[];
+                            yours: {
+                                permission: string;
+                                place: string;
+                            }[];
+                            labels: {
+                                [key: string]: string;
+                            };
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "people.resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        person: {
+                            id: string;
+                            name: string;
+                            email: string;
+                            /** @enum {string} */
+                            state: "active" | "no_role" | "expired" | "invited" | "ready" | "disabled";
+                            last_signed_in_at: string | null;
+                            invitation_sent_at: string | null;
+                            disabled: {
+                                at: string | null;
+                                reason: string | null;
+                            } | null;
+                        };
+                        can_act: boolean;
+                        held: unknown[];
+                        ended: unknown[];
+                        can_do: {
+                            group: string;
+                            permissions: string;
+                        }[];
+                        giving: {
+                            roles: unknown[];
+                            places: {
+                                type: string;
+                                id: string;
+                                label: string;
+                                within: unknown[];
+                            }[];
+                            yours: unknown[];
+                            labels: string;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "people.give": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    role_id: string;
+                    /** Format: date */
+                    starts_on?: string | null;
+                    /** Format: date */
+                    ends_on?: string | null;
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        person: {
+                            id: string;
+                            name: string;
+                            email: string;
+                            /** @enum {string} */
+                            state: "active" | "no_role" | "expired" | "invited" | "ready" | "disabled";
+                            last_signed_in_at: string | null;
+                            invitation_sent_at: string | null;
+                            disabled: {
+                                at: string | null;
+                                reason: string | null;
+                            } | null;
+                        };
+                        can_act: boolean;
+                        held: unknown[];
+                        ended: unknown[];
+                        can_do: {
+                            group: string;
+                            permissions: string;
+                        }[];
+                        giving: {
+                            roles: unknown[];
+                            places: {
+                                type: string;
+                                id: string;
+                                label: string;
+                                within: unknown[];
+                            }[];
+                            yours: unknown[];
+                            labels: string;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "people.end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                assignment: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        person: {
+                            id: string;
+                            name: string;
+                            email: string;
+                            /** @enum {string} */
+                            state: "active" | "no_role" | "expired" | "invited" | "ready" | "disabled";
+                            last_signed_in_at: string | null;
+                            invitation_sent_at: string | null;
+                            disabled: {
+                                at: string | null;
+                                reason: string | null;
+                            } | null;
+                        };
+                        can_act: boolean;
+                        held: unknown[];
+                        ended: unknown[];
+                        can_do: {
+                            group: string;
+                            permissions: string;
+                        }[];
+                        giving: {
+                            roles: unknown[];
+                            places: {
+                                type: string;
+                                id: string;
+                                label: string;
+                                within: unknown[];
+                            }[];
+                            yours: unknown[];
+                            labels: string;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "people.disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        person: {
+                            id: string;
+                            name: string;
+                            email: string;
+                            /** @enum {string} */
+                            state: "active" | "no_role" | "expired" | "invited" | "ready" | "disabled";
+                            last_signed_in_at: string | null;
+                            invitation_sent_at: string | null;
+                            disabled: {
+                                at: string | null;
+                                reason: string | null;
+                            } | null;
+                        };
+                        can_act: boolean;
+                        held: unknown[];
+                        ended: unknown[];
+                        can_do: {
+                            group: string;
+                            permissions: string;
+                        }[];
+                        giving: {
+                            roles: unknown[];
+                            places: {
+                                type: string;
+                                id: string;
+                                label: string;
+                                within: unknown[];
+                            }[];
+                            yours: unknown[];
+                            labels: string;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "people.password-reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        status: "sent";
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "kernel.ready": {
         parameters: {
             query?: never;
@@ -1784,6 +2421,116 @@ export interface operations {
                     "application/json": 200;
                 };
             };
+        };
+    };
+    "roles.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        roles: {
+                            id: string;
+                            name: string;
+                            description: string | null;
+                            system: boolean;
+                            people: number;
+                            permissions: string[];
+                        }[];
+                        groups: {
+                            name: string;
+                            permissions: {
+                                key: string;
+                                label: string;
+                                help: string;
+                                sight: boolean;
+                                yours: boolean;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "roles.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    description?: string;
+                    permissions?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        roles: unknown[];
+                        groups: {
+                            name: string;
+                            permissions: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "roles.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    description?: string;
+                    permissions?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        roles: unknown[];
+                        groups: {
+                            name: string;
+                            permissions: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
         };
     };
     "kernel.school": {

@@ -11,7 +11,7 @@ export type Saved<T> =
   | { kind: 'refused' }
   | { kind: 'unavailable' }
 
-async function settle<T>(request: Promise<{ data?: T; error?: unknown; response: Response }>): Promise<Saved<T>> {
+export async function settle<T>(request: Promise<{ data?: T; error?: unknown; response: Response }>): Promise<Saved<T>> {
   try {
     const { data, error, response } = await request
 
@@ -27,7 +27,7 @@ async function settle<T>(request: Promise<{ data?: T; error?: unknown; response:
   }
 }
 
-async function read<T>(request: Promise<{ data?: T; response: Response }>): Promise<T | 'refused' | null> {
+export async function read<T>(request: Promise<{ data?: T; response: Response }>): Promise<T | 'refused' | null> {
   try {
     const { data, response } = await request
 

@@ -6,8 +6,8 @@ import {
   getSchoolName,
   navigate,
   signOut,
+  useAppContext,
   useLocation,
-  useSchool,
   type Account,
   type AppContext,
 } from '@acadly/kernel'
@@ -17,38 +17,52 @@ import { copy } from './copy'
 import { AuthLayout, Heading } from './sign-in/AuthLayout'
 import { ForgotPasswordScreen } from './sign-in/ForgotPasswordScreen'
 import { ResetPasswordScreen } from './sign-in/ResetPasswordScreen'
+import { PeopleScreen } from './settings/PeopleScreen'
+import { PersonScreen } from './settings/PersonScreen'
+import { RolesScreen } from './settings/RolesScreen'
 import { SetupWizard } from './setup/SetupWizard'
+import { ConsoleShell, holdsAnywhere } from './shell/ConsoleShell'
 import { SignInScreen } from './sign-in/SignInScreen'
 import { StatusScreen } from './StatusScreen'
 
-/** Until the staff home screen is built: who is signed in, and the way out. */
-function SignedIn({ account, onSignedOut }: { account: Account; onSignedOut: () => void }) {
+/** The console after the school opens: the shell, and the page for the path. */
+function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void }) {
+  const context = useAppContext()
   const t = copy.home
-  const { licence } = useSchool()
+  const gives = holdsAnywhere(context, 'access.roles.assign')
+  const edits = can(context, 'access.roles.manage')
+  const person = /^\/settings\/people\/([0-9a-f-]{36})$/.exec(path)?.[1]
+
+  useEffect(() => {
+    if (path === '/settings' && (gives || edits)) navigate(gives ? '/settings/people' : '/settings/roles', true)
+  }, [path, gives, edits])
+
+  let page
+  if (path === '/settings/people' && gives) page = <PeopleScreen />
+  else if (person !== undefined && gives) page = <PersonScreen id={person} />
+  else if (path === '/settings/roles' && edits) page = <RolesScreen />
+
+  if (page !== undefined) {
+    return (
+      <ConsoleShell section="settings" onSignedOut={onSignedOut}>
+        {page}
+      </ConsoleShell>
+    )
+  }
 
   return (
-    <>
-      <Heading kicker={t.kicker} title={account.name} />
-      <div className="flex justify-between gap-3 border-t-2 border-b border-t-ink border-b-rule py-2.5 text-sm">
-        <span className="text-text-muted">{t.signedInAs}</span>
-        <span className="font-extrabold break-all">{account.email}</span>
+    <ConsoleShell section="today" onSignedOut={onSignedOut}>
+      <div className="flex flex-col gap-4 px-[clamp(16px,3vw,40px)] pt-7 pb-8">
+        <div className="label-caps text-text-muted">{t.kicker}</div>
+        <h1 className="type-display text-[clamp(56px,7vw,96px)]">{context.user.name}</h1>
+        {context.licence.read_only && (
+          <Notice tone="wrong" title={t.readOnlyTitle}>
+            {t.readOnly}
+          </Notice>
+        )}
+        <p className="max-w-[70ch] text-text-muted">{t.pending}</p>
       </div>
-      {licence.read_only && (
-        <Notice tone="wrong" title={t.readOnlyTitle}>
-          {t.readOnly}
-        </Notice>
-      )}
-      <p className="text-text-muted">{t.pending}</p>
-      <Button
-        variant="secondary"
-        className="h-12"
-        onClick={() => {
-          void signOut().then(onSignedOut)
-        }}
-      >
-        {t.signOut}
-      </Button>
-    </>
+    </ConsoleShell>
   )
 }
 
@@ -128,20 +142,16 @@ export function App() {
     )
   }
 
-  let screen
   if (account !== null && context !== null && context !== undefined) {
-    screen = (
+    return (
       <ContextProvider value={context}>
-        <SignedIn
-          account={account}
-          onSignedOut={() => {
-            setContext(undefined)
-            setAccount(null)
-          }}
-        />
+        <Console path={path} onSignedOut={signedOut} />
       </ContextProvider>
     )
-  } else if (account !== null && context === null) {
+  }
+
+  let screen
+  if (account !== null && context === null) {
     // Signed in, but the context could not be read: say so, never wait for ever.
     screen = (
       <>

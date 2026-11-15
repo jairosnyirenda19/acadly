@@ -2950,6 +2950,1761 @@
                 }
             }
         },
+        "/v1/people": {
+            "get": {
+                "operationId": "people.index",
+                "summary": "The people the viewer can see, with what they hold and where",
+                "tags": [
+                    "People"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "people": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "active",
+                                                            "ready",
+                                                            "invited",
+                                                            "expired",
+                                                            "no_role",
+                                                            "disabled"
+                                                        ]
+                                                    },
+                                                    "last_signed_in_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "invitation_sent_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "disabled": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "at": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "reason": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "at",
+                                                            "reason"
+                                                        ]
+                                                    },
+                                                    "roles": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "role": {
+                                                                    "type": "string"
+                                                                },
+                                                                "where": {
+                                                                    "type": "string"
+                                                                },
+                                                                "ends_at": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "role",
+                                                                "where",
+                                                                "ends_at"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "email",
+                                                    "state",
+                                                    "last_signed_in_at",
+                                                    "invitation_sent_at",
+                                                    "disabled",
+                                                    "roles"
+                                                ]
+                                            }
+                                        },
+                                        "totals": {
+                                            "type": "object",
+                                            "properties": {
+                                                "with_access": {
+                                                    "type": "integer"
+                                                },
+                                                "invited": {
+                                                    "type": "integer"
+                                                },
+                                                "expired": {
+                                                    "type": "integer"
+                                                },
+                                                "no_role": {
+                                                    "type": "integer"
+                                                },
+                                                "disabled": {
+                                                    "type": "integer"
+                                                },
+                                                "whole_school_givers": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "with_access",
+                                                "invited",
+                                                "expired",
+                                                "no_role",
+                                                "disabled",
+                                                "whole_school_givers"
+                                            ]
+                                        },
+                                        "giving": {
+                                            "type": "object",
+                                            "properties": {
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "permissions": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name",
+                                                            "permissions"
+                                                        ]
+                                                    }
+                                                },
+                                                "places": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "institution",
+                                                                    "division",
+                                                                    "campus",
+                                                                    "offering",
+                                                                    "class"
+                                                                ]
+                                                            },
+                                                            "id": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "within": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "type",
+                                                            "id",
+                                                            "label",
+                                                            "within"
+                                                        ]
+                                                    }
+                                                },
+                                                "yours": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "permission": {
+                                                                "type": "string"
+                                                            },
+                                                            "place": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "permission",
+                                                            "place"
+                                                        ]
+                                                    }
+                                                },
+                                                "labels": {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "roles",
+                                                "places",
+                                                "yours",
+                                                "labels"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "people",
+                                        "totals",
+                                        "giving"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "people.invite",
+                "summary": "Invites a person with a role at a place: `{name, email, role_id, scope_type, scope_id, send}`",
+                "tags": [
+                    "People"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 120
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "role_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "send": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "role_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "person": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "active",
+                                                        "no_role",
+                                                        "expired",
+                                                        "invited",
+                                                        "ready",
+                                                        "disabled"
+                                                    ]
+                                                },
+                                                "last_signed_in_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "invitation_sent_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "disabled": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "reason": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "at",
+                                                        "reason"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "email",
+                                                "state",
+                                                "last_signed_in_at",
+                                                "invitation_sent_at",
+                                                "disabled"
+                                            ]
+                                        },
+                                        "can_act": {
+                                            "type": "boolean"
+                                        },
+                                        "held": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "ended": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "can_do": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "group": {
+                                                        "type": "string"
+                                                    },
+                                                    "permissions": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "group",
+                                                    "permissions"
+                                                ]
+                                            }
+                                        },
+                                        "giving": {
+                                            "type": "object",
+                                            "properties": {
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "places": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "type": {
+                                                                "type": "string"
+                                                            },
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "within": {
+                                                                "type": "array",
+                                                                "items": {}
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "type",
+                                                            "id",
+                                                            "label",
+                                                            "within"
+                                                        ]
+                                                    }
+                                                },
+                                                "yours": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "labels": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "roles",
+                                                "places",
+                                                "yours",
+                                                "labels"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "person",
+                                        "can_act",
+                                        "held",
+                                        "ended",
+                                        "can_do",
+                                        "giving"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/people/{id}": {
+            "get": {
+                "operationId": "people.show",
+                "summary": "One person: roles held and ended, what they can do, and the means to give",
+                "tags": [
+                    "People"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "person": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "active",
+                                                        "ready",
+                                                        "invited",
+                                                        "expired",
+                                                        "no_role",
+                                                        "disabled"
+                                                    ]
+                                                },
+                                                "last_signed_in_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "invitation_sent_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "disabled": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "reason": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "at",
+                                                        "reason"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "email",
+                                                "state",
+                                                "last_signed_in_at",
+                                                "invitation_sent_at",
+                                                "disabled"
+                                            ]
+                                        },
+                                        "can_act": {
+                                            "type": "boolean"
+                                        },
+                                        "held": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "role": {
+                                                        "type": "string"
+                                                    },
+                                                    "where": {
+                                                        "type": "string"
+                                                    },
+                                                    "scope_type": {
+                                                        "type": "string"
+                                                    },
+                                                    "scope_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "starts_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "ends_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "given_by": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "ended_by": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "end_reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "can_end": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "role",
+                                                    "where",
+                                                    "scope_type",
+                                                    "scope_id",
+                                                    "starts_at",
+                                                    "ends_at",
+                                                    "reason",
+                                                    "given_by",
+                                                    "ended_by",
+                                                    "end_reason",
+                                                    "can_end"
+                                                ]
+                                            }
+                                        },
+                                        "ended": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "role": {
+                                                        "type": "string"
+                                                    },
+                                                    "where": {
+                                                        "type": "string"
+                                                    },
+                                                    "scope_type": {
+                                                        "type": "string"
+                                                    },
+                                                    "scope_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "starts_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "ends_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "given_by": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "ended_by": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "end_reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "role",
+                                                    "where",
+                                                    "scope_type",
+                                                    "scope_id",
+                                                    "starts_at",
+                                                    "ends_at",
+                                                    "reason",
+                                                    "given_by",
+                                                    "ended_by",
+                                                    "end_reason"
+                                                ]
+                                            }
+                                        },
+                                        "can_do": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "group": {
+                                                        "type": "string"
+                                                    },
+                                                    "permissions": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "key": {
+                                                                    "type": "string"
+                                                                },
+                                                                "label": {
+                                                                    "type": "string"
+                                                                },
+                                                                "sight": {
+                                                                    "type": "boolean"
+                                                                },
+                                                                "where": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "key",
+                                                                "label",
+                                                                "sight",
+                                                                "where"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "group",
+                                                    "permissions"
+                                                ]
+                                            }
+                                        },
+                                        "giving": {
+                                            "type": "object",
+                                            "properties": {
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "permissions": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name",
+                                                            "permissions"
+                                                        ]
+                                                    }
+                                                },
+                                                "places": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "type": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "institution",
+                                                                    "division",
+                                                                    "campus",
+                                                                    "offering",
+                                                                    "class"
+                                                                ]
+                                                            },
+                                                            "id": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "within": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "type",
+                                                            "id",
+                                                            "label",
+                                                            "within"
+                                                        ]
+                                                    }
+                                                },
+                                                "yours": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "permission": {
+                                                                "type": "string"
+                                                            },
+                                                            "place": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "permission",
+                                                            "place"
+                                                        ]
+                                                    }
+                                                },
+                                                "labels": {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "roles",
+                                                "places",
+                                                "yours",
+                                                "labels"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "person",
+                                        "can_act",
+                                        "held",
+                                        "ended",
+                                        "can_do",
+                                        "giving"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/people/{id}/invitation": {
+            "post": {
+                "operationId": "people.resend",
+                "summary": "Sends the invitation again: the earlier link stops working",
+                "tags": [
+                    "People"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "person": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "active",
+                                                        "no_role",
+                                                        "expired",
+                                                        "invited",
+                                                        "ready",
+                                                        "disabled"
+                                                    ]
+                                                },
+                                                "last_signed_in_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "invitation_sent_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "disabled": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "reason": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "at",
+                                                        "reason"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "email",
+                                                "state",
+                                                "last_signed_in_at",
+                                                "invitation_sent_at",
+                                                "disabled"
+                                            ]
+                                        },
+                                        "can_act": {
+                                            "type": "boolean"
+                                        },
+                                        "held": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "ended": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "can_do": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "group": {
+                                                        "type": "string"
+                                                    },
+                                                    "permissions": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "group",
+                                                    "permissions"
+                                                ]
+                                            }
+                                        },
+                                        "giving": {
+                                            "type": "object",
+                                            "properties": {
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "places": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "type": {
+                                                                "type": "string"
+                                                            },
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "within": {
+                                                                "type": "array",
+                                                                "items": {}
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "type",
+                                                            "id",
+                                                            "label",
+                                                            "within"
+                                                        ]
+                                                    }
+                                                },
+                                                "yours": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "labels": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "roles",
+                                                "places",
+                                                "yours",
+                                                "labels"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "person",
+                                        "can_act",
+                                        "held",
+                                        "ended",
+                                        "can_do",
+                                        "giving"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/people/{id}/roles": {
+            "post": {
+                "operationId": "people.give",
+                "summary": "Gives a role: `{role_id, scope_type, scope_id, starts_on?, ends_on?, reason}`",
+                "tags": [
+                    "People"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "role_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "starts_on": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date"
+                                    },
+                                    "ends_on": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date"
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 500
+                                    }
+                                },
+                                "required": [
+                                    "role_id",
+                                    "reason"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "person": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "active",
+                                                        "no_role",
+                                                        "expired",
+                                                        "invited",
+                                                        "ready",
+                                                        "disabled"
+                                                    ]
+                                                },
+                                                "last_signed_in_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "invitation_sent_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "disabled": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "reason": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "at",
+                                                        "reason"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "email",
+                                                "state",
+                                                "last_signed_in_at",
+                                                "invitation_sent_at",
+                                                "disabled"
+                                            ]
+                                        },
+                                        "can_act": {
+                                            "type": "boolean"
+                                        },
+                                        "held": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "ended": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "can_do": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "group": {
+                                                        "type": "string"
+                                                    },
+                                                    "permissions": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "group",
+                                                    "permissions"
+                                                ]
+                                            }
+                                        },
+                                        "giving": {
+                                            "type": "object",
+                                            "properties": {
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "places": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "type": {
+                                                                "type": "string"
+                                                            },
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "within": {
+                                                                "type": "array",
+                                                                "items": {}
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "type",
+                                                            "id",
+                                                            "label",
+                                                            "within"
+                                                        ]
+                                                    }
+                                                },
+                                                "yours": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "labels": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "roles",
+                                                "places",
+                                                "yours",
+                                                "labels"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "person",
+                                        "can_act",
+                                        "held",
+                                        "ended",
+                                        "can_do",
+                                        "giving"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/people/{id}/roles/{assignment}/end": {
+            "post": {
+                "operationId": "people.end",
+                "summary": "Ends a role now: `{reason}`",
+                "tags": [
+                    "People"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "assignment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "person": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "active",
+                                                        "no_role",
+                                                        "expired",
+                                                        "invited",
+                                                        "ready",
+                                                        "disabled"
+                                                    ]
+                                                },
+                                                "last_signed_in_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "invitation_sent_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "disabled": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "reason": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "at",
+                                                        "reason"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "email",
+                                                "state",
+                                                "last_signed_in_at",
+                                                "invitation_sent_at",
+                                                "disabled"
+                                            ]
+                                        },
+                                        "can_act": {
+                                            "type": "boolean"
+                                        },
+                                        "held": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "ended": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "can_do": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "group": {
+                                                        "type": "string"
+                                                    },
+                                                    "permissions": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "group",
+                                                    "permissions"
+                                                ]
+                                            }
+                                        },
+                                        "giving": {
+                                            "type": "object",
+                                            "properties": {
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "places": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "type": {
+                                                                "type": "string"
+                                                            },
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "within": {
+                                                                "type": "array",
+                                                                "items": {}
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "type",
+                                                            "id",
+                                                            "label",
+                                                            "within"
+                                                        ]
+                                                    }
+                                                },
+                                                "yours": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "labels": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "roles",
+                                                "places",
+                                                "yours",
+                                                "labels"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "person",
+                                        "can_act",
+                                        "held",
+                                        "ended",
+                                        "can_do",
+                                        "giving"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/people/{id}/disable": {
+            "post": {
+                "operationId": "people.disable",
+                "summary": "Disables the account: `{reason}`",
+                "tags": [
+                    "People"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "person": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "active",
+                                                        "no_role",
+                                                        "expired",
+                                                        "invited",
+                                                        "ready",
+                                                        "disabled"
+                                                    ]
+                                                },
+                                                "last_signed_in_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "invitation_sent_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "disabled": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "reason": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "at",
+                                                        "reason"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "email",
+                                                "state",
+                                                "last_signed_in_at",
+                                                "invitation_sent_at",
+                                                "disabled"
+                                            ]
+                                        },
+                                        "can_act": {
+                                            "type": "boolean"
+                                        },
+                                        "held": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "ended": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "can_do": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "group": {
+                                                        "type": "string"
+                                                    },
+                                                    "permissions": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "group",
+                                                    "permissions"
+                                                ]
+                                            }
+                                        },
+                                        "giving": {
+                                            "type": "object",
+                                            "properties": {
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "places": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "type": {
+                                                                "type": "string"
+                                                            },
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "within": {
+                                                                "type": "array",
+                                                                "items": {}
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "type",
+                                                            "id",
+                                                            "label",
+                                                            "within"
+                                                        ]
+                                                    }
+                                                },
+                                                "yours": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "labels": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "roles",
+                                                "places",
+                                                "yours",
+                                                "labels"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "person",
+                                        "can_act",
+                                        "held",
+                                        "ended",
+                                        "can_do",
+                                        "giving"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/people/{id}/password-reset": {
+            "post": {
+                "operationId": "people.password-reset",
+                "summary": "Sends the person a link to set a new password",
+                "tags": [
+                    "People"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "const": "sent"
+                                        }
+                                    },
+                                    "required": [
+                                        "status"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/ready": {
             "get": {
                 "operationId": "kernel.ready",
@@ -2969,6 +4724,275 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/v1/roles": {
+            "get": {
+                "operationId": "roles.index",
+                "tags": [
+                    "Roles"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "system": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "people": {
+                                                        "type": "integer"
+                                                    },
+                                                    "permissions": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "description",
+                                                    "system",
+                                                    "people",
+                                                    "permissions"
+                                                ]
+                                            }
+                                        },
+                                        "groups": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "permissions": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "key": {
+                                                                    "type": "string"
+                                                                },
+                                                                "label": {
+                                                                    "type": "string"
+                                                                },
+                                                                "help": {
+                                                                    "type": "string"
+                                                                },
+                                                                "sight": {
+                                                                    "type": "boolean"
+                                                                },
+                                                                "yours": {
+                                                                    "type": "boolean"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "key",
+                                                                "label",
+                                                                "help",
+                                                                "sight",
+                                                                "yours"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "name",
+                                                    "permissions"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "roles",
+                                        "groups"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "roles.store",
+                "summary": "Creates a role: `{name, description?, permissions: [keys]}`",
+                "tags": [
+                    "Roles"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "permissions": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "groups": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "permissions": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "name",
+                                                    "permissions"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "roles",
+                                        "groups"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/roles/{id}": {
+            "put": {
+                "operationId": "roles.update",
+                "summary": "Changes a role: `{name, description?, permissions: [keys]}`",
+                "tags": [
+                    "Roles"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "permissions": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "groups": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "permissions": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "name",
+                                                    "permissions"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "roles",
+                                        "groups"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -3271,8 +5295,7 @@
                                             }
                                         },
                                         "administrators": {
-                                            "type": "integer",
-                                            "minimum": 0
+                                            "type": "integer"
                                         },
                                         "waiting": {
                                             "type": "integer",
@@ -3449,8 +5472,7 @@
                                             }
                                         },
                                         "administrators": {
-                                            "type": "integer",
-                                            "minimum": 0
+                                            "type": "integer"
                                         },
                                         "waiting": {
                                             "type": "integer",
@@ -3621,8 +5643,7 @@
                                             }
                                         },
                                         "administrators": {
-                                            "type": "integer",
-                                            "minimum": 0
+                                            "type": "integer"
                                         },
                                         "waiting": {
                                             "type": "integer",

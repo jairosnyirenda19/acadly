@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
+use Acadly\Kernel\Access\Http\RolesController;
 use Acadly\Kernel\Documents\Http\DocumentsController;
 use Acadly\Kernel\Http\HealthController;
 use Acadly\Kernel\Http\ReadinessController;
 use Acadly\Kernel\Http\SchoolController;
 use Acadly\Kernel\Identity\Http\MeController;
 use Acadly\Kernel\Identity\Http\PasswordResetController;
+use Acadly\Kernel\Identity\Http\PeopleController;
 use Acadly\Kernel\Identity\Http\SignInController;
 use Acadly\Kernel\Identity\Http\SignOutController;
 use Acadly\Kernel\Module\Http\ContextController;
@@ -40,4 +42,19 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/documents/trash/{batch}/restore', [DocumentsController::class, 'restore'])->whereUuid('batch')->name('documents.restore');
     Route::get('/modules', [ModulesController::class, 'index'])->name('modules.index');
     Route::put('/modules/{key}', [ModulesController::class, 'update'])->where('key', '[a-z][a-z0-9_]*')->name('modules.update');
+
+    Route::prefix('people')->name('people.')->group(function (): void {
+        Route::get('/', [PeopleController::class, 'index'])->name('index');
+        Route::post('/', [PeopleController::class, 'invite'])->name('invite');
+        Route::get('/{id}', [PeopleController::class, 'show'])->whereUuid('id')->name('show');
+        Route::post('/{id}/invitation', [PeopleController::class, 'resend'])->whereUuid('id')->name('resend');
+        Route::post('/{id}/roles', [PeopleController::class, 'give'])->whereUuid('id')->name('give');
+        Route::post('/{id}/roles/{assignment}/end', [PeopleController::class, 'end'])->whereUuid(['id', 'assignment'])->name('end');
+        Route::post('/{id}/disable', [PeopleController::class, 'disable'])->whereUuid('id')->name('disable');
+        Route::post('/{id}/password-reset', [PeopleController::class, 'passwordReset'])->whereUuid('id')->name('password-reset');
+    });
+
+    Route::get('/roles', [RolesController::class, 'index'])->name('roles.index');
+    Route::post('/roles', [RolesController::class, 'store'])->name('roles.store');
+    Route::put('/roles/{id}', [RolesController::class, 'update'])->whereUuid('id')->name('roles.update');
 });

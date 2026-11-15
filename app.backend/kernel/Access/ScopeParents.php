@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Acadly\Kernel\Access;
 
 /**
- * Knows the places of some scope types and what directly contains each.
- * The domains that own those places register one (tag `acadly.scope-parents`);
- * the kernel composes them into the scope tree and names no domain.
+ * Knows the places of some scope types: what directly contains each, what
+ * each is called, and which are in force. The domains that own those places
+ * register one (tag `acadly.scope-parents`); the kernel composes them into the
+ * scope tree and names no domain.
  */
 interface ScopeParents
 {
@@ -21,4 +22,14 @@ interface ScopeParents
      * @return list<ScopeRef>|null
      */
     public function parents(ScopeRef $scope): ?array;
+
+    /** What people call the place, or null when it is unknown. */
+    public function label(ScopeRef $scope): ?string;
+
+    /**
+     * The places in force a role can be given at, in the order people expect.
+     *
+     * @return list<array{scope: ScopeRef, label: string}>
+     */
+    public function places(): array;
 }

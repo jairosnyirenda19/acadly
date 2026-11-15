@@ -57,7 +57,8 @@ export function ContextProvider({ value, children }: { value: AppContext; childr
   return createElement(Shared.Provider, { value }, children)
 }
 
-function useAppContext(): AppContext {
+/** The whole context, for screens that decide what to offer. */
+export function useAppContext(): AppContext {
   const value = useContext(Shared)
 
   if (value === null) {

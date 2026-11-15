@@ -54,6 +54,7 @@ final class AssignRole
         ScopeRef $at,
         ?CarbonImmutable $endsAt = null,
         ?string $reason = null,
+        ?CarbonImmutable $startsAt = null,
     ): RoleAssignment {
         $this->access->check($by, AccessPermission::AssignRoles, $at);
 
@@ -76,17 +77,19 @@ final class AssignRole
             throw ValidationException::withMessages(['user' => ['The account is disabled.']]);
         }
 
-        if ($endsAt !== null && $endsAt <= $now) {
-            throw ValidationException::withMessages(['ends_at' => ['The end date must be in the future.']]);
+        $startsAt = $startsAt !== null && $startsAt > $now ? $startsAt : $now;
+
+        if ($endsAt !== null && $endsAt <= $startsAt) {
+            throw ValidationException::withMessages(['ends_at' => ['The end date must be after the start date, and in the future.']]);
         }
 
-        $assignment = DB::transaction(function () use ($by, $to, $role, $at, $now, $endsAt, $reason): RoleAssignment {
+        $assignment = DB::transaction(function () use ($by, $to, $role, $at, $startsAt, $endsAt, $reason): RoleAssignment {
             $assignment = RoleAssignment::query()->create([
                 'user_id' => $to->id,
                 'role_id' => $role->id,
                 'scope_type' => $at->type,
                 'scope_id' => $at->id,
-                'starts_at' => $now,
+                'starts_at' => $startsAt,
                 'ends_at' => $endsAt,
                 'granted_by' => $by->id,
                 'reason' => $reason,

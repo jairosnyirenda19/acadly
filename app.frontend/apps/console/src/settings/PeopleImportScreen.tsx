@@ -1,5 +1,5 @@
 import { api, navigate, type paths } from '@acadly/kernel'
-import { Button, Notice } from '@acadly/ui'
+import { Button, Notice, slips } from '@acadly/ui'
 import { useRef, useState } from 'react'
 import { copy } from '../copy'
 import { errorFor, settle } from '../setup/api'
@@ -84,7 +84,10 @@ export function PeopleImportScreen() {
     setError(null)
     const r = await upload<Imported>('/v1/people/import', file, send)
     setWorking(false)
-    if (r.kind === 'saved') navigate(`/settings/people?imported=${r.data.invited}:${r.data.roles}`)
+    if (r.kind === 'saved') {
+      slips.done({ word: copy.slips.imported, title: t.done(r.data.invited, r.data.roles) })
+      navigate('/settings/people')
+    }
     else fail(r)
   }
 
@@ -288,7 +291,7 @@ export function PeopleImportScreen() {
           </label>
         )}
         <span className="flex-[1_1_240px] text-sm text-text-muted">{importable === 0 ? t.nothing : t.leftOut(checked.totals.wrong)}</span>
-        <Button disabled={working || importable === 0} onClick={() => void run()}>
+        <Button busy={working} disabled={importable === 0} onClick={() => void run()}>
           {working ? t.inviting : checked.totals.new_people > 0 ? t.invite(checked.totals.new_people) : t.giveOnly(importable)}
         </Button>
       </footer>

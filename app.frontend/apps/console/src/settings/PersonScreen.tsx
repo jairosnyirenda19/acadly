@@ -1,6 +1,6 @@
-import { navigate } from '@acadly/kernel'
-import { Button, Notice } from '@acadly/ui'
-import { useEffect, useState } from 'react'
+import { navigate, useLoad } from '@acadly/kernel'
+import { Button, Notice, slips, Waiting } from '@acadly/ui'
+import { useState } from 'react'
 import { copy } from '../copy'
 import { errorFor } from '../setup/api'
 import { Input, SectionTitle, nn } from '../setup/parts'
@@ -14,12 +14,11 @@ const s = copy.settings
 const COLS = 'grid-cols-[48px_minmax(150px,1.3fr)_minmax(140px,1.2fr)_minmax(130px,1fr)_72px]'
 
 export function PersonScreen({ id }: { id: string }) {
-  const [state, setState] = useState<PersonState | 'refused' | null | undefined>(undefined)
   const [message, setMessage] = useState<{ tone: 'done' | 'wrong'; text: string } | null>(null)
 
-  useEffect(() => {
-    void settingsApi.person(id).then(setState)
-  }, [id])
+  const loaded = useLoad(`person:${id}`, () => settingsApi.person(id))
+  const state = loaded.data
+  const setState = loaded.set
 
   const back = (
     <a
@@ -34,14 +33,21 @@ export function PersonScreen({ id }: { id: string }) {
     </a>
   )
 
-  if (state === undefined) return <SettingsTabs current="people" />
+  if (state === undefined && (loaded.phase === 'quiet' || loaded.phase === 'waiting' || loaded.phase === 'slow')) {
+    return (
+      <>
+        <SettingsTabs current="people" />
+        <Waiting phase={loaded.phase} what={t.held} labels={copy.loading} rows={3} />
+      </>
+    )
+  }
 
-  if (state === null || state === 'refused') {
+  if (state === undefined) {
     return (
       <>
         <SettingsTabs current="people" />
         <div className="flex flex-col gap-4 p-[clamp(16px,3vw,40px)]">
-          <Notice tone="wrong" title={state === null ? t.notFound : s.refused} />
+          <Notice tone="wrong" title={loaded.phase === 'refused' ? s.refused : t.notFound} />
           <div>{back}</div>
         </div>
       </>
@@ -52,7 +58,8 @@ export function PersonScreen({ id }: { id: string }) {
   const outcome = (result: { kind: string; data?: PersonState }, done?: string) => {
     if (result.kind === 'saved' && result.data !== undefined) {
       setState(result.data)
-      setMessage(done !== undefined ? { tone: 'done', text: done } : null)
+      setMessage(null)
+      if (done !== undefined) slips.done({ word: done === t.resetSent || done === t.resent ? copy.slips.sent : copy.slips.saved, title: done })
     } else {
       setMessage({ tone: 'wrong', text: result.kind === 'refused' ? s.refused : s.failed })
     }
@@ -105,13 +112,13 @@ export function PersonScreen({ id }: { id: string }) {
               <div className="ledger [--margin:48px]">
                 {state.held.length === 0 && <p className="py-4 pl-[60px] text-sm text-text-muted">{t.none}</p>}
                 {state.held.map((held, i) => (
-                  <HeldLine key={held.id} n={i + 1} held={held} personId={person.id} onDone={(r) => outcome(r)} />
+                  <HeldLine key={held.id} n={i + 1} held={held} personId={person.id} onDone={(r) => outcome(r, t.roleEnded)} />
                 ))}
               </div>
             </div>
           </div>
 
-          {person.state !== 'disabled' && state.giving.places.length > 0 && <GiveForm state={state} onDone={(r) => outcome(r)} />}
+          {person.state !== 'disabled' && state.giving.places.length > 0 && <GiveForm state={state} onDone={(r) => outcome(r, t.roleGiven)} />}
 
           {state.ended.length > 0 && (
             <>
@@ -214,7 +221,7 @@ function HeldLine({ n, held, personId, onDone }: { n: number; held: PersonState[
           <div className="min-w-[220px] flex-1">
             <Input label={t.endReason} required value={reason} onChange={(e) => setReason(e.target.value)} error={error} maxLength={500} />
           </div>
-          <Button type="submit" disabled={working}>
+          <Button type="submit" busy={working}>
             {working ? s.saving : t.endConfirm}
           </Button>
           <Button variant="secondary" onClick={() => setEnding(false)}>
@@ -281,7 +288,7 @@ function GiveForm({ state, onDone }: { state: PersonState; onDone: Done }) {
         <Input label={g.reason} required wide value={reason} onChange={(e) => setReason(e.target.value)} error={errorFor(errors, 'reason')} maxLength={500} />
       </div>
       <div className="mt-4 flex flex-wrap gap-2.5">
-        <Button type="submit" disabled={working || blocked}>
+        <Button type="submit" busy={working} disabled={blocked}>
           {working ? s.saving : t.giveSubmit}
         </Button>
       </div>
@@ -313,7 +320,7 @@ function AccountActions({ state, onDone }: { state: PersonState; onDone: Done })
         {person.state === 'active' || person.state === 'no_role' ? (
           <Button
             variant="secondary"
-            disabled={working}
+            busy={working}
             onClick={() =>
               void run(async () => {
                 const r = await settingsApi.passwordReset(person.id)
@@ -325,7 +332,7 @@ function AccountActions({ state, onDone }: { state: PersonState; onDone: Done })
             {t.reset}
           </Button>
         ) : (
-          <Button variant="secondary" disabled={working} onClick={() => void run(() => settingsApi.resend(person.id), t.resent)}>
+          <Button variant="secondary" busy={working} onClick={() => void run(() => settingsApi.resend(person.id), t.resent)}>
             {t.resend}
           </Button>
         )}

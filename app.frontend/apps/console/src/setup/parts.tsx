@@ -156,7 +156,7 @@ export function StepFooter({
         </Button>
       )}
       <span className="flex-[1_1_240px] text-sm text-text-muted">{blocked ?? t.later}</span>
-      <Button disabled={working || blocked !== undefined} onClick={onPrimary}>
+      <Button busy={working} disabled={blocked !== undefined} onClick={onPrimary}>
         {working ? t.saving : primary}
       </Button>
     </>

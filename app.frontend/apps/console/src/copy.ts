@@ -327,6 +327,27 @@ export const copy = {
     },
   },
 
+  loading: {
+    loading: (what: string) => `Loading ${what}.`,
+    slowTitle: 'Still loading.',
+    slowText: 'The connection is slow. The page keeps trying.',
+    failedTitle: 'This page could not be loaded.',
+    failedText: 'The service cannot be reached. Try again shortly.',
+    retry: 'Try again',
+    refusedTitle: 'Access refused.',
+    refusedText: 'You do not hold the permission for this page.',
+  },
+
+  slips: {
+    region: 'Notices, F8',
+    close: 'Close',
+    count: (n: number) => `${n} notices · F8`,
+    repeat: (n: number) => `x${n}`,
+    saved: 'Saved',
+    sent: 'Sent',
+    imported: 'Imported',
+  },
+
   settings: {
     kicker: 'Settings',
     tabsLabel: 'Settings',
@@ -460,6 +481,11 @@ export const copy = {
       bandGiversNote: (names: string[]) => (names.length === 0 ? 'Nobody.' : `${names.join(', ')}.`),
       find: 'Find a person',
       findPlaceholder: 'Name or email address',
+      scopeLabel: 'Whose roles to list',
+      scopeIn: (place: string) => `In ${place}`,
+      scopeEveryone: 'Everyone you can see',
+      showingIn: (place: string) => `Showing the people with a role in ${place}, where you work now.`,
+      showingEveryone: 'Showing everyone in the parts of the school where you can give roles, whatever place you work in.',
       anyRole: 'Any role',
       anywhere: 'Anywhere',
       stateLabel: 'State',
@@ -579,6 +605,8 @@ export const copy = {
       disableConfirm: 'Disable',
       disableNote: 'Disabling stops every role at once and signs the person out. It needs a reason and is recorded.',
       disabledDone: 'The account has been disabled.',
+      roleGiven: 'The role has been given.',
+      roleEnded: 'The role has been ended.',
       disabled: (day: string, reason: string) => `Disabled ${day}${reason !== '' ? `: ${reason}` : '.'}`,
       outside: "Some of this person's roles are outside the parts of the school where you can give roles. Only the roles inside them can be changed here.",
       back: 'All people',

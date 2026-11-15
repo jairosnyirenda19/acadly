@@ -1,5 +1,6 @@
-import { Button, Notice } from '@acadly/ui'
-import { useEffect, useState } from 'react'
+import { useLoad } from '@acadly/kernel'
+import { Button, Notice, slips, Waiting } from '@acadly/ui'
+import { useState } from 'react'
 import { copy } from '../copy'
 import { errorFor } from '../setup/api'
 import { Input, SectionTitle, Select, Total, TotalsBand, nn } from '../setup/parts'
@@ -14,24 +15,20 @@ type Panel = { mode: 'add' } | { mode: 'edit'; subject: Subject } | { mode: 'ret
 const COLS = 'grid-cols-[48px_minmax(200px,1.4fr)_90px_minmax(230px,1.6fr)_130px_90px]'
 
 export function SubjectsScreen() {
-  const [state, setState] = useState<SubjectsState | 'refused' | null | undefined>(undefined)
   const [tab, setTab] = useState('')
   const [panel, setPanel] = useState<Panel>({ mode: 'add' })
   const [message, setMessage] = useState<{ tone: 'done' | 'wrong'; text: string } | null>(null)
   const [working, setWorking] = useState(false)
 
-  useEffect(() => {
-    void academicsApi.subjects().then(setState)
-  }, [])
+  const loaded = useLoad('subjects', () => academicsApi.subjects())
+  const state = loaded.data
+  const setState = loaded.set
 
-  if (state === undefined) return <SettingsTabs current="subjects" />
-  if (state === null || state === 'refused') {
+  if (state === undefined) {
     return (
       <>
         <SettingsTabs current="subjects" />
-        <div className="p-[clamp(16px,3vw,40px)]">
-          <Notice tone="wrong" title={state === 'refused' ? s.refused : s.loadFailed} />
-        </div>
+        <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} band={[t.title, t.bandCore, t.bandOptional, t.bandAttention]} rows={8} onRetry={loaded.reload} />
       </>
     )
   }
@@ -40,7 +37,8 @@ export function SubjectsScreen() {
   const outcome = (result: { kind: string; data?: SubjectsState }, done?: string) => {
     if (result.kind === 'saved' && result.data !== undefined) {
       setState(result.data)
-      setMessage(done !== undefined ? { tone: 'done', text: done } : null)
+      setMessage(null)
+      if (done !== undefined) slips.done({ word: copy.slips.saved, title: done })
       return true
     }
     setMessage({ tone: 'wrong', text: result.kind === 'refused' ? s.refused : s.failed })
@@ -116,7 +114,7 @@ export function SubjectsScreen() {
               <p className="mt-1.5 mb-3 max-w-[60ch] text-sm text-text-muted">{t.emptyText(level.starter.length, level.subject_word_plural)}</p>
               <p className="mb-4 text-sm font-bold">{level.starter.map((x) => x.name).join(' · ')}</p>
               <Button
-                disabled={working}
+                busy={working}
                 onClick={() => {
                   setWorking(true)
                   void academicsApi.start(level.division_id).then((r) => {
@@ -205,7 +203,8 @@ export function SubjectsScreen() {
               onDone={(data, done) => {
                 setState(data)
                 setPanel({ mode: 'add' })
-                setMessage({ tone: 'done', text: done })
+                setMessage(null)
+                slips.done({ word: copy.slips.saved, title: done })
               }}
               onCancel={() => setPanel({ mode: 'add' })}
             />
@@ -282,7 +281,7 @@ function SidePanel({ level, panel, onDone, onCancel }: { level: SubjectLevel; pa
         <Input label={t.reason} required value={reason} onChange={(e) => setReason(e.target.value)} error={errorFor(errors, 'reason')} maxLength={500} />
         <p className="text-[13px] text-text-muted">{t.retireNote}</p>
         <div className="flex flex-wrap gap-2.5">
-          <Button type="submit" disabled={working || subject === ''}>
+          <Button type="submit" busy={working} disabled={subject === ''}>
             {working ? s.saving : t.retire}
           </Button>
           <Button variant="secondary" onClick={onCancel}>
@@ -353,7 +352,7 @@ function SidePanel({ level, panel, onDone, onCancel }: { level: SubjectLevel; pa
         ))}
       </div>
       <div className="flex flex-wrap gap-2.5">
-        <Button type="submit" disabled={working}>
+        <Button type="submit" busy={working}>
           {working ? s.saving : editing !== null ? t.save : t.add}
         </Button>
         {editing !== null && (

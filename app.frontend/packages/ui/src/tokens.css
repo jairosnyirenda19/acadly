@@ -48,6 +48,18 @@
 
   /* Nothing floats. */
   --shadow-*: initial;
+
+  /* A slip arrives: up 12px, from already visible. The one authored movement. */
+  --animate-slip-in: slip-in 180ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes slip-in {
+    from {
+      transform: translateY(12px);
+    }
+    to {
+      transform: none;
+    }
+  }
 }
 
 /* ── Idioms ──────────────────────────────────────────────────────────────────

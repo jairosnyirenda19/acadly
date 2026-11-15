@@ -42,7 +42,12 @@ export function Heading({ kicker, title }: { kicker: string; title: string }) {
 }
 
 /** A link to another screen of the app, without a page reload. */
-export function InLink({ to, className = '', children }: { to: string; className?: string; children: ReactNode }) {
+export function InLink({ to, className = '', look = 'link', children }: { to: string; className?: string; look?: 'link' | 'button'; children: ReactNode }) {
+  const style =
+    look === 'button'
+      ? 'inline-flex h-[52px] items-center justify-center bg-teal text-base font-extrabold text-sheet no-underline hover:bg-ink hover:text-sheet'
+      : 'text-[13px] font-bold text-teal hover:text-ink'
+
   return (
     <a
       href={to}
@@ -50,7 +55,7 @@ export function InLink({ to, className = '', children }: { to: string; className
         event.preventDefault()
         navigate(to)
       }}
-      className={`text-[13px] font-bold text-teal hover:text-ink ${className}`}
+      className={`${style} ${className}`}
     >
       {children}
     </a>

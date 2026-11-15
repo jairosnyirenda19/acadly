@@ -32,7 +32,7 @@ function CampusForm({ campus, onDone }: { campus: Campus | null; onDone: (state:
       <Input label={t.campusPlace} required value={place} onChange={(e) => setPlace(e.target.value)} error={errorFor(errors, 'place')} maxLength={120} />
       <TextArea label={t.campusAddress} value={address} onChange={(e) => setAddress(e.target.value)} error={errorFor(errors, 'address')} />
       <div className="flex flex-wrap gap-2">
-        <Button disabled={working} onClick={() => void save()}>
+        <Button busy={working} onClick={() => void save()}>
           {working ? copy.setup.saving : t.saveCampus}
         </Button>
         <Button variant="secondary" onClick={() => onDone(null)}>

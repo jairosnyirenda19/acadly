@@ -54,10 +54,7 @@ export function ResetPasswordScreen({ token, email, invitation = false }: { toke
         <Notice tone={changed ? 'done' : 'wrong'} title={changed ? words.changedTitle : words.invalidTitle}>
           {changed ? words.changed : words.invalid}
         </Notice>
-        <InLink
-          to={changed ? '/' : '/forgot-password'}
-          className="inline-flex h-[52px] items-center justify-center bg-teal text-base font-extrabold text-sheet no-underline hover:bg-ink hover:text-sheet"
-        >
+        <InLink to={changed ? '/' : '/forgot-password'} look="button">
           {changed ? t.toSignIn : t.requestNew}
         </InLink>
       </>

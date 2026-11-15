@@ -1,5 +1,6 @@
-import { Button, Notice } from '@acadly/ui'
-import { Fragment, useEffect, useState } from 'react'
+import { useLoad } from '@acadly/kernel'
+import { Button, Notice, slips, Waiting } from '@acadly/ui'
+import { Fragment, useState } from 'react'
 import { copy } from '../copy'
 import { errorFor } from '../setup/api'
 import { Input, Select } from '../setup/parts'
@@ -16,25 +17,20 @@ type Flips = Record<string, Set<string>>
 const has = (role: Role, flips: Flips, key: string) => (role.system ? true : role.permissions.includes(key) !== (flips[role.id]?.has(key) ?? false))
 
 export function RolesScreen() {
-  const [state, setState] = useState<RolesState | 'refused' | null | undefined>(undefined)
   const [flips, setFlips] = useState<Flips>({})
   const [creating, setCreating] = useState<'new' | 'copy' | null>(null)
   const [message, setMessage] = useState<{ tone: 'done' | 'wrong'; text: string } | null>(null)
   const [working, setWorking] = useState(false)
 
-  useEffect(() => {
-    void settingsApi.roles().then(setState)
-  }, [])
+  const loaded = useLoad('roles', () => settingsApi.roles())
+  const state = loaded.data
+  const setState = loaded.set
 
-  if (state === undefined) return <SettingsTabs current="roles" />
-
-  if (state === null || state === 'refused') {
+  if (state === undefined) {
     return (
       <>
         <SettingsTabs current="roles" />
-        <div className="p-[clamp(16px,3vw,40px)]">
-          <Notice tone="wrong" title={state === 'refused' ? s.refused : s.loadFailed} />
-        </div>
+        <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} rows={8} onRetry={loaded.reload} />
       </>
     )
   }
@@ -77,7 +73,8 @@ export function RolesScreen() {
     setWorking(false)
     setState(latest)
     setFlips({})
-    setMessage({ tone: 'done', text: t.saved })
+    setMessage(null)
+    slips.done({ word: copy.slips.saved, title: t.saved })
   }
 
   const cols = `minmax(300px,1.6fr) repeat(${state.roles.length}, minmax(112px,1fr))`
@@ -266,7 +263,7 @@ function CreateRole({ mode, state, onDone, onCancel }: { mode: 'new' | 'copy'; s
         )}
       </div>
       <div className="mt-4 flex flex-wrap gap-2.5">
-        <Button type="submit" disabled={working}>
+        <Button type="submit" busy={working}>
           {working ? s.saving : t.createSubmit}
         </Button>
         <Button variant="secondary" onClick={onCancel}>

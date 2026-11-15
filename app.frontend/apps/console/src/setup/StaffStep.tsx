@@ -115,7 +115,7 @@ export function StaffStep({ setup, onSetup, layout, next }: StepProps) {
                 </option>
               ))}
             </Select>
-            <Button type="submit" variant="secondary" disabled={working}>
+            <Button type="submit" variant="secondary" busy={working}>
               {t.add}
             </Button>
           </form>

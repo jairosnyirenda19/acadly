@@ -1,5 +1,6 @@
-import { Button, Notice } from '@acadly/ui'
-import { useEffect, useState } from 'react'
+import { useLoad } from '@acadly/kernel'
+import { Button, Notice, slips, Waiting } from '@acadly/ui'
+import { useState } from 'react'
 import { copy } from '../copy'
 import { Total, TotalsBand } from '../setup/parts'
 import { academicsApi, type TeachingState } from './academicsApi'
@@ -12,24 +13,20 @@ type Tab = { division_id: string; campus_id: string }
 type Cell = { classId: string; className: string; subjectId: string | null; what: string; who: { id: string; name: string } | null }
 
 export function TeachingScreen() {
-  const [state, setState] = useState<TeachingState | 'refused' | null | undefined>(undefined)
   const [tab, setTab] = useState<Tab | null>(null)
   const [cell, setCell] = useState<Cell | null>(null)
   const [message, setMessage] = useState<{ tone: 'done' | 'wrong'; text: string } | null>(null)
   const [working, setWorking] = useState(false)
 
-  useEffect(() => {
-    void academicsApi.teaching(tab).then(setState)
-  }, [tab])
+  const loaded = useLoad(`teaching:${tab?.division_id ?? ''}:${tab?.campus_id ?? ''}`, () => academicsApi.teaching(tab))
+  const state = loaded.data
+  const setState = loaded.set
 
-  if (state === undefined) return <SettingsTabs current="teaching" />
-  if (state === null || state === 'refused') {
+  if (state === undefined) {
     return (
       <>
         <SettingsTabs current="teaching" />
-        <div className="p-[clamp(16px,3vw,40px)]">
-          <Notice tone="wrong" title={state === 'refused' ? s.refused : s.loadFailed} />
-        </div>
+        <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} band={[t.bandClasses, t.bandGiven, t.bandAttention, t.bandTeachers]} rows={6} onRetry={loaded.reload} />
       </>
     )
   }
@@ -44,7 +41,8 @@ export function TeachingScreen() {
     if (r.kind === 'saved' && r.data !== undefined) {
       setState(r.data)
       setCell(null)
-      setMessage(done !== undefined ? { tone: 'done', text: done } : null)
+      setMessage(null)
+      if (done !== undefined) slips.done({ word: copy.slips.saved, title: done })
     } else if (r.kind === 'invalid') {
       setMessage({ tone: 'wrong', text: Object.values(r.errors ?? {})[0]?.[0] ?? s.failed })
     } else {
@@ -83,7 +81,7 @@ export function TeachingScreen() {
           state.earlier_year !== null && current !== null ? (
             <Button
               variant="secondary"
-              disabled={working}
+              busy={working}
               onClick={() => {
                 setWorking(true)
                 const before = state.totals.given
@@ -269,11 +267,11 @@ function Chooser({
         ))}
       </div>
       <div className="mt-4 flex flex-wrap gap-2.5">
-        <Button disabled={working || chosen === '' || chosen === cell.who?.id} onClick={() => onGive(chosen)}>
+        <Button busy={working} disabled={chosen === '' || chosen === cell.who?.id} onClick={() => onGive(chosen)}>
           {cell.subjectId === null ? t.giveClass(name) : t.give(cell.what, name)}
         </Button>
         {cell.who !== null && (
-          <Button variant="secondary" disabled={working} onClick={() => onGive(null)}>
+          <Button variant="secondary" busy={working} onClick={() => onGive(null)}>
             {t.takeBack}
           </Button>
         )}

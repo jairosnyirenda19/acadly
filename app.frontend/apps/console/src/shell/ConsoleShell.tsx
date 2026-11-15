@@ -1,4 +1,5 @@
-import { can, navigate, signOut, useAppContext, type AppContext } from '@acadly/kernel'
+import { can, navigate, signOut, useAppContext, useLoading, type AppContext } from '@acadly/kernel'
+import { LoadingRule } from '@acadly/ui'
 import { useCallback, useState, type ReactNode } from 'react'
 import { copy } from '../copy'
 import { WorkInButton, WorkInPanel } from './WorkIn'
@@ -36,6 +37,7 @@ function initials(name: string): string {
 /** The frame of the console after the school opens: the ink rail, the header and the page. */
 export function ConsoleShell({ section, children, onSignedOut }: { section: 'today' | 'settings'; children: ReactNode; onSignedOut: () => void }) {
   const context = useAppContext()
+  const busy = useLoading()
   const [choosing, setChoosing] = useState(false)
   const close = useCallback(() => setChoosing(false), [])
   const items = [
@@ -82,7 +84,8 @@ export function ConsoleShell({ section, children, onSignedOut }: { section: 'tod
       {choosing && <WorkInPanel onClose={close} />}
 
       <main className="flex min-w-0 flex-[999_1_560px] flex-col">
-        <header className="flex flex-wrap items-center gap-3 border-b-2 border-ink bg-paper px-[clamp(16px,3vw,40px)] py-2.5">
+        <header className="relative flex flex-wrap items-center gap-3 border-b-2 border-ink bg-paper px-[clamp(16px,3vw,40px)] py-2.5">
+          <LoadingRule active={busy} />
           <div className="ml-auto flex items-center gap-2">
             <span className="w-[176px] text-right leading-tight">
               <span className="block truncate text-sm font-extrabold">{context.user.name}</span>

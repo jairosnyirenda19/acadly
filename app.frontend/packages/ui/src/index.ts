@@ -1,3 +1,6 @@
 export { Button } from './Button'
 export { PasswordField, TextField } from './Field'
 export { Notice } from './Notice'
+export { SlipPad, type SlipLabels } from './SlipPad'
+export { createSlips, slips, type Slip, type SlipInput, type SlipKind, type Slips } from './slips'
+export { LoadingRule, Waiting, WaitingBand, WaitingRows, type WaitingLabels } from './Waiting'

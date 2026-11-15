@@ -11,7 +11,7 @@ import {
   type Account,
   type AppContext,
 } from '@acadly/kernel'
-import { Button, Notice } from '@acadly/ui'
+import { Button, Notice, SlipPad } from '@acadly/ui'
 import { useEffect, useState } from 'react'
 import { copy } from './copy'
 import { AuthLayout, Heading } from './sign-in/AuthLayout'
@@ -157,6 +157,7 @@ export function App() {
         <WorkInProvider>
           <Console path={path} onSignedOut={signedOut} />
         </WorkInProvider>
+        <SlipPad labels={copy.slips} />
       </ContextProvider>
     )
   }

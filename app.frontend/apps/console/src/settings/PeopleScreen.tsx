@@ -1,6 +1,6 @@
-import { navigate, useLocation } from '@acadly/kernel'
-import { Button, Notice } from '@acadly/ui'
-import { useEffect, useMemo, useState } from 'react'
+import { navigate, useLoad } from '@acadly/kernel'
+import { Button, Notice, Waiting } from '@acadly/ui'
+import { useMemo, useState } from 'react'
 import { copy } from '../copy'
 import { errorFor } from '../setup/api'
 import { Input, Total, TotalsBand, nn } from '../setup/parts'
@@ -23,7 +23,6 @@ const inFilter = (person: PersonRow, filter: Filter) =>
 const COLS = 'grid-cols-[48px_minmax(200px,1.4fr)_minmax(240px,2fr)_minmax(110px,0.7fr)_180px]'
 
 export function PeopleScreen() {
-  const [state, setState] = useState<PeopleState | 'refused' | null | undefined>(undefined)
   const [search, setSearch] = useState('')
   const [role, setRole] = useState('')
   const [where, setWhere] = useState('')
@@ -31,14 +30,15 @@ export function PeopleScreen() {
   const [inviting, setInviting] = useState(false)
 
   const { place } = useWorkIn()
-  const { query } = useLocation()
-  const imported = (query.get('imported') ?? '').split(':').map(Number)
-  const inPlace = place !== null && place.key !== 'institution:' ? place.key : null
-  const load = () => void settingsApi.people(inPlace).then(setState)
-  useEffect(load, [inPlace])
+  const [everyone, setEveryone] = useState(false)
+  const narrowed = place !== null && place.key !== 'institution:'
+  const inPlace = narrowed && !everyone ? place.key : null
+  const loaded = useLoad(`people:${inPlace ?? ''}`, () => settingsApi.people(inPlace))
+  const state = loaded.data
+  const load = loaded.reload
 
   const people = useMemo(() => {
-    if (state === undefined || state === null || state === 'refused') return []
+    if (state === undefined) return []
     const q = search.trim().toLowerCase()
 
     return state.people.filter(
@@ -50,15 +50,11 @@ export function PeopleScreen() {
     )
   }, [state, search, role, where, filter])
 
-  if (state === undefined) return <SettingsTabs current="people" />
-
-  if (state === null || state === 'refused') {
+  if (state === undefined) {
     return (
       <>
         <SettingsTabs current="people" />
-        <div className="p-[clamp(16px,3vw,40px)]">
-          <Notice tone="wrong" title={state === 'refused' ? s.refused : s.loadFailed} />
-        </div>
+        <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} band={[t.bandAccess, t.bandInvited, t.bandAttention, t.bandGivers]} rows={6} onRetry={loaded.reload} />
       </>
     )
   }
@@ -98,9 +94,22 @@ export function PeopleScreen() {
       </TotalsBand>
 
       <section className="flex-1 bg-sheet px-[clamp(16px,3vw,40px)] pt-5 pb-8">
-        {imported.length === 2 && imported.every((n) => Number.isFinite(n)) && (
-          <div className="mb-4">
-            <Notice tone="done" title={copy.settings.importing.done(imported[0] ?? 0, imported[1] ?? 0)} />
+        {narrowed && (
+          <div className="mb-4 flex flex-wrap items-center gap-3 border-l-4 border-ink bg-paper px-4 py-2.5">
+            <span className="flex-[1_1_260px] text-sm">{everyone ? t.showingEveryone : t.showingIn(place.label)}</span>
+            <div role="group" aria-label={t.scopeLabel} className="flex h-10 border-2 border-ink">
+              {[false, true].map((all, i) => (
+                <button
+                  key={String(all)}
+                  type="button"
+                  aria-pressed={everyone === all}
+                  onClick={() => setEveryone(all)}
+                  className={`px-3.5 text-sm ${i > 0 ? 'border-l-2 border-ink' : ''} ${everyone === all ? 'bg-ink font-extrabold text-sheet' : 'font-bold text-ink hover:bg-field'}`}
+                >
+                  {all ? t.scopeEveryone : t.scopeIn(place.label)}
+                </button>
+              ))}
+            </div>
           </div>
         )}
         {inviting && <InviteForm giving={state.giving} onDone={(id) => navigate(`/settings/people/${id}`)} onCancel={() => setInviting(false)} />}
@@ -283,7 +292,7 @@ function InviteForm({ giving, onDone, onCancel }: { giving: PeopleState['giving'
         {t.sendNow}
       </label>
       <div className="mt-4 flex flex-wrap gap-2.5">
-        <Button type="submit" disabled={working || (role !== '' && place !== '' && missingAt(giving, role, place).length > 0)}>
+        <Button type="submit" busy={working} disabled={(role !== '' && place !== '' && missingAt(giving, role, place).length > 0)}>
           {working ? s.saving : t.inviteSubmit}
         </Button>
         <Button variant="secondary" onClick={onCancel}>

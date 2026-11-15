@@ -1,4 +1,5 @@
 import { api } from './api'
+import { forgetLoads } from './load'
 
 export interface Account {
   id: string
@@ -67,6 +68,9 @@ export async function signIn(email: string, password: string): Promise<SignInOut
 }
 
 export async function signOut(): Promise<void> {
+  // What pages remembered belongs to this account only.
+  forgetLoads()
+
   try {
     await prepare()
     await api.POST('/v1/auth/sign-out')

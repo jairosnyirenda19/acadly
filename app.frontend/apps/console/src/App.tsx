@@ -18,6 +18,7 @@ import { AuthLayout, Heading } from './sign-in/AuthLayout'
 import { ForgotPasswordScreen } from './sign-in/ForgotPasswordScreen'
 import { ResetPasswordScreen } from './sign-in/ResetPasswordScreen'
 import { AdmitScreen } from './learners/AdmitScreen'
+import { LearnerImportScreen } from './learners/LearnerImportScreen'
 import { LearnerScreen } from './learners/LearnerScreen'
 import { LearnersScreen } from './learners/LearnersScreen'
 import { PeopleImportScreen } from './settings/PeopleImportScreen'
@@ -51,6 +52,7 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   let page
   if (path === '/learners' && seesLearners) page = <LearnersScreen />
   else if (path === '/learners/admit' && holdsAnywhere(context, 'enrolment.admit')) page = <AdmitScreen />
+  else if (path === '/learners/import' && holdsAnywhere(context, 'enrolment.admit')) page = <LearnerImportScreen />
   else if (learner !== undefined && seesLearners) page = <LearnerScreen key={learner} id={learner} />
   else if (path === '/settings/people' && gives) page = <PeopleScreen />
   else if (path === '/settings/people/import' && gives) page = <PeopleImportScreen />

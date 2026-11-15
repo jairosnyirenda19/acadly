@@ -57,11 +57,20 @@ final class Numbers
         }
 
         while (DB::table('learner_identifiers')->where('kind', self::KIND)->where('value', $candidate)->exists()) {
-            preg_match('/^(.*?)(\d+)$/', $candidate, $m);
-            $candidate = ($m[1] ?? '').str_pad((string) ((int) ($m[2] ?? 0) + 1), strlen($m[2] ?? '1'), '0', STR_PAD_LEFT);
+            $candidate = self::after($candidate);
         }
 
         return $candidate;
+    }
+
+    /** The number after one: its digits at the end go up by one, keeping their width. */
+    public static function after(string $value): string
+    {
+        if (preg_match('/^(.*?)(\d+)$/', $value, $m) !== 1) {
+            return $value.'-1';
+        }
+
+        return $m[1].str_pad((string) ((int) $m[2] + 1), strlen($m[2]), '0', STR_PAD_LEFT);
     }
 
     /** Issues a number to a learner, retiring the one in force. */

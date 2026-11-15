@@ -46,7 +46,16 @@ export function LearnersScreen() {
         kicker={t.kicker(inPlace !== null && place !== null ? place.label : null, state.year?.name ?? null)}
         title={plural}
         intro={t.intro(word)}
-        actions={state.can_admit ? <Button onClick={() => navigate('/learners/admit')}>{t.admit(word)}</Button> : undefined}
+        actions={
+          state.can_admit ? (
+            <>
+              <Button variant="secondary" onClick={() => navigate('/learners/import')}>
+                {t.import}
+              </Button>
+              <Button onClick={() => navigate('/learners/admit')}>{t.admit(word)}</Button>
+            </>
+          ) : undefined
+        }
       />
 
       {state.year === null ? (

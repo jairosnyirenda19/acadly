@@ -2551,6 +2551,204 @@
                 }
             }
         },
+        "/v1/learners/import/template": {
+            "get": {
+                "operationId": "learners.import.template",
+                "summary": "A spreadsheet to fill in: the columns, and the classes, relationships and sexes to choose from",
+                "tags": [
+                    "LearnerImport"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "required": true,
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "attachment; filename=learners-to-admit.xlsx"
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/learners/import/check": {
+            "post": {
+                "operationId": "learners.import.check",
+                "summary": "Checks every row of a spreadsheet. Nothing is saved: `{file}`",
+                "tags": [
+                    "LearnerImport"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "rows": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "row": {
+                                                        "type": "integer"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "born": {
+                                                        "type": "string"
+                                                    },
+                                                    "sex": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "contacts": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "number": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "ready",
+                                                            "double",
+                                                            "wrong"
+                                                        ]
+                                                    },
+                                                    "note": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "row",
+                                                    "name",
+                                                    "born",
+                                                    "sex",
+                                                    "class",
+                                                    "contacts",
+                                                    "number",
+                                                    "state",
+                                                    "note"
+                                                ]
+                                            }
+                                        },
+                                        "totals": {
+                                            "type": "object",
+                                            "properties": {
+                                                "rows": {
+                                                    "type": "integer"
+                                                },
+                                                "ready": {
+                                                    "type": "integer"
+                                                },
+                                                "double": {
+                                                    "type": "integer"
+                                                },
+                                                "wrong": {
+                                                    "type": "integer"
+                                                },
+                                                "classes": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "rows",
+                                                "ready",
+                                                "double",
+                                                "wrong",
+                                                "classes"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "rows",
+                                        "totals"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/learners/import": {
+            "post": {
+                "operationId": "learners.import",
+                "summary": "Admits the rows without a problem, and the possible duplicates confirmed by row number: `{file, confirmed[]}`",
+                "tags": [
+                    "LearnerImport"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "confirmed": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "admitted": {
+                                            "type": "integer"
+                                        },
+                                        "left_out": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "admitted",
+                                        "left_out"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/learners": {
             "get": {
                 "operationId": "learners.index",

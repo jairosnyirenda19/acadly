@@ -348,6 +348,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/learners/import/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A spreadsheet to fill in: the columns, and the classes, relationships and sexes to choose from */
+        get: operations["learners.import.template"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learners/import/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Checks every row of a spreadsheet. Nothing is saved: `{file}` */
+        post: operations["learners.import.check"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learners/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Admits the rows without a problem, and the possible duplicates confirmed by row number: `{file, confirmed[]}` */
+        post: operations["learners.import"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/learners": {
         parameters: {
             query?: never;
@@ -1998,6 +2049,97 @@ export interface operations {
             403: components["responses"]["AuthorizationException"];
             404: components["responses"]["NotFoundHttpException"];
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "learners.import.template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    /** @example attachment; filename=learners-to-admit.xlsx */
+                    "Content-Disposition": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "learners.import.check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        rows: {
+                            row: number;
+                            name: string;
+                            born: string;
+                            sex: string;
+                            class: string;
+                            contacts: string[];
+                            number: string | null;
+                            /** @enum {string} */
+                            state: "ready" | "double" | "wrong";
+                            note: string;
+                        }[];
+                        totals: {
+                            rows: number;
+                            ready: number;
+                            double: number;
+                            wrong: number;
+                            classes: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "learners.import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    confirmed?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        admitted: number;
+                        left_out: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "learners.index": {

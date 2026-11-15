@@ -44,6 +44,9 @@ const RECORD_ROUTES = [
     'people.import.template' => 'PeopleImportTest: the template lists only the roles and places the viewer can give',
     'people.import.check' => 'PeopleImportTest: a row for a place outside the viewer\'s reach is not imported',
     'people.import' => 'PeopleImportTest: a row for a place outside the viewer\'s reach is not imported',
+    'learners.import.template' => 'LearnerImportTest: the template lists only the classes the viewer may admit into',
+    'learners.import.check' => 'LearnerImportTest: a row for a class outside the viewer\'s reach is not imported',
+    'learners.import' => 'LearnerImportTest: a row for a class outside the viewer\'s reach is not imported',
 ];
 
 /**

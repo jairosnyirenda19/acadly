@@ -27,7 +27,7 @@ final class ContextController
      * Navigation is empty until the screens that fill it. The screens use this
      * to decide what to offer; the server checks every request again.
      *
-     * @response array{user: array{id: string, name: string, email: string}, school: array{name: string, short_name: string, has_logo: bool, open: bool}, setup_required: bool, licence: array{status: 'valid'|'expired'|'missing'|'development', read_only: bool}, modules: list<string>, divisions: list<array{id: string, name: string, vocabulary: array<string, array{one: string, many: string}>}>, campuses: list<array{id: string, name: string}>, vocabulary: array<string, array{one: string, many: string}>, navigation: list<array{key: string, permission: string}>, grants: list<array{permission: string, scope_type: 'institution'|'division'|'campus'|'class', scope_id: string|null}>}
+     * @response array{user: array{id: string, name: string, email: string}, school: array{name: string, short_name: string, has_logo: bool, open: bool}, setup_required: bool, licence: array{status: 'valid'|'expired'|'missing'|'development', read_only: bool}, modules: list<string>, divisions: list<array{id: string, name: string, vocabulary: array<string, array{one: string, many: string}>}>, campuses: list<array{id: string, name: string}>, vocabulary: array<string, array{one: string, many: string}>, navigation: list<array{key: string, permission: string}>, grants: list<array{permission: string, scope_type: 'institution'|'division'|'campus'|'offering'|'class', scope_id: string|null}>}
      */
     public function __invoke(Request $request, Access $access, ModuleActivation $activation, Licences $licences, SchoolProfile $school): JsonResponse
     {

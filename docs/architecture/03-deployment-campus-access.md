@@ -81,12 +81,12 @@ History tables (audit, attendance events, journey step completions, effect appli
 
 ### Scope inside the school
 
-A user works within a scope: the whole institution, one division, one campus, or their own classes. Scope is resolved on the server from the user's role assignments. An identifier sent by a client is only a selector; it is checked before use. Every list and every record access applies the scope (§5).
+A user works within a scope: the whole institution, one division, one campus, one division at one campus (an offering), or their own classes. Scope is resolved on the server from the user's role assignments. An identifier sent by a client is only a selector; it is checked before use. Every list and every record access applies the scope (§5).
 
 ### Proof
 
 - Tests run against PostgreSQL as `acadly_app`. They prove the role cannot change the schema and cannot change an append-only row, and that the owner role is refused by the trigger too.
-- A generated test walks every route with a user scoped to campus A and resources of campus B. Every read and write must return 404 or 403.
+- A generated test walks every route with a user scoped to campus A and resources of campus B. Every read and write must return 404 or 403, with a full body and with an empty one, so the refusal comes before validation. A route that may answer such a user is listed in the test with its reason (`tests/Feature/CrossScopeTest.php`).
 
 ## 4. Identity
 
@@ -146,11 +146,12 @@ Journey gates are **not** in this list. "A fee is unpaid" or "the period is clos
 roles              (id, is_system, key, name)
 role_permissions   (role_id, permission_key)
 role_assignments   (id, user_id, role_id,
-                    scope_type, scope_id,           -- institution | division | campus | class
+                    scope_type, scope_id,           -- institution | division | campus | offering | class
                     starts_at, ends_at, granted_by)
 ```
 
-- A role is never global. It is always held **at a scope**. Wider scope covers narrower: institution covers its divisions and campuses.
+- A role is never global. It is always held **at a scope**. Wider scope covers narrower: the institution covers everything; a division and a campus each cover the offerings that join them; an offering covers its classes.
+- **A role is a name. Its permissions are its power.** No code tests the name of a role: it asks whether a permission is held at a scope. The one system role is found by its key only to keep its permissions complete and to make the first administrator; `acadly:lint` refuses any other use.
 - System roles come from the PRD (§5.2) and from Profile Blueprint role templates. A school may clone and adjust roles; it may never exceed the catalogue.
 - No one can grant a permission they do not hold, or a scope wider than their own.
 - Time-bound assignments (`ends_at`) serve temporary staff and support access.

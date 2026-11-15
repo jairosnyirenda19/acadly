@@ -8,6 +8,7 @@ use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Audit\KernelAudit;
 use Acadly\Kernel\Audit\Outcome;
 use Acadly\Kernel\Http\Problem;
+use Acadly\Kernel\Identity\AccountStatus;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Module\ModuleActivation;
 use Acadly\Kernel\Support\Clock;
@@ -111,6 +112,38 @@ final class Access
     public function grants(User $user): array
     {
         return $this->grants[$user->id] ??= $this->load($user);
+    }
+
+    /**
+     * How many active accounts hold a permission at a scope, through a role
+     * held there or at a scope that contains it. Power comes from permissions,
+     * never from the name of a role: this is how "is anyone left who can give
+     * roles for the whole school" is asked.
+     *
+     * @param  string|null  $except  an assignment to leave out, as if it had ended
+     */
+    public function holders(Permission $permission, ?ScopeRef $at = null, ?string $except = null): int
+    {
+        $at ??= ScopeRef::institution();
+        $places = [$at, ...$this->hierarchy->ancestors($at)];
+        $now = $this->clock->now();
+
+        return DB::table('access_role_assignments as a')
+            ->join('access_role_permissions as rp', 'rp.role_id', '=', 'a.role_id')
+            ->join('users as u', 'u.id', '=', 'a.user_id')
+            ->where('rp.permission_key', $permission->key())
+            ->where('u.status', AccountStatus::Active->value)
+            ->where('a.starts_at', '<=', $now)
+            ->where(fn (Builder $q): Builder => $q->whereNull('a.ends_at')->orWhere('a.ends_at', '>', $now))
+            ->when($except !== null, fn (Builder $q): Builder => $q->where('a.id', '!=', $except))
+            ->where(function (Builder $q) use ($places): void {
+                foreach ($places as $place) {
+                    $q->orWhere(fn (Builder $one): Builder => $one->where('a.scope_type', $place->type->value)
+                        ->where(fn (Builder $id): Builder => $place->id === null ? $id->whereNull('a.scope_id') : $id->where('a.scope_id', $place->id)));
+                }
+            })
+            ->distinct()
+            ->count('a.user_id');
     }
 
     /** Drop what this request remembers about an account, after its roles change. */

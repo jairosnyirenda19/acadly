@@ -439,6 +439,9 @@
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
                     },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     }
@@ -581,6 +584,9 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -781,6 +787,7 @@
                                                             "institution",
                                                             "division",
                                                             "campus",
+                                                            "offering",
                                                             "class"
                                                         ]
                                                     },
@@ -1809,6 +1816,9 @@
                             }
                         }
                     },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     }
@@ -1988,6 +1998,9 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -2282,6 +2295,9 @@
                     "404": {
                         "$ref": "#/components/responses/NotFoundHttpException"
                     },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     }
@@ -2455,6 +2471,9 @@
                     },
                     "404": {
                         "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -2715,6 +2734,9 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -3105,7 +3127,8 @@
                                                         "enum": [
                                                             "institution",
                                                             "division",
-                                                            "campus"
+                                                            "campus",
+                                                            "offering"
                                                         ]
                                                     },
                                                     "id": {
@@ -3180,7 +3203,8 @@
                                         "enum": [
                                             "institution",
                                             "division",
-                                            "campus"
+                                            "campus",
+                                            "offering"
                                         ]
                                     },
                                     "place_id": {
@@ -3316,13 +3340,23 @@
                                                     "properties": {
                                                         "type": {
                                                             "type": "string",
-                                                            "const": "campus"
+                                                            "const": "offering"
                                                         },
                                                         "id": {
                                                             "type": "string"
                                                         },
                                                         "name": {
-                                                            "type": "string"
+                                                            "anyOf": [
+                                                                {
+                                                                    "type": "string"
+                                                                },
+                                                                {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        " \u00b7 "
+                                                                    ]
+                                                                }
+                                                            ]
                                                         }
                                                     },
                                                     "required": [
@@ -3352,6 +3386,9 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -3481,13 +3518,23 @@
                                                     "properties": {
                                                         "type": {
                                                             "type": "string",
-                                                            "const": "campus"
+                                                            "const": "offering"
                                                         },
                                                         "id": {
                                                             "type": "string"
                                                         },
                                                         "name": {
-                                                            "type": "string"
+                                                            "anyOf": [
+                                                                {
+                                                                    "type": "string"
+                                                                },
+                                                                {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        " \u00b7 "
+                                                                    ]
+                                                                }
+                                                            ]
                                                         }
                                                     },
                                                     "required": [
@@ -3643,13 +3690,23 @@
                                                     "properties": {
                                                         "type": {
                                                             "type": "string",
-                                                            "const": "campus"
+                                                            "const": "offering"
                                                         },
                                                         "id": {
                                                             "type": "string"
                                                         },
                                                         "name": {
-                                                            "type": "string"
+                                                            "anyOf": [
+                                                                {
+                                                                    "type": "string"
+                                                                },
+                                                                {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        " \u00b7 "
+                                                                    ]
+                                                                }
+                                                            ]
                                                         }
                                                     },
                                                     "required": [

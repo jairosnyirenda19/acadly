@@ -7,15 +7,17 @@ namespace Acadly\Core\Setup\Application;
 use Acadly\Core\Academics\Contracts\AcademicCalendar;
 use Acadly\Core\Institution\Contracts\DivisionView;
 use Acadly\Core\Institution\Contracts\SchoolDirectory;
-use Acadly\Kernel\Access\Role;
+use Acadly\Kernel\Access\Access;
+use Acadly\Kernel\Access\AccessPermission;
+use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Identity\AccountStatus;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Where setup stands, step by step (the approved setup screens). A step is
  * done when what it sets is complete; staff is optional. The school can open
- * when every required step is done and an administrator holds the school.
+ * when every required step is done and an active account can give roles for
+ * the whole school.
  */
 final class SetupProgress
 {
@@ -24,6 +26,7 @@ final class SetupProgress
     public function __construct(
         private readonly SchoolDirectory $school,
         private readonly AcademicCalendar $calendar,
+        private readonly Access $access,
     ) {}
 
     /** @return array<string, bool> step => done */
@@ -76,16 +79,10 @@ final class SetupProgress
         return $blockers;
     }
 
+    /** Active accounts that can give roles for the whole school, whatever their roles are called. */
     public function administrators(): int
     {
-        return DB::table('access_role_assignments as a')
-            ->join('access_roles as r', 'r.id', '=', 'a.role_id')
-            ->join('users as u', 'u.id', '=', 'a.user_id')
-            ->where('r.key', Role::ADMINISTRATOR)->where('a.scope_type', 'institution')
-            ->where('u.status', AccountStatus::Active->value)
-            ->where('a.starts_at', '<=', now())
-            ->where(fn (Builder $q): Builder => $q->whereNull('a.ends_at')->orWhere('a.ends_at', '>', now()))
-            ->distinct()->count('a.user_id');
+        return $this->access->holders(AccessPermission::AssignRoles, ScopeRef::institution());
     }
 
     public function invitationsWaiting(): int

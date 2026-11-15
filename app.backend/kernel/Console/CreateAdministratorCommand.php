@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Acadly\Kernel\Console;
 
+use Acadly\Kernel\Access\Access;
+use Acadly\Kernel\Access\AccessPermission;
 use Acadly\Kernel\Access\Role;
 use Acadly\Kernel\Access\RoleAssignment;
 use Acadly\Kernel\Access\ScopeType;
@@ -20,8 +22,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 
 /**
- * Creates the first administrator of a new deployment. It runs only while no
- * administrator exists; after that, roles are given in the application.
+ * Creates the first administrator of a new deployment: an account holding the
+ * system role, which holds every permission, at the whole school. It runs only
+ * while no active account can give roles for the whole school; after that,
+ * roles are given in the application.
  */
 final class CreateAdministratorCommand extends Command
 {
@@ -29,7 +33,7 @@ final class CreateAdministratorCommand extends Command
 
     protected $description = 'Create the first administrator of this deployment';
 
-    public function handle(Clock $clock, Audit $audit): int
+    public function handle(Clock $clock, Audit $audit, Access $access): int
     {
         $role = Role::query()->where('key', Role::ADMINISTRATOR)->first();
 
@@ -39,8 +43,8 @@ final class CreateAdministratorCommand extends Command
             return self::FAILURE;
         }
 
-        if (RoleAssignment::query()->activeAt($clock->now())->where('role_id', $role->id)->exists()) {
-            $this->components->error('An administrator already exists. Give further roles in the application.');
+        if ($access->holders(AccessPermission::AssignRoles) > 0) {
+            $this->components->error('An account that can give roles for the whole school already exists. Give further roles in the application.');
 
             return self::FAILURE;
         }

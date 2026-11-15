@@ -1,0 +1,117 @@
+<?php
+
+declare(strict_types=1);
+
+use Acadly\Kernel\Access\PermissionCatalogue;
+use Acadly\Kernel\Access\Role;
+use Acadly\Kernel\Access\RoleAssignment;
+use Acadly\Kernel\Access\ScopeType;
+use Acadly\Kernel\Identity\User;
+use Acadly\Kernel\Support\Ids;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route as Router;
+use Tests\Fixtures\TwoCampusSchool;
+
+/*
+ * The cross-scope test (03 §3, "Proof"). It walks every route of the API with
+ * an account that holds every permission in the build, but only at campus A,
+ * and points each route at campus B. Every route must refuse: 403 or 404.
+ * A refusal must come before validation, so nothing about campus B leaks.
+ *
+ * A new route is covered the moment it is added. A route that may answer
+ * such an account must be listed below with the reason.
+ */
+
+/** Routes open to anyone: they reveal nothing about a place. */
+const OPEN_ROUTES = [
+    'sanctum.csrf-cookie', 'auth.sign-in', 'auth.forgot-password', 'auth.reset-password',
+    'kernel.health', 'kernel.ready', 'kernel.school', 'institution.logo.public',
+];
+
+/** Routes about the account itself, not about a place. */
+const OWN_ROUTES = ['auth.sign-out', 'me', 'me.context', 'me.notifications', 'me.notifications.read'];
+
+/** Routes decided per record by the owning domain, and proved in its own tests. */
+const RECORD_ROUTES = [
+    'documents.store' => 'DocumentsTest: refuses to store for a person without the kind permission',
+    'documents.show' => 'DocumentsTest: answers not found to a person who may not open the document',
+    'documents.content' => 'DocumentsTest: answers not found to a person who may not open the document',
+    'documents.versions.store' => 'DocumentsTest: answers not found to a person who may not open the document',
+    'documents.trash' => 'DocumentsTest: answers not found to a person who may not open the document',
+    'documents.restore' => 'DocumentsTest: trashes with a reason, restores a batch together',
+];
+
+uses(DatabaseTransactions::class);
+
+/** @return list<Route> */
+function apiRoutes(): array
+{
+    return array_values(array_filter(Router::getRoutes()->getRoutes(), fn (Route $route): bool => str_starts_with($route->uri(), 'api/v1/')));
+}
+
+it('lists only routes that exist, and every open route needs no sign-in', function (): void {
+    $names = array_map(fn (Route $route): ?string => $route->getName(), apiRoutes());
+
+    foreach ([...OPEN_ROUTES, ...OWN_ROUTES, ...array_keys(RECORD_ROUTES)] as $listed) {
+        expect($names)->toContain($listed);
+    }
+
+    foreach (apiRoutes() as $route) {
+        $guarded = in_array('auth:sanctum', $route->gatherMiddleware(), true);
+        expect($guarded)->toBe(! in_array($route->getName(), OPEN_ROUTES, true), "Route {$route->getName()} is listed wrongly as open or guarded.");
+    }
+});
+
+it('refuses every place-bound route to an account that holds everything, but only at another campus', function (): void {
+    $this->artisan('acadly:sync')->assertSuccessful();
+    DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'attendance', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
+    $school = TwoCampusSchool::make();
+
+    $everything = Role::query()->create(['key' => 'everything_at_a', 'name' => 'Everything at campus A']);
+    $everything->grant(array_values(app(PermissionCatalogue::class)->all()));
+    $user = User::factory()->create();
+    RoleAssignment::query()->create(['user_id' => $user->id, 'role_id' => $everything->id, 'scope_type' => ScopeType::Campus,
+        'scope_id' => $school->id('campus_a'), 'starts_at' => now()->subMinute()]);
+
+    // Values that point at campus B, for route parameters and request bodies alike.
+    $b = [
+        'id' => $school->id('campus_b'),
+        'key' => 'attendance',
+        'division_id' => $school->id('secondary'),
+        'campus_id' => $school->id('campus_b'),
+    ];
+    $body = [...$b, 'name' => 'Campus B', 'place' => 'Blantyre', 'taught' => true, 'streams' => ['F1' => ['East']],
+        'terms' => [['name' => 'Term 1', 'starts_on' => '2026-09-07', 'ends_on' => '2026-12-11']],
+        'starts_on' => '2026-09-07', 'ends_on' => '2027-07-23', 'levels' => [['profile' => 'SECONDARY']],
+        'email' => 'someone@example.test', 'role' => 'class_teacher', 'place_type' => 'campus', 'place_id' => $school->id('campus_b'),
+        'enabled' => true, 'reason' => 'Cross-scope test.'];
+
+    $checked = 0;
+
+    foreach (apiRoutes() as $route) {
+        $name = (string) $route->getName();
+
+        if (in_array($name, [...OPEN_ROUTES, ...OWN_ROUTES], true) || array_key_exists($name, RECORD_ROUTES)) {
+            continue;
+        }
+
+        $uri = '/'.preg_replace_callback('/\{(\w+)\??\}/', function (array $m) use ($b, $name): string {
+            return $b[$m[1]] ?? throw new LogicException("Give the cross-scope test a campus B value for {{$m[1]}} in route {$name}.");
+        }, $route->uri());
+
+        foreach (array_diff($route->methods(), ['HEAD']) as $method) {
+            // A full body pointing at campus B, and an empty one: neither may get past the refusal.
+            foreach ($method === 'GET' ? [[]] : [$body, []] as $sent) {
+                app()->forgetScopedInstances();
+                $status = $this->actingAs($user)->json($method, $uri, $sent)->status();
+
+                expect($status)->toBeIn([403, 404], "{$method} {$uri} ({$name}) answered {$status} to an account scoped to another campus.");
+                $checked++;
+            }
+        }
+    }
+
+    expect($checked)->toBeGreaterThan(10);
+});

@@ -56,8 +56,9 @@ final class ModulesController
      *
      * A reason is required and is kept in the audit trail.
      */
-    public function update(Request $request, string $key, SwitchModule $switch): JsonResponse
+    public function update(Request $request, string $key, SwitchModule $switch, Access $access): JsonResponse
     {
+        $access->check(self::user($request), ModulePermission::Manage);
         $request->validate([
             'enabled' => ['required', 'boolean'],
             'reason' => ['required', 'string', 'max:1000'],

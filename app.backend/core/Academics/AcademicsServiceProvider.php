@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Acadly\Core\Academics;
 
 use Acadly\Core\Academics\Application\Calendar;
+use Acadly\Core\Academics\Application\ClassScopes;
 use Acadly\Core\Academics\Contracts\AcademicCalendar;
+use Acadly\Kernel\Access\ScopeTree;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -16,6 +18,7 @@ final class AcademicsServiceProvider extends ServiceProvider
     {
         $this->app->scoped(Calendar::class);
         $this->app->bind(AcademicCalendar::class, Calendar::class);
+        $this->app->tag(ClassScopes::class, ScopeTree::PARENTS);
     }
 
     public function boot(): void

@@ -17,8 +17,8 @@ use Throwable;
  * The one command that runs every structural check
  * (docs/architecture/07-engineering-rules.md). It grows with each stage;
  * it checks the module graph, strict types, that the kernel names no
- * domain and no education level, the blueprints, the notices and the
- * document kinds.
+ * domain and no education level, no code tests the name of a role, the
+ * blueprints, the notices and the document kinds.
  */
 final class LintCommand extends Command
 {
@@ -38,6 +38,7 @@ final class LintCommand extends Command
             ...$this->moduleGraph(),
             ...$this->strictTypes(),
             ...$this->kernelNamesNoDomain(),
+            ...$this->noRoleNameChecks(),
             ...$this->blueprints(),
             ...$this->notices(),
             ...$this->documentKinds(),
@@ -140,6 +141,42 @@ final class LintCommand extends Command
         }
 
         return $problems;
+    }
+
+    /**
+     * A role is a name; its permissions give it power (rule 8). No code may
+     * test the name of a role. The key of the one system role may be used only
+     * to find that record: to keep its permissions complete and to make the
+     * first administrator.
+     *
+     * @return list<string>
+     */
+    private function noRoleNameChecks(): array
+    {
+        $allowed = ['kernel/Access/Role.php', 'kernel/Console/SyncCommand.php', 'kernel/Console/CreateAdministratorCommand.php'];
+        $problems = [];
+
+        foreach ($this->sources(['kernel', 'core', 'modules']) as $path => $code) {
+            if (in_array($path, $allowed, true) || str_ends_with($path, 'LintCommand.php')) {
+                continue;
+            }
+
+            // The system role's key, or a role compared with a fixed name. Reading a role's
+            // permissions, or recording its name in history, is not a test of power.
+
+            if (str_contains($code, 'Role::ADMINISTRATOR') || self::comparesRoleName($code)) {
+                $problems[] = "{$path}: code tests the name of a role. Ask Access whether a permission is held instead.";
+            }
+        }
+
+        return $problems;
+    }
+
+    /** A role's key compared with a fixed name: `Role::query()->where('key', 'x')` or `->where('r.key', 'x')`. */
+    public static function comparesRoleName(string $code): bool
+    {
+        return preg_match('/Role::query\(\)\s*->\s*where\(\s*[\'"]key[\'"]\s*,\s*[\'"]/', $code) === 1
+            || preg_match('/where\(\s*[\'"]r\.key[\'"]\s*,\s*[\'"]/', $code) === 1;
     }
 
     /**

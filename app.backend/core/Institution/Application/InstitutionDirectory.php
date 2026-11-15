@@ -116,20 +116,25 @@ final class InstitutionDirectory implements SchoolDirectory, SchoolProfile
             ->join('institution_campuses as c', 'c.id', '=', 'o.campus_id')
             ->whereNull('o.ended_at')->whereNull('d.ended_at')->whereNull('c.ended_at')
             ->orderBy('d.position')->orderBy('c.position')
-            ->get(['o.division_id', 'o.campus_id'])
-            ->map(fn (object $row): array => ['division_id' => Row::text($row, 'division_id'), 'campus_id' => Row::text($row, 'campus_id')])
+            ->get(['o.id', 'o.division_id', 'o.campus_id'])
+            ->map(fn (object $row): array => ['id' => Row::text($row, 'id'), 'division_id' => Row::text($row, 'division_id'), 'campus_id' => Row::text($row, 'campus_id')])
             ->all());
     }
 
     public function offers(string $divisionId, string $campusId): bool
     {
+        return $this->offeringId($divisionId, $campusId) !== null;
+    }
+
+    public function offeringId(string $divisionId, string $campusId): ?string
+    {
         foreach ($this->offerings() as $offering) {
             if ($offering['division_id'] === $divisionId && $offering['campus_id'] === $campusId) {
-                return true;
+                return $offering['id'];
             }
         }
 
-        return false;
+        return null;
     }
 
     public function open(User $by): void

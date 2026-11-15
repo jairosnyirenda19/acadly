@@ -844,6 +844,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
             422: components["responses"]["ValidationException"];
         };
     };
@@ -895,6 +896,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
             422: components["responses"]["ValidationException"];
         };
     };
@@ -958,7 +960,7 @@ export interface operations {
                         grants: {
                             permission: string;
                             /** @enum {string} */
-                            scope_type: "institution" | "division" | "campus" | "class";
+                            scope_type: "institution" | "division" | "campus" | "offering" | "class";
                             scope_id: string | null;
                         }[];
                     };
@@ -1357,6 +1359,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
         };
     };
     "institution.levels": {
@@ -1407,6 +1410,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
             422: components["responses"]["ValidationException"];
         };
     };
@@ -1492,6 +1496,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
             404: components["responses"]["NotFoundHttpException"];
         };
     };
@@ -1544,6 +1549,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
             404: components["responses"]["NotFoundHttpException"];
             422: components["responses"]["ValidationException"];
         };
@@ -1647,6 +1653,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
             422: components["responses"]["ValidationException"];
         };
     };
@@ -1840,7 +1847,7 @@ export interface operations {
                         }[];
                         places: {
                             /** @enum {string} */
-                            type: "institution" | "division" | "campus";
+                            type: "institution" | "division" | "campus" | "offering";
                             id: string | null;
                             name: string;
                         }[];
@@ -1865,7 +1872,7 @@ export interface operations {
                     email: string;
                     role: string;
                     /** @enum {string} */
-                    place_type: "institution" | "division" | "campus";
+                    place_type: "institution" | "division" | "campus" | "offering";
                     /** Format: uuid */
                     place_id?: string | null;
                 };
@@ -1899,15 +1906,16 @@ export interface operations {
                         places: [
                             {
                                 /** @constant */
-                                type: "campus";
+                                type: "offering";
                                 id: string;
-                                name: string;
+                                name: string | " · ";
                             }
                         ];
                     };
                 };
             };
             401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
             422: components["responses"]["ValidationException"];
         };
     };
@@ -1947,9 +1955,9 @@ export interface operations {
                         places: [
                             {
                                 /** @constant */
-                                type: "campus";
+                                type: "offering";
                                 id: string;
-                                name: string;
+                                name: string | " · ";
                             }
                         ];
                     };
@@ -1994,9 +2002,9 @@ export interface operations {
                         places: [
                             {
                                 /** @constant */
-                                type: "campus";
+                                type: "offering";
                                 id: string;
-                                name: string;
+                                name: string | " · ";
                             }
                         ];
                     };

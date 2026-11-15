@@ -10,6 +10,7 @@ use Acadly\Kernel\Access\Events\RoleAssigned;
 use Acadly\Kernel\Access\PermissionCatalogue;
 use Acadly\Kernel\Access\Role;
 use Acadly\Kernel\Access\RoleAssignment;
+use Acadly\Kernel\Access\ScopeHierarchy;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Audit\KernelAudit;
@@ -31,6 +32,7 @@ use Illuminate\Validation\ValidationException;
  *  - the assigner must hold "Give and end roles" at that scope;
  *  - the assigner must hold, at that scope, every permission in the role:
  *    nobody can give what they do not have;
+ *  - the place must be in force;
  *  - the account must not be disabled (an invited account may hold a role
  *    before it is first used), and an end date must be in the future.
  */
@@ -42,6 +44,7 @@ final class AssignRole
         private readonly Clock $clock,
         private readonly Audit $audit,
         private readonly Outbox $outbox,
+        private readonly ScopeHierarchy $hierarchy,
     ) {}
 
     public function handle(
@@ -64,6 +67,10 @@ final class AssignRole
         }
 
         $now = $this->clock->now();
+
+        if (! $this->hierarchy->exists($at)) {
+            throw ValidationException::withMessages(['scope' => ['This part of the school does not exist or has ended.']]);
+        }
 
         if ($to->status === AccountStatus::Disabled) {
             throw ValidationException::withMessages(['user' => ['The account is disabled.']]);

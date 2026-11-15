@@ -61,9 +61,13 @@ function hold(User $user, Role $role, ScopeRef $at, ?Carbon $startsAt = null, ?C
     ]);
 }
 
+/** A campus in force: roles are given only at places that exist. */
 function campus(): ScopeRef
 {
-    return ScopeRef::of(ScopeType::Campus, Ids::next());
+    $id = Ids::next();
+    DB::table('institution_campuses')->insert(['id' => $id, 'name' => 'Campus '.substr($id, -6), 'place' => 'Lilongwe', 'position' => 1, 'created_at' => now(), 'updated_at' => now()]);
+
+    return ScopeRef::of(ScopeType::Campus, $id);
 }
 
 function access(): Access

@@ -24,8 +24,11 @@ interface SchoolDirectory
 
     public function campus(string $id): ?CampusView;
 
-    /** @return list<array{division_id: string, campus_id: string}> where each division is taught */
+    /** @return list<array{id: string, division_id: string, campus_id: string}> where each division is taught */
     public function offerings(): array;
+
+    /** The offering in force of a division at a campus: a place a role can be held. */
+    public function offeringId(string $divisionId, string $campusId): ?string;
 
     public function offers(string $divisionId, string $campusId): bool;
 

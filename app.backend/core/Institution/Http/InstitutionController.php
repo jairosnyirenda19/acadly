@@ -94,8 +94,9 @@ final class InstitutionController
     }
 
     /** Sets the school logo: a PNG or JPEG of at most 1 MB. */
-    public function logo(Request $request, ReplaceLogo $replace): JsonResponse
+    public function logo(Request $request, ReplaceLogo $replace, Access $access): JsonResponse
     {
+        $access->check(self::user($request), InstitutionPermission::Manage);
         $file = $request->file('file');
 
         if (! $file instanceof UploadedFile) {
@@ -108,8 +109,9 @@ final class InstitutionController
     }
 
     /** Sets the levels the school runs: `levels: [{profile, name}]`. */
-    public function levels(Request $request, SetLevels $set): JsonResponse
+    public function levels(Request $request, SetLevels $set, Access $access): JsonResponse
     {
+        $access->check(self::user($request), InstitutionPermission::Manage);
         $request->validate(['levels' => ['required', 'array', 'min:1'], 'levels.*.profile' => ['required', 'string'], 'levels.*.name' => ['nullable', 'string', 'max:80']]);
         $levels = [];
 
@@ -133,8 +135,9 @@ final class InstitutionController
     }
 
     /** Changes a campus. */
-    public function updateCampus(Request $request, string $id, SaveCampus $save): JsonResponse
+    public function updateCampus(Request $request, string $id, SaveCampus $save, Access $access): JsonResponse
     {
+        $access->check(self::user($request), InstitutionPermission::Manage);
         $campus = Campus::query()->whereNull('ended_at')->find($id) ?? throw new NotFoundHttpException;
         $save->handle(self::user($request), $campus, $request->only(['name', 'place', 'address']));
 
@@ -142,8 +145,9 @@ final class InstitutionController
     }
 
     /** Says whether a level is taught at a campus: `{division_id, campus_id, taught}`. */
-    public function offering(Request $request, SetOffering $set): JsonResponse
+    public function offering(Request $request, SetOffering $set, Access $access): JsonResponse
     {
+        $access->check(self::user($request), InstitutionPermission::Manage);
         $request->validate(['division_id' => ['required', 'uuid'], 'campus_id' => ['required', 'uuid'], 'taught' => ['required', 'boolean']]);
         $division = Division::query()->whereNull('ended_at')->find($request->string('division_id')->toString()) ?? throw new NotFoundHttpException;
         $campus = Campus::query()->whereNull('ended_at')->find($request->string('campus_id')->toString()) ?? throw new NotFoundHttpException;

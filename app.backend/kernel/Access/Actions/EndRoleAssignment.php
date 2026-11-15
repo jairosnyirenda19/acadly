@@ -9,6 +9,7 @@ use Acadly\Kernel\Access\AccessPermission;
 use Acadly\Kernel\Access\Events\RoleEnded;
 use Acadly\Kernel\Access\Role;
 use Acadly\Kernel\Access\RoleAssignment;
+use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Audit\KernelAudit;
 use Acadly\Kernel\Events\Outbox;
@@ -20,8 +21,9 @@ use Illuminate\Validation\ValidationException;
 /**
  * Ends a role assignment now. The row is kept, with who ended it and why.
  *
- * The last institution-wide administrator cannot be ended: the school would
- * have nobody left who can give roles.
+ * An assignment cannot be ended when it would leave nobody active who can
+ * give roles for the whole school. What counts is the permission "Give and
+ * end roles" held at the institution, whatever the role is called.
  */
 final class EndRoleAssignment
 {
@@ -49,8 +51,8 @@ final class EndRoleAssignment
                 throw ValidationException::withMessages(['assignment' => ['The assignment has already ended.']]);
             }
 
-            if ($this->isLastAdministrator($locked)) {
-                throw ValidationException::withMessages(['assignment' => ['The last administrator cannot be removed.']]);
+            if ($this->leavesNobodyToGiveRoles($locked)) {
+                throw ValidationException::withMessages(['assignment' => ['This is the last account that can give roles for the whole school. Give that permission to another account first.']]);
             }
 
             $watch = $this->audit->watch($locked);
@@ -75,19 +77,11 @@ final class EndRoleAssignment
         }
     }
 
-    private function isLastAdministrator(RoleAssignment $assignment): bool
+    private function leavesNobodyToGiveRoles(RoleAssignment $assignment): bool
     {
-        $administrator = Role::query()->where('key', Role::ADMINISTRATOR)->first();
+        $whole = ScopeRef::institution();
 
-        if ($administrator === null || $assignment->role_id !== $administrator->id || $assignment->scope_id !== null) {
-            return false;
-        }
-
-        return RoleAssignment::query()
-            ->activeAt($this->clock->now())
-            ->where('role_id', $administrator->id)
-            ->whereNull('scope_id')
-            ->whereKeyNot($assignment->id)
-            ->doesntExist();
+        return $this->access->holders(AccessPermission::AssignRoles, $whole) > 0
+            && $this->access->holders(AccessPermission::AssignRoles, $whole, except: $assignment->id) === 0;
     }
 }

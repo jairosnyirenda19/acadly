@@ -22,7 +22,11 @@ final class Role extends Model
 {
     use HasUuids;
 
-    /** The system role that holds every permission. It cannot be edited. */
+    /**
+     * The key of the one system role: it holds every permission, kept so by
+     * acadly:sync, and cannot be edited. The key identifies that record; it is
+     * never a test of power. Power is asked of permissions (Access).
+     */
     public const string ADMINISTRATOR = 'administrator';
 
     protected $table = 'access_roles';

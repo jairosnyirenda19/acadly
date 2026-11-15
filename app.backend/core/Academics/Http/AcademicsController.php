@@ -113,6 +113,7 @@ final class AcademicsController
     /** Sets the terms of one level for the year: `{division_id, terms: [{name, starts_on, ends_on}]}`. */
     public function terms(Request $request, SaveTerms $save, Access $access): JsonResponse
     {
+        $access->check(self::user($request), AcademicsPermission::Manage);
         $request->validate(['division_id' => ['required', 'uuid'], 'terms' => ['present', 'array']]);
         $current = $this->calendar->currentYear();
         $year = $current !== null ? AcademicYear::query()->find($current['id']) : null;
@@ -129,6 +130,7 @@ final class AcademicsController
     /** Sets the classes of one level at one campus: `{division_id, campus_id, streams: {LEVEL: [names]}}`. */
     public function classes(Request $request, SaveClasses $save, Access $access): JsonResponse
     {
+        $access->check(self::user($request), AcademicsPermission::Manage);
         $request->validate(['division_id' => ['required', 'uuid'], 'campus_id' => ['required', 'uuid'], 'streams' => ['present', 'array']]);
         $current = $this->calendar->currentYear();
         $year = $current !== null ? AcademicYear::query()->find($current['id']) : null;

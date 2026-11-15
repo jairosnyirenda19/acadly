@@ -37,7 +37,7 @@ final class SetupController
      * Where setup stands: each step, the staff list, the roles and places a
      * person can be invited to, and what still blocks opening.
      *
-     * @response array{open: bool, steps: list<array{key: string, done: bool}>, blockers: list<string>, administrators: int, waiting: int, staff: list<array{id: string, name: string, email: string, role: string, works_in: string, state: 'signed_in'|'active'|'ready'|'sent'}>, roles: list<array{key: string, name: string, scope: string}>, places: list<array{type: 'institution'|'division'|'campus', id: string|null, name: string}>}
+     * @response array{open: bool, steps: list<array{key: string, done: bool}>, blockers: list<string>, administrators: int, waiting: int, staff: list<array{id: string, name: string, email: string, role: string, works_in: string, state: 'signed_in'|'active'|'ready'|'sent'}>, roles: list<array{key: string, name: string, scope: string}>, places: list<array{type: 'institution'|'division'|'campus'|'offering', id: string|null, name: string}>}
      */
     public function show(Request $request, Access $access): JsonResponse
     {
@@ -49,7 +49,7 @@ final class SetupController
             $roles[$key] = ['key' => $key, 'name' => $starter['name'], 'scope' => $starter['scope']];
         }
 
-        foreach (Role::query()->where('key', '!=', Role::ADMINISTRATOR)->orderBy('name')->get() as $role) {
+        foreach (Role::query()->where('is_system', false)->orderBy('name')->get() as $role) {
             $roles[$role->key] ??= ['key' => $role->key, 'name' => $role->name, 'scope' => ''];
         }
 
@@ -59,8 +59,27 @@ final class SetupController
             $places[] = ['type' => 'division', 'id' => $division->id, 'name' => $division->name];
         }
 
+        $divisionNames = [];
+        $campusNames = [];
+
+        foreach ($this->school->divisionViews() as $division) {
+            $divisionNames[$division->id] = $division->name;
+        }
+
         foreach ($this->school->campusViews() as $campus) {
             $places[] = ['type' => 'campus', 'id' => $campus->id, 'name' => $campus->name];
+            $campusNames[$campus->id] = $campus->name;
+        }
+
+        // A level at one campus, where a level is taught at more than one campus.
+        $offerings = $this->school->offerings();
+        $campusesOf = array_count_values(array_column($offerings, 'division_id'));
+
+        foreach ($offerings as $offering) {
+            if (($campusesOf[$offering['division_id']] ?? 0) > 1) {
+                $places[] = ['type' => 'offering', 'id' => $offering['id'],
+                    'name' => ($divisionNames[$offering['division_id']] ?? '').' · '.($campusNames[$offering['campus_id']] ?? '')];
+            }
         }
 
         $steps = [];
@@ -84,11 +103,12 @@ final class SetupController
     /** Adds a member of staff to the list: `{name, email, role, place_type, place_id}`. The invitation is not sent yet. */
     public function invite(Request $request, InviteStaff $invite, Access $access): JsonResponse
     {
+        $access->check(self::user($request), InstitutionPermission::Manage);
         $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'string', 'max:255'],
             'role' => ['required', 'string', 'max:60'],
-            'place_type' => ['required', 'in:institution,division,campus'],
+            'place_type' => ['required', 'in:institution,division,campus,offering'],
             'place_id' => ['nullable', 'uuid'],
         ]);
 

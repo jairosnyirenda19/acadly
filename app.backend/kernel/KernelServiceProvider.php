@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Acadly\Kernel;
 
 use Acadly\Kernel\Access\Access;
-use Acadly\Kernel\Access\FlatScopeHierarchy;
 use Acadly\Kernel\Access\PermissionCatalogue;
 use Acadly\Kernel\Access\ScopeHierarchy;
+use Acadly\Kernel\Access\ScopeTree;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Audit\AuditCatalogue;
 use Acadly\Kernel\Blueprint\BlueprintCompiler;
@@ -103,7 +103,8 @@ final class KernelServiceProvider extends ServiceProvider
         $this->app->scoped(Licences::class);
         $this->app->scoped(ModuleActivation::class);
 
-        $this->app->bindIf(ScopeHierarchy::class, FlatScopeHierarchy::class, true);
+        // The scope tree, from the places each domain registers. One per request: it remembers what it has read.
+        $this->app->scoped(ScopeHierarchy::class, fn (Application $app): ScopeHierarchy => new ScopeTree($app->tagged(ScopeTree::PARENTS)));
 
         // One instance per request: it remembers the grants it has loaded.
         $this->app->scoped(Access::class);

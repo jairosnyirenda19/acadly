@@ -11,7 +11,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The academic year, its terms, and the classes of each level at each campus */
+        /** The academic year, the terms of each level, and the classes of each level at each campus */
         get: operations["academics.show"];
         put?: never;
         post?: never;
@@ -29,8 +29,25 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Sets the academic year and its terms: `{name, starts_on, ends_on, terms: [{name, starts_on, ends_on}]}` */
+        /** Sets the school's academic year: `{name, starts_on, ends_on}` */
         put: operations["academics.year"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/academics/terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Sets the terms of one level for the year: `{division_id, terms: [{name, starts_on, ends_on}]}` */
+        put: operations["academics.terms"];
         post?: never;
         delete?: never;
         options?: never;
@@ -705,15 +722,20 @@ export interface operations {
                             name: string;
                             starts_on: string;
                             ends_on: string;
-                            periods: {
+                        } | null;
+                        levels: {
+                            division_id: string;
+                            division: string;
+                            period_word: string;
+                            period_word_plural: string;
+                            periods_per_year: number | null;
+                            terms: {
                                 id: string;
                                 name: string;
                                 starts_on: string;
                                 ends_on: string;
                             }[];
-                        } | null;
-                        periods_per_year: number | null;
-                        period_word: string;
+                        }[];
                         offerings: {
                             division_id: string;
                             division: string;
@@ -756,10 +778,8 @@ export interface operations {
                             name: string;
                             starts_on: string;
                             ends_on: string;
-                            periods: unknown[];
                         } | null;
-                        periods_per_year: string | null;
-                        period_word: string | "Term";
+                        levels: unknown[];
                         offerings: {
                             division_id: string;
                             division: string;
@@ -776,6 +796,55 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "academics.terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    division_id: string;
+                    terms: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        year: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                        } | null;
+                        levels: unknown[];
+                        offerings: {
+                            division_id: string;
+                            division: string;
+                            campus_id: string;
+                            campus: string;
+                            level_word: string;
+                            group_word: string;
+                            levels: unknown[];
+                            /** @constant */
+                            classes: 0;
+                        }[];
+                        classes: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "academics.classes": {
@@ -808,10 +877,8 @@ export interface operations {
                             name: string;
                             starts_on: string;
                             ends_on: string;
-                            periods: unknown[];
                         } | null;
-                        periods_per_year: string | null;
-                        period_word: string | "Term";
+                        levels: unknown[];
                         offerings: {
                             division_id: string;
                             division: string;

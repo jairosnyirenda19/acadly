@@ -13,7 +13,7 @@
         "/v1/academics": {
             "get": {
                 "operationId": "academics.show",
-                "summary": "The academic year, its terms, and the classes of each level at each campus",
+                "summary": "The academic year, the terms of each level, and the classes of each level at each campus",
                 "tags": [
                     "Academics"
                 ],
@@ -42,50 +42,74 @@
                                                 },
                                                 "ends_on": {
                                                     "type": "string"
-                                                },
-                                                "periods": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "object",
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "string"
-                                                            },
-                                                            "name": {
-                                                                "type": "string"
-                                                            },
-                                                            "starts_on": {
-                                                                "type": "string"
-                                                            },
-                                                            "ends_on": {
-                                                                "type": "string"
-                                                            }
-                                                        },
-                                                        "required": [
-                                                            "id",
-                                                            "name",
-                                                            "starts_on",
-                                                            "ends_on"
-                                                        ]
-                                                    }
                                                 }
                                             },
                                             "required": [
                                                 "id",
                                                 "name",
                                                 "starts_on",
-                                                "ends_on",
-                                                "periods"
+                                                "ends_on"
                                             ]
                                         },
-                                        "periods_per_year": {
-                                            "type": [
-                                                "integer",
-                                                "null"
-                                            ]
-                                        },
-                                        "period_word": {
-                                            "type": "string"
+                                        "levels": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "division_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "division": {
+                                                        "type": "string"
+                                                    },
+                                                    "period_word": {
+                                                        "type": "string"
+                                                    },
+                                                    "period_word_plural": {
+                                                        "type": "string"
+                                                    },
+                                                    "periods_per_year": {
+                                                        "type": [
+                                                            "integer",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "terms": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                },
+                                                                "starts_on": {
+                                                                    "type": "string"
+                                                                },
+                                                                "ends_on": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name",
+                                                                "starts_on",
+                                                                "ends_on"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "division_id",
+                                                    "division",
+                                                    "period_word",
+                                                    "period_word_plural",
+                                                    "periods_per_year",
+                                                    "terms"
+                                                ]
+                                            }
                                         },
                                         "offerings": {
                                             "type": "array",
@@ -157,8 +181,7 @@
                                     },
                                     "required": [
                                         "year",
-                                        "periods_per_year",
-                                        "period_word",
+                                        "levels",
                                         "offerings",
                                         "classes"
                                     ]
@@ -178,7 +201,7 @@
         "/v1/academics/year": {
             "put": {
                 "operationId": "academics.year",
-                "summary": "Sets the academic year and its terms: `{name, starts_on, ends_on, terms: [{name, starts_on, ends_on}]}`",
+                "summary": "Sets the school's academic year: `{name, starts_on, ends_on}`",
                 "tags": [
                     "Academics"
                 ],
@@ -207,38 +230,18 @@
                                                 },
                                                 "ends_on": {
                                                     "type": "string"
-                                                },
-                                                "periods": {
-                                                    "type": "array",
-                                                    "items": {}
                                                 }
                                             },
                                             "required": [
                                                 "id",
                                                 "name",
                                                 "starts_on",
-                                                "ends_on",
-                                                "periods"
+                                                "ends_on"
                                             ]
                                         },
-                                        "periods_per_year": {
-                                            "type": [
-                                                "string",
-                                                "null"
-                                            ]
-                                        },
-                                        "period_word": {
-                                            "anyOf": [
-                                                {
-                                                    "type": "string"
-                                                },
-                                                {
-                                                    "type": "string",
-                                                    "enum": [
-                                                        "Term"
-                                                    ]
-                                                }
-                                            ]
+                                        "levels": {
+                                            "type": "array",
+                                            "items": {}
                                         },
                                         "offerings": {
                                             "type": "array",
@@ -290,14 +293,151 @@
                                     },
                                     "required": [
                                         "year",
-                                        "periods_per_year",
-                                        "period_word",
+                                        "levels",
                                         "offerings",
                                         "classes"
                                     ]
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/academics/terms": {
+            "put": {
+                "operationId": "academics.terms",
+                "summary": "Sets the terms of one level for the year: `{division_id, terms: [{name, starts_on, ends_on}]}`",
+                "tags": [
+                    "Academics"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "division_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "terms": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "division_id",
+                                    "terms"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "starts_on": {
+                                                    "type": "string"
+                                                },
+                                                "ends_on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "starts_on",
+                                                "ends_on"
+                                            ]
+                                        },
+                                        "levels": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "offerings": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "division_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "division": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus": {
+                                                        "type": "string"
+                                                    },
+                                                    "level_word": {
+                                                        "type": "string"
+                                                    },
+                                                    "group_word": {
+                                                        "type": "string"
+                                                    },
+                                                    "levels": {
+                                                        "type": "array",
+                                                        "items": {}
+                                                    },
+                                                    "classes": {
+                                                        "type": "integer",
+                                                        "const": 0
+                                                    }
+                                                },
+                                                "required": [
+                                                    "division_id",
+                                                    "division",
+                                                    "campus_id",
+                                                    "campus",
+                                                    "level_word",
+                                                    "group_word",
+                                                    "levels",
+                                                    "classes"
+                                                ]
+                                            }
+                                        },
+                                        "classes": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "year",
+                                        "levels",
+                                        "offerings",
+                                        "classes"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -368,38 +508,18 @@
                                                 },
                                                 "ends_on": {
                                                     "type": "string"
-                                                },
-                                                "periods": {
-                                                    "type": "array",
-                                                    "items": {}
                                                 }
                                             },
                                             "required": [
                                                 "id",
                                                 "name",
                                                 "starts_on",
-                                                "ends_on",
-                                                "periods"
+                                                "ends_on"
                                             ]
                                         },
-                                        "periods_per_year": {
-                                            "type": [
-                                                "string",
-                                                "null"
-                                            ]
-                                        },
-                                        "period_word": {
-                                            "anyOf": [
-                                                {
-                                                    "type": "string"
-                                                },
-                                                {
-                                                    "type": "string",
-                                                    "enum": [
-                                                        "Term"
-                                                    ]
-                                                }
-                                            ]
+                                        "levels": {
+                                            "type": "array",
+                                            "items": {}
                                         },
                                         "offerings": {
                                             "type": "array",
@@ -451,8 +571,7 @@
                                     },
                                     "required": [
                                         "year",
-                                        "periods_per_year",
-                                        "period_word",
+                                        "levels",
                                         "offerings",
                                         "classes"
                                     ]

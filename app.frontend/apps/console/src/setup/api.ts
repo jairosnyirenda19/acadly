@@ -85,8 +85,17 @@ export const setupApi = {
       }>,
     ),
 
-  saveYear: (body: { name: string; starts_on: string; ends_on: string; terms: { name: string; starts_on: string; ends_on: string }[] }) =>
+  saveYear: (body: { name: string; starts_on: string; ends_on: string }) =>
     settle(api.PUT('/v1/academics/year', { body: body as never }) as Promise<{ data?: AcademicsState; error?: unknown; response: Response }>),
+
+  saveTerms: (divisionId: string, terms: { name: string; starts_on: string; ends_on: string }[]) =>
+    settle(
+      api.PUT('/v1/academics/terms', { body: { division_id: divisionId, terms } as never }) as Promise<{
+        data?: AcademicsState
+        error?: unknown
+        response: Response
+      }>,
+    ),
 
   saveClasses: (divisionId: string, campusId: string, streams: Record<string, string[]>) =>
     settle(

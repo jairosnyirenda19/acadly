@@ -45,16 +45,30 @@ function schoolDetails(array $overrides = []): array
     ];
 }
 
+function schoolYear(): array
+{
+    return ['name' => '2026/27', 'starts_on' => '2026-09-07', 'ends_on' => '2027-07-23'];
+}
+
 function threeTerms(): array
 {
     return [
-        'name' => '2026/27', 'starts_on' => '2026-09-07', 'ends_on' => '2027-07-23',
-        'terms' => [
-            ['name' => 'Term 1', 'starts_on' => '2026-09-07', 'ends_on' => '2026-12-11'],
-            ['name' => 'Term 2', 'starts_on' => '2027-01-04', 'ends_on' => '2027-04-02'],
-            ['name' => 'Term 3', 'starts_on' => '2027-04-26', 'ends_on' => '2027-07-23'],
-        ],
+        ['name' => 'Term 1', 'starts_on' => '2026-09-07', 'ends_on' => '2026-12-11'],
+        ['name' => 'Term 2', 'starts_on' => '2027-01-04', 'ends_on' => '2027-04-02'],
+        ['name' => 'Term 3', 'starts_on' => '2027-04-26', 'ends_on' => '2027-07-23'],
     ];
+}
+
+/** Sets the year, then the same three terms for every level the school runs. */
+function setYear($test, User $admin): array
+{
+    $academics = $test->actingAs($admin)->putJson('/api/v1/academics/year', schoolYear())->assertOk()->json();
+
+    foreach ($academics['levels'] as $level) {
+        $academics = $test->actingAs($admin)->putJson('/api/v1/academics/terms', ['division_id' => $level['division_id'], 'terms' => threeTerms()])->assertOk()->json();
+    }
+
+    return $academics;
 }
 
 /** Runs the required steps: details, two levels at the main campus plus Blantyre, the year, and classes everywhere. */
@@ -62,8 +76,7 @@ function completeSetup($test, User $admin): array
 {
     $test->actingAs($admin)->putJson('/api/v1/institution', schoolDetails())->assertOk();
     $state = $test->actingAs($admin)->putJson('/api/v1/institution/levels', ['levels' => [['profile' => 'PRIMARY'], ['profile' => 'SECONDARY']]])->assertOk()->json();
-    $test->actingAs($admin)->putJson('/api/v1/academics/year', threeTerms())->assertOk();
-    $academics = $test->actingAs($admin)->getJson('/api/v1/academics')->json();
+    $academics = setYear($test, $admin);
 
     foreach ($academics['offerings'] as $offering) {
         $test->actingAs($admin)->putJson('/api/v1/academics/classes', [
@@ -155,26 +168,64 @@ describe('levels and campuses', function (): void {
 });
 
 describe('the academic year and classes', function (): void {
-    it('sets the year with as many terms as the levels use, in order and inside the year', function (): void {
+    it('sets one year, and terms for each level as many as its profile uses, in order and inside the year', function (): void {
         $admin = setupAdministrator();
-        $this->actingAs($admin)->putJson('/api/v1/institution/levels', ['levels' => [['profile' => 'PRIMARY']]]);
+        $state = $this->actingAs($admin)->putJson('/api/v1/institution/levels', ['levels' => [['profile' => 'PRIMARY']]])->json();
+        $primary = $state['divisions'][0]['id'];
+
+        $this->actingAs($admin)->putJson('/api/v1/academics/terms', ['division_id' => $primary, 'terms' => threeTerms()])
+            ->assertUnprocessable()->assertJsonValidationErrors(['year']);
+
+        $this->actingAs($admin)->putJson('/api/v1/academics/year', schoolYear())
+            ->assertOk()->assertJsonPath('year.name', '2026/27')->assertJsonPath('levels.0.period_word', 'Term')
+            ->assertJsonPath('levels.0.periods_per_year', 3)->assertJsonPath('levels.0.terms', []);
 
         $two = threeTerms();
-        array_pop($two['terms']);
-        $this->actingAs($admin)->putJson('/api/v1/academics/year', $two)->assertUnprocessable()->assertJsonValidationErrors(['terms']);
+        array_pop($two);
+        $this->actingAs($admin)->putJson('/api/v1/academics/terms', ['division_id' => $primary, 'terms' => $two])
+            ->assertUnprocessable()->assertJsonValidationErrors(['terms']);
 
         $overlap = threeTerms();
-        $overlap['terms'][1]['starts_on'] = '2026-12-01';
-        $this->actingAs($admin)->putJson('/api/v1/academics/year', $overlap)->assertUnprocessable();
+        $overlap[1]['starts_on'] = '2026-12-01';
+        $this->actingAs($admin)->putJson('/api/v1/academics/terms', ['division_id' => $primary, 'terms' => $overlap])
+            ->assertUnprocessable()->assertJsonValidationErrors(['terms.1.starts_on']);
 
-        $this->actingAs($admin)->putJson('/api/v1/academics/year', threeTerms())
-            ->assertOk()->assertJsonPath('year.name', '2026/27')->assertJsonPath('year.periods.2.ends_on', '2027-07-23')->assertJsonPath('period_word', 'Term');
+        $outside = threeTerms();
+        $outside[2]['ends_on'] = '2027-08-20';
+        $this->actingAs($admin)->putJson('/api/v1/academics/terms', ['division_id' => $primary, 'terms' => $outside])
+            ->assertUnprocessable()->assertJsonValidationErrors(['terms.2.starts_on']);
+
+        $this->actingAs($admin)->putJson('/api/v1/academics/terms', ['division_id' => $primary, 'terms' => threeTerms()])
+            ->assertOk()->assertJsonPath('levels.0.terms.2.ends_on', '2027-07-23');
+    });
+
+    it('keeps different terms for each level, changes a term in place, and keeps the year around them', function (): void {
+        $admin = setupAdministrator();
+        $state = $this->actingAs($admin)->putJson('/api/v1/institution/levels', ['levels' => [['profile' => 'PRIMARY'], ['profile' => 'SECONDARY']]])->json();
+        $academics = setYear($this, $admin);
+        [$primary, $secondary] = array_column($academics['levels'], 'division_id');
+        $before = $academics['levels'][1]['terms'][2]['id'];
+
+        $earlier = threeTerms();
+        $earlier[2]['starts_on'] = '2027-04-12';
+        $earlier[2]['ends_on'] = '2027-07-09';
+        $academics = $this->actingAs($admin)->putJson('/api/v1/academics/terms', ['division_id' => $secondary, 'terms' => $earlier])->assertOk()->json();
+
+        expect($academics['levels'][1]['terms'][2]['ends_on'])->toBe('2027-07-09')
+            ->and($academics['levels'][1]['terms'][2]['id'])->toBe($before)
+            ->and($academics['levels'][0]['terms'][2]['ends_on'])->toBe('2027-07-23')
+            ->and($academics['levels'][0]['division_id'])->toBe($primary);
+
+        $this->actingAs($admin)->putJson('/api/v1/academics/year', [...schoolYear(), 'ends_on' => '2027-07-16'])
+            ->assertUnprocessable()->assertJsonValidationErrors(['starts_on']);
+
+        expect(DB::table('audit_events')->where('action', 'academics.terms_saved')->count())->toBe(3);
     });
 
     it('makes the classes of a level at a campus from its ladder and the streams the school names', function (): void {
         $admin = setupAdministrator();
         $state = $this->actingAs($admin)->putJson('/api/v1/institution/levels', ['levels' => [['profile' => 'SECONDARY']]])->json();
-        $this->actingAs($admin)->putJson('/api/v1/academics/year', threeTerms());
+        setYear($this, $admin);
         $offering = ['division_id' => $state['divisions'][0]['id'], 'campus_id' => $state['campuses'][0]['id']];
 
         $this->actingAs($admin)->putJson('/api/v1/academics/classes', [...$offering, 'streams' => ['F9' => ['East']]])->assertUnprocessable();

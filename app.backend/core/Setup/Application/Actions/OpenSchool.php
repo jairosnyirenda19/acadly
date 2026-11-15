@@ -22,7 +22,7 @@ final class OpenSchool
     private const array SAY = [
         'school' => 'The school details are not complete.',
         'levels' => 'Every level must be taught at a campus.',
-        'year' => 'The academic year and its terms are not set.',
+        'year' => 'The academic year, or the terms of a level, are not set.',
         'classes' => 'Every level at every campus needs at least one class.',
         'administrator' => 'An administrator must hold the whole school.',
     ];

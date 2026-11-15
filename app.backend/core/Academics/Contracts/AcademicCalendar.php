@@ -8,9 +8,10 @@ namespace Acadly\Core\Academics\Contracts;
 interface AcademicCalendar
 {
     /**
-     * The year that contains the given day, or the first year when none does.
+     * The year that contains the given day, or the first year when none does,
+     * with the terms of each level (division id => terms in order).
      *
-     * @return array{id: string, name: string, starts_on: string, ends_on: string, periods: list<array{id: string, name: string, starts_on: string, ends_on: string}>}|null
+     * @return array{id: string, name: string, starts_on: string, ends_on: string, terms: array<string, list<array{id: string, name: string, starts_on: string, ends_on: string}>>}|null
      */
     public function currentYear(?string $day = null): ?array;
 

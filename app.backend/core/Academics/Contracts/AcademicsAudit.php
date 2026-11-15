@@ -9,6 +9,7 @@ use Acadly\Kernel\Audit\AuditAction;
 enum AcademicsAudit: string implements AuditAction
 {
     case YearSaved = 'academics.year_saved';
+    case TermsSaved = 'academics.terms_saved';
     case ClassesSaved = 'academics.classes_saved';
 
     public function key(): string
@@ -19,7 +20,8 @@ enum AcademicsAudit: string implements AuditAction
     public function sentence(): string
     {
         return match ($this) {
-            self::YearSaved => 'Set an academic year and its terms.',
+            self::YearSaved => 'Set an academic year.',
+            self::TermsSaved => 'Set the terms of a level for an academic year.',
             self::ClassesSaved => 'Set the classes of a level at a campus.',
         };
     }

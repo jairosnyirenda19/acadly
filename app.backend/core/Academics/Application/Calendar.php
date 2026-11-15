@@ -35,14 +35,25 @@ final class Calendar implements AcademicCalendar
             'name' => Row::text($year, 'name'),
             'starts_on' => self::day(Row::text($year, 'starts_on')),
             'ends_on' => self::day(Row::text($year, 'ends_on')),
-            'periods' => array_values(DB::table('academic_periods')->where('year_id', $id)->orderBy('position')->get()
-                ->map(fn (object $period): array => [
-                    'id' => Row::text($period, 'id'),
-                    'name' => Row::text($period, 'name'),
-                    'starts_on' => self::day(Row::text($period, 'starts_on')),
-                    'ends_on' => self::day(Row::text($period, 'ends_on')),
-                ])->all()),
+            'terms' => $this->termsOf($id),
         ];
+    }
+
+    /** @return array<string, list<array{id: string, name: string, starts_on: string, ends_on: string}>> division id => terms in order */
+    private function termsOf(string $yearId): array
+    {
+        $terms = [];
+
+        foreach (DB::table('academic_periods')->where('year_id', $yearId)->orderBy('position')->get() as $period) {
+            $terms[Row::text($period, 'division_id')][] = [
+                'id' => Row::text($period, 'id'),
+                'name' => Row::text($period, 'name'),
+                'starts_on' => self::day(Row::text($period, 'starts_on')),
+                'ends_on' => self::day(Row::text($period, 'ends_on')),
+            ];
+        }
+
+        return $terms;
     }
 
     public function classCount(string $yearId): int

@@ -32,7 +32,6 @@ final class SetupProgress
         $year = $this->calendar->currentYear();
         $divisions = $this->school->divisionViews();
         $offerings = $this->school->offerings();
-        $perYear = $divisions !== [] ? $divisions[0]->profile->periodsPerYear : null;
         $taught = [];
 
         foreach ($offerings as $offering) {
@@ -44,11 +43,19 @@ final class SetupProgress
         return [
             'school' => $this->school->detailsComplete(),
             'levels' => $levels,
-            'year' => $year !== null && $year['periods'] !== [] && ($perYear === null || count($year['periods']) === $perYear),
+            'year' => $year !== null && $divisions !== [] && array_filter($divisions, fn (DivisionView $division): bool => ! self::termsSet($division, $year['terms'][$division->id] ?? [])) === [],
             'classes' => $year !== null && $this->calendar->everyOfferingHasClasses($year['id']),
             'staff' => $this->invitationsWaiting() === 0 && $this->staffCount() > 1,
             'review' => $this->school->isOpen(),
         ];
+    }
+
+    /** @param  list<mixed>  $terms */
+    private static function termsSet(DivisionView $division, array $terms): bool
+    {
+        $expected = $division->profile->periodsPerYear;
+
+        return $terms !== [] && ($expected === null || count($terms) === $expected);
     }
 
     /** @return list<string> the required steps not yet done */

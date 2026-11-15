@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * An academic year of the school. Its terms are rows of `academic_periods`.
+ * An academic year of the school. The terms of each level are rows of
+ * `academic_periods`.
  *
  * @property string $id
  * @property string $name

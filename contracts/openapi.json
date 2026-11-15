@@ -2551,6 +2551,1761 @@
                 }
             }
         },
+        "/v1/learners": {
+            "get": {
+                "operationId": "learners.index",
+                "summary": "The learners in the classes the viewer may see: `?in=type:id&class_id=&q=`",
+                "tags": [
+                    "Learners"
+                ],
+                "parameters": [
+                    {
+                        "name": "in",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 80
+                        }
+                    },
+                    {
+                        "name": "class_id",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 80
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "word": {
+                                            "type": "string"
+                                        },
+                                        "word_plural": {
+                                            "type": "string"
+                                        },
+                                        "classes": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "level": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus": {
+                                                        "type": "string"
+                                                    },
+                                                    "count": {
+                                                        "type": "integer"
+                                                    },
+                                                    "can_admit": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "level",
+                                                    "campus",
+                                                    "count",
+                                                    "can_admit"
+                                                ]
+                                            }
+                                        },
+                                        "learners": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "acadly_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "admission_number": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "class_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "has_photo": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "main_contact": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "relationship": {
+                                                                "type": "string"
+                                                            },
+                                                            "phone": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "name",
+                                                            "relationship",
+                                                            "phone"
+                                                        ]
+                                                    },
+                                                    "contacts": {
+                                                        "type": "integer"
+                                                    },
+                                                    "possible_duplicate": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "acadly_id",
+                                                    "name",
+                                                    "admission_number",
+                                                    "class_id",
+                                                    "class",
+                                                    "has_photo",
+                                                    "main_contact",
+                                                    "contacts",
+                                                    "possible_duplicate"
+                                                ]
+                                            }
+                                        },
+                                        "totals": {
+                                            "type": "object",
+                                            "properties": {
+                                                "active": {
+                                                    "type": "integer"
+                                                },
+                                                "admitted_this_year": {
+                                                    "type": "integer"
+                                                },
+                                                "classes": {
+                                                    "type": "integer"
+                                                },
+                                                "few_contacts": {
+                                                    "type": "integer"
+                                                },
+                                                "duplicates": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "active",
+                                                "admitted_this_year",
+                                                "classes",
+                                                "few_contacts",
+                                                "duplicates"
+                                            ]
+                                        },
+                                        "can_admit": {
+                                            "type": "boolean"
+                                        },
+                                        "relationships": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "value": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "value",
+                                                    "label"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "year",
+                                        "word",
+                                        "word_plural",
+                                        "classes",
+                                        "learners",
+                                        "totals",
+                                        "can_admit",
+                                        "relationships"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "learners.store",
+                "summary": "Admits a learner: `{first_name, other_names, surname, sex, date_of_birth, class_id, admitted_on, admission_number, different, contacts: [{name, relationship, phone, email, main}]}`",
+                "tags": [
+                    "Learners"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "different": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "contacts": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/learners/{id}": {
+            "get": {
+                "operationId": "learners.show",
+                "summary": "One learner's record",
+                "tags": [
+                    "Learners"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "acadly_id": {
+                                            "type": "string"
+                                        },
+                                        "admission_number": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "first_name": {
+                                            "type": "string"
+                                        },
+                                        "other_names": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "surname": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "sex": {
+                                            "type": "string"
+                                        },
+                                        "date_of_birth": {
+                                            "type": "string"
+                                        },
+                                        "has_photo": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "admitted_on": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "word": {
+                                            "type": "string"
+                                        },
+                                        "class": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "level": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "division": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "campus": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "class_teacher": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "placements": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus": {
+                                                        "type": "string"
+                                                    },
+                                                    "year": {
+                                                        "type": "string"
+                                                    },
+                                                    "starts_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "ends_on": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "entry_reason": {
+                                                        "type": "string"
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "now": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "class",
+                                                    "campus",
+                                                    "year",
+                                                    "starts_on",
+                                                    "ends_on",
+                                                    "entry_reason",
+                                                    "reason",
+                                                    "now"
+                                                ]
+                                            }
+                                        },
+                                        "contacts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "relationship": {
+                                                        "type": "string"
+                                                    },
+                                                    "relationship_label": {
+                                                        "type": "string"
+                                                    },
+                                                    "phone": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "main": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "relationship",
+                                                    "relationship_label",
+                                                    "phone",
+                                                    "email",
+                                                    "main"
+                                                ]
+                                            }
+                                        },
+                                        "activity": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "what": {
+                                                        "type": "string"
+                                                    },
+                                                    "who": {
+                                                        "type": "string"
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "at",
+                                                    "what",
+                                                    "who",
+                                                    "reason"
+                                                ]
+                                            }
+                                        },
+                                        "possible_duplicate": {
+                                            "type": "boolean"
+                                        },
+                                        "move_to": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "count": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "count"
+                                                ]
+                                            }
+                                        },
+                                        "can_manage": {
+                                            "type": "boolean"
+                                        },
+                                        "relationships": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "value": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "value",
+                                                    "label"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "acadly_id",
+                                        "admission_number",
+                                        "first_name",
+                                        "other_names",
+                                        "surname",
+                                        "name",
+                                        "sex",
+                                        "date_of_birth",
+                                        "has_photo",
+                                        "status",
+                                        "admitted_on",
+                                        "word",
+                                        "class",
+                                        "level",
+                                        "division",
+                                        "campus",
+                                        "class_teacher",
+                                        "placements",
+                                        "contacts",
+                                        "activity",
+                                        "possible_duplicate",
+                                        "move_to",
+                                        "can_manage",
+                                        "relationships"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "learners.update",
+                "summary": "Corrects the details: `{first_name, other_names, surname, sex, date_of_birth, admission_number, reason}`",
+                "tags": [
+                    "Learners"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "acadly_id": {
+                                            "type": "string"
+                                        },
+                                        "admission_number": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "first_name": {
+                                            "type": "string"
+                                        },
+                                        "other_names": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "surname": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "sex": {
+                                            "type": "string"
+                                        },
+                                        "date_of_birth": {
+                                            "type": "string"
+                                        },
+                                        "has_photo": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "admitted_on": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "word": {
+                                            "type": "string"
+                                        },
+                                        "class": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "level": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "division": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "campus": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "class_teacher": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "placements": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "contacts": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "activity": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "possible_duplicate": {
+                                            "type": "boolean"
+                                        },
+                                        "move_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "can_manage": {
+                                            "type": "boolean"
+                                        },
+                                        "relationships": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "acadly_id",
+                                        "admission_number",
+                                        "first_name",
+                                        "other_names",
+                                        "surname",
+                                        "name",
+                                        "sex",
+                                        "date_of_birth",
+                                        "has_photo",
+                                        "status",
+                                        "admitted_on",
+                                        "word",
+                                        "class",
+                                        "level",
+                                        "division",
+                                        "campus",
+                                        "class_teacher",
+                                        "placements",
+                                        "contacts",
+                                        "activity",
+                                        "possible_duplicate",
+                                        "move_to",
+                                        "can_manage",
+                                        "relationships"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/learners/{id}/class": {
+            "post": {
+                "operationId": "learners.move",
+                "summary": "Moves the learner to another class: `{class_id, from, reason}`",
+                "tags": [
+                    "Learners"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "acadly_id": {
+                                            "type": "string"
+                                        },
+                                        "admission_number": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "first_name": {
+                                            "type": "string"
+                                        },
+                                        "other_names": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "surname": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "sex": {
+                                            "type": "string"
+                                        },
+                                        "date_of_birth": {
+                                            "type": "string"
+                                        },
+                                        "has_photo": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "admitted_on": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "word": {
+                                            "type": "string"
+                                        },
+                                        "class": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "level": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "division": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "campus": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "class_teacher": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "placements": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "contacts": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "activity": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "possible_duplicate": {
+                                            "type": "boolean"
+                                        },
+                                        "move_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "can_manage": {
+                                            "type": "boolean"
+                                        },
+                                        "relationships": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "acadly_id",
+                                        "admission_number",
+                                        "first_name",
+                                        "other_names",
+                                        "surname",
+                                        "name",
+                                        "sex",
+                                        "date_of_birth",
+                                        "has_photo",
+                                        "status",
+                                        "admitted_on",
+                                        "word",
+                                        "class",
+                                        "level",
+                                        "division",
+                                        "campus",
+                                        "class_teacher",
+                                        "placements",
+                                        "contacts",
+                                        "activity",
+                                        "possible_duplicate",
+                                        "move_to",
+                                        "can_manage",
+                                        "relationships"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/learners/{id}/contacts": {
+            "post": {
+                "operationId": "learners.contacts.store",
+                "summary": "Adds a contact: `{name, relationship, phone, email, main}`",
+                "tags": [
+                    "Learners"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "main": {
+                                        "type": "boolean",
+                                        "default": false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "acadly_id": {
+                                            "type": "string"
+                                        },
+                                        "admission_number": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "first_name": {
+                                            "type": "string"
+                                        },
+                                        "other_names": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "surname": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "sex": {
+                                            "type": "string"
+                                        },
+                                        "date_of_birth": {
+                                            "type": "string"
+                                        },
+                                        "has_photo": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "admitted_on": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "word": {
+                                            "type": "string"
+                                        },
+                                        "class": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "level": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "division": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "campus": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "class_teacher": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "placements": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "contacts": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "activity": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "possible_duplicate": {
+                                            "type": "boolean"
+                                        },
+                                        "move_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "can_manage": {
+                                            "type": "boolean"
+                                        },
+                                        "relationships": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "acadly_id",
+                                        "admission_number",
+                                        "first_name",
+                                        "other_names",
+                                        "surname",
+                                        "name",
+                                        "sex",
+                                        "date_of_birth",
+                                        "has_photo",
+                                        "status",
+                                        "admitted_on",
+                                        "word",
+                                        "class",
+                                        "level",
+                                        "division",
+                                        "campus",
+                                        "class_teacher",
+                                        "placements",
+                                        "contacts",
+                                        "activity",
+                                        "possible_duplicate",
+                                        "move_to",
+                                        "can_manage",
+                                        "relationships"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/learners/{id}/contacts/{contact}/main": {
+            "post": {
+                "operationId": "learners.contacts.main",
+                "summary": "Makes a contact the main contact",
+                "tags": [
+                    "Learners"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "contact",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "acadly_id": {
+                                            "type": "string"
+                                        },
+                                        "admission_number": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "first_name": {
+                                            "type": "string"
+                                        },
+                                        "other_names": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "surname": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "sex": {
+                                            "type": "string"
+                                        },
+                                        "date_of_birth": {
+                                            "type": "string"
+                                        },
+                                        "has_photo": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "admitted_on": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "word": {
+                                            "type": "string"
+                                        },
+                                        "class": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "level": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "division": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "campus": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "class_teacher": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "placements": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "contacts": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "activity": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "possible_duplicate": {
+                                            "type": "boolean"
+                                        },
+                                        "move_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "can_manage": {
+                                            "type": "boolean"
+                                        },
+                                        "relationships": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "acadly_id",
+                                        "admission_number",
+                                        "first_name",
+                                        "other_names",
+                                        "surname",
+                                        "name",
+                                        "sex",
+                                        "date_of_birth",
+                                        "has_photo",
+                                        "status",
+                                        "admitted_on",
+                                        "word",
+                                        "class",
+                                        "level",
+                                        "division",
+                                        "campus",
+                                        "class_teacher",
+                                        "placements",
+                                        "contacts",
+                                        "activity",
+                                        "possible_duplicate",
+                                        "move_to",
+                                        "can_manage",
+                                        "relationships"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/learners/{id}/contacts/{contact}/remove": {
+            "post": {
+                "operationId": "learners.contacts.remove",
+                "summary": "Removes a contact while two others remain: `{reason}`",
+                "tags": [
+                    "Learners"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "contact",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "acadly_id": {
+                                            "type": "string"
+                                        },
+                                        "admission_number": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "first_name": {
+                                            "type": "string"
+                                        },
+                                        "other_names": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "surname": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "sex": {
+                                            "type": "string"
+                                        },
+                                        "date_of_birth": {
+                                            "type": "string"
+                                        },
+                                        "has_photo": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "admitted_on": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "word": {
+                                            "type": "string"
+                                        },
+                                        "class": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "level": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "division": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "campus": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "class_teacher": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "placements": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "contacts": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "activity": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "possible_duplicate": {
+                                            "type": "boolean"
+                                        },
+                                        "move_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "can_manage": {
+                                            "type": "boolean"
+                                        },
+                                        "relationships": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "acadly_id",
+                                        "admission_number",
+                                        "first_name",
+                                        "other_names",
+                                        "surname",
+                                        "name",
+                                        "sex",
+                                        "date_of_birth",
+                                        "has_photo",
+                                        "status",
+                                        "admitted_on",
+                                        "word",
+                                        "class",
+                                        "level",
+                                        "division",
+                                        "campus",
+                                        "class_teacher",
+                                        "placements",
+                                        "contacts",
+                                        "activity",
+                                        "possible_duplicate",
+                                        "move_to",
+                                        "can_manage",
+                                        "relationships"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/learners/{id}/photo": {
+            "post": {
+                "operationId": "learners.photo.store",
+                "summary": "Sets the photo: a JPEG or PNG of at most 2 MB, as `file`",
+                "tags": [
+                    "Learners"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "acadly_id": {
+                                            "type": "string"
+                                        },
+                                        "admission_number": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "first_name": {
+                                            "type": "string"
+                                        },
+                                        "other_names": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "surname": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "sex": {
+                                            "type": "string"
+                                        },
+                                        "date_of_birth": {
+                                            "type": "string"
+                                        },
+                                        "has_photo": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "admitted_on": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "word": {
+                                            "type": "string"
+                                        },
+                                        "class": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "level": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "division": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "campus": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "class_teacher": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "placements": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "contacts": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "activity": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "possible_duplicate": {
+                                            "type": "boolean"
+                                        },
+                                        "move_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "can_manage": {
+                                            "type": "boolean"
+                                        },
+                                        "relationships": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "acadly_id",
+                                        "admission_number",
+                                        "first_name",
+                                        "other_names",
+                                        "surname",
+                                        "name",
+                                        "sex",
+                                        "date_of_birth",
+                                        "has_photo",
+                                        "status",
+                                        "admitted_on",
+                                        "word",
+                                        "class",
+                                        "level",
+                                        "division",
+                                        "campus",
+                                        "class_teacher",
+                                        "placements",
+                                        "contacts",
+                                        "activity",
+                                        "possible_duplicate",
+                                        "move_to",
+                                        "can_manage",
+                                        "relationships"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "get": {
+                "operationId": "learners.photo.show",
+                "summary": "The current photo, to those who may see the learner. Opening it is recorded",
+                "tags": [
+                    "Learners"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/me": {
             "get": {
                 "operationId": "me",

@@ -4,6 +4,7 @@
  */
 const PATHS = {
   today: 'M4 5h16v15H4z M4 10h16 M9 3v4 M15 3v4 M8 14h3v3H8z',
+  learners: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1',
   people: 'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M3 20v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1 M16 5a3 3 0 0 1 0 6 M18 14a5 5 0 0 1 3 5v1',
   roles: 'M4 4h16v16H4z M8 12l3 3 5-6',
   subjects: 'M4 5h7v14H4z M13 5h7v14h-7z M6.5 9h2 M15.5 9h2',

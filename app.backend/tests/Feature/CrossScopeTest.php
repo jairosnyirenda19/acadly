@@ -50,7 +50,7 @@ const RECORD_ROUTES = [
  * Lists that answer every viewer with only what is inside the viewer's reach.
  * For these the test checks that nothing of campus B is in the answer.
  */
-const LIST_ROUTES = ['people.index', 'academics.teaching.index'];
+const LIST_ROUTES = ['people.index', 'academics.teaching.index', 'learners.index'];
 
 uses(DatabaseTransactions::class);
 
@@ -90,11 +90,25 @@ it('refuses every place-bound route to an account that holds everything, but onl
     $heldAtB = RoleAssignment::query()->create(['user_id' => $atB->id, 'role_id' => $clerk->id, 'scope_type' => ScopeType::Campus,
         'scope_id' => $school->id('campus_b'), 'starts_at' => now()->subMinute()]);
 
+    // A learner in a class at campus B, with a contact.
+    $learner = Ids::next();
+    $enrolment = Ids::next();
+    $contact = Ids::next();
+    DB::table('learners')->insert(['id' => $learner, 'acadly_id' => 'AL-2222-2222', 'first_name' => 'Chimwemwe', 'surname' => 'Blantyre',
+        'sex' => 'female', 'date_of_birth' => '2012-01-01', 'created_at' => now(), 'updated_at' => now()]);
+    DB::table('enrolments')->insert(['id' => $enrolment, 'learner_id' => $learner, 'status' => 'active', 'admitted_on' => '2026-09-07', 'created_at' => now(), 'updated_at' => now()]);
+    DB::table('placements')->insert(['id' => Ids::next(), 'enrolment_id' => $enrolment, 'learner_id' => $learner, 'year_id' => $school->id('year'),
+        'division_id' => $school->id('secondary'), 'campus_id' => $school->id('campus_b'), 'level_code' => 'F1', 'class_id' => $school->id('class_secondary_b'),
+        'starts_on' => '2026-09-07', 'entry_reason' => 'admission', 'created_at' => now()]);
+    DB::table('learner_contacts')->insert(['id' => $contact, 'learner_id' => $learner, 'name' => 'Chimwemwe Blantyre', 'relationship' => 'mother',
+        'phone' => '0999 000 111', 'position' => 1, 'added_at' => now()]);
+
     // Values that point at campus B, for route parameters and request bodies alike;
     // a route's own values come first.
     $own = [
         'people.' => ['id' => $atB->id, 'assignment' => $heldAtB->id],
         'roles.' => ['id' => $clerk->id],
+        'learners.' => ['id' => $learner, 'contact' => $contact],
     ];
     $b = [
         'id' => $school->id('campus_b'),
@@ -107,7 +121,9 @@ it('refuses every place-bound route to an account that holds everything, but onl
         'starts_on' => '2026-09-07', 'ends_on' => '2027-07-23', 'levels' => [['profile' => 'SECONDARY']],
         'email' => 'someone@example.test', 'role' => 'class_teacher', 'place_type' => 'campus', 'place_id' => $school->id('campus_b'),
         'enabled' => true, 'reason' => 'Cross-scope test.', 'role_id' => $clerk->id, 'scope_type' => 'campus',
-        'scope_id' => $school->id('campus_b'), 'permissions' => [], 'send' => false];
+        'scope_id' => $school->id('campus_b'), 'permissions' => [], 'send' => false, 'class_id' => $school->id('class_secondary_b'),
+        'first_name' => 'Wezi', 'surname' => 'Banda', 'sex' => 'female', 'date_of_birth' => '2012-02-02', 'admitted_on' => '2026-09-08',
+        'from' => '2026-10-01', 'phone' => '0999 000 222', 'relationship' => 'father'];
     $secrets = [$school->id('campus_b'), $atB->email, $atB->name, 'Blantyre'];
 
     $checked = 0;

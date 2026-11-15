@@ -17,6 +17,9 @@ import { copy } from './copy'
 import { AuthLayout, Heading } from './sign-in/AuthLayout'
 import { ForgotPasswordScreen } from './sign-in/ForgotPasswordScreen'
 import { ResetPasswordScreen } from './sign-in/ResetPasswordScreen'
+import { AdmitScreen } from './learners/AdmitScreen'
+import { LearnerScreen } from './learners/LearnerScreen'
+import { LearnersScreen } from './learners/LearnersScreen'
 import { PeopleImportScreen } from './settings/PeopleImportScreen'
 import { PeopleScreen } from './settings/PeopleScreen'
 import { PersonScreen } from './settings/PersonScreen'
@@ -38,13 +41,18 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const teaches = holdsAnywhere(context, 'academics.manage')
   const home = settingsHome(context)
   const person = /^\/settings\/people\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const seesLearners = holdsAnywhere(context, 'enrolment.learners.view')
+  const learner = /^\/learners\/([0-9a-f-]{36})$/.exec(path)?.[1]
 
   useEffect(() => {
     if (path === '/settings' && home !== null) navigate(home, true)
   }, [path, home])
 
   let page
-  if (path === '/settings/people' && gives) page = <PeopleScreen />
+  if (path === '/learners' && seesLearners) page = <LearnersScreen />
+  else if (path === '/learners/admit' && holdsAnywhere(context, 'enrolment.admit')) page = <AdmitScreen />
+  else if (learner !== undefined && seesLearners) page = <LearnerScreen key={learner} id={learner} />
+  else if (path === '/settings/people' && gives) page = <PeopleScreen />
   else if (path === '/settings/people/import' && gives) page = <PeopleImportScreen />
   else if (person !== undefined && gives) page = <PersonScreen id={person} />
   else if (path === '/settings/roles' && edits) page = <RolesScreen />

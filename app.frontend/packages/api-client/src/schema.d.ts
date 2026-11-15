@@ -348,6 +348,128 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/learners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The learners in the classes the viewer may see: `?in=type:id&class_id=&q=` */
+        get: operations["learners.index"];
+        put?: never;
+        /** Admits a learner: `{first_name, other_names, surname, sex, date_of_birth, class_id, admitted_on, admission_number, different, contacts: [{name, relationship, phone, email, main}]}` */
+        post: operations["learners.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learners/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One learner's record */
+        get: operations["learners.show"];
+        /** Corrects the details: `{first_name, other_names, surname, sex, date_of_birth, admission_number, reason}` */
+        put: operations["learners.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learners/{id}/class": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Moves the learner to another class: `{class_id, from, reason}` */
+        post: operations["learners.move"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learners/{id}/contacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adds a contact: `{name, relationship, phone, email, main}` */
+        post: operations["learners.contacts.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learners/{id}/contacts/{contact}/main": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Makes a contact the main contact */
+        post: operations["learners.contacts.main"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learners/{id}/contacts/{contact}/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Removes a contact while two others remain: `{reason}` */
+        post: operations["learners.contacts.remove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learners/{id}/photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The current photo, to those who may see the learner. Opening it is recorded */
+        get: operations["learners.photo.show"];
+        put?: never;
+        /** Sets the photo: a JPEG or PNG of at most 2 MB, as `file` */
+        post: operations["learners.photo.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/me": {
         parameters: {
             query?: never;
@@ -1876,6 +1998,522 @@ export interface operations {
             403: components["responses"]["AuthorizationException"];
             404: components["responses"]["NotFoundHttpException"];
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "learners.index": {
+        parameters: {
+            query?: {
+                in?: string | null;
+                class_id?: string | null;
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        year: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        word: string;
+                        word_plural: string;
+                        classes: {
+                            id: string;
+                            name: string;
+                            level: string;
+                            campus: string;
+                            count: number;
+                            can_admit: boolean;
+                        }[];
+                        learners: {
+                            id: string;
+                            acadly_id: string;
+                            name: string;
+                            admission_number: string | null;
+                            class_id: string;
+                            class: string;
+                            has_photo: boolean;
+                            main_contact: {
+                                name: string;
+                                relationship: string;
+                                phone: string;
+                            } | null;
+                            contacts: number;
+                            possible_duplicate: boolean;
+                        }[];
+                        totals: {
+                            active: number;
+                            admitted_this_year: number;
+                            classes: number;
+                            few_contacts: number;
+                            duplicates: number;
+                        };
+                        can_admit: boolean;
+                        relationships: {
+                            value: string;
+                            label: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "learners.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @default false */
+                    different?: boolean;
+                    contacts?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "learners.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        acadly_id: string;
+                        admission_number: string | null;
+                        first_name: string;
+                        other_names: string | null;
+                        surname: string;
+                        name: string;
+                        sex: string;
+                        date_of_birth: string;
+                        has_photo: boolean;
+                        status: string;
+                        admitted_on: string | null;
+                        word: string;
+                        class: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        level: string | null;
+                        division: string | null;
+                        campus: string | null;
+                        class_teacher: string | null;
+                        placements: {
+                            class: string;
+                            campus: string;
+                            year: string;
+                            starts_on: string;
+                            ends_on: string | null;
+                            entry_reason: string;
+                            reason: string | null;
+                            now: boolean;
+                        }[];
+                        contacts: {
+                            id: string;
+                            name: string;
+                            relationship: string;
+                            relationship_label: string;
+                            phone: string;
+                            email: string | null;
+                            main: boolean;
+                        }[];
+                        activity: {
+                            at: string;
+                            what: string;
+                            who: string;
+                            reason: string | null;
+                        }[];
+                        possible_duplicate: boolean;
+                        move_to: {
+                            id: string;
+                            name: string;
+                            count: number;
+                        }[];
+                        can_manage: boolean;
+                        relationships: {
+                            value: string;
+                            label: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "learners.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        acadly_id: string;
+                        admission_number: string | null;
+                        first_name: string;
+                        other_names: string | null;
+                        surname: string;
+                        name: string;
+                        sex: string;
+                        date_of_birth: string;
+                        has_photo: boolean;
+                        status: string;
+                        admitted_on: string | null;
+                        word: string;
+                        class: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        level: string | null;
+                        division: string | null;
+                        campus: string | null;
+                        class_teacher: string | null;
+                        placements: unknown[];
+                        contacts: unknown[];
+                        activity: unknown[];
+                        possible_duplicate: boolean;
+                        move_to: unknown[];
+                        can_manage: boolean;
+                        relationships: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "learners.move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        acadly_id: string;
+                        admission_number: string | null;
+                        first_name: string;
+                        other_names: string | null;
+                        surname: string;
+                        name: string;
+                        sex: string;
+                        date_of_birth: string;
+                        has_photo: boolean;
+                        status: string;
+                        admitted_on: string | null;
+                        word: string;
+                        class: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        level: string | null;
+                        division: string | null;
+                        campus: string | null;
+                        class_teacher: string | null;
+                        placements: unknown[];
+                        contacts: unknown[];
+                        activity: unknown[];
+                        possible_duplicate: boolean;
+                        move_to: unknown[];
+                        can_manage: boolean;
+                        relationships: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "learners.contacts.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @default false */
+                    main?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        acadly_id: string;
+                        admission_number: string | null;
+                        first_name: string;
+                        other_names: string | null;
+                        surname: string;
+                        name: string;
+                        sex: string;
+                        date_of_birth: string;
+                        has_photo: boolean;
+                        status: string;
+                        admitted_on: string | null;
+                        word: string;
+                        class: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        level: string | null;
+                        division: string | null;
+                        campus: string | null;
+                        class_teacher: string | null;
+                        placements: unknown[];
+                        contacts: unknown[];
+                        activity: unknown[];
+                        possible_duplicate: boolean;
+                        move_to: unknown[];
+                        can_manage: boolean;
+                        relationships: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "learners.contacts.main": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                contact: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        acadly_id: string;
+                        admission_number: string | null;
+                        first_name: string;
+                        other_names: string | null;
+                        surname: string;
+                        name: string;
+                        sex: string;
+                        date_of_birth: string;
+                        has_photo: boolean;
+                        status: string;
+                        admitted_on: string | null;
+                        word: string;
+                        class: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        level: string | null;
+                        division: string | null;
+                        campus: string | null;
+                        class_teacher: string | null;
+                        placements: unknown[];
+                        contacts: unknown[];
+                        activity: unknown[];
+                        possible_duplicate: boolean;
+                        move_to: unknown[];
+                        can_manage: boolean;
+                        relationships: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "learners.contacts.remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                contact: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        acadly_id: string;
+                        admission_number: string | null;
+                        first_name: string;
+                        other_names: string | null;
+                        surname: string;
+                        name: string;
+                        sex: string;
+                        date_of_birth: string;
+                        has_photo: boolean;
+                        status: string;
+                        admitted_on: string | null;
+                        word: string;
+                        class: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        level: string | null;
+                        division: string | null;
+                        campus: string | null;
+                        class_teacher: string | null;
+                        placements: unknown[];
+                        contacts: unknown[];
+                        activity: unknown[];
+                        possible_duplicate: boolean;
+                        move_to: unknown[];
+                        can_manage: boolean;
+                        relationships: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "learners.photo.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "learners.photo.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        acadly_id: string;
+                        admission_number: string | null;
+                        first_name: string;
+                        other_names: string | null;
+                        surname: string;
+                        name: string;
+                        sex: string;
+                        date_of_birth: string;
+                        has_photo: boolean;
+                        status: string;
+                        admitted_on: string | null;
+                        word: string;
+                        class: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        level: string | null;
+                        division: string | null;
+                        campus: string | null;
+                        class_teacher: string | null;
+                        placements: unknown[];
+                        contacts: unknown[];
+                        activity: unknown[];
+                        possible_duplicate: boolean;
+                        move_to: unknown[];
+                        can_manage: boolean;
+                        relationships: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     me: {

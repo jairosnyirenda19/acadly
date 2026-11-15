@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Acadly\Core\Academics\AcademicsCore;
+use Acadly\Core\Enrolment\EnrolmentCore;
 use Acadly\Core\Institution\InstitutionCore;
 use Acadly\Core\Setup\SetupCore;
 use Acadly\Modules\Attendance\AttendanceModule;
@@ -78,6 +79,7 @@ return [
     'modules' => [
         InstitutionCore::class,
         AcademicsCore::class,
+        EnrolmentCore::class,
         SetupCore::class,
         AttendanceModule::class,
     ],

@@ -7,6 +7,7 @@ namespace Acadly\Core\Academics\Application;
 use Acadly\Core\Academics\Contracts\AcademicCalendar;
 use Acadly\Core\Institution\Contracts\SchoolDirectory;
 use Acadly\Kernel\Support\Clock;
+use Acadly\Kernel\Support\Ids;
 use Acadly\Kernel\Support\Row;
 use Illuminate\Support\Facades\DB;
 
@@ -96,6 +97,62 @@ final class Calendar implements AcademicCalendar
         }
 
         return $out;
+    }
+
+    public function classInForce(string $classId): ?array
+    {
+        if (! Ids::isValid($classId)) {
+            return null;
+        }
+
+        $row = DB::table('academic_classes')->where('id', $classId)->whereNull('ended_at')->first(self::CLASS_COLUMNS);
+
+        return $row === null ? null : self::classOf($row);
+    }
+
+    public function classesInYear(string $yearId): array
+    {
+        return array_values(DB::table('academic_classes as k')
+            ->join('institution_divisions as d', 'd.id', '=', 'k.division_id')
+            ->join('institution_campuses as c', 'c.id', '=', 'k.campus_id')
+            ->where('k.year_id', $yearId)->whereNull('k.ended_at')
+            ->orderBy('d.position')->orderBy('c.position')->orderBy('k.position')
+            ->get(array_map(fn (string $c): string => "k.{$c}", self::CLASS_COLUMNS))
+            ->map(fn (object $row): array => self::classOf($row))->all());
+    }
+
+    public function classNames(array $classIds): array
+    {
+        if ($classIds === []) {
+            return [];
+        }
+
+        $out = [];
+
+        foreach (DB::table('academic_classes as k')->join('academic_years as y', 'y.id', '=', 'k.year_id')
+            ->whereIn('k.id', array_values(array_unique($classIds)))->get(['k.id', 'k.name', 'y.name as year']) as $row) {
+            $out[Row::text($row, 'id')] = ['name' => Row::text($row, 'name'), 'year' => Row::text($row, 'year')];
+        }
+
+        return $out;
+    }
+
+    public function classTeacherId(string $classId): ?string
+    {
+        $row = DB::table('academic_teaching')->where('class_id', $classId)->whereNull('subject_id')->whereNull('ended_at')->first(['user_id']);
+
+        return $row === null ? null : Row::text($row, 'user_id');
+    }
+
+    private const array CLASS_COLUMNS = ['id', 'name', 'year_id', 'division_id', 'campus_id', 'level_code'];
+
+    /** @return array{id: string, name: string, year_id: string, division_id: string, campus_id: string, level_code: string} */
+    private static function classOf(object $row): array
+    {
+        return [
+            'id' => Row::text($row, 'id'), 'name' => Row::text($row, 'name'), 'year_id' => Row::text($row, 'year_id'),
+            'division_id' => Row::text($row, 'division_id'), 'campus_id' => Row::text($row, 'campus_id'), 'level_code' => Row::text($row, 'level_code'),
+        ];
     }
 
     private static function day(string $value): string

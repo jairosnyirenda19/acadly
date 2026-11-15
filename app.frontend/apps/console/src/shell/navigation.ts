@@ -39,6 +39,11 @@ export const GROUPS: NavGroup[] = [
     items: [{ key: 'today', label: t.nav.today, path: '/', icon: 'today', show: () => true, lights: (p) => p === '/' }],
   },
   {
+    key: 'learners',
+    label: t.groups.learners,
+    items: [{ key: 'learners', label: t.nav.learners, path: '/learners', icon: 'learners', show: (c) => holdsAnywhere(c, 'enrolment.learners.view'), lights: under('/learners') }],
+  },
+  {
     key: 'school',
     label: t.groups.school,
     items: [

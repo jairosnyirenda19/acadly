@@ -20,4 +20,29 @@ interface AcademicCalendar
 
     /** Whether every offering of the school has at least one class in the year. */
     public function everyOfferingHasClasses(string $yearId): bool;
+
+    /**
+     * A class in force, or null when it does not exist or has ended.
+     *
+     * @return array{id: string, name: string, year_id: string, division_id: string, campus_id: string, level_code: string}|null
+     */
+    public function classInForce(string $classId): ?array;
+
+    /**
+     * The classes in force in a year, in the order of their divisions, campuses and positions.
+     *
+     * @return list<array{id: string, name: string, year_id: string, division_id: string, campus_id: string, level_code: string}>
+     */
+    public function classesInYear(string $yearId): array;
+
+    /**
+     * The names of classes, ended ones too, with the name of their year.
+     *
+     * @param  list<string>  $classIds
+     * @return array<string, array{name: string, year: string}>
+     */
+    public function classNames(array $classIds): array;
+
+    /** The account given the class as its class teacher, now. */
+    public function classTeacherId(string $classId): ?string;
 }

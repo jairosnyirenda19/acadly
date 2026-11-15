@@ -8,4 +8,5 @@ parameters:
         - core
         - modules
         - tests/Fixtures/Toy
+        - database/seeders
     tmpDir: storage/framework/phpstan

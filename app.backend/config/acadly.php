@@ -62,6 +62,16 @@ return [
     ],
 
     /*
+    | The administrator made by the development seed (php artisan db:seed).
+    | Local and testing only; a real deployment uses acadly:administrator.
+    */
+    'development' => [
+        'admin_email' => env('DEV_ADMIN_EMAIL'),
+        'admin_name' => env('DEV_ADMIN_NAME', 'Development Administrator'),
+        'admin_password' => env('DEV_ADMIN_PASSWORD'),
+    ],
+
+    /*
     | Every Core domain and every Module in this build, by manifest class.
     | A module that is not listed here does not exist for the application.
     */

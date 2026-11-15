@@ -35,6 +35,7 @@ Append-only log. A decision is changed by adding a new entry that supersedes the
 | D-029 | 2026-11-14 | The two deployables live in `app.backend/` and `app.frontend/`, the owner's folder standard across IQ-X products (replaces the `api/` and `web/` names used in the first commit) | Accepted (owner standard) | One layout across the catalogue |
 | D-030 | 2026-11-14 | **One deployment per school.** Each school has its own application, database, storage and address. No `tenant_id`, no tenant row-level security, no shared multi-tenant database, no IQ-X platform app inside a deployment. A deployment holds one institution row; divisions and campuses stay. Modules and limits come from a signed licence. **Supersedes D-005** and the tenant model of PRD §4 | Accepted (owner decision) | The owner sells and operates Acadly per school, as with eOffice IQ-X |
 | D-031 | 2026-11-14 | Two database roles are kept: `acadly_owner` runs migrations; `acadly_app` runs the application and cannot change the schema. History tables are append-only by privilege and by trigger | Accepted | Protects a school's own records, which D-030 does not replace |
+| D-032 | 2026-11-14 | The Acadly IQ-X mark: a thin-line sheet that carries a graduation cap, behind a solid closed book with a ribbon marker, a cut-out `a` from Archivo ExtraBold, and a quiet IQ-X. One ink (`#0C2340`). A sibling of the eOffice IQ-X mark. Files in `design/brand/` | Accepted (owner approved 15 November 2026) | One mark family across IQ-X products |
 
 ## Open (from the PRD, not decided here)
 

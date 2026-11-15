@@ -72,7 +72,7 @@ Undecided: EPUB reader engine; PWA offline scope for the first pilot; whether Sa
 - **Register: professional on serious matters** (owner rule, 14 November 2026). Status, security, access, audit, results, attendance, safeguarding, errors and system messages use clean, professional terms. No conversational or playful phrasing ("The API says", "asks", "look here", "chatty" asides). Preferred: "Service status", "Operational", "Unavailable", "Awaiting decision", "Access refused", "Check again".
 - **Disclose nothing about the build.** No screen, response, header or error message names the framework, the language, the server, internal file paths, module lists, release identifiers or developer commands. A public status says only whether the service is available.
 - **Character: a balance of boldness and professionalism** (owner's words). Confident and distinct, never playful at the cost of trust.
-- **Logo: draft.** The name and the navy-and-teal idea are kept. The mark (an "A" with a graduation cap and a rising path) may be redrawn to fit the interface. Source image supplied by the owner; not yet stored in the repository.
+- **Logo: approved** (owner, 15 November 2026), in `design/brand/`: a sheet that carries a graduation cap, behind a closed book with a ribbon marker and a cut-out `a`, in one ink. It is built as a sibling of the eOffice IQ-X mark.
 - **Safe on a shared phone.** SMS and push text never carries marks, health or custody detail. It points to the portal.
 
 ## Evidence on Hand

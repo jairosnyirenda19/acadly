@@ -46,6 +46,9 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::prefix('people')->name('people.')->group(function (): void {
         Route::get('/', [PeopleController::class, 'index'])->name('index');
         Route::post('/', [PeopleController::class, 'invite'])->name('invite');
+        Route::get('/import/template', [PeopleController::class, 'template'])->name('import.template');
+        Route::post('/import/check', [PeopleController::class, 'checkImport'])->name('import.check');
+        Route::post('/import', [PeopleController::class, 'import'])->name('import');
         Route::get('/{id}', [PeopleController::class, 'show'])->whereUuid('id')->name('show');
         Route::post('/{id}/invitation', [PeopleController::class, 'resend'])->whereUuid('id')->name('resend');
         Route::post('/{id}/roles', [PeopleController::class, 'give'])->whereUuid('id')->name('give');

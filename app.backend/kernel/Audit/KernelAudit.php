@@ -18,6 +18,7 @@ enum KernelAudit: string implements AuditAction
     case InvitationAccepted = 'identity.invitation_accepted';
     case AccountDisabled = 'identity.account_disabled';
     case ResetSent = 'identity.reset_sent';
+    case PeopleImported = 'identity.people_imported';
     case FirstAdministrator = 'access.first_administrator';
     case RoleAssigned = 'access.role_assigned';
     case RoleEnded = 'access.role_ended';
@@ -64,6 +65,7 @@ enum KernelAudit: string implements AuditAction
             self::InvitationAccepted => 'Set a first password with an invitation link.',
             self::AccountDisabled => 'Disabled an account.',
             self::ResetSent => 'Sent a password reset link to a member of staff.',
+            self::PeopleImported => 'Invited people and gave roles from a spreadsheet.',
             self::FirstAdministrator => 'Created the first administrator of the deployment.',
             self::RoleAssigned => 'Gave a role.',
             self::RoleEnded => 'Ended a role.',

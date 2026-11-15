@@ -18,15 +18,18 @@ use Acadly\Kernel\Identity\Actions\InviteAccount;
 use Acadly\Kernel\Identity\Actions\SendInvitation;
 use Acadly\Kernel\Identity\Actions\SendPasswordReset;
 use Acadly\Kernel\Identity\People;
+use Acadly\Kernel\Identity\PeopleImport;
 use Acadly\Kernel\Identity\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
@@ -181,6 +184,62 @@ final class PeopleController
         $send->handle($viewer, $person);
 
         return response()->json(['status' => 'sent']);
+    }
+
+    /** A spreadsheet to fill in: the columns, and the roles and places the viewer can give. */
+    public function template(Request $request, PeopleImport $import): BinaryFileResponse
+    {
+        $viewer = self::user($request);
+        $this->refuseWithoutAnyReach($viewer);
+        $path = tempnam(sys_get_temp_dir(), 'people').'.xlsx';
+        $import->template($viewer, $path);
+
+        return response()->download($path, 'people-to-invite.xlsx', ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])->deleteFileAfterSend();
+    }
+
+    /**
+     * Checks every row of a spreadsheet. Nothing is saved: `{file}`.
+     *
+     * @response array{rows: list<array{row: int, name: string, email: string, role: string, where: string, state: 'ready'|'second'|'existing'|'wrong', note: string}>, totals: array{rows: int, ready: int, existing: int, wrong: int, new_people: int}}
+     */
+    public function checkImport(Request $request, PeopleImport $import): JsonResponse
+    {
+        $viewer = self::user($request);
+        $this->refuseWithoutAnyReach($viewer);
+        [$path, $extension] = self::spreadsheet($request);
+
+        return response()->json($import->check($viewer, $path, $extension));
+    }
+
+    /**
+     * Imports the rows without a problem, and sends the invitations when asked: `{file, send}`.
+     *
+     * @response array{invited: int, roles: int, left_out: int}
+     */
+    public function import(Request $request, PeopleImport $import): JsonResponse
+    {
+        $viewer = self::user($request);
+        $this->refuseWithoutAnyReach($viewer);
+        [$path, $extension] = self::spreadsheet($request);
+
+        return response()->json($import->import($viewer, $path, $extension, $request->boolean('send')));
+    }
+
+    /** @return array{string, string} the uploaded file's path and kind */
+    private static function spreadsheet(Request $request): array
+    {
+        $request->validate(['file' => ['required', 'file', 'max:2048']], [
+            'file.required' => 'Choose a file.',
+            'file.max' => 'The file is larger than 2 MB.',
+        ]);
+        $file = $request->file('file');
+        $extension = $file instanceof UploadedFile ? mb_strtolower($file->getClientOriginalExtension()) : '';
+
+        if (! $file instanceof UploadedFile || ! in_array($extension, ['xlsx', 'csv'], true)) {
+            throw ValidationException::withMessages(['file' => ['Choose an .xlsx or .csv file.']]);
+        }
+
+        return [$file->getRealPath() ?: '', $extension];
     }
 
     private function refuseWithoutAnyReach(User $viewer): void

@@ -41,6 +41,9 @@ const RECORD_ROUTES = [
     'documents.versions.store' => 'DocumentsTest: answers not found to a person who may not open the document',
     'documents.trash' => 'DocumentsTest: answers not found to a person who may not open the document',
     'documents.restore' => 'DocumentsTest: trashes with a reason, restores a batch together',
+    'people.import.template' => 'PeopleImportTest: the template lists only the roles and places the viewer can give',
+    'people.import.check' => 'PeopleImportTest: a row for a place outside the viewer\'s reach is not imported',
+    'people.import' => 'PeopleImportTest: a row for a place outside the viewer\'s reach is not imported',
 ];
 
 /**

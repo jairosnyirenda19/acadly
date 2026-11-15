@@ -3517,6 +3517,196 @@
                 }
             }
         },
+        "/v1/people/import/template": {
+            "get": {
+                "operationId": "people.import.template",
+                "summary": "A spreadsheet to fill in: the columns, and the roles and places the viewer can give",
+                "tags": [
+                    "People"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "required": true,
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "attachment; filename=people-to-invite.xlsx"
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/people/import/check": {
+            "post": {
+                "operationId": "people.import.check",
+                "summary": "Checks every row of a spreadsheet. Nothing is saved: `{file}`",
+                "tags": [
+                    "People"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "rows": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "row": {
+                                                        "type": "integer"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    },
+                                                    "role": {
+                                                        "type": "string"
+                                                    },
+                                                    "where": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "ready",
+                                                            "second",
+                                                            "existing",
+                                                            "wrong"
+                                                        ]
+                                                    },
+                                                    "note": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "row",
+                                                    "name",
+                                                    "email",
+                                                    "role",
+                                                    "where",
+                                                    "state",
+                                                    "note"
+                                                ]
+                                            }
+                                        },
+                                        "totals": {
+                                            "type": "object",
+                                            "properties": {
+                                                "rows": {
+                                                    "type": "integer"
+                                                },
+                                                "ready": {
+                                                    "type": "integer"
+                                                },
+                                                "existing": {
+                                                    "type": "integer"
+                                                },
+                                                "wrong": {
+                                                    "type": "integer"
+                                                },
+                                                "new_people": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "rows",
+                                                "ready",
+                                                "existing",
+                                                "wrong",
+                                                "new_people"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "rows",
+                                        "totals"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/people/import": {
+            "post": {
+                "operationId": "people.import",
+                "summary": "Imports the rows without a problem, and sends the invitations when asked: `{file, send}`",
+                "tags": [
+                    "People"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "send": {
+                                        "type": "boolean",
+                                        "default": false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "invited": {
+                                            "type": "integer"
+                                        },
+                                        "roles": {
+                                            "type": "integer"
+                                        },
+                                        "left_out": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "invited",
+                                        "roles",
+                                        "left_out"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/people/{id}": {
             "get": {
                 "operationId": "people.show",

@@ -1,4 +1,4 @@
-import { navigate } from '@acadly/kernel'
+import { navigate, useLocation } from '@acadly/kernel'
 import { Button, Notice } from '@acadly/ui'
 import { useEffect, useMemo, useState } from 'react'
 import { copy } from '../copy'
@@ -31,6 +31,8 @@ export function PeopleScreen() {
   const [inviting, setInviting] = useState(false)
 
   const { place } = useWorkIn()
+  const { query } = useLocation()
+  const imported = (query.get('imported') ?? '').split(':').map(Number)
   const inPlace = place !== null && place.key !== 'institution:' ? place.key : null
   const load = () => void settingsApi.people(inPlace).then(setState)
   useEffect(load, [inPlace])
@@ -80,14 +82,13 @@ export function PeopleScreen() {
         intro={t.intro}
         actions={
           <>
-            <Button variant="secondary" disabled title={t.importNote}>
+            <Button variant="secondary" onClick={() => navigate('/settings/people/import')}>
               {t.import}
             </Button>
             <Button onClick={() => setInviting(!inviting)}>{t.invite}</Button>
           </>
         }
       />
-      <p className="-mt-2 px-[clamp(16px,3vw,40px)] pb-4 text-right text-[13px] text-text-muted">{t.importNote}</p>
 
       <TotalsBand>
         <Total tone="ink" label={t.bandAccess} value={String(state.totals.with_access)} note={t.bandAccessNote} />
@@ -97,6 +98,11 @@ export function PeopleScreen() {
       </TotalsBand>
 
       <section className="flex-1 bg-sheet px-[clamp(16px,3vw,40px)] pt-5 pb-8">
+        {imported.length === 2 && imported.every((n) => Number.isFinite(n)) && (
+          <div className="mb-4">
+            <Notice tone="done" title={copy.settings.importing.done(imported[0] ?? 0, imported[1] ?? 0)} />
+          </div>
+        )}
         {inviting && <InviteForm giving={state.giving} onDone={(id) => navigate(`/settings/people/${id}`)} onCancel={() => setInviting(false)} />}
 
         <div className="mb-4 flex flex-wrap items-end gap-x-4.5 gap-y-3">

@@ -17,6 +17,7 @@ import { copy } from './copy'
 import { AuthLayout, Heading } from './sign-in/AuthLayout'
 import { ForgotPasswordScreen } from './sign-in/ForgotPasswordScreen'
 import { ResetPasswordScreen } from './sign-in/ResetPasswordScreen'
+import { PeopleImportScreen } from './settings/PeopleImportScreen'
 import { PeopleScreen } from './settings/PeopleScreen'
 import { PersonScreen } from './settings/PersonScreen'
 import { RolesScreen } from './settings/RolesScreen'
@@ -44,6 +45,7 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
 
   let page
   if (path === '/settings/people' && gives) page = <PeopleScreen />
+  else if (path === '/settings/people/import' && gives) page = <PeopleImportScreen />
   else if (person !== undefined && gives) page = <PersonScreen id={person} />
   else if (path === '/settings/roles' && edits) page = <RolesScreen />
   else if (path === '/settings/subjects' && teaches) page = <SubjectsScreen />

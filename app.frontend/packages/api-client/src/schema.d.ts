@@ -503,6 +503,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/people/import/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A spreadsheet to fill in: the columns, and the roles and places the viewer can give */
+        get: operations["people.import.template"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/people/import/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Checks every row of a spreadsheet. Nothing is saved: `{file}` */
+        post: operations["people.import.check"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/people/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Imports the rows without a problem, and sends the invitations when asked: `{file, send}` */
+        post: operations["people.import"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/people/{id}": {
         parameters: {
             query?: never;
@@ -2172,6 +2223,97 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "people.import.template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    /** @example attachment; filename=people-to-invite.xlsx */
+                    "Content-Disposition": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "people.import.check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        rows: {
+                            row: number;
+                            name: string;
+                            email: string;
+                            role: string;
+                            where: string;
+                            /** @enum {string} */
+                            state: "ready" | "second" | "existing" | "wrong";
+                            note: string;
+                        }[];
+                        totals: {
+                            rows: number;
+                            ready: number;
+                            existing: number;
+                            wrong: number;
+                            new_people: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "people.import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @default false */
+                    send?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        invited: number;
+                        roles: number;
+                        left_out: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "people.show": {

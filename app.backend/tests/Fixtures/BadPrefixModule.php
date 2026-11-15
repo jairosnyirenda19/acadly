@@ -49,4 +49,9 @@ final class BadPrefixModule implements Module
     {
         return [];
     }
+
+    public function journeys(): array
+    {
+        return [];
+    }
 }

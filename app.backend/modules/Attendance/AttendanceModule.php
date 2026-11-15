@@ -54,4 +54,9 @@ final class AttendanceModule implements Module
     {
         return [];
     }
+
+    public function journeys(): array
+    {
+        return [];
+    }
 }

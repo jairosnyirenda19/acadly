@@ -27,6 +27,15 @@ return [
     'frontend_url' => env('ACADLY_FRONTEND_URL', 'http://localhost:5173'),
 
     /*
+    | Compiled blueprints and the lock of released versions (02 §1). Made by
+    | blueprint:compile and blueprint:release; read by the journey engine.
+    */
+    'blueprints' => [
+        'compiled' => base_path('blueprints/compiled'),
+        'lock' => base_path('blueprints/blueprints.lock'),
+    ],
+
+    /*
     | Every Core domain and every Module in this build, by manifest class.
     | A module that is not listed here does not exist for the application.
     */

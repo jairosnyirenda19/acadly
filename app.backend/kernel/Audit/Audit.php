@@ -64,6 +64,7 @@ final class Audit
         ?string $aboutPersonId = null,
         array $personal = [],
         array $meta = [],
+        ?JourneyLine $journey = null,
     ): string {
         if (! $this->catalogue->has($action->key())) {
             throw new LogicException("[{$action->key()}] is not an audit action in this build.");
@@ -105,9 +106,9 @@ final class Audit
             'payload_id' => null,
             'payload_hash' => null,
             'reason' => $reason,
-            'journey_ref' => null,
-            'journey_step' => null,
-            'journey_outcome' => null,
+            'journey_ref' => $journey?->ref,
+            'journey_step' => $journey?->step,
+            'journey_outcome' => $journey?->outcome,
             'meta' => $at?->type === ScopeType::ClassGroup ? [...$meta, 'class_id' => $at->id] : $meta,
         ];
 

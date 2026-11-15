@@ -13,8 +13,8 @@ use Acadly\Kernel\Events\EventConsumer;
  * The manifest of one Core domain or one Module (docs/architecture/01-foundations.md §5).
  *
  * A manifest is a declaration. The kernel reads it at boot and the linters read
- * it in CI. Later stages add permissions, topics, journeys, search sources and
- * audit actions to this contract.
+ * it in CI. Later stages add topics, binding slots, search sources and navigation
+ * to this contract.
  */
 interface Module
 {
@@ -60,4 +60,12 @@ interface Module
      * @return array<class-string<DomainEvent>, list<class-string<EventConsumer>>>
      */
     public function subscriptions(): array;
+
+    /**
+     * The journey keys this module owns, such as `attendance.correction`.
+     * Each has declarations in the module's `Journeys/` folder.
+     *
+     * @return list<string>
+     */
+    public function journeys(): array;
 }

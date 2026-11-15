@@ -26,6 +26,9 @@ abstract class TestCase extends BaseTestCase
 
         Artisan::call('migrate:fresh', ['--database' => 'pgsql_owner', '--force' => true]);
 
+        // The toy module's tables exist only in the test database.
+        Artisan::call('migrate', ['--database' => 'pgsql_owner', '--path' => 'tests/Fixtures/Toy/Database/migrations', '--force' => true]);
+
         self::$migrated = true;
     }
 

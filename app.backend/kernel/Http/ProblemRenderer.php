@@ -42,7 +42,7 @@ final class ProblemRenderer
     {
         if ($e instanceof Problem) {
             return new JsonResponse(
-                ['type' => 'about:blank', 'title' => $e->title, 'status' => $e->status, 'code' => $e->problemCode],
+                [...$e->extra, 'type' => 'about:blank', 'title' => $e->title, 'status' => $e->status, 'code' => $e->problemCode],
                 $e->status,
                 ['Content-Type' => 'application/problem+json'],
             );

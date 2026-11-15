@@ -207,6 +207,11 @@ it('refuses a subscription to an event that is not in the build', function (): v
         {
             return [UnlistedEvent::class => [RecordingConsumer::class]];
         }
+
+        public function journeys(): array
+        {
+            return [];
+        }
     };
 
     new EventCatalogue(new ModuleRegistry([new InstitutionCore, $module]));

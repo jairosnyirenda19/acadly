@@ -78,6 +78,18 @@ cd app.backend && composer lint && php artisan test
 cd app.frontend && corepack pnpm check
 ```
 
+After a change to a journey declaration, compile it and commit the files in `app.backend/blueprints/`. `composer lint` fails while a compiled file is out of date:
+
+```bash
+cd app.backend && php artisan blueprint:compile
+```
+
+Release a version when it goes to schools. From then on it cannot change; a change is a new version:
+
+```bash
+cd app.backend && php artisan blueprint:release key@YYYY.N
+```
+
 After a change to an API route or response:
 
 ```bash

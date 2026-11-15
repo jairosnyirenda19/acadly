@@ -24,9 +24,9 @@ The target of stages 0–4 is the PRD's vertical slice (§21): institution → c
 4. `Access`: permission catalogue sync, roles, scoped assignments, `Access::check()`, entitlements, support grants. *(Built 15 November 2026: catalogue, sync, roles, scoped assignments with periods, `Access::check()`, assignment guard rails, first-administrator command. Not yet: record-level rules, the licence, support grants, audit of access changes.)*
 5. `Audit` and `Events` (outbox, idempotent consumers). *(Audit write side built 16 November 2026: action catalogue, hash chain, encrypted personal payloads, field classes and diffs, refusals, sign-in and access lines, `audit:verify`, nightly `audit:seal`. Not yet: the read endpoints and screens, sensitive-read auditing, watchers, the spool file, partitioning, erasure. Events built the same day: outbox, publisher, at-most-once delivery per consumer, role events. Not yet: webhooks.)*
 6. `Module`: manifest contract, registry, activation check, `/me/context`. *(Built 16 November 2026: activation check with the offering socket, signed licence, switches with history, `module:` route guard, read-only mode, `/me/context`, web context hooks. Not yet: per-division switching, navigation entries, the modules screen.)*
-7. `Blueprint`: definitions, compiler, lock file, linter, journey engine, conformance suite, projections.
+7. `Blueprint`: definitions, compiler, lock file, linter, journey engine, conformance suite, projections. *(Journeys built 16 November 2026: typed declarations, canonical compiled form, lock and release, linter in `acadly:lint`, the engine with gates, capability, four eyes, idempotent internal and after-commit effects, guarded state column, step completions, events and audit lines, milestones, projections and diagrams, and a toy module with one journey that passes them all. Not yet: Profile Blueprints (stage 2, with divisions), `blueprint:diff`, `blueprint:migrate`, SLA clocks, cure windows, obligations, the HTTP endpoint for performing a step.)*
 8. `Notify`: topic contract, compiled catalogue, audiences, dispatcher, in-app + email + SMS adapters (SMS against a fake provider first), delivery ledger, sync + readiness hash.
-9. `Files`: private storage, upload validation, signed access.
+9. `Files`: private storage, upload validation, signed access. *(Build it so that a later document management capability can sit on top: one file may link to many records, and storage must scale to many documents per learner. See "Document management" under Open in `DECISIONS.md`.)*
 
 **Exit:** a toy module with one journey and one topic passes isolation, conformance and catalogue tests.
 
@@ -75,6 +75,7 @@ The target of stages 0–4 is the PRD's vertical slice (§21): institution → c
 - `TERTIARY@…` profile and the Programmes module.
 - DataImport, offline attendance sync, push channel.
 - Later modules take their reserved slots: Fees, Timetable, Transport, Hostel, StrideBridge, Insights.
+- Document management: learner records, scanned marked scripts, documents linked to many records. Discuss and design first (see `DECISIONS.md`, Open). It may move earlier, next to `Assessment` in stage 4, if scanned scripts are needed for the pilot.
 
 ## What is deliberately not built early
 

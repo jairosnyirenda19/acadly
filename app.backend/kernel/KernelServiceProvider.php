@@ -10,6 +10,17 @@ use Acadly\Kernel\Access\PermissionCatalogue;
 use Acadly\Kernel\Access\ScopeHierarchy;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Audit\AuditCatalogue;
+use Acadly\Kernel\Blueprint\BlueprintCompiler;
+use Acadly\Kernel\Blueprint\Blueprints;
+use Acadly\Kernel\Blueprint\Console\BlueprintCompileCommand;
+use Acadly\Kernel\Blueprint\Console\BlueprintDiagramCommand;
+use Acadly\Kernel\Blueprint\Console\BlueprintLintCommand;
+use Acadly\Kernel\Blueprint\Console\BlueprintReleaseCommand;
+use Acadly\Kernel\Blueprint\Declarations;
+use Acadly\Kernel\Blueprint\Engine\JourneyEngine;
+use Acadly\Kernel\Blueprint\Engine\Projection;
+use Acadly\Kernel\Blueprint\Journey\JourneyLinter;
+use Acadly\Kernel\Blueprint\Lock;
 use Acadly\Kernel\Console\AuditSealCommand;
 use Acadly\Kernel\Console\AuditVerifyCommand;
 use Acadly\Kernel\Console\CreateAdministratorCommand;
@@ -33,7 +44,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
-/** Identity and access: the kernel services every module relies on. */
+/** Identity, access, audit, events, modules and blueprints: the kernel services every module relies on. */
 final class KernelServiceProvider extends ServiceProvider
 {
     public function register(): void
@@ -70,6 +81,23 @@ final class KernelServiceProvider extends ServiceProvider
 
         // One instance per request: it remembers the grants it has loaded.
         $this->app->scoped(Access::class);
+
+        // Blueprints: the compiled form is read once per process and checked against the lock.
+        $this->app->singleton(Lock::class, fn (): Lock => new Lock(config()->string('acadly.blueprints.lock')));
+        $this->app->singleton(
+            Blueprints::class,
+            fn (Application $app): Blueprints => Blueprints::load(config()->string('acadly.blueprints.compiled'), $app->make(Lock::class)),
+        );
+        $this->app->bind(
+            BlueprintCompiler::class,
+            fn (Application $app): BlueprintCompiler => new BlueprintCompiler(
+                new Declarations($app->make(ModuleRegistry::class)),
+                $app->make(JourneyLinter::class),
+                $app->make(Lock::class),
+            ),
+        );
+        $this->app->scoped(JourneyEngine::class);
+        $this->app->scoped(Projection::class);
     }
 
     public function boot(): void
@@ -80,6 +108,7 @@ final class KernelServiceProvider extends ServiceProvider
             __DIR__.'/Audit/Database/migrations',
             __DIR__.'/Events/Database/migrations',
             __DIR__.'/Module/Database/migrations',
+            __DIR__.'/Blueprint/Database/migrations',
         ]);
 
         $this->app->make('router')->aliasMiddleware('module', RequireModule::class);
@@ -100,7 +129,8 @@ final class KernelServiceProvider extends ServiceProvider
         });
 
         if ($this->app->runningInConsole()) {
-            $this->commands([SyncCommand::class, CreateAdministratorCommand::class, AuditVerifyCommand::class, AuditSealCommand::class, PublishEventsCommand::class, InstallLicenceCommand::class]);
+            $this->commands([SyncCommand::class, CreateAdministratorCommand::class, AuditVerifyCommand::class, AuditSealCommand::class, PublishEventsCommand::class, InstallLicenceCommand::class,
+                BlueprintCompileCommand::class, BlueprintLintCommand::class, BlueprintReleaseCommand::class, BlueprintDiagramCommand::class]);
         }
 
         // Every night: verify the audit trail, then seal its head.

@@ -7,4 +7,5 @@ parameters:
         - kernel
         - core
         - modules
+        - tests/Fixtures/Toy
     tmpDir: storage/framework/phpstan

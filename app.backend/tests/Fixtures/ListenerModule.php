@@ -50,4 +50,9 @@ final class ListenerModule implements Module
     {
         return [RoleAssigned::class => [RecordingConsumer::class]];
     }
+
+    public function journeys(): array
+    {
+        return [];
+    }
 }

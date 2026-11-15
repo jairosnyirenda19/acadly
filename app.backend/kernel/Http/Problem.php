@@ -13,10 +13,12 @@ use RuntimeException;
  */
 final class Problem extends RuntimeException
 {
+    /** @param  array<string, string>  $extra  further members of the problem document */
     public function __construct(
         public readonly int $status,
         public readonly string $problemCode,
         public readonly string $title,
+        public readonly array $extra = [],
     ) {
         parent::__construct($title);
     }
@@ -24,6 +26,27 @@ final class Problem extends RuntimeException
     public static function moduleInactive(): self
     {
         return new self(403, 'module_inactive', 'This function is not available for the school.');
+    }
+
+    public static function stepNotAvailable(): self
+    {
+        return new self(409, 'step_not_available', 'This step is not available for the record in its current state.');
+    }
+
+    /** A journey gate is closed: the reason says what is not true yet, the remedy what makes it true. */
+    public static function stepNotAdmissible(string $reason, string $remedy): self
+    {
+        return new self(422, 'step_not_admissible', 'The step cannot be performed yet.', ['reason' => $reason, 'remedy' => $remedy]);
+    }
+
+    public static function anotherPersonRequired(): self
+    {
+        return new self(403, 'another_person_required', 'This step must be performed by a different person.');
+    }
+
+    public static function stateChanged(): self
+    {
+        return new self(409, 'state_changed', 'The record changed while the request was in progress. Reload the record and try again.');
     }
 
     public static function readOnly(): self

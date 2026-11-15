@@ -53,4 +53,9 @@ final class InstitutionCore implements Module
     {
         return [];
     }
+
+    public function journeys(): array
+    {
+        return [];
+    }
 }

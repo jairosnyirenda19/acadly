@@ -55,4 +55,9 @@ final class ListenerModule implements Module
     {
         return [];
     }
+
+    public function topics(): array
+    {
+        return [];
+    }
 }

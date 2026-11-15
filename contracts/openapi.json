@@ -509,6 +509,113 @@
                 }
             }
         },
+        "/v1/me/notifications": {
+            "get": {
+                "operationId": "me.notifications",
+                "summary": "The signed-in person's in-app notices, newest first",
+                "tags": [
+                    "Notifications"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "unread": {
+                                            "type": "integer"
+                                        },
+                                        "items": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "topic": {
+                                                        "type": "string"
+                                                    },
+                                                    "subject": {
+                                                        "type": "string"
+                                                    },
+                                                    "body": {
+                                                        "type": "string"
+                                                    },
+                                                    "action_url": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "read_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "topic",
+                                                    "subject",
+                                                    "body",
+                                                    "action_url",
+                                                    "created_at",
+                                                    "read_at"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "unread",
+                                        "items"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/me/notifications/{id}/read": {
+            "post": {
+                "operationId": "me.notifications.read",
+                "summary": "Marks one of the person's own notices as read",
+                "tags": [
+                    "Notifications"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/auth/forgot-password": {
             "post": {
                 "operationId": "auth.forgot-password",
@@ -601,6 +708,29 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/ready": {
+            "get": {
+                "operationId": "kernel.ready",
+                "description": "Ready when the database has been brought into line with this release:\nthe notice catalogue it holds matches the one in the code (04 \u00a79). It\ndiscloses nothing else and requires no authentication.",
+                "summary": "Readiness",
+                "tags": [
+                    "Readiness"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 200
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -767,6 +897,25 @@
             },
             "AuthenticationException": {
                 "description": "Unauthenticated",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": [
+                                "message"
+                            ]
+                        }
+                    }
+                }
+            },
+            "NotFoundHttpException": {
+                "description": "Not found",
                 "content": {
                     "application/json": {
                         "schema": {

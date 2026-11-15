@@ -59,4 +59,9 @@ final class AttendanceModule implements Module
     {
         return [];
     }
+
+    public function topics(): array
+    {
+        return [];
+    }
 }

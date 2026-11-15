@@ -20,6 +20,9 @@ enum KernelAudit: string implements AuditAction
     case ModuleSwitched = 'modules.switched';
     case LicenceInstalled = 'modules.licence_installed';
     case StepPerformed = 'journeys.step_performed';
+    case Subscribed = 'notify.subscribed';
+    case Unsubscribed = 'notify.unsubscribed';
+    case PreferenceChanged = 'notify.preference_changed';
     case Sealed = 'audit.sealed';
     case ChainBroken = 'audit.chain_broken';
 
@@ -44,6 +47,9 @@ enum KernelAudit: string implements AuditAction
             self::ModuleSwitched => 'Switched a module on or off.',
             self::LicenceInstalled => 'Installed a licence.',
             self::StepPerformed => 'Performed a step of a process on a record.',
+            self::Subscribed => 'Subscribed to a notice.',
+            self::Unsubscribed => 'Ended a subscription to a notice.',
+            self::PreferenceChanged => 'Changed how a notice is received.',
             self::Sealed => 'Sealed the audit trail.',
             self::ChainBroken => 'Found that the audit trail does not verify.',
         };

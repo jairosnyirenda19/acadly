@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('title');
             $table->string('state', 60);
             $table->string('journey_ref', 64);
+            $table->uuid('requested_by')->nullable();
+            $table->string('requester_phone', 32)->nullable();
             $table->timestampsTz(6);
         });
 

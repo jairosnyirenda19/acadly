@@ -6,6 +6,7 @@ namespace Acadly\Kernel\Console;
 
 use Acadly\Kernel\Blueprint\BlueprintCompiler;
 use Acadly\Kernel\Module\ModuleRegistry;
+use Acadly\Kernel\Notify\NoticeLinter;
 use Illuminate\Console\Command;
 use Symfony\Component\Finder\Finder;
 use Throwable;
@@ -14,7 +15,7 @@ use Throwable;
  * The one command that runs every structural check
  * (docs/architecture/07-engineering-rules.md). It grows with each stage;
  * it checks the module graph, strict types, that the kernel names no
- * domain and no education level, and the blueprints.
+ * domain and no education level, the blueprints and the notices.
  */
 final class LintCommand extends Command
 {
@@ -35,6 +36,7 @@ final class LintCommand extends Command
             ...$this->strictTypes(),
             ...$this->kernelNamesNoDomain(),
             ...$this->blueprints(),
+            ...$this->notices(),
         ];
 
         if ($problems === []) {
@@ -77,6 +79,18 @@ final class LintCommand extends Command
             fn (string $problem): string => 'Blueprints: '.$problem,
             [...$compiler->problems(), ...$compiler->staleFiles(config()->string('acadly.blueprints.compiled'))],
         );
+    }
+
+    /** @return list<string> */
+    private function notices(): array
+    {
+        try {
+            $problems = app(NoticeLinter::class)->problems();
+        } catch (Throwable $e) {
+            return ['Notices: '.$e->getMessage()];
+        }
+
+        return array_map(fn (string $problem): string => 'Notices: '.$problem, $problems);
     }
 
     /** @return list<string> */

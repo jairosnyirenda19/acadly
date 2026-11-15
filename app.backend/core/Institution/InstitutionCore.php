@@ -58,4 +58,9 @@ final class InstitutionCore implements Module
     {
         return [];
     }
+
+    public function topics(): array
+    {
+        return [];
+    }
 }

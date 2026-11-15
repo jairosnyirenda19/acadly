@@ -8,12 +8,13 @@ use Acadly\Kernel\Access\Permission;
 use Acadly\Kernel\Audit\AuditAction;
 use Acadly\Kernel\Events\DomainEvent;
 use Acadly\Kernel\Events\EventConsumer;
+use Acadly\Kernel\Notify\Topic;
 
 /**
  * The manifest of one Core domain or one Module (docs/architecture/01-foundations.md §5).
  *
  * A manifest is a declaration. The kernel reads it at boot and the linters read
- * it in CI. Later stages add topics, binding slots, search sources and navigation
+ * it in CI. Later stages add binding slots, search sources and navigation
  * to this contract.
  */
 interface Module
@@ -68,4 +69,12 @@ interface Module
      * @return list<string>
      */
     public function journeys(): array;
+
+    /**
+     * The notices this module sends, one topic class each. Each key starts
+     * with the module key.
+     *
+     * @return list<class-string<Topic>>
+     */
+    public function topics(): array;
 }

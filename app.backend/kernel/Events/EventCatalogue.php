@@ -8,6 +8,7 @@ use Acadly\Kernel\Access\Events\RoleAssigned;
 use Acadly\Kernel\Access\Events\RoleEnded;
 use Acadly\Kernel\Module\Events\ModuleSwitched;
 use Acadly\Kernel\Module\ModuleRegistry;
+use Acadly\Kernel\Notify\SeedDeskSubscriptions;
 use Illuminate\Contracts\Container\Container;
 use LogicException;
 
@@ -25,6 +26,9 @@ final class EventCatalogue
     public const array KERNEL_EVENTS = [RoleAssigned::class, RoleEnded::class, ModuleSwitched::class];
 
     public const array KERNEL_OWNERS = ['identity', 'access', 'audit', 'modules'];
+
+    /** @var array<class-string<DomainEvent>, list<class-string<EventConsumer>>> the kernel's own consumers */
+    public const array KERNEL_SUBSCRIPTIONS = [RoleAssigned::class => [SeedDeskSubscriptions::class]];
 
     /** @var array<string, class-string<DomainEvent>> */
     private array $events = [];
@@ -44,6 +48,12 @@ final class EventCatalogue
         foreach ($modules->all() as $module) {
             foreach ($module->events() as $event) {
                 $this->addEvent($module->key(), $event, [$module->key()]);
+            }
+        }
+
+        foreach (self::KERNEL_SUBSCRIPTIONS as $event => $consumers) {
+            foreach ($consumers as $consumer) {
+                $this->addConsumer($event::eventName(), $consumer);
             }
         }
 

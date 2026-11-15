@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 final class ModuleActivation
 {
     /** Areas of the kernel itself. Never switched off. */
-    public const array KERNEL_AREAS = ['identity', 'access', 'audit', 'modules'];
+    public const array KERNEL_AREAS = ['identity', 'access', 'audit', 'modules', 'journeys', 'notify'];
 
     /** @var array<string, bool>|null module key => switched on */
     private ?array $switches = null;

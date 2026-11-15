@@ -8,6 +8,9 @@ use Acadly\Kernel\Access\PermissionCatalogue;
 use Acadly\Kernel\Blueprint\Compiled\CompiledCall;
 use Acadly\Kernel\Blueprint\Compiled\CompiledJourney;
 use Acadly\Kernel\Events\EventCatalogue;
+use Acadly\Kernel\Notify\JourneyTopic;
+use Acadly\Kernel\Notify\NoticeCatalogue;
+use Acadly\Kernel\Notify\SendTopic;
 
 /**
  * Checks what a compiled journey means (02 §3.7, §3.9): every part refers to
@@ -20,6 +23,7 @@ final class JourneyLinter
     public function __construct(
         private readonly PermissionCatalogue $permissions,
         private readonly EventCatalogue $events,
+        private readonly NoticeCatalogue $notices,
     ) {}
 
     /** @return list<string> */
@@ -86,6 +90,16 @@ final class JourneyLinter
 
                 foreach ($outcome->effects as $effect) {
                     $problems = [...$problems, ...$this->call($here, 'effect', $effect, Effect::class, EffectArgs::class)];
+
+                    if ($effect->class === SendTopic::class) {
+                        $topic = $effect->args['topic'] ?? null;
+
+                        if (! is_string($topic) || ! is_subclass_of($topic, JourneyTopic::class)) {
+                            $problems[] = "{$here}: the notice is not a journey topic.";
+                        } elseif (! $this->notices->has($topic::notice()->key)) {
+                            $problems[] = "{$here}: the notice [{$topic::notice()->key}] is not listed by its module.";
+                        }
+                    }
                 }
 
                 foreach ($outcome->emits as $event) {

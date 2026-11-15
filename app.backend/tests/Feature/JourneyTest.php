@@ -27,6 +27,8 @@ use Acadly\Kernel\Events\Outbox;
 use Acadly\Kernel\Http\Problem;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Module\ModuleRegistry;
+use Acadly\Kernel\Notify\NoticeCatalogue;
+use Acadly\Kernel\Notify\Notifier;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Modules\Attendance\AttendanceModule;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -52,7 +54,7 @@ const TOY_REF = 'toy.errand@2026.1';
 beforeEach(function (): void {
     app()->instance(ModuleRegistry::class, new ModuleRegistry([new InstitutionCore, new AttendanceModule, new ToyModule]));
 
-    foreach ([PermissionCatalogue::class, AuditCatalogue::class, EventCatalogue::class, Audit::class, Outbox::class] as $service) {
+    foreach ([PermissionCatalogue::class, AuditCatalogue::class, EventCatalogue::class, NoticeCatalogue::class, Notifier::class, Audit::class, Outbox::class] as $service) {
         app()->forgetInstance($service);
     }
 
@@ -317,7 +319,7 @@ describe('effects', function (): void {
 
         expect(TellRequester::$calls)->toHaveCount(1)
             ->and(TellRequester::$calls[0]['decision'])->toBe($receipt->produced[RecordDecision::class])
-            ->and(DB::table('effect_applications')->where('subject_id', $errand->id)->count())->toBe(2);
+            ->and(DB::table('effect_applications')->where('subject_id', $errand->id)->count())->toBe(3);
     });
 
     it('keeps nothing and sends nothing when an internal effect fails', function (): void {

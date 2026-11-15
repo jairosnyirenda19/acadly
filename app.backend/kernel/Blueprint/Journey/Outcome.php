@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Acadly\Kernel\Blueprint\Journey;
 
+use Acadly\Kernel\Notify\JourneyTopic;
+use Acadly\Kernel\Notify\SendTopic;
+use Acadly\Kernel\Notify\TopicArgs;
 use BackedEnum;
 
 /**
@@ -49,6 +52,17 @@ final class Outcome
         $this->effects[] = ['class' => $effect, 'args' => $args];
 
         return $this;
+    }
+
+    /**
+     * Sends a notice when this outcome is committed. The request is written in
+     * the step's transaction; who hears it is resolved after commit.
+     *
+     * @param  class-string<JourneyTopic>  $topic
+     */
+    public function notify(string $topic): self
+    {
+        return $this->effect(SendTopic::class, new TopicArgs($topic));
     }
 
     public function transition(Transition $transition): self

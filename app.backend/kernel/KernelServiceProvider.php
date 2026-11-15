@@ -35,6 +35,17 @@ use Acadly\Kernel\Module\ModuleActivation;
 use Acadly\Kernel\Module\ModuleOffering;
 use Acadly\Kernel\Module\ModuleRegistry;
 use Acadly\Kernel\Module\OfferEverything;
+use Acadly\Kernel\Notify\Channels\ChannelAdapters;
+use Acadly\Kernel\Notify\Channels\DevelopmentSmsProvider;
+use Acadly\Kernel\Notify\Channels\EmailChannel;
+use Acadly\Kernel\Notify\Channels\InAppChannel;
+use Acadly\Kernel\Notify\Channels\NoSmsProvider;
+use Acadly\Kernel\Notify\Channels\SmsChannel;
+use Acadly\Kernel\Notify\Channels\SmsProvider;
+use Acadly\Kernel\Notify\Console\NotifySweepCommand;
+use Acadly\Kernel\Notify\NoticeCatalogue;
+use Acadly\Kernel\Notify\NoticeDispatcher;
+use Acadly\Kernel\Notify\Notifier;
 use Acadly\Kernel\Support\Clock;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Console\Scheduling\Schedule;
@@ -44,7 +55,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
-/** Identity, access, audit, events, modules and blueprints: the kernel services every module relies on. */
+/** Identity, access, audit, events, modules, blueprints and notices: the kernel services every module relies on. */
 final class KernelServiceProvider extends ServiceProvider
 {
     public function register(): void
@@ -98,6 +109,26 @@ final class KernelServiceProvider extends ServiceProvider
         );
         $this->app->scoped(JourneyEngine::class);
         $this->app->scoped(Projection::class);
+
+        // Notify: the catalogue is the union of the manifests. A deployment binds its own SMS provider.
+        $this->app->singleton(
+            NoticeCatalogue::class,
+            fn (Application $app): NoticeCatalogue => new NoticeCatalogue($app->make(ModuleRegistry::class)),
+        );
+        $this->app->singleton(Notifier::class);
+        $this->app->bindIf(
+            SmsProvider::class,
+            fn (Application $app): SmsProvider => $app->environment(['local', 'testing']) ? new DevelopmentSmsProvider : new NoSmsProvider,
+        );
+        $this->app->bind(
+            ChannelAdapters::class,
+            fn (Application $app): ChannelAdapters => new ChannelAdapters([
+                $app->make(InAppChannel::class),
+                $app->make(EmailChannel::class),
+                $app->make(SmsChannel::class),
+            ]),
+        );
+        $this->app->scoped(NoticeDispatcher::class);
     }
 
     public function boot(): void
@@ -109,6 +140,7 @@ final class KernelServiceProvider extends ServiceProvider
             __DIR__.'/Events/Database/migrations',
             __DIR__.'/Module/Database/migrations',
             __DIR__.'/Blueprint/Database/migrations',
+            __DIR__.'/Notify/Database/migrations',
         ]);
 
         $this->app->make('router')->aliasMiddleware('module', RequireModule::class);
@@ -130,7 +162,8 @@ final class KernelServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([SyncCommand::class, CreateAdministratorCommand::class, AuditVerifyCommand::class, AuditSealCommand::class, PublishEventsCommand::class, InstallLicenceCommand::class,
-                BlueprintCompileCommand::class, BlueprintLintCommand::class, BlueprintReleaseCommand::class, BlueprintDiagramCommand::class]);
+                BlueprintCompileCommand::class, BlueprintLintCommand::class, BlueprintReleaseCommand::class, BlueprintDiagramCommand::class,
+                NotifySweepCommand::class]);
         }
 
         // Every night: verify the audit trail, then seal its head.
@@ -139,6 +172,9 @@ final class KernelServiceProvider extends ServiceProvider
 
             // Events are published after each commit; this catches anything a stopped worker left.
             $schedule->command('events:publish')->everyMinute()->withoutOverlapping()->onOneServer();
+
+            // Notices a stopped worker left unresolved, and deliveries waiting too long.
+            $schedule->command('notify:sweep')->everyMinute()->withoutOverlapping()->onOneServer();
         });
     }
 }

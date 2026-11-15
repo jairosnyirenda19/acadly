@@ -7,6 +7,7 @@ use Acadly\Kernel\Blueprint\Journey\Outcome;
 use Acadly\Kernel\Blueprint\Journey\Stage;
 use Acadly\Kernel\Blueprint\Journey\Step;
 use Acadly\Kernel\Blueprint\Journey\Transition;
+use Tests\Fixtures\Toy\Contracts\ErrandApproved;
 use Tests\Fixtures\Toy\Contracts\ErrandCompleted;
 use Tests\Fixtures\Toy\Contracts\ToyPermission;
 use Tests\Fixtures\Toy\Journeys\Errand\Limit;
@@ -54,6 +55,7 @@ return JourneyBlueprint::make('toy.errand@2026.1')
                     Outcome::make(O::Approved)->title('Approve')
                         ->effect(RecordDecision::class)
                         ->effect(TellRequester::class)
+                        ->notify(ErrandApproved::class)
                         ->transition(Transition::to(St::Approved))
                 )
                 ->outcome(

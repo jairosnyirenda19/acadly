@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $title
  * @property string $state
  * @property string $journey_ref
+ * @property string|null $requested_by
+ * @property string|null $requester_phone
  */
 final class ToyErrand extends Model implements JourneySubject
 {
@@ -23,7 +25,7 @@ final class ToyErrand extends Model implements JourneySubject
 
     protected $table = 'toy_errands';
 
-    protected $fillable = ['title', 'state', 'journey_ref'];
+    protected $fillable = ['title', 'state', 'journey_ref', 'requested_by', 'requester_phone'];
 
     public function journeyScope(): ScopeRef
     {

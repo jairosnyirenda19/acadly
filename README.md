@@ -78,6 +78,8 @@ cd app.backend && composer lint && php artisan test
 cd app.frontend && corepack pnpm check
 ```
 
+After a deploy, `/api/v1/ready` answers `ready` only once `acadly:sync` has run for that release.
+
 After a change to a journey declaration, compile it and commit the files in `app.backend/blueprints/`. `composer lint` fails while a compiled file is out of date:
 
 ```bash

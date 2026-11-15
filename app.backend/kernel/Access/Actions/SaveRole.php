@@ -54,7 +54,7 @@ final class SaveRole
             throw ValidationException::withMessages(['name' => ['Give the role a name of up to 60 characters.']]);
         }
 
-        $same = Role::query()->whereRaw('lower(name) = ?', [mb_strtolower($name)]);
+        $same = Role::query()->inForce()->whereRaw('lower(name) = ?', [mb_strtolower($name)]);
 
         if ($role !== null) {
             $same->whereKeyNot($role->id);

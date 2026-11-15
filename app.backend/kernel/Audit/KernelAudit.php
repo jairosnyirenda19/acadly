@@ -24,6 +24,8 @@ enum KernelAudit: string implements AuditAction
     case RoleEnded = 'access.role_ended';
     case RoleCreated = 'access.role_created';
     case RoleChanged = 'access.role_changed';
+    case RoleRetired = 'access.role_retired';
+    case RoleDeleted = 'access.role_deleted';
     case Refused = 'access.refused';
     case ModuleSwitched = 'modules.switched';
     case LicenceInstalled = 'modules.licence_installed';
@@ -71,6 +73,8 @@ enum KernelAudit: string implements AuditAction
             self::RoleEnded => 'Ended a role.',
             self::RoleCreated => 'Created a role.',
             self::RoleChanged => 'Changed the name or the permissions of a role.',
+            self::RoleRetired => 'Retired a role nobody holds any longer.',
+            self::RoleDeleted => 'Deleted a role that was never held.',
             self::Refused => 'Attempted an action without the required permission.',
             self::ModuleSwitched => 'Switched a module on or off.',
             self::LicenceInstalled => 'Installed a licence.',

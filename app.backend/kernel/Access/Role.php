@@ -6,6 +6,8 @@ namespace Acadly\Kernel\Access;
 
 use Acadly\Kernel\Audit\Auditable;
 use Acadly\Kernel\Audit\FieldClass;
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +21,7 @@ use Illuminate\Support\Facades\DB;
  * @property string $name
  * @property string|null $description
  * @property bool $is_system
+ * @property CarbonImmutable|null $retired_at
  */
 final class Role extends Model implements Auditable
 {
@@ -76,8 +79,19 @@ final class Role extends Model implements Auditable
         ));
     }
 
+    /**
+     * Roles in force: retired roles keep their history and are offered nowhere.
+     *
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
+    public function scopeInForce(Builder $query): Builder
+    {
+        return $query->whereNull('retired_at');
+    }
+
     protected function casts(): array
     {
-        return ['is_system' => 'boolean'];
+        return ['is_system' => 'boolean', 'retired_at' => 'immutable_datetime'];
     }
 }

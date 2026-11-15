@@ -58,7 +58,7 @@ final class PeopleImport
     {
         $roles = [];
 
-        foreach (Role::query()->get() as $role) {
+        foreach (Role::query()->inForce()->get() as $role) {
             $roles[mb_strtolower($role->name)] = $role;
         }
 
@@ -180,7 +180,7 @@ final class PeopleImport
     public function import(User $viewer, string $path, string $extension, bool $send): array
     {
         $checked = $this->check($viewer, $path, $extension);
-        $roles = Role::query()->get()->keyBy(fn (Role $r): string => mb_strtolower($r->name));
+        $roles = Role::query()->inForce()->get()->keyBy(fn (Role $r): string => mb_strtolower($r->name));
         $places = [];
 
         foreach ($this->access->places() as $place) {
@@ -235,7 +235,7 @@ final class PeopleImport
      */
     public function template(User $viewer, string $path): void
     {
-        $roles = Role::query()->orderByDesc('is_system')->orderBy('name')->get()
+        $roles = Role::query()->inForce()->orderByDesc('is_system')->orderBy('name')->get()
             ->filter(function (Role $role) use ($viewer): bool {
                 foreach ($this->access->places() as $place) {
                     if ($this->access->allows($viewer, AccessPermission::AssignRoles, $place['scope']) && $this->missing($viewer, $role, $place['scope']) === []) {

@@ -19,6 +19,7 @@ const has = (role: Role, flips: Flips, key: string) => (role.system ? true : rol
 export function RolesScreen() {
   const [flips, setFlips] = useState<Flips>({})
   const [creating, setCreating] = useState<'new' | 'copy' | null>(null)
+  const [editing, setEditing] = useState<string | null>(null)
   const [message, setMessage] = useState<{ tone: 'done' | 'wrong'; text: string } | null>(null)
   const [working, setWorking] = useState(false)
 
@@ -35,6 +36,7 @@ export function RolesScreen() {
     )
   }
 
+  const editingRole = state.roles.find((r) => r.id === editing && !r.system)
   const total = state.groups.reduce((n, g) => n + g.permissions.length, 0)
   const changed = state.roles.filter((r) => (flips[r.id]?.size ?? 0) > 0)
   const changeCount = changed.reduce((n, r) => n + (flips[r.id]?.size ?? 0), 0)
@@ -88,10 +90,23 @@ export function RolesScreen() {
         intro={t.intro}
         actions={
           <>
-            <Button variant="secondary" onClick={() => setCreating(creating === 'copy' ? null : 'copy')}>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setEditing(null)
+                setCreating(creating === 'copy' ? null : 'copy')
+              }}
+            >
               {t.copyRole}
             </Button>
-            <Button onClick={() => setCreating(creating === 'new' ? null : 'new')}>{t.create}</Button>
+            <Button
+              onClick={() => {
+                setEditing(null)
+                setCreating(creating === 'new' ? null : 'new')
+              }}
+            >
+              {t.create}
+            </Button>
           </>
         }
       />
@@ -106,6 +121,18 @@ export function RolesScreen() {
             setCreating(null)
           }}
           onCancel={() => setCreating(null)}
+        />
+      )}
+
+      {editingRole !== undefined && (
+        <EditRole
+          key={editingRole.id}
+          role={editingRole}
+          onDone={(next) => {
+            setState(next)
+            setEditing(null)
+          }}
+          onCancel={() => setEditing(null)}
         />
       )}
 
@@ -137,7 +164,23 @@ export function RolesScreen() {
 
               return (
                 <div key={role.id} className={`flex flex-col gap-1.5 border-l border-rule px-3 pt-3.5 pb-3 ${dirty ? 'bg-marigold-wash' : role.system ? 'bg-paper' : ''}`}>
-                  <div className="type-display min-h-10 text-xl leading-none">{role.name}</div>
+                  {role.system ? (
+                    <div className="type-display min-h-10 text-xl leading-none">{role.name}</div>
+                  ) : (
+                    <button
+                      type="button"
+                      aria-expanded={editing === role.id}
+                      aria-label={t.openRole(role.name)}
+                      title={t.openRole(role.name)}
+                      onClick={() => {
+                        setCreating(null)
+                        setEditing(editing === role.id ? null : role.id)
+                      }}
+                      className={`type-display min-h-10 text-left text-xl leading-none underline decoration-2 underline-offset-4 hover:decoration-ink ${editing === role.id ? 'decoration-teal' : 'decoration-rule'}`}
+                    >
+                      {role.name}
+                    </button>
+                  )}
                   <div className="flex justify-between text-xs text-text-muted">
                     <span>{t.people(role.people)}</span>
                     <span className="ref">{t.held(held, total)}</span>
@@ -211,6 +254,111 @@ export function RolesScreen() {
         <span>{t.legendAudit}</span>
       </div>
     </>
+  )
+}
+
+function EditRole({ role, onDone, onCancel }: { role: Role; onDone: (next: RolesState) => void; onCancel: () => void }) {
+  const [name, setName] = useState(role.name)
+  const [description, setDescription] = useState(role.description ?? '')
+  const [errors, setErrors] = useState<Record<string, string[]>>({})
+  const [failed, setFailed] = useState<string | null>(null)
+  const [working, setWorking] = useState<'save' | 'remove' | null>(null)
+  const [confirming, setConfirming] = useState(false)
+
+  const fail = (result: { kind: 'refused' } | { kind: 'unavailable' } | { kind: 'invalid'; errors: Record<string, string[]> }) => {
+    if (result.kind === 'invalid') {
+      setErrors(result.errors)
+      setFailed(Object.values(result.errors)[0]?.[0] ?? s.failed)
+    } else setFailed(result.kind === 'refused' ? s.refused : s.failed)
+  }
+
+  const save = async () => {
+    setWorking('save')
+    setFailed(null)
+    setErrors({})
+    const result = await settingsApi.saveRole(role.id, { name, description: description.trim() === '' ? null : description.trim(), permissions: role.permissions })
+    setWorking(null)
+
+    if (result.kind === 'saved') {
+      onDone(result.data)
+      slips.done({ word: copy.slips.saved, title: t.renamed })
+    } else fail(result)
+  }
+
+  const remove = async () => {
+    setWorking('remove')
+    setFailed(null)
+    const result = await settingsApi.removeRole(role.id)
+    setWorking(null)
+    setConfirming(false)
+
+    if (result.kind === 'saved') {
+      onDone(result.data)
+      slips.done({ word: copy.slips.saved, title: t.removed })
+    } else fail(result)
+  }
+
+  return (
+    <div className="mx-[clamp(16px,3vw,40px)] mb-5 grid border-2 border-ink bg-sheet md:grid-cols-[1.4fr_1fr]">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          void save()
+        }}
+        className="p-4.5"
+      >
+        <h2 className="type-display mb-3.5 text-[22px] leading-none">{t.editTitle(role.name)}</h2>
+        {failed !== null && (
+          <div className="mb-3">
+            <Notice tone="wrong" title={failed} />
+          </div>
+        )}
+        <div className="grid gap-y-4">
+          <Input label={t.name} required value={name} onChange={(e) => setName(e.target.value)} error={errorFor(errors, 'name')} maxLength={60} />
+          <Input label={t.description} hint={t.descriptionHint} value={description} onChange={(e) => setDescription(e.target.value)} error={errorFor(errors, 'description')} maxLength={200} />
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2.5">
+          <Button type="submit" busy={working === 'save'} disabled={working !== null}>
+            {working === 'save' ? s.saving : t.saveRole}
+          </Button>
+          <Button variant="secondary" onClick={onCancel}>
+            {s.cancel}
+          </Button>
+        </div>
+      </form>
+      <div className="border-t-2 border-ink bg-paper p-4.5 md:border-t-0 md:border-l-2">
+        <h3 className="label-caps mb-2">{t.removeTitle}</h3>
+        {role.people > 0 ? (
+          <p className="text-sm leading-snug">
+            <Tag tone="attention">{t.people(role.people)}</Tag> {t.removeHeld(role.people)}
+          </p>
+        ) : confirming ? (
+          <>
+            <p className="mb-3 text-sm font-semibold">{t.removeConfirm(role.name)}</p>
+            <div className="flex flex-wrap gap-2.5">
+              <button
+                type="button"
+                disabled={working !== null}
+                onClick={() => void remove()}
+                className="h-11 bg-red-pen px-[18px] text-[15px] font-extrabold text-sheet disabled:bg-disabled disabled:text-text-muted"
+              >
+                {working === 'remove' ? t.removing : t.removeYes}
+              </button>
+              <Button variant="secondary" onClick={() => setConfirming(false)}>
+                {s.cancel}
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="mb-3 text-sm leading-snug">{t.removeNote}</p>
+            <button type="button" onClick={() => setConfirming(true)} className="h-11 border-2 border-red-pen bg-sheet px-[18px] text-[15px] font-extrabold text-red-text">
+              {t.remove}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
   )
 }
 

@@ -36,6 +36,8 @@ export const settingsApi = {
 
   saveRole: (id: string, body: { name: string; description: string | null; permissions: string[] }) =>
     settle(api.PUT('/v1/roles/{id}', { params: { path: { id } }, body: body as never }) as Done<RolesState>),
+
+  removeRole: (id: string) => settle(api.DELETE('/v1/roles/{id}', { params: { path: { id } } }) as Done<RolesState>),
 }
 
 export const placeKey = (place: { type: string; id: string | null }) => `${place.type}:${place.id ?? ''}`

@@ -106,6 +106,23 @@ describe('teaching', function (): void {
             ->and(DB::table('academic_teaching')->where('subject_id', $maths)->whereNull('ended_at')->value('user_id'))->toBe($kondwani->id);
     });
 
+    it('lists who holds a role at a class but cannot be given teaching, with the roles', function (): void {
+        $mercy = teacherAt($this->school->scope(ScopeType::Campus, 'campus_a'), 'Mercy Banda');
+        $empty = Role::query()->create(['key' => 'class_teacher_empty', 'name' => 'Class teacher']);
+        $jairos = User::factory()->create(['name' => 'Jairos Nyirenda']);
+        RoleAssignment::query()->create(['user_id' => $jairos->id, 'role_id' => $empty->id, 'scope_type' => ScopeType::ClassGroup,
+            'scope_id' => $this->school->id('class_primary_a'), 'starts_at' => now()->subMinute()]);
+
+        $board = $this->actingAs($this->admin)->getJson('/api/v1/academics/teaching?division_id='.$this->school->id('primary').'&campus_id='.$this->school->id('campus_a'))
+            ->assertOk()->json();
+
+        expect(collect($board['teachers'])->pluck('name')->all())->toContain('Mercy Banda')->not->toContain('Jairos Nyirenda')
+            ->and($board['blocked'])->toHaveCount(1)
+            ->and($board['blocked'][0])->toMatchArray(['id' => $jairos->id, 'name' => 'Jairos Nyirenda', 'state' => 'no_teach', 'roles' => ['Class teacher'],
+                'classes' => [$this->school->id('class_primary_a')]])
+            ->and(collect($board['blocked'])->pluck('id')->all())->not->toContain($mercy->id);
+    });
+
     it('shows a campus office only the levels at its own campus', function (): void {
         $role = Role::query()->create(['key' => 'campus_academic', 'name' => 'Campus academic office']);
         DB::table('access_role_permissions')->insert(['role_id' => $role->id, 'permission_key' => AcademicsPermission::Manage->value]);

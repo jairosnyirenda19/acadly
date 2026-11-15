@@ -159,7 +159,7 @@ final class People
         }
 
         return [
-            'roles' => array_values(Role::query()->orderByDesc('is_system')->orderBy('name')->get()
+            'roles' => array_values(Role::query()->inForce()->orderByDesc('is_system')->orderBy('name')->get()
                 ->map(fn (Role $role): array => ['id' => $role->id, 'name' => $role->name, 'permissions' => $role->permissionKeys()])->all()),
             'places' => $places,
             'yours' => array_map(fn (Grant $g): array => ['permission' => $g->permission, 'place' => self::placeKey($g->scope)], $this->access->grants($viewer)),

@@ -60,4 +60,5 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/roles', [RolesController::class, 'index'])->name('roles.index');
     Route::post('/roles', [RolesController::class, 'store'])->name('roles.store');
     Route::put('/roles/{id}', [RolesController::class, 'update'])->whereUuid('id')->name('roles.update');
+    Route::delete('/roles/{id}', [RolesController::class, 'destroy'])->whereUuid('id')->name('roles.destroy');
 });

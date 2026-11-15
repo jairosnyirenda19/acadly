@@ -706,7 +706,8 @@ export interface paths {
         /** Changes a role: `{name, description?, permissions: [keys]}` */
         put: operations["roles.update"];
         post?: never;
-        delete?: never;
+        /** Removes a role nobody holds: retired when it was held before, deleted when never */
+        delete: operations["roles.destroy"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2796,6 +2797,35 @@ export interface operations {
             403: components["responses"]["AuthorizationException"];
         };
     };
+    "roles.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        roles: unknown[];
+                        groups: {
+                            name: string;
+                            permissions: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
     "kernel.school": {
         parameters: {
             query?: never;
@@ -3292,6 +3322,14 @@ export interface operations {
                             name: string;
                             classes: string[];
                             teaches: string[];
+                        }[];
+                        blocked: {
+                            id: string;
+                            name: string;
+                            /** @enum {string} */
+                            state: "invited" | "no_teach";
+                            roles: string[];
+                            classes: string[];
                         }[];
                         totals: {
                             classes: number;

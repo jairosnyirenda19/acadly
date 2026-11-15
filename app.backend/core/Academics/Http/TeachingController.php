@@ -14,6 +14,7 @@ use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Row;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -35,7 +36,7 @@ final class TeachingController
     /**
      * `?division_id=&campus_id=` chooses the tab; the first the viewer manages otherwise.
      *
-     * @response array{tabs: list<array{division_id: string, campus_id: string, label: string, not_given: int}>, current: array{division_id: string, campus_id: string, label: string}|null, year: array{id: string, name: string}|null, earlier_year: string|null, subjects: list<array{id: string, short: string, name: string, levels: list<string>}>, classes: list<array{id: string, name: string, level_code: string, class_teacher: array{id: string, name: string}|null, teaching: array<string, array{id: string, name: string}|null>}>, teachers: list<array{id: string, name: string, classes: list<string>, teaches: list<string>}>, totals: array{classes: int, given: int, places: int, not_given: int, teachers: int}}
+     * @response array{tabs: list<array{division_id: string, campus_id: string, label: string, not_given: int}>, current: array{division_id: string, campus_id: string, label: string}|null, year: array{id: string, name: string}|null, earlier_year: string|null, subjects: list<array{id: string, short: string, name: string, levels: list<string>}>, classes: list<array{id: string, name: string, level_code: string, class_teacher: array{id: string, name: string}|null, teaching: array<string, array{id: string, name: string}|null>}>, teachers: list<array{id: string, name: string, classes: list<string>, teaches: list<string>}>, blocked: list<array{id: string, name: string, state: 'invited'|'no_teach', roles: list<string>, classes: list<string>}>, totals: array{classes: int, given: int, places: int, not_given: int, teachers: int}}
      */
     public function index(Request $request): JsonResponse
     {
@@ -84,7 +85,7 @@ final class TeachingController
             'current' => $current !== null ? ['division_id' => $current['division_id'], 'campus_id' => $current['campus_id'], 'label' => $current['label']] : null,
             'year' => $year !== null ? ['id' => $year['id'], 'name' => $year['name']] : null,
             'earlier_year' => is_string($earlier) ? $earlier : null,
-            ...($board ?? ['subjects' => [], 'classes' => [], 'teachers' => [], 'totals' => ['classes' => 0, 'given' => 0, 'places' => 0, 'not_given' => 0, 'teachers' => 0]]),
+            ...($board ?? ['subjects' => [], 'classes' => [], 'teachers' => [], 'blocked' => [], 'totals' => ['classes' => 0, 'given' => 0, 'places' => 0, 'not_given' => 0, 'teachers' => 0]]),
         ]);
     }
 
@@ -121,7 +122,7 @@ final class TeachingController
         return $this->index($request);
     }
 
-    /** @return array{subjects: list<array<string, mixed>>, classes: list<array<string, mixed>>, teachers: list<array<string, mixed>>, totals: array{classes: int, given: int, places: int, not_given: int, teachers: int}} */
+    /** @return array{subjects: list<array<string, mixed>>, classes: list<array<string, mixed>>, teachers: list<array<string, mixed>>, blocked: list<array<string, mixed>>, totals: array{classes: int, given: int, places: int, not_given: int, teachers: int}} */
     private function board(string $yearId, string $divisionId, string $campusId): array
     {
         $names = DB::table('users')->pluck('name', 'id')->all();
@@ -142,6 +143,7 @@ final class TeachingController
         $teachers = [];
         $given = 0;
         $places = 0;
+        $blocked = [];
 
         foreach ($classRows as $row) {
             $id = Row::text($row, 'id');
@@ -160,8 +162,20 @@ final class TeachingController
 
             $classes[] = ['id' => $id, 'name' => Row::text($row, 'name'), 'level_code' => $level, 'class_teacher' => $person($teaching[$id][''] ?? null), 'teaching' => (object) $cells];
 
-            foreach ($this->access->holderIds(AcademicsPermission::Teach, ScopeRef::of(ScopeType::ClassGroup, $id)) as $teacher) {
+            $holders = $this->access->holderIds(AcademicsPermission::Teach, ScopeRef::of(ScopeType::ClassGroup, $id));
+
+            foreach ($holders as $teacher) {
                 $teachers[$teacher]['classes'][] = $id;
+            }
+
+            foreach ($this->rolesAround($id) as $who => $held) {
+                if (in_array($who, $holders, true)) {
+                    continue;
+                }
+
+                $blocked[$who]['state'] = $held['state'];
+                $blocked[$who]['classes'][] = $id;
+                $blocked[$who]['roles'] = array_values(array_unique([...($blocked[$who]['roles'] ?? []), ...$held['roles']]));
             }
         }
 
@@ -188,8 +202,51 @@ final class TeachingController
             'subjects' => $subjects,
             'classes' => $classes,
             'teachers' => $list,
+            'blocked' => array_map(fn (string $who, array $b): array => [
+                'id' => $who, 'name' => is_string($names[$who] ?? null) ? $names[$who] : '', 'state' => $b['state'], 'roles' => $b['roles'], 'classes' => $b['classes'],
+            ], array_keys($blocked), $blocked),
             'totals' => ['classes' => count($classes), 'given' => $given, 'places' => $places, 'not_given' => $places - $given, 'teachers' => count($list)],
         ];
+    }
+
+    /**
+     * The people who hold a role at a class or around it, with the roles, and
+     * whether they are still invited. Those who cannot be given teaching there
+     * are shown with the reason, so nobody has to guess.
+     *
+     * @return array<string, array{state: 'invited'|'no_teach', roles: list<string>}>
+     */
+    private function rolesAround(string $classId): array
+    {
+        $scope = ScopeRef::of(ScopeType::ClassGroup, $classId);
+        $places = [$scope, ...$this->access->ancestors($scope)];
+        $now = now();
+        $rows = DB::table('access_role_assignments as a')
+            ->join('users as u', 'u.id', '=', 'a.user_id')
+            ->join('access_roles as r', 'r.id', '=', 'a.role_id')
+            ->whereIn('u.status', ['active', 'invited'])
+            ->where('a.starts_at', '<=', $now)
+            ->where(fn (Builder $q): Builder => $q->whereNull('a.ends_at')->orWhere('a.ends_at', '>', $now))
+            ->where(function (Builder $q) use ($places): void {
+                foreach ($places as $place) {
+                    $q->orWhere(fn (Builder $one): Builder => $one->where('a.scope_type', $place->type->value)
+                        ->where(fn (Builder $id): Builder => $place->id === null ? $id->whereNull('a.scope_id') : $id->where('a.scope_id', $place->id)));
+                }
+            })
+            ->selectRaw('a.user_id, u.status, r.name, (r.is_system or exists (select 1 from access_role_permissions p where p.role_id = r.id and p.permission_key = ?)) as teaches', [AcademicsPermission::Teach->value])
+            ->get();
+
+        $out = [];
+
+        foreach ($rows as $row) {
+            $who = Row::text($row, 'user_id');
+            $out[$who]['invited'] = Row::text($row, 'status') === 'invited';
+            $out[$who]['teaches'] = ($out[$who]['teaches'] ?? false) || (bool) ($row->teaches ?? false);
+            $out[$who]['roles'][] = Row::text($row, 'name');
+        }
+
+        // Invited is the reason only when a role held would allow teaching once the account is active.
+        return array_map(fn (array $o): array => ['state' => $o['invited'] && $o['teaches'] ? 'invited' : 'no_teach', 'roles' => array_values(array_unique($o['roles']))], $out);
     }
 
     private function label(string $divisionId, string $campusId): string

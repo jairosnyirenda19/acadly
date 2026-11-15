@@ -6,6 +6,7 @@ namespace Acadly\Kernel\Access\Http;
 
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\AccessPermission;
+use Acadly\Kernel\Access\Actions\RemoveRole;
 use Acadly\Kernel\Access\Actions\SaveRole;
 use Acadly\Kernel\Access\PermissionCatalogue;
 use Acadly\Kernel\Access\Role;
@@ -48,7 +49,7 @@ final class RolesController
             ->where(fn (Builder $q): Builder => $q->whereNull('a.ends_at')->orWhere('a.ends_at', '>', $now))
             ->groupBy('a.role_id')->selectRaw('a.role_id, count(distinct a.user_id) as people')->pluck('people', 'role_id')->all();
 
-        $roles = Role::query()->orderByDesc('is_system')->orderBy('name')->get()->map(fn (Role $role): array => [
+        $roles = Role::query()->inForce()->orderByDesc('is_system')->orderBy('name')->get()->map(fn (Role $role): array => [
             'id' => $role->id,
             'name' => $role->name,
             'description' => $role->description,
@@ -100,8 +101,19 @@ final class RolesController
     {
         $viewer = self::user($request);
         $this->access->check($viewer, AccessPermission::ManageRoles);
-        $role = Role::query()->find($id) ?? throw (new ModelNotFoundException)->setModel(Role::class);
+        $role = Role::query()->inForce()->find($id) ?? throw (new ModelNotFoundException)->setModel(Role::class);
         $save->handle($viewer, $role, $request->string('name')->toString(), self::text($request->input('description')), self::keys($request->input('permissions')));
+
+        return $this->index($request, $catalogue, $modules, $activation, $clock);
+    }
+
+    /** Removes a role nobody holds: retired when it was held before, deleted when never. */
+    public function destroy(Request $request, string $id, RemoveRole $remove, PermissionCatalogue $catalogue, ModuleRegistry $modules, ModuleActivation $activation, Clock $clock): JsonResponse
+    {
+        $viewer = self::user($request);
+        $this->access->check($viewer, AccessPermission::ManageRoles);
+        $role = Role::query()->inForce()->find($id) ?? throw (new ModelNotFoundException)->setModel(Role::class);
+        $remove->handle($viewer, $role);
 
         return $this->index($request, $catalogue, $modules, $activation, $clock);
     }

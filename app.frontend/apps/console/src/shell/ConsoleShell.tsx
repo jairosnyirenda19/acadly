@@ -348,7 +348,7 @@ export function ConsoleShell({ children, onSignedOut }: { children: ReactNode; o
             </span>
           </div>
         </header>
-        <main className="flex min-w-0 flex-1 flex-col">{children}</main>
+        <main className="settle-in flex min-w-0 flex-1 flex-col">{children}</main>
       </div>
     </div>
   )

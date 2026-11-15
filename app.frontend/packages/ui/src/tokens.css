@@ -60,6 +60,32 @@
       transform: none;
     }
   }
+
+  /* What arrives on a page, the ruled sheet or the data, settles in instead of cutting in. */
+  --animate-settle: settle 240ms cubic-bezier(0.25, 1, 0.5, 1) both;
+
+  @keyframes settle {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+/* A page's parts settle in as they arrive. Parts that stay are not redrawn. */
+@layer utilities {
+  .settle-in > * {
+    animation: var(--animate-settle);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .settle-in > *,
+    .animate-settle {
+      animation: none;
+    }
+  }
 }
 
 /* ── Idioms ──────────────────────────────────────────────────────────────────

@@ -296,7 +296,7 @@ final class PeopleController
 
     private function givableRole(string $id): Role
     {
-        $role = Role::query()->find($id);
+        $role = Role::query()->inForce()->find($id);
 
         return $role instanceof Role ? $role : throw ValidationException::withMessages(['role_id' => ['Choose a role.']]);
     }

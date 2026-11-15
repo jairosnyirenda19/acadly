@@ -181,4 +181,39 @@ describe('roles', function (): void {
         $this->actingAs($only)->putJson("/api/v1/roles/{$director->id}", ['name' => 'Director', 'permissions' => [AccessPermission::ManageRoles->value]])
             ->assertUnprocessable()->assertJsonValidationErrors(['permissions']);
     });
+
+    it('removes a role nobody holds: retired when held before, deleted when never, refused while held', function (): void {
+        $never = peopleRole('Never held', [AttendancePermission::Capture->value]);
+        $past = peopleRole('Held before', [AttendancePermission::Capture->value]);
+        $now = peopleRole('Held now', [AttendancePermission::Capture->value]);
+        $person = User::factory()->create();
+        holdRole($person, $past, ScopeRef::institution())->forceFill(['ends_at' => now()->subSecond()])->save();
+        holdRole($person, $now, ScopeRef::institution());
+
+        $this->actingAs($this->admin)->deleteJson("/api/v1/roles/{$now->id}")
+            ->assertUnprocessable()->assertJsonValidationErrors(['role']);
+
+        $names = $this->actingAs($this->admin)->deleteJson("/api/v1/roles/{$never->id}")->assertOk()->json('roles.*.name');
+        expect($names)->not->toContain('Never held')
+            ->and(Role::query()->find($never->id))->toBeNull();
+
+        $names = $this->actingAs($this->admin)->deleteJson("/api/v1/roles/{$past->id}")->assertOk()->json('roles.*.name');
+        expect($names)->not->toContain('Held before')
+            ->and(Role::query()->find($past->id)?->retired_at)->not->toBeNull()
+            ->and(DB::table('access_role_assignments')->where('role_id', $past->id)->count())->toBe(1);
+
+        $this->actingAs($this->admin)->deleteJson("/api/v1/roles/{$past->id}")->assertNotFound();
+
+        $system = Role::query()->where('is_system', true)->value('id');
+        $this->actingAs($this->admin)->deleteJson("/api/v1/roles/{$system}")->assertUnprocessable();
+    });
+
+    it('refuses to remove a role without the permission to manage roles', function (): void {
+        $role = peopleRole('Bursar', []);
+        $clerk = User::factory()->create();
+        holdRole($clerk, peopleRole('Clerk', [AccessPermission::AssignRoles->value]), ScopeRef::institution());
+
+        $this->actingAs($clerk)->deleteJson("/api/v1/roles/{$role->id}")->assertForbidden();
+        expect(Role::query()->find($role->id))->not->toBeNull();
+    });
 });

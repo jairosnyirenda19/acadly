@@ -49,7 +49,7 @@ final class SetupController
             $roles[$key] = ['key' => $key, 'name' => $starter['name'], 'scope' => $starter['scope']];
         }
 
-        foreach (Role::query()->where('is_system', false)->orderBy('name')->get() as $role) {
+        foreach (Role::query()->inForce()->where('is_system', false)->orderBy('name')->get() as $role) {
             $roles[$role->key] ??= ['key' => $role->key, 'name' => $role->name, 'scope' => ''];
         }
 

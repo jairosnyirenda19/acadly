@@ -100,7 +100,7 @@ export function Waiting({ phase, what, labels, band, rows = 5, onRetry }: { phas
         {labels.loading(what)}
       </span>
       {phase !== 'quiet' && (
-        <>
+        <div className="animate-settle">
           {band !== undefined && <WaitingBand labels={band} />}
           <div className="bg-sheet px-[clamp(16px,3vw,40px)] pt-5 pb-8">
             {phase === 'slow' && (
@@ -112,7 +112,7 @@ export function Waiting({ phase, what, labels, band, rows = 5, onRetry }: { phas
             )}
             <WaitingRows rows={rows} />
           </div>
-        </>
+        </div>
       )}
     </div>
   )
@@ -137,7 +137,7 @@ export function LoadingRule({ active }: { active: boolean }) {
     }
 
     setWidth(100)
-    const end = window.setTimeout(() => setShown(false), 200)
+    const end = window.setTimeout(() => setShown(false), 380)
 
     return () => window.clearTimeout(end)
   }, [active])
@@ -148,7 +148,11 @@ export function LoadingRule({ active }: { active: boolean }) {
     <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 -bottom-0.5 h-[3px]">
       <div
         className="h-[3px] bg-teal motion-reduce:!w-1/2 motion-reduce:!transition-none"
-        style={{ width: `${width}%`, transition: width === 100 ? 'width 150ms ease-out' : width === 0 ? 'none' : 'width 8s cubic-bezier(0.1, 0.6, 0.2, 1)' }}
+        style={{
+          width: `${width}%`,
+          opacity: width === 100 ? 0 : 1,
+          transition: width === 100 ? 'width 180ms cubic-bezier(0.25, 1, 0.5, 1), opacity 200ms ease-out 160ms' : width === 0 ? 'none' : 'width 8s cubic-bezier(0.1, 0.6, 0.2, 1)',
+        }}
       />
     </div>
   )

@@ -235,6 +235,7 @@ function Chooser({
   const candidates = state.teachers.filter((p) => p.classes.includes(cell.classId) && p.name.toLowerCase().includes(query.trim().toLowerCase()))
   const [chosen, setChosen] = useState<string>(cell.who?.id ?? candidates[0]?.id ?? '')
   const name = state.teachers.find((p) => p.id === chosen)?.name ?? ''
+  const blocked = state.blocked.filter((p) => p.classes.includes(cell.classId) && p.name.toLowerCase().includes(query.trim().toLowerCase()))
 
   return (
     <div>
@@ -266,6 +267,23 @@ function Chooser({
           </label>
         ))}
       </div>
+      {blocked.length > 0 && (
+        <div className="mt-4">
+          <div className="label-caps border-b-2 border-ink pb-1.5 text-text-muted">{t.blockedTitle}</div>
+          {blocked.map((p) => (
+            <div key={p.id} className="flex items-start gap-2.5 border-b border-rule py-2.5">
+              <span aria-hidden="true" className="mt-0.5 flex size-[18px] shrink-0 items-center justify-center border-2 border-dashed border-rule-dashed text-xs font-extrabold text-text-muted">
+                –
+              </span>
+              <span className="flex-1">
+                <span className="block text-[15px] font-extrabold text-text-muted">{p.name}</span>
+                <span className="block text-[13px] text-text-muted">{t.blockedRoles(p.roles)}</span>
+                <span className="block text-[13px]">{p.state === 'invited' ? t.blockedInvited : t.blockedNoTeach(p.roles)}</span>
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="mt-4 flex flex-wrap gap-2.5">
         <Button busy={working} disabled={chosen === '' || chosen === cell.who?.id} onClick={() => onGive(chosen)}>
           {cell.subjectId === null ? t.giveClass(name) : t.give(cell.what, name)}

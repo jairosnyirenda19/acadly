@@ -793,6 +793,109 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/academics/subjects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["academics.subjects.index"];
+        put?: never;
+        /** Adds a subject: `{division_id, name, short, core, levels}` */
+        post: operations["academics.subjects.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/academics/subjects/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Starts a level's subjects from its profile: `{division_id}` */
+        post: operations["academics.subjects.start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/academics/subjects/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Changes a subject: `{division_id, name, short, core, levels}` */
+        put: operations["academics.subjects.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/academics/subjects/{id}/retire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retires a subject: `{reason}` */
+        post: operations["academics.subjects.retire"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/academics/teaching": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** `?division_id=&campus_id=` chooses the tab; the first the viewer manages otherwise */
+        get: operations["academics.teaching.index"];
+        /** Gives a subject in a class, or the class (no subject), to a teacher or to nobody: `{class_id, subject_id?, user_id?}` */
+        put: operations["academics.teaching.give"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/academics/teaching/copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Copies who taught what in the year before: `{division_id, campus_id}` */
+        post: operations["academics.teaching.copy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2830,6 +2933,308 @@ export interface operations {
                 content?: never;
             };
             401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "academics.subjects.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        levels: {
+                            division_id: string;
+                            division: string;
+                            level_word: string;
+                            subject_word: string;
+                            subject_word_plural: string;
+                            levels: {
+                                code: string;
+                                label: string;
+                            }[];
+                            subjects: {
+                                id: string;
+                                short: string;
+                                name: string;
+                                core: boolean;
+                                levels: string[];
+                                classes: number;
+                            }[];
+                            starter: {
+                                short: string;
+                                name: string;
+                                core: boolean;
+                                levels: string[];
+                            }[];
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "academics.subjects.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @default false */
+                    core?: boolean;
+                    levels?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        levels: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "academics.subjects.start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        levels: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "academics.subjects.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @default false */
+                    core?: boolean;
+                    levels?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        levels: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "academics.subjects.retire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        levels: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "academics.teaching.index": {
+        parameters: {
+            query?: {
+                division_id?: string | null;
+                campus_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        tabs: {
+                            division_id: string;
+                            campus_id: string;
+                            label: string;
+                            not_given: number;
+                        }[];
+                        current: {
+                            division_id: string;
+                            campus_id: string;
+                            label: string;
+                        } | null;
+                        year: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        earlier_year: string | null;
+                        subjects: {
+                            id: string;
+                            short: string;
+                            name: string;
+                            levels: string[];
+                        }[];
+                        classes: {
+                            id: string;
+                            name: string;
+                            level_code: string;
+                            class_teacher: {
+                                id: string;
+                                name: string;
+                            } | null;
+                            teaching: {
+                                [key: string]: {
+                                    id: string;
+                                    name: string;
+                                } | null;
+                            };
+                        }[];
+                        teachers: {
+                            id: string;
+                            name: string;
+                            classes: string[];
+                            teaches: string[];
+                        }[];
+                        totals: {
+                            classes: number;
+                            given: number;
+                            places: number;
+                            not_given: number;
+                            teachers: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["NotFoundHttpException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "academics.teaching.give": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        tabs: unknown[] | unknown;
+                        current: ({
+                            division_id: string;
+                            campus_id: string;
+                            label: string;
+                        } | null) | unknown;
+                        year: ({
+                            id: string;
+                            name: string;
+                        } | null) | unknown;
+                        earlier_year: unknown;
+                    } & {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "academics.teaching.copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        tabs: unknown[] | unknown;
+                        current: ({
+                            division_id: string;
+                            campus_id: string;
+                            label: string;
+                        } | null) | unknown;
+                        year: ({
+                            id: string;
+                            name: string;
+                        } | null) | unknown;
+                        earlier_year: unknown;
+                    } & {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["NotFoundHttpException"];
         };
     };
 }

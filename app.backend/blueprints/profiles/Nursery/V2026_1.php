@@ -14,4 +14,10 @@ return ProfileBlueprint::make('ECD@2026.1')
     ->term(Term::Level, 'Age group', 'Age groups')
     ->term(Term::Group, 'Room', 'Rooms')
     ->levels(['BABY' => 'Baby class', 'MIDDLE' => 'Middle class', 'TOP' => 'Top class'])
-    ->grouping(Grouping::Rooms);
+    ->term(Term::Subject, 'Learning area', 'Learning areas')
+    ->grouping(Grouping::Rooms)
+    ->subject('LAN', 'Language and communication')
+    ->subject('NUM', 'Numeracy')
+    ->subject('CRE', 'Creative arts')
+    ->subject('PHY', 'Physical development')
+    ->subject('SOC', 'Social and emotional development');

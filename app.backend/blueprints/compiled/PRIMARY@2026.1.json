@@ -42,6 +42,124 @@
         "period_model": "terms",
         "periods_per_year": 3
     },
+    "subjects": [
+        {
+            "core": true,
+            "levels": [
+                "STD1",
+                "STD2",
+                "STD3",
+                "STD4",
+                "STD5",
+                "STD6",
+                "STD7",
+                "STD8"
+            ],
+            "name": "Chichewa",
+            "short": "CHI"
+        },
+        {
+            "core": true,
+            "levels": [
+                "STD1",
+                "STD2",
+                "STD3",
+                "STD4",
+                "STD5",
+                "STD6",
+                "STD7",
+                "STD8"
+            ],
+            "name": "English",
+            "short": "ENG"
+        },
+        {
+            "core": true,
+            "levels": [
+                "STD1",
+                "STD2",
+                "STD3",
+                "STD4",
+                "STD5",
+                "STD6",
+                "STD7",
+                "STD8"
+            ],
+            "name": "Mathematics",
+            "short": "MAT"
+        },
+        {
+            "core": true,
+            "levels": [
+                "STD1",
+                "STD2",
+                "STD3",
+                "STD4",
+                "STD5",
+                "STD6",
+                "STD7",
+                "STD8"
+            ],
+            "name": "Expressive Arts",
+            "short": "EXA"
+        },
+        {
+            "core": true,
+            "levels": [
+                "STD1",
+                "STD2",
+                "STD3",
+                "STD4",
+                "STD5",
+                "STD6",
+                "STD7",
+                "STD8"
+            ],
+            "name": "Life Skills",
+            "short": "LSK"
+        },
+        {
+            "core": true,
+            "levels": [
+                "STD1",
+                "STD2",
+                "STD3",
+                "STD4",
+                "STD5",
+                "STD6",
+                "STD7",
+                "STD8"
+            ],
+            "name": "Science and Technology",
+            "short": "SCT"
+        },
+        {
+            "core": true,
+            "levels": [
+                "STD1",
+                "STD2",
+                "STD3",
+                "STD4",
+                "STD5",
+                "STD6",
+                "STD7",
+                "STD8"
+            ],
+            "name": "Social and Environmental Sciences",
+            "short": "SES"
+        },
+        {
+            "core": true,
+            "levels": [
+                "STD5",
+                "STD6",
+                "STD7",
+                "STD8"
+            ],
+            "name": "Agriculture",
+            "short": "AGR"
+        }
+    ],
     "summary": "Standards 1 to 8. One class teacher per class. Marks and report cards.",
     "title": "Primary",
     "vocabulary": {
@@ -60,6 +178,10 @@
         "period": {
             "many": "Terms",
             "one": "Term"
+        },
+        "subject": {
+            "many": "Subjects",
+            "one": "Subject"
         }
     }
 }

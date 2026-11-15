@@ -26,6 +26,138 @@
         "period_model": "terms",
         "periods_per_year": 3
     },
+    "subjects": [
+        {
+            "core": true,
+            "levels": [
+                "F1",
+                "F2",
+                "F3",
+                "F4"
+            ],
+            "name": "English",
+            "short": "ENG"
+        },
+        {
+            "core": true,
+            "levels": [
+                "F1",
+                "F2",
+                "F3",
+                "F4"
+            ],
+            "name": "Chichewa",
+            "short": "CHI"
+        },
+        {
+            "core": true,
+            "levels": [
+                "F1",
+                "F2",
+                "F3",
+                "F4"
+            ],
+            "name": "Mathematics",
+            "short": "MAT"
+        },
+        {
+            "core": true,
+            "levels": [
+                "F1",
+                "F2",
+                "F3",
+                "F4"
+            ],
+            "name": "Biology",
+            "short": "BIO"
+        },
+        {
+            "core": true,
+            "levels": [
+                "F1",
+                "F2",
+                "F3",
+                "F4"
+            ],
+            "name": "Physical Science",
+            "short": "PHS"
+        },
+        {
+            "core": false,
+            "levels": [
+                "F1",
+                "F2",
+                "F3",
+                "F4"
+            ],
+            "name": "Agriculture",
+            "short": "AGR"
+        },
+        {
+            "core": false,
+            "levels": [
+                "F1",
+                "F2",
+                "F3",
+                "F4"
+            ],
+            "name": "Geography",
+            "short": "GEO"
+        },
+        {
+            "core": false,
+            "levels": [
+                "F1",
+                "F2",
+                "F3",
+                "F4"
+            ],
+            "name": "History",
+            "short": "HIS"
+        },
+        {
+            "core": false,
+            "levels": [
+                "F1",
+                "F2",
+                "F3",
+                "F4"
+            ],
+            "name": "Social Studies",
+            "short": "SOS"
+        },
+        {
+            "core": false,
+            "levels": [
+                "F1",
+                "F2",
+                "F3",
+                "F4"
+            ],
+            "name": "Life Skills",
+            "short": "LSK"
+        },
+        {
+            "core": false,
+            "levels": [
+                "F1",
+                "F2",
+                "F3",
+                "F4"
+            ],
+            "name": "Bible Knowledge",
+            "short": "BK"
+        },
+        {
+            "core": false,
+            "levels": [
+                "F3",
+                "F4"
+            ],
+            "name": "Computer Studies",
+            "short": "CST"
+        }
+    ],
     "summary": "Forms 1 to 4. Streams and subject teachers. Marks and report cards.",
     "title": "Secondary",
     "vocabulary": {
@@ -44,6 +176,10 @@
         "period": {
             "many": "Terms",
             "one": "Term"
+        },
+        "subject": {
+            "many": "Subjects",
+            "one": "Subject"
         }
     }
 }

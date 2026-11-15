@@ -11,4 +11,5 @@ return ProfileBlueprint::abstract('SCHOOL_BASE@2026.1')
     ->title('School')
     ->term(Term::Period, 'Term', 'Terms')
     ->term(Term::Group, 'Class', 'Classes')
+    ->term(Term::Subject, 'Subject', 'Subjects')
     ->periods(PeriodModel::Terms, 3);

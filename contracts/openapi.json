@@ -5943,6 +5943,820 @@
                     }
                 }
             }
+        },
+        "/v1/academics/subjects": {
+            "get": {
+                "operationId": "academics.subjects.index",
+                "tags": [
+                    "Subjects"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "levels": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "division_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "division": {
+                                                        "type": "string"
+                                                    },
+                                                    "level_word": {
+                                                        "type": "string"
+                                                    },
+                                                    "subject_word": {
+                                                        "type": "string"
+                                                    },
+                                                    "subject_word_plural": {
+                                                        "type": "string"
+                                                    },
+                                                    "levels": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "code": {
+                                                                    "type": "string"
+                                                                },
+                                                                "label": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "code",
+                                                                "label"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "subjects": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "short": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                },
+                                                                "core": {
+                                                                    "type": "boolean"
+                                                                },
+                                                                "levels": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "classes": {
+                                                                    "type": "integer"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "short",
+                                                                "name",
+                                                                "core",
+                                                                "levels",
+                                                                "classes"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "starter": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "short": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                },
+                                                                "core": {
+                                                                    "type": "boolean"
+                                                                },
+                                                                "levels": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "short",
+                                                                "name",
+                                                                "core",
+                                                                "levels"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "division_id",
+                                                    "division",
+                                                    "level_word",
+                                                    "subject_word",
+                                                    "subject_word_plural",
+                                                    "levels",
+                                                    "subjects",
+                                                    "starter"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "levels"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "academics.subjects.store",
+                "summary": "Adds a subject: `{division_id, name, short, core, levels}`",
+                "tags": [
+                    "Subjects"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "core": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "levels": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "levels": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "levels"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/academics/subjects/start": {
+            "post": {
+                "operationId": "academics.subjects.start",
+                "summary": "Starts a level's subjects from its profile: `{division_id}`",
+                "tags": [
+                    "Subjects"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "levels": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "levels"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/academics/subjects/{id}": {
+            "put": {
+                "operationId": "academics.subjects.update",
+                "summary": "Changes a subject: `{division_id, name, short, core, levels}`",
+                "tags": [
+                    "Subjects"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "core": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "levels": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "levels": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "levels"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/academics/subjects/{id}/retire": {
+            "post": {
+                "operationId": "academics.subjects.retire",
+                "summary": "Retires a subject: `{reason}`",
+                "tags": [
+                    "Subjects"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "levels": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "levels"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/academics/teaching": {
+            "get": {
+                "operationId": "academics.teaching.index",
+                "summary": "`?division_id=&campus_id=` chooses the tab; the first the viewer manages otherwise",
+                "tags": [
+                    "Teaching"
+                ],
+                "parameters": [
+                    {
+                        "name": "division_id",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "campus_id",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "tabs": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "division_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "not_given": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "division_id",
+                                                    "campus_id",
+                                                    "label",
+                                                    "not_given"
+                                                ]
+                                            }
+                                        },
+                                        "current": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "division_id": {
+                                                    "type": "string"
+                                                },
+                                                "campus_id": {
+                                                    "type": "string"
+                                                },
+                                                "label": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "division_id",
+                                                "campus_id",
+                                                "label"
+                                            ]
+                                        },
+                                        "year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "earlier_year": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "subjects": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "short": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "levels": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "short",
+                                                    "name",
+                                                    "levels"
+                                                ]
+                                            }
+                                        },
+                                        "classes": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "level_code": {
+                                                        "type": "string"
+                                                    },
+                                                    "class_teacher": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name"
+                                                        ]
+                                                    },
+                                                    "teaching": {
+                                                        "type": "object",
+                                                        "additionalProperties": {
+                                                            "type": [
+                                                                "object",
+                                                                "null"
+                                                            ],
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "level_code",
+                                                    "class_teacher",
+                                                    "teaching"
+                                                ]
+                                            }
+                                        },
+                                        "teachers": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "classes": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "teaches": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "classes",
+                                                    "teaches"
+                                                ]
+                                            }
+                                        },
+                                        "totals": {
+                                            "type": "object",
+                                            "properties": {
+                                                "classes": {
+                                                    "type": "integer"
+                                                },
+                                                "given": {
+                                                    "type": "integer"
+                                                },
+                                                "places": {
+                                                    "type": "integer"
+                                                },
+                                                "not_given": {
+                                                    "type": "integer"
+                                                },
+                                                "teachers": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "classes",
+                                                "given",
+                                                "places",
+                                                "not_given",
+                                                "teachers"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "tabs",
+                                        "current",
+                                        "year",
+                                        "earlier_year",
+                                        "subjects",
+                                        "classes",
+                                        "teachers",
+                                        "totals"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "academics.teaching.give",
+                "summary": "Gives a subject in a class, or the class (no subject), to a teacher or to nobody: `{class_id, subject_id?, user_id?}`",
+                "tags": [
+                    "Teaching"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "tabs": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "array"
+                                                },
+                                                {}
+                                            ]
+                                        },
+                                        "current": {
+                                            "anyOf": [
+                                                {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "division_id": {
+                                                            "type": "string"
+                                                        },
+                                                        "campus_id": {
+                                                            "type": "string"
+                                                        },
+                                                        "label": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "division_id",
+                                                        "campus_id",
+                                                        "label"
+                                                    ]
+                                                },
+                                                {}
+                                            ]
+                                        },
+                                        "year": {
+                                            "anyOf": [
+                                                {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name"
+                                                    ]
+                                                },
+                                                {}
+                                            ]
+                                        },
+                                        "earlier_year": {}
+                                    },
+                                    "required": [
+                                        "tabs",
+                                        "current",
+                                        "year",
+                                        "earlier_year"
+                                    ],
+                                    "additionalProperties": {}
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/academics/teaching/copy": {
+            "post": {
+                "operationId": "academics.teaching.copy",
+                "summary": "Copies who taught what in the year before: `{division_id, campus_id}`",
+                "tags": [
+                    "Teaching"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "tabs": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "array"
+                                                },
+                                                {}
+                                            ]
+                                        },
+                                        "current": {
+                                            "anyOf": [
+                                                {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "division_id": {
+                                                            "type": "string"
+                                                        },
+                                                        "campus_id": {
+                                                            "type": "string"
+                                                        },
+                                                        "label": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "division_id",
+                                                        "campus_id",
+                                                        "label"
+                                                    ]
+                                                },
+                                                {}
+                                            ]
+                                        },
+                                        "year": {
+                                            "anyOf": [
+                                                {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name"
+                                                    ]
+                                                },
+                                                {}
+                                            ]
+                                        },
+                                        "earlier_year": {}
+                                    },
+                                    "required": [
+                                        "tabs",
+                                        "current",
+                                        "year",
+                                        "earlier_year"
+                                    ],
+                                    "additionalProperties": {}
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
         }
     },
     "components": {

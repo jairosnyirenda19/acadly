@@ -20,8 +20,10 @@ import { ResetPasswordScreen } from './sign-in/ResetPasswordScreen'
 import { PeopleScreen } from './settings/PeopleScreen'
 import { PersonScreen } from './settings/PersonScreen'
 import { RolesScreen } from './settings/RolesScreen'
+import { SubjectsScreen } from './settings/SubjectsScreen'
+import { TeachingScreen } from './settings/TeachingScreen'
 import { SetupWizard } from './setup/SetupWizard'
-import { ConsoleShell, holdsAnywhere } from './shell/ConsoleShell'
+import { ConsoleShell, holdsAnywhere, settingsHome } from './shell/ConsoleShell'
 import { WorkInProvider } from './shell/WorkIn'
 import { SignInScreen } from './sign-in/SignInScreen'
 import { StatusScreen } from './StatusScreen'
@@ -32,16 +34,20 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const t = copy.home
   const gives = holdsAnywhere(context, 'access.roles.assign')
   const edits = can(context, 'access.roles.manage')
+  const teaches = holdsAnywhere(context, 'academics.manage')
+  const home = settingsHome(context)
   const person = /^\/settings\/people\/([0-9a-f-]{36})$/.exec(path)?.[1]
 
   useEffect(() => {
-    if (path === '/settings' && (gives || edits)) navigate(gives ? '/settings/people' : '/settings/roles', true)
-  }, [path, gives, edits])
+    if (path === '/settings' && home !== null) navigate(home, true)
+  }, [path, home])
 
   let page
   if (path === '/settings/people' && gives) page = <PeopleScreen />
   else if (person !== undefined && gives) page = <PersonScreen id={person} />
   else if (path === '/settings/roles' && edits) page = <RolesScreen />
+  else if (path === '/settings/subjects' && teaches) page = <SubjectsScreen />
+  else if (path === '/settings/teaching' && teaches) page = <TeachingScreen />
 
   if (page !== undefined) {
     return (

@@ -9,6 +9,7 @@ use Acadly\Kernel\Access\Permission;
 enum AcademicsPermission: string implements Permission
 {
     case Manage = 'academics.manage';
+    case Teach = 'academics.teach';
 
     public function key(): string
     {
@@ -17,12 +18,18 @@ enum AcademicsPermission: string implements Permission
 
     public function label(): string
     {
-        return 'Manage the academic calendar and classes';
+        return match ($this) {
+            self::Manage => 'Manage the academic calendar, classes and subjects',
+            self::Teach => 'Teach classes',
+        };
     }
 
     public function help(): string
     {
-        return 'Academic years, terms, and the classes of each level at each campus.';
+        return match ($this) {
+            self::Manage => 'Academic years, terms, classes, subjects, and who teaches each subject in each class.',
+            self::Teach => 'Can be given subjects and classes to teach where the role is given. What a teacher may do in a class comes from their other permissions.',
+        };
     }
 
     public function isSight(): bool

@@ -22,4 +22,7 @@ enum Term: string
 
     /** Term, Semester. */
     case Period = 'period';
+
+    /** Subject, Learning area. */
+    case Subject = 'subject';
 }

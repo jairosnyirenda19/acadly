@@ -9,6 +9,7 @@
         "period_model": "terms",
         "periods_per_year": 3
     },
+    "subjects": [],
     "summary": "",
     "title": "School",
     "vocabulary": {
@@ -19,6 +20,10 @@
         "period": {
             "many": "Terms",
             "one": "Term"
+        },
+        "subject": {
+            "many": "Subjects",
+            "one": "Subject"
         }
     }
 }

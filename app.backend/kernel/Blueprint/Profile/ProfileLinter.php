@@ -10,7 +10,9 @@ use BackedEnum;
 /**
  * Checks a compiled profile (02 §3.9): a profile that can be pinned has a
  * title, a sentence, a period model, a ladder and a grouping; level codes are
- * unique; and every term of each vocabulary it uses has its words.
+ * unique; starter subjects have short names of 2 to 4 capitals, unique, on
+ * levels the profile has; and every term of each vocabulary it uses has its
+ * words.
  */
 final class ProfileLinter
 {
@@ -53,6 +55,26 @@ final class ProfileLinter
             }
 
             $codes[$level['code']] = true;
+        }
+
+        $shorts = [];
+
+        foreach ($profile->subjects as $subject) {
+            if (preg_match('/^[A-Z][A-Z0-9]{1,3}$/', $subject['short']) !== 1) {
+                $problems[] = "{$at}: [{$subject['short']}] is not a valid short name: 2 to 4 capital letters or digits.";
+            }
+
+            if (isset($shorts[$subject['short']])) {
+                $problems[] = "{$at}: the subject [{$subject['short']}] is declared twice.";
+            }
+
+            $shorts[$subject['short']] = true;
+
+            foreach ($subject['levels'] as $code) {
+                if (! isset($codes[$code])) {
+                    $problems[] = "{$at}: the subject [{$subject['short']}] names the level [{$code}], which the profile does not have.";
+                }
+            }
         }
 
         foreach ($termEnums as $enum) {

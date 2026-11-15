@@ -6,12 +6,16 @@ import type { PersonStateName } from './api'
 
 const t = copy.settings
 
+export type SettingsTab = 'people' | 'roles' | 'subjects' | 'teaching'
+
 /** The settings tabs that are built and that the account may use. */
-export function SettingsTabs({ current }: { current: 'people' | 'roles' }) {
+export function SettingsTabs({ current }: { current: SettingsTab }) {
   const context = useAppContext()
   const tabs = [
     { key: 'people' as const, path: '/settings/people', show: holdsAnywhere(context, 'access.roles.assign') },
     { key: 'roles' as const, path: '/settings/roles', show: can(context, 'access.roles.manage') },
+    { key: 'subjects' as const, path: '/settings/subjects', show: holdsAnywhere(context, 'academics.manage') },
+    { key: 'teaching' as const, path: '/settings/teaching', show: holdsAnywhere(context, 'academics.manage') },
   ]
 
   return (

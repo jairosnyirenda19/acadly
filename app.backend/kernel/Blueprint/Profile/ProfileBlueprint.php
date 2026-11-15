@@ -44,6 +44,9 @@ final class ProfileBlueprint
 
     private ?string $grouping = null;
 
+    /** @var list<array{short: string, name: string, core: bool, levels: list<string>|null}>|null */
+    private ?array $subjects = null;
+
     private function __construct(
         public readonly BlueprintRef $ref,
         public readonly bool $abstract,
@@ -117,6 +120,20 @@ final class ProfileBlueprint
         return $this;
     }
 
+    /**
+     * A starter subject: the school begins with it and keeps its own list
+     * from then on. `$levels` are level codes; null means every level.
+     *
+     * @param  list<string>|null  $levels
+     */
+    public function subject(string $short, string $name, bool $core = true, ?array $levels = null): self
+    {
+        $this->subjects ??= [];
+        $this->subjects[] = ['short' => $short, 'name' => $name, 'core' => $core, 'levels' => $levels];
+
+        return $this;
+    }
+
     public function extendsRef(): ?BlueprintRef
     {
         return $this->extends;
@@ -135,6 +152,13 @@ final class ProfileBlueprint
             throw new InvalidArgumentException("{$this->ref}: the profile it extends, [{$this->extends}], is not declared.");
         }
 
+        $levels = $this->levels ?? ($parent->levels ?? []);
+        $every = array_column($levels, 'code');
+        $subjects = $this->subjects === null ? ($parent->subjects ?? []) : array_map(
+            fn (array $s): array => ['short' => $s['short'], 'name' => $s['name'], 'core' => $s['core'], 'levels' => $s['levels'] ?? $every],
+            $this->subjects,
+        );
+
         return new CompiledProfile(
             $this->ref,
             $this->title !== '' ? $this->title : ($parent->title ?? ''),
@@ -144,8 +168,9 @@ final class ProfileBlueprint
             [...($parent->vocabulary ?? []), ...$this->vocabulary],
             $this->periodModel ?? $parent?->periodModel,
             $this->periodsPerYear ?? $parent?->periodsPerYear,
-            $this->levels ?? ($parent->levels ?? []),
+            $levels,
             $this->grouping ?? $parent?->grouping,
+            $subjects,
         );
     }
 

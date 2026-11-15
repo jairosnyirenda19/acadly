@@ -47,7 +47,7 @@ const RECORD_ROUTES = [
  * Lists that answer every viewer with only what is inside the viewer's reach.
  * For these the test checks that nothing of campus B is in the answer.
  */
-const LIST_ROUTES = ['people.index'];
+const LIST_ROUTES = ['people.index', 'academics.teaching.index'];
 
 uses(DatabaseTransactions::class);
 

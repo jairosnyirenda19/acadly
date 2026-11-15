@@ -16,4 +16,12 @@ return ProfileBlueprint::make('PRIMARY@2026.1')
         'STD1' => 'Standard 1', 'STD2' => 'Standard 2', 'STD3' => 'Standard 3', 'STD4' => 'Standard 4',
         'STD5' => 'Standard 5', 'STD6' => 'Standard 6', 'STD7' => 'Standard 7', 'STD8' => 'Standard 8',
     ])
-    ->grouping(Grouping::Streams);
+    ->grouping(Grouping::Streams)
+    ->subject('CHI', 'Chichewa')
+    ->subject('ENG', 'English')
+    ->subject('MAT', 'Mathematics')
+    ->subject('EXA', 'Expressive Arts')
+    ->subject('LSK', 'Life Skills')
+    ->subject('SCT', 'Science and Technology')
+    ->subject('SES', 'Social and Environmental Sciences')
+    ->subject('AGR', 'Agriculture', true, ['STD5', 'STD6', 'STD7', 'STD8']);

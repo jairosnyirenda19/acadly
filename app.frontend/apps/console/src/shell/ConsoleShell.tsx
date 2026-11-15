@@ -12,7 +12,16 @@ export function holdsAnywhere(context: AppContext, permission: string): boolean 
 
 /** Whether the account sees Settings: it can give roles somewhere, or edit roles. */
 export function seesSettings(context: AppContext): boolean {
-  return holdsAnywhere(context, 'access.roles.assign') || can(context, 'access.roles.manage')
+  return settingsHome(context) !== null
+}
+
+/** The first settings page the account may use, or null. */
+export function settingsHome(context: AppContext): string | null {
+  if (holdsAnywhere(context, 'access.roles.assign')) return '/settings/people'
+  if (can(context, 'access.roles.manage')) return '/settings/roles'
+  if (holdsAnywhere(context, 'academics.manage')) return '/settings/subjects'
+
+  return null
 }
 
 function initials(name: string): string {
@@ -31,7 +40,7 @@ export function ConsoleShell({ section, children, onSignedOut }: { section: 'tod
   const close = useCallback(() => setChoosing(false), [])
   const items = [
     { key: 'today' as const, label: t.nav.today, path: '/', show: true },
-    { key: 'settings' as const, label: t.nav.settings, path: holdsAnywhere(context, 'access.roles.assign') ? '/settings/people' : '/settings/roles', show: seesSettings(context) },
+    { key: 'settings' as const, label: t.nav.settings, path: settingsHome(context) ?? '/', show: seesSettings(context) },
   ]
 
   return (

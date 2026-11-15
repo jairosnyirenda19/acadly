@@ -22,6 +22,58 @@
         "period_model": "terms",
         "periods_per_year": 3
     },
+    "subjects": [
+        {
+            "core": true,
+            "levels": [
+                "BABY",
+                "MIDDLE",
+                "TOP"
+            ],
+            "name": "Language and communication",
+            "short": "LAN"
+        },
+        {
+            "core": true,
+            "levels": [
+                "BABY",
+                "MIDDLE",
+                "TOP"
+            ],
+            "name": "Numeracy",
+            "short": "NUM"
+        },
+        {
+            "core": true,
+            "levels": [
+                "BABY",
+                "MIDDLE",
+                "TOP"
+            ],
+            "name": "Creative arts",
+            "short": "CRE"
+        },
+        {
+            "core": true,
+            "levels": [
+                "BABY",
+                "MIDDLE",
+                "TOP"
+            ],
+            "name": "Physical development",
+            "short": "PHY"
+        },
+        {
+            "core": true,
+            "levels": [
+                "BABY",
+                "MIDDLE",
+                "TOP"
+            ],
+            "name": "Social and emotional development",
+            "short": "SOC"
+        }
+    ],
     "summary": "Children from 3 to 5 years. Rooms, caregivers and observations instead of marks.",
     "title": "Nursery",
     "vocabulary": {
@@ -40,6 +92,10 @@
         "period": {
             "many": "Terms",
             "one": "Term"
+        },
+        "subject": {
+            "many": "Learning areas",
+            "one": "Learning area"
         }
     }
 }

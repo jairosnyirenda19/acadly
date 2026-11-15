@@ -12,13 +12,14 @@ use InvalidArgumentException;
 /**
  * A Profile Blueprint in its compiled form, with what it extends already
  * merged in (02 §2). What a division is: its words, its period model, its
- * ladder of levels and how classes are grouped.
+ * ladder of levels, how classes are grouped, and the subjects it starts with.
  */
 final readonly class CompiledProfile implements CompiledBlueprint
 {
     /**
      * @param  array<string, array{one: string, many: string}>  $vocabulary  term => words
      * @param  list<array{code: string, label: string}>  $levels  in order, lowest first
+     * @param  list<array{short: string, name: string, core: bool, levels: list<string>}>  $subjects  the starter subjects
      */
     public function __construct(
         public BlueprintRef $ref,
@@ -31,6 +32,7 @@ final readonly class CompiledProfile implements CompiledBlueprint
         public ?int $periodsPerYear,
         public array $levels,
         public ?string $grouping,
+        public array $subjects = [],
     ) {}
 
     public function reference(): BlueprintRef
@@ -95,6 +97,7 @@ final readonly class CompiledProfile implements CompiledBlueprint
                 'levels' => $this->levels,
                 'grouping' => $this->grouping,
             ],
+            'subjects' => $this->subjects,
         ];
     }
 
@@ -119,6 +122,15 @@ final readonly class CompiledProfile implements CompiledBlueprint
             Shape::records($structure, 'levels'),
         );
         $perYear = $structure['periods_per_year'] ?? null;
+        $subjects = array_map(
+            fn (array $s): array => [
+                'short' => Shape::string($s, 'short'),
+                'name' => Shape::string($s, 'name'),
+                'core' => Shape::bool($s, 'core'),
+                'levels' => array_values(array_filter(is_array($s['levels'] ?? null) ? $s['levels'] : [], is_string(...))),
+            ],
+            Shape::records($data, 'subjects'),
+        );
 
         return new self(
             BlueprintRef::parse(Shape::string($data, 'ref')),
@@ -131,6 +143,7 @@ final readonly class CompiledProfile implements CompiledBlueprint
             is_int($perYear) ? $perYear : null,
             $levels,
             Shape::nullableString($structure, 'grouping'),
+            $subjects,
         );
     }
 }

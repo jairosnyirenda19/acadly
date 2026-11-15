@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Acadly\Kernel\Access;
 
+use Acadly\Kernel\Audit\Audit;
+use Acadly\Kernel\Audit\KernelAudit;
+use Acadly\Kernel\Audit\Outcome;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -35,6 +38,7 @@ final class Access
         private readonly PermissionCatalogue $catalogue,
         private readonly ScopeHierarchy $hierarchy,
         private readonly Clock $clock,
+        private readonly Audit $audit,
     ) {}
 
     public function allows(?Authenticatable $who, Permission $permission, ?ScopeRef $at = null): bool
@@ -65,10 +69,18 @@ final class Access
         return false;
     }
 
-    /** @throws AuthorizationException when the check fails; rendered as 403 access_refused */
+    /**
+     * Refuses with an exception, rendered as 403 access_refused. A refusal is
+     * an audit line: no module writes its own.
+     *
+     * @throws AuthorizationException
+     */
     public function check(?Authenticatable $who, Permission $permission, ?ScopeRef $at = null): void
     {
         if (! $this->allows($who, $permission, $at)) {
+            $this->audit->record(KernelAudit::Refused, outcome: Outcome::Refused, refusal: 'permission:'.$permission->key(),
+                actor: $this->audit->actorFor($who), at: $at, meta: ['permission' => $permission->key()]);
+
             throw new AuthorizationException('Access is refused.');
         }
     }

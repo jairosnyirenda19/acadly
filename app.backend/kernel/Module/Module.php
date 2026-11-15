@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acadly\Kernel\Module;
 
 use Acadly\Kernel\Access\Permission;
+use Acadly\Kernel\Audit\AuditAction;
 
 /**
  * The manifest of one Core domain or one Module (docs/architecture/01-foundations.md §5).
@@ -33,4 +34,11 @@ interface Module
      * @return list<Permission>
      */
     public function permissions(): array;
+
+    /**
+     * The audit actions this module declares. Each key starts with the module key.
+     *
+     * @return list<AuditAction>
+     */
+    public function auditActions(): array;
 }

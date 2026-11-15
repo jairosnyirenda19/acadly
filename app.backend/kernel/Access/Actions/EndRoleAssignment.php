@@ -8,6 +8,8 @@ use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\AccessPermission;
 use Acadly\Kernel\Access\Role;
 use Acadly\Kernel\Access\RoleAssignment;
+use Acadly\Kernel\Audit\Audit;
+use Acadly\Kernel\Audit\KernelAudit;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +26,7 @@ final class EndRoleAssignment
     public function __construct(
         private readonly Access $access,
         private readonly Clock $clock,
+        private readonly Audit $audit,
     ) {}
 
     public function handle(User $by, RoleAssignment $assignment, string $reason): void
@@ -47,11 +50,16 @@ final class EndRoleAssignment
                 throw ValidationException::withMessages(['assignment' => ['The last administrator cannot be removed.']]);
             }
 
+            $watch = $this->audit->watch($locked);
+
             $locked->forceFill([
                 'ends_at' => $now,
                 'ended_by' => $by->id,
                 'end_reason' => $reason,
             ])->save();
+
+            $this->audit->record(KernelAudit::RoleEnded, subject: $locked, changes: $watch->diff(), reason: $reason,
+                actor: $this->audit->actorFor($by), at: $locked->scope());
         });
 
         $user = User::query()->find($assignment->user_id);

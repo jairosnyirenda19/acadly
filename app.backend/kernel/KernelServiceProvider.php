@@ -8,11 +8,16 @@ use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\FlatScopeHierarchy;
 use Acadly\Kernel\Access\PermissionCatalogue;
 use Acadly\Kernel\Access\ScopeHierarchy;
+use Acadly\Kernel\Audit\Audit;
+use Acadly\Kernel\Audit\AuditCatalogue;
+use Acadly\Kernel\Console\AuditSealCommand;
+use Acadly\Kernel\Console\AuditVerifyCommand;
 use Acadly\Kernel\Console\CreateAdministratorCommand;
 use Acadly\Kernel\Console\SyncCommand;
 use Acadly\Kernel\Module\ModuleRegistry;
 use Acadly\Kernel\Support\Clock;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -31,6 +36,13 @@ final class KernelServiceProvider extends ServiceProvider
             fn (Application $app): PermissionCatalogue => new PermissionCatalogue($app->make(ModuleRegistry::class)),
         );
 
+        $this->app->singleton(
+            AuditCatalogue::class,
+            fn (Application $app): AuditCatalogue => new AuditCatalogue($app->make(ModuleRegistry::class)),
+        );
+
+        $this->app->singleton(Audit::class);
+
         $this->app->bindIf(ScopeHierarchy::class, FlatScopeHierarchy::class, true);
 
         // One instance per request: it remembers the grants it has loaded.
@@ -42,6 +54,7 @@ final class KernelServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom([
             __DIR__.'/Identity/Database/migrations',
             __DIR__.'/Access/Database/migrations',
+            __DIR__.'/Audit/Database/migrations',
         ]);
 
         Password::defaults(fn (): Password => Password::min(12)->max(255));
@@ -60,7 +73,12 @@ final class KernelServiceProvider extends ServiceProvider
         });
 
         if ($this->app->runningInConsole()) {
-            $this->commands([SyncCommand::class, CreateAdministratorCommand::class]);
+            $this->commands([SyncCommand::class, CreateAdministratorCommand::class, AuditVerifyCommand::class, AuditSealCommand::class]);
         }
+
+        // Every night: verify the audit trail, then seal its head.
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule): void {
+            $schedule->command('audit:seal')->dailyAt('01:00')->withoutOverlapping()->onOneServer();
+        });
     }
 }

@@ -25,8 +25,15 @@ export function readCookie(source: string, name: string): string | null {
  * The session is a cookie. A request that changes state carries the
  * XSRF-TOKEN cookie back as the X-XSRF-TOKEN header.
  */
-export function createApi(baseUrl: string) {
-  const client = createClient<paths>({ baseUrl, credentials: 'include', headers: { Accept: 'application/json' } })
+export function createApi(baseUrl: string, channel?: string) {
+  const headers: Record<string, string> = { Accept: 'application/json' }
+
+  // Which app made the request, for the audit trail.
+  if (channel !== undefined) {
+    headers['X-Acadly-Channel'] = channel
+  }
+
+  const client = createClient<paths>({ baseUrl, credentials: 'include', headers })
 
   client.use({
     onRequest({ request }) {

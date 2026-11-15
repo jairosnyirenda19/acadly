@@ -33,4 +33,9 @@ final class InstitutionCore implements Module
     {
         return [];
     }
+
+    public function auditActions(): array
+    {
+        return [];
+    }
 }

@@ -93,6 +93,11 @@ it('refuses a core domain that requires an optional module', function (): void {
         {
             return [];
         }
+
+        public function auditActions(): array
+        {
+            return [];
+        }
     };
 
     new ModuleRegistry([new InstitutionCore, new AttendanceModule, $core]);

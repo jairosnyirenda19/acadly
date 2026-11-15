@@ -22,7 +22,7 @@ The target of stages 0–4 is the PRD's vertical slice (§21): institution → c
 2. `Database` and `Scope`: owner and application roles, `AppendOnly::protect()`, the Scope value object, the cross-scope test generator. *(Roles and append-only protection: built 14 November 2026.)*
 3. `Identity`: users, sessions, password reset, MFA, `IdentityProvider` socket. *(Built 15 November 2026: accounts, sign-in, sign-out, password reset, `/me`. Sign-in screens for the console and the portal built the same day. Not yet: two-step sign-in, the `IdentityProvider` socket.)*
 4. `Access`: permission catalogue sync, roles, scoped assignments, `Access::check()`, entitlements, support grants. *(Built 15 November 2026: catalogue, sync, roles, scoped assignments with periods, `Access::check()`, assignment guard rails, first-administrator command. Not yet: record-level rules, the licence, support grants, audit of access changes.)*
-5. `Audit` and `Events` (outbox, idempotent consumers).
+5. `Audit` and `Events` (outbox, idempotent consumers). *(Audit write side built 16 November 2026: action catalogue, hash chain, encrypted personal payloads, field classes and diffs, refusals, sign-in and access lines, `audit:verify`, nightly `audit:seal`. Not yet: the read endpoints and screens, sensitive-read auditing, watchers, the spool file, partitioning, erasure, Events.)*
 6. `Module`: manifest contract, registry, activation check, `/me/context`.
 7. `Blueprint`: definitions, compiler, lock file, linter, journey engine, conformance suite, projections.
 8. `Notify`: topic contract, compiled catalogue, audiences, dispatcher, in-app + email + SMS adapters (SMS against a fake provider first), delivery ledger, sync + readiness hash.

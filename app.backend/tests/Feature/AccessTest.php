@@ -13,6 +13,7 @@ use Acadly\Kernel\Access\Role;
 use Acadly\Kernel\Access\RoleAssignment;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
+use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Module\ModuleRegistry;
 use Acadly\Kernel\Support\Clock;
@@ -235,7 +236,7 @@ describe('the catalogue and sync', function (): void {
 
     it('refuses an unknown permission at check time', function (): void {
         $catalogue = new PermissionCatalogue(new ModuleRegistry([]));
-        $access = new Access($catalogue, new FlatScopeHierarchy, new Clock);
+        $access = new Access($catalogue, new FlatScopeHierarchy, new Clock, app(Audit::class));
 
         $access->allows(User::factory()->create(), AttendancePermission::Capture);
     })->throws(LogicException::class, 'not a permission in this build');

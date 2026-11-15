@@ -7,6 +7,10 @@ namespace Acadly\Kernel\Console;
 use Acadly\Kernel\Access\Role;
 use Acadly\Kernel\Access\RoleAssignment;
 use Acadly\Kernel\Access\ScopeType;
+use Acadly\Kernel\Audit\Actor;
+use Acadly\Kernel\Audit\Audit;
+use Acadly\Kernel\Audit\KernelAudit;
+use Acadly\Kernel\Audit\Watch;
 use Acadly\Kernel\Identity\AccountStatus;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
@@ -25,7 +29,7 @@ final class CreateAdministratorCommand extends Command
 
     protected $description = 'Create the first administrator of this deployment';
 
-    public function handle(Clock $clock): int
+    public function handle(Clock $clock, Audit $audit): int
     {
         $role = Role::query()->where('key', Role::ADMINISTRATOR)->first();
 
@@ -64,11 +68,11 @@ final class CreateAdministratorCommand extends Command
             return self::FAILURE;
         }
 
-        DB::transaction(function () use ($email, $name, $password, $role, $clock): void {
+        DB::transaction(function () use ($email, $name, $password, $role, $clock, $audit): void {
             $user = User::query()->firstOrNew(['email' => $email]);
             $user->forceFill(['name' => $name, 'password' => $password, 'status' => AccountStatus::Active])->save();
 
-            RoleAssignment::query()->create([
+            $assignment = RoleAssignment::query()->create([
                 'user_id' => $user->id,
                 'role_id' => $role->id,
                 'scope_type' => ScopeType::Institution,
@@ -76,6 +80,9 @@ final class CreateAdministratorCommand extends Command
                 'starts_at' => $clock->now(),
                 'reason' => 'First administrator of the deployment.',
             ]);
+
+            $audit->record(KernelAudit::FirstAdministrator, subject: $assignment, changes: Watch::created($assignment)->diff(),
+                reason: 'First administrator of the deployment.', actor: Actor::system('Deployment console'), meta: ['to' => $user->id]);
         });
 
         $this->components->info("The administrator account {$email} is ready.");

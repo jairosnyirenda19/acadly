@@ -34,4 +34,9 @@ final class AttendanceModule implements Module
     {
         return AttendancePermission::cases();
     }
+
+    public function auditActions(): array
+    {
+        return [];
+    }
 }

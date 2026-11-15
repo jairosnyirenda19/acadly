@@ -29,4 +29,9 @@ final class BadPrefixModule implements Module
     {
         return [WrongPrefixPermission::Borrow];
     }
+
+    public function auditActions(): array
+    {
+        return [];
+    }
 }

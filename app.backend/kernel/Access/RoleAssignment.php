@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Acadly\Kernel\Access;
 
+use Acadly\Kernel\Audit\Auditable;
+use Acadly\Kernel\Audit\FieldClass;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -27,7 +29,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $end_reason
  * @property-read Role $role
  */
-final class RoleAssignment extends Model
+final class RoleAssignment extends Model implements Auditable
 {
     use HasUuids;
 
@@ -37,6 +39,35 @@ final class RoleAssignment extends Model
         'user_id', 'role_id', 'scope_type', 'scope_id', 'starts_at', 'ends_at',
         'granted_by', 'reason', 'ended_by', 'end_reason',
     ];
+
+    public function auditType(): string
+    {
+        return 'role_assignment';
+    }
+
+    public function auditId(): string
+    {
+        return $this->id;
+    }
+
+    public function auditLabel(): string
+    {
+        $role = Role::query()->find($this->role_id);
+
+        return ($role !== null ? $role->name : 'Role').' · '.$this->scope_type->value;
+    }
+
+    public function auditFields(): array
+    {
+        return [
+            'user_id' => FieldClass::Plain,
+            'role_id' => FieldClass::Plain,
+            'scope_type' => FieldClass::Plain,
+            'scope_id' => FieldClass::Plain,
+            'starts_at' => FieldClass::Plain,
+            'ends_at' => FieldClass::Plain,
+        ];
+    }
 
     public function scope(): ScopeRef
     {

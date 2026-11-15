@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Acadly\Kernel\Identity;
 
+use Acadly\Kernel\Audit\Auditable;
+use Acadly\Kernel\Audit\FieldClass;
 use Carbon\CarbonImmutable;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -25,7 +27,7 @@ use Illuminate\Notifications\Notifiable;
  * @property AccountStatus $status
  * @property CarbonImmutable|null $last_signed_in_at
  */
-final class User extends Authenticatable
+final class User extends Authenticatable implements Auditable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasUuids, Notifiable;
@@ -39,6 +41,31 @@ final class User extends Authenticatable
     public function isActive(): bool
     {
         return $this->status === AccountStatus::Active;
+    }
+
+    public function auditType(): string
+    {
+        return 'account';
+    }
+
+    public function auditId(): string
+    {
+        return $this->id;
+    }
+
+    public function auditLabel(): string
+    {
+        return $this->name;
+    }
+
+    public function auditFields(): array
+    {
+        return [
+            'name' => FieldClass::Plain,
+            'email' => FieldClass::Personal,
+            'password' => FieldClass::Secret,
+            'status' => FieldClass::Plain,
+        ];
     }
 
     protected static function newFactory(): UserFactory

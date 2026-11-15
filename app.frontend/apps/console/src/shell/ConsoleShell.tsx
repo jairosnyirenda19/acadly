@@ -1,6 +1,7 @@
 import { can, navigate, signOut, useAppContext, type AppContext } from '@acadly/kernel'
-import type { ReactNode } from 'react'
+import { useCallback, useState, type ReactNode } from 'react'
 import { copy } from '../copy'
+import { WorkInButton, WorkInPanel } from './WorkIn'
 
 const t = copy.shell
 
@@ -26,6 +27,8 @@ function initials(name: string): string {
 /** The frame of the console after the school opens: the ink rail, the header and the page. */
 export function ConsoleShell({ section, children, onSignedOut }: { section: 'today' | 'settings'; children: ReactNode; onSignedOut: () => void }) {
   const context = useAppContext()
+  const [choosing, setChoosing] = useState(false)
+  const close = useCallback(() => setChoosing(false), [])
   const items = [
     { key: 'today' as const, label: t.nav.today, path: '/', show: true },
     { key: 'settings' as const, label: t.nav.settings, path: holdsAnywhere(context, 'access.roles.assign') ? '/settings/people' : '/settings/roles', show: seesSettings(context) },
@@ -37,11 +40,7 @@ export function ConsoleShell({ section, children, onSignedOut }: { section: 'tod
         <div className="type-display px-5 pt-5 pb-4 text-[34px] leading-[0.9]">
           {copy.setup.product} <span className="text-teal-bright">{copy.setup.productAccent}</span>
         </div>
-        <div className="border-y border-ink-rule px-5 py-3">
-          <div className="label-caps text-on-ink-muted">{t.scope}</div>
-          <div className="text-[15px] font-extrabold">{context.school.name}</div>
-          <div className="text-[13px] text-on-ink-soft">{t.wholeSchool}</div>
-        </div>
+        <WorkInButton open={choosing} onToggle={() => setChoosing(!choosing)} />
         <nav aria-label={t.navLabel} className="flex flex-col py-3 text-[15px]">
           {items
             .filter((item) => item.show)
@@ -70,6 +69,8 @@ export function ConsoleShell({ section, children, onSignedOut }: { section: 'tod
           </button>
         </div>
       </aside>
+
+      {choosing && <WorkInPanel onClose={close} />}
 
       <main className="flex min-w-0 flex-[999_1_560px] flex-col">
         <header className="flex flex-wrap items-center gap-3 border-b-2 border-ink bg-paper px-[clamp(16px,3vw,40px)] py-2.5">

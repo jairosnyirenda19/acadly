@@ -12,6 +12,7 @@ use Acadly\Kernel\Access\Role;
 use Acadly\Kernel\Access\RoleAssignment;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
+use Acadly\Kernel\Access\WorkPlaces;
 use Acadly\Kernel\Identity\Actions\DisableAccount;
 use Acadly\Kernel\Identity\Actions\InviteAccount;
 use Acadly\Kernel\Identity\Actions\SendInvitation;
@@ -26,6 +27,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 /**
@@ -45,12 +47,42 @@ final class PeopleController
      *
      * @response array{people: list<array{id: string, name: string, email: string, state: 'active'|'ready'|'invited'|'expired'|'no_role'|'disabled', last_signed_in_at: string|null, invitation_sent_at: string|null, disabled: array{at: string|null, reason: string|null}|null, roles: list<array{role: string, where: string, ends_at: string|null}>}>, totals: array{with_access: int, invited: int, expired: int, no_role: int, disabled: int, whole_school_givers: list<string>}, giving: array{roles: list<array{id: string, name: string, permissions: list<string>}>, places: list<array{type: 'institution'|'division'|'campus'|'offering'|'class', id: string|null, label: string, within: list<string>}>, yours: list<array{permission: string, place: string}>, labels: array<string, string>}}
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, WorkPlaces $places): JsonResponse
     {
         $viewer = self::user($request);
         $this->refuseWithoutAnyReach($viewer);
+        $request->validate(['in' => ['nullable', 'string', 'max:80']]);
+        $in = $this->workPlace($request, $viewer, $places);
 
-        return response()->json([...$this->people->list($viewer), 'giving' => $this->people->giving($viewer)]);
+        return response()->json([...$this->people->list($viewer, $in), 'giving' => $this->people->giving($viewer)]);
+    }
+
+    /**
+     * The place the viewer works in (`?in=type:id`), only a selector: it is
+     * refused unless the viewer holds a role there or around it.
+     */
+    private function workPlace(Request $request, User $viewer, WorkPlaces $places): ?ScopeRef
+    {
+        $in = $request->string('in')->toString();
+
+        if ($in === '') {
+            return null;
+        }
+
+        [$type, $id] = array_pad(explode(':', $in, 2), 2, '');
+        $kind = ScopeType::tryFrom($type);
+
+        try {
+            $place = $kind !== null ? ScopeRef::of($kind, $id !== '' ? $id : null) : null;
+        } catch (InvalidArgumentException) {
+            $place = null;
+        }
+
+        if ($place === null || ! $places->allows($viewer, $place)) {
+            throw new NotFoundHttpException;
+        }
+
+        return $place;
     }
 
     /**

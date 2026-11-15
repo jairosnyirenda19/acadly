@@ -597,7 +597,7 @@
         "/v1/me/context": {
             "get": {
                 "operationId": "me.context",
-                "description": "The school, its divisions and campuses, the modules that are on, the\nwording, the account's permissions per scope and the navigation\n(docs/architecture/03-deployment-campus-access.md \u00a75.8). `setup_required`\nholds until the school is opened. `vocabulary` is the words of the only\ndivision when there is one; with several, each division carries its own.\nNavigation is empty until the screens that fill it. The screens use this\nto decide what to offer; the server checks every request again.",
+                "description": "The school, its divisions and campuses, the modules that are on, the\nwording, the account's permissions per scope and the navigation\n(docs/architecture/03-deployment-campus-access.md \u00a75.8). `setup_required`\nholds until the school is opened. `vocabulary` is the words of the only\ndivision when there is one; with several, each division carries its own.\n`places` are where the account can work: where it holds a role, and\nwhat is inside (the \"Work in\" switcher). Navigation is empty until the\nscreens that fill it. The screens use this\nto decide what to offer; the server checks every request again.",
                 "summary": "What the screens are built from",
                 "tags": [
                     "Context"
@@ -804,6 +804,75 @@
                                                     "scope_id"
                                                 ]
                                             }
+                                        },
+                                        "places": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "institution",
+                                                            "division",
+                                                            "campus",
+                                                            "offering",
+                                                            "class"
+                                                        ]
+                                                    },
+                                                    "id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "within": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "held": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "roles": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "role": {
+                                                                    "type": "string"
+                                                                },
+                                                                "ends_at": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "role",
+                                                                "ends_at"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "type",
+                                                    "id",
+                                                    "label",
+                                                    "within",
+                                                    "held",
+                                                    "roles"
+                                                ]
+                                            }
                                         }
                                     },
                                     "required": [
@@ -816,7 +885,8 @@
                                         "campuses",
                                         "vocabulary",
                                         "navigation",
-                                        "grants"
+                                        "grants",
+                                        "places"
                                     ]
                                 }
                             }
@@ -2957,6 +3027,19 @@
                 "tags": [
                     "People"
                 ],
+                "parameters": [
+                    {
+                        "name": "in",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 80
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "",
@@ -3206,6 +3289,9 @@
                                 }
                             }
                         }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"

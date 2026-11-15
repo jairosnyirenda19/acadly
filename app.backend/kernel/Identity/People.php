@@ -61,13 +61,15 @@ final class People
     /**
      * @return array{people: list<array<string, mixed>>, totals: array<string, mixed>}
      */
-    public function list(User $viewer): array
+    public function list(User $viewer, ?ScopeRef $in = null): array
     {
+        $inKey = $in !== null ? self::placeKey($in) : null;
+
         $people = [];
         $counts = ['with_access' => 0, 'invited' => 0, 'expired' => 0, 'no_role' => 0, 'disabled' => 0];
 
         foreach (User::query()->orderBy('name')->get() as $person) {
-            if (! $this->sees($viewer, $person)) {
+            if (! $this->sees($viewer, $person) || ($inKey !== null && ! $this->worksInside($person, $inKey))) {
                 continue;
             }
 
@@ -163,6 +165,18 @@ final class People
             'yours' => array_map(fn (Grant $g): array => ['permission' => $g->permission, 'place' => self::placeKey($g->scope)], $this->access->grants($viewer)),
             'labels' => $labels,
         ];
+    }
+
+    /** Whether one of the person's roles is at the place or inside it. */
+    private function worksInside(User $person, string $place): bool
+    {
+        foreach ($this->openScopes($person) as $scope) {
+            if (in_array($place, array_map(self::placeKey(...), [$scope, ...$this->access->ancestors($scope)]), true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static function placeKey(ScopeRef $scope): string

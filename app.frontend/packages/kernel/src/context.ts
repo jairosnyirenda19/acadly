@@ -31,10 +31,23 @@ export function moduleOn(context: AppContext, key: string): boolean {
   return KERNEL_AREAS.has(key) || context.modules.includes(key)
 }
 
+/** A place the account can work in, with the keys of the places that contain it. */
+export type Place = AppContext['places'][number]
+
+/** `type:id`, the key of a place; the institution is `institution:`. */
+export const placeKey = (at: ScopeTarget) => `${at.type}:${at.id ?? ''}`
+
+/** The place and every place that contains it, as far as the context knows. */
+function around(context: AppContext, at: ScopeTarget): string[] {
+  const key = placeKey(at)
+
+  return context.places.find((place) => place.key === key)?.within ?? [key, 'institution:']
+}
+
 /**
- * Whether the account holds a permission at a scope: a grant of that
- * permission at the scope itself or at the institution, and the module that
- * declares it is on. For comfort only. The server checks every request.
+ * Whether the account holds a permission at a place: a grant of that
+ * permission at the place or at a place that contains it, and the module
+ * that declares it is on. For comfort only. The server checks every request.
  */
 export function can(context: AppContext, permission: string, at: ScopeTarget = { type: 'institution' }): boolean {
   const owner = permission.split('.')[0] ?? ''
@@ -43,11 +56,9 @@ export function can(context: AppContext, permission: string, at: ScopeTarget = {
     return false
   }
 
-  return context.grants.some(
-    (grant) =>
-      grant.permission === permission &&
-      (grant.scope_type === 'institution' || (grant.scope_type === at.type && grant.scope_id === (at.id ?? null))),
-  )
+  const places = around(context, at)
+
+  return context.grants.some((grant) => grant.permission === permission && places.includes(placeKey({ type: grant.scope_type, id: grant.scope_id })))
 }
 
 const Shared = createContext<AppContext | null>(null)

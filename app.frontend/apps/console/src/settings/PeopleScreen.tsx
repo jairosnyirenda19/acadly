@@ -7,6 +7,7 @@ import { Input, Total, TotalsBand, nn } from '../setup/parts'
 import { day, daysSince, missingAt, settingsApi, type PeopleState, type PersonRow } from './api'
 import { PageHead, SettingsTabs, SmallButton, Tag, stateTone } from './parts'
 import { RolePlace, placeBody } from './RolePlace'
+import { useWorkIn } from '../shell/WorkIn'
 
 const t = copy.settings.people
 const s = copy.settings
@@ -29,8 +30,10 @@ export function PeopleScreen() {
   const [filter, setFilter] = useState<Filter>('all')
   const [inviting, setInviting] = useState(false)
 
-  const load = () => void settingsApi.people().then(setState)
-  useEffect(load, [])
+  const { place } = useWorkIn()
+  const inPlace = place !== null && place.key !== 'institution:' ? place.key : null
+  const load = () => void settingsApi.people(inPlace).then(setState)
+  useEffect(load, [inPlace])
 
   const people = useMemo(() => {
     if (state === undefined || state === null || state === 'refused') return []
@@ -72,7 +75,7 @@ export function PeopleScreen() {
     <>
       <SettingsTabs current="people" />
       <PageHead
-        kicker={`${s.kicker} · ${t.title}`}
+        kicker={inPlace !== null && place !== null ? `${s.kicker} · ${t.title} · ${place.label}` : `${s.kicker} · ${t.title}`}
         title={t.title}
         intro={t.intro}
         actions={

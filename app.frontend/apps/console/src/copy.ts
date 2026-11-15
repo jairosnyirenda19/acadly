@@ -310,6 +310,21 @@ export const copy = {
     nav: { today: 'Today', settings: 'Settings' },
     signOut: 'Sign out',
     navLabel: 'Main',
+    workIn: {
+      title: 'Work in',
+      workingIn: 'Working in',
+      change: (place: string) => `Working in ${place}. Change the part of the school.`,
+      close: 'Close',
+      find: 'Find a place',
+      findPlaceholder: 'Find a place: a level, campus or class',
+      held: 'Where you hold roles',
+      inside: (place: string) => `Inside ${place}`,
+      results: 'Places found',
+      noMatch: 'No place matches.',
+      current: 'Current',
+      roleUntil: (role: string, day: string) => `${role} until ${day}`,
+      note: 'Pages show what is inside the place you work in. What you may do there comes from your roles: switching never adds a permission. Remembered on this device.',
+    },
   },
 
   settings: {

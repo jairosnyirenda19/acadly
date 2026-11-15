@@ -22,6 +22,7 @@ import { PersonScreen } from './settings/PersonScreen'
 import { RolesScreen } from './settings/RolesScreen'
 import { SetupWizard } from './setup/SetupWizard'
 import { ConsoleShell, holdsAnywhere } from './shell/ConsoleShell'
+import { WorkInProvider } from './shell/WorkIn'
 import { SignInScreen } from './sign-in/SignInScreen'
 import { StatusScreen } from './StatusScreen'
 
@@ -145,7 +146,9 @@ export function App() {
   if (account !== null && context !== null && context !== undefined) {
     return (
       <ContextProvider value={context}>
-        <Console path={path} onSignedOut={signedOut} />
+        <WorkInProvider>
+          <Console path={path} onSignedOut={signedOut} />
+        </WorkInProvider>
       </ContextProvider>
     )
   }

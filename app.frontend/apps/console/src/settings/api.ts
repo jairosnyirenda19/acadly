@@ -12,7 +12,7 @@ export type PersonStateName = PersonRow['state']
 type Done<T> = Promise<{ data?: T; error?: unknown; response: Response }>
 
 export const settingsApi = {
-  people: () => read(api.GET('/v1/people')),
+  people: (inPlace: string | null) => read(api.GET('/v1/people', { params: { query: inPlace !== null ? { in: inPlace } : {} } })),
   person: (id: string) => read(api.GET('/v1/people/{id}', { params: { path: { id } } })),
   roles: () => read(api.GET('/v1/roles')),
 

@@ -86,7 +86,9 @@ export interface paths {
          *     (docs/architecture/03-deployment-campus-access.md §5.8). `setup_required`
          *     holds until the school is opened. `vocabulary` is the words of the only
          *     division when there is one; with several, each division carries its own.
-         *     Navigation is empty until the screens that fill it. The screens use this
+         *     `places` are where the account can work: where it holds a role, and
+         *     what is inside (the "Work in" switcher). Navigation is empty until the
+         *     screens that fill it. The screens use this
          *     to decide what to offer; the server checks every request again.
          */
         get: operations["me.context"];
@@ -1117,6 +1119,19 @@ export interface operations {
                             scope_type: "institution" | "division" | "campus" | "offering" | "class";
                             scope_id: string | null;
                         }[];
+                        places: {
+                            key: string;
+                            /** @enum {string} */
+                            type: "institution" | "division" | "campus" | "offering" | "class";
+                            id: string | null;
+                            label: string;
+                            within: string[];
+                            held: boolean;
+                            roles: {
+                                role: string;
+                                ends_at: string | null;
+                            }[];
+                        }[];
                     };
                 };
             };
@@ -1923,7 +1938,9 @@ export interface operations {
     };
     "people.index": {
         parameters: {
-            query?: never;
+            query?: {
+                in?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1987,6 +2004,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "people.invite": {

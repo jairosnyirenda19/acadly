@@ -6,6 +6,7 @@ namespace Acadly\Kernel\Module\Http;
 
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\Grant;
+use Acadly\Kernel\Access\WorkPlaces;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Module\Licence\Licences;
 use Acadly\Kernel\Module\ModuleActivation;
@@ -24,12 +25,14 @@ final class ContextController
      * (docs/architecture/03-deployment-campus-access.md §5.8). `setup_required`
      * holds until the school is opened. `vocabulary` is the words of the only
      * division when there is one; with several, each division carries its own.
-     * Navigation is empty until the screens that fill it. The screens use this
+     * `places` are where the account can work: where it holds a role, and
+     * what is inside (the "Work in" switcher). Navigation is empty until the
+     * screens that fill it. The screens use this
      * to decide what to offer; the server checks every request again.
      *
-     * @response array{user: array{id: string, name: string, email: string}, school: array{name: string, short_name: string, has_logo: bool, open: bool}, setup_required: bool, licence: array{status: 'valid'|'expired'|'missing'|'development', read_only: bool}, modules: list<string>, divisions: list<array{id: string, name: string, vocabulary: array<string, array{one: string, many: string}>}>, campuses: list<array{id: string, name: string}>, vocabulary: array<string, array{one: string, many: string}>, navigation: list<array{key: string, permission: string}>, grants: list<array{permission: string, scope_type: 'institution'|'division'|'campus'|'offering'|'class', scope_id: string|null}>}
+     * @response array{user: array{id: string, name: string, email: string}, school: array{name: string, short_name: string, has_logo: bool, open: bool}, setup_required: bool, licence: array{status: 'valid'|'expired'|'missing'|'development', read_only: bool}, modules: list<string>, divisions: list<array{id: string, name: string, vocabulary: array<string, array{one: string, many: string}>}>, campuses: list<array{id: string, name: string}>, vocabulary: array<string, array{one: string, many: string}>, navigation: list<array{key: string, permission: string}>, grants: list<array{permission: string, scope_type: 'institution'|'division'|'campus'|'offering'|'class', scope_id: string|null}>, places: list<array{key: string, type: 'institution'|'division'|'campus'|'offering'|'class', id: string|null, label: string, within: list<string>, held: bool, roles: list<array{role: string, ends_at: string|null}>}>}
      */
-    public function __invoke(Request $request, Access $access, ModuleActivation $activation, Licences $licences, SchoolProfile $school): JsonResponse
+    public function __invoke(Request $request, Access $access, ModuleActivation $activation, Licences $licences, SchoolProfile $school, WorkPlaces $places): JsonResponse
     {
         $user = $request->user();
 
@@ -58,6 +61,7 @@ final class ContextController
                 ],
                 $access->grants($user),
             ),
+            'places' => $places->of($user),
         ]);
     }
 }

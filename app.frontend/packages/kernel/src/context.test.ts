@@ -13,6 +13,7 @@ function context(overrides: Partial<AppContext> = {}): AppContext {
     vocabulary: {},
     navigation: [],
     grants: [],
+    places: [],
     ...overrides,
   }
 }
@@ -41,6 +42,20 @@ describe('permissions', () => {
     expect(can(ctx, 'attendance.capture', { type: 'class', id: 'c1' })).toBe(true)
     expect(can(ctx, 'attendance.capture', { type: 'class', id: 'c2' })).toBe(false)
     expect(can(ctx, 'attendance.capture')).toBe(false)
+  })
+
+  it('applies a grant at a level to the classes inside it, and not to another level', () => {
+    const ctx = context({
+      grants: [{ permission: 'attendance.capture', scope_type: 'division', scope_id: 'd1' }],
+      places: [
+        { key: 'division:d1', type: 'division', id: 'd1', label: 'Primary', within: ['division:d1', 'institution:'], held: true, roles: [] },
+        { key: 'class:c1', type: 'class', id: 'c1', label: 'Standard 1', within: ['class:c1', 'offering:o1', 'division:d1', 'campus:k1', 'institution:'], held: false, roles: [] },
+      ],
+    })
+
+    expect(can(ctx, 'attendance.capture', { type: 'class', id: 'c1' })).toBe(true)
+    expect(can(ctx, 'attendance.capture', { type: 'division', id: 'd2' })).toBe(false)
+    expect(can(ctx, 'attendance.capture', { type: 'campus', id: 'k1' })).toBe(false)
   })
 
   it('refuses a permission of a module that is off, even when it is granted', () => {

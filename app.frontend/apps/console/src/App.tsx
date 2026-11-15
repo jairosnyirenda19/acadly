@@ -53,14 +53,14 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
 
   if (page !== undefined) {
     return (
-      <ConsoleShell section="settings" onSignedOut={onSignedOut}>
+      <ConsoleShell onSignedOut={onSignedOut}>
         {page}
       </ConsoleShell>
     )
   }
 
   return (
-    <ConsoleShell section="today" onSignedOut={onSignedOut}>
+    <ConsoleShell onSignedOut={onSignedOut}>
       <div className="flex flex-col gap-4 px-[clamp(16px,3vw,40px)] pt-7 pb-8">
         <div className="label-caps text-text-muted">{t.kicker}</div>
         <h1 className="type-display text-[clamp(56px,7vw,96px)]">{context.user.name}</h1>

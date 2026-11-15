@@ -110,7 +110,7 @@ export function WorkInButton({ open, onToggle }: { open: boolean; onToggle: () =
 }
 
 /** The panel that lists where the account can work. */
-export function WorkInPanel({ onClose }: { onClose: () => void }) {
+export function WorkInPanel({ onClose, className = '' }: { onClose: () => void; className?: string }) {
   const { places } = useAppContext()
   const { place, choose } = useWorkIn()
   const [query, setQuery] = useState('')
@@ -163,7 +163,7 @@ export function WorkInPanel({ onClose }: { onClose: () => void }) {
   const group = (text: string) => <div className="label-caps border-b-2 border-ink bg-paper px-4 pt-3.5 pb-1.5 text-text-muted">{text}</div>
 
   return (
-    <div role="dialog" aria-label={t.title} className="flex max-h-screen max-w-full min-w-0 flex-[0_0_420px] flex-col border-2 border-t-0 border-ink bg-sheet">
+    <div role="dialog" aria-label={t.title} className={`fixed top-0 z-[60] flex h-screen w-[420px] max-w-full flex-col border-2 border-t-0 border-ink bg-sheet ${className}`}>
       <div className="flex items-center gap-3 px-4 pt-4 pb-3">
         <h2 className="type-display flex-1 text-[34px] leading-[0.9]">{t.title}</h2>
         <button type="button" onClick={onClose} className="h-9 border-2 border-ink px-3 text-sm font-extrabold hover:bg-field">

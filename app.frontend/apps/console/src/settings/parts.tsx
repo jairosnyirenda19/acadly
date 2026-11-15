@@ -1,7 +1,7 @@
 import { can, navigate, useAppContext } from '@acadly/kernel'
 import type { ReactNode } from 'react'
 import { copy } from '../copy'
-import { holdsAnywhere } from '../shell/ConsoleShell'
+import { holdsAnywhere } from '../shell/navigation'
 import type { PersonStateName } from './api'
 
 const t = copy.settings
@@ -19,7 +19,7 @@ export function SettingsTabs({ current }: { current: SettingsTab }) {
   ]
 
   return (
-    <nav aria-label={t.tabsLabel} className="flex flex-wrap gap-1 border-b-2 border-ink bg-sheet px-[clamp(16px,3vw,40px)]">
+    <nav aria-label={t.tabsLabel} className="flex gap-1 overflow-x-auto border-b-2 border-ink bg-sheet px-3 [scrollbar-width:none] md:px-[clamp(16px,3vw,40px)]">
       {tabs
         .filter((tab) => tab.show)
         .map((tab) => (
@@ -31,7 +31,7 @@ export function SettingsTabs({ current }: { current: SettingsTab }) {
               event.preventDefault()
               navigate(tab.path)
             }}
-            className={`border-b-4 px-4 pt-3 pb-2.5 text-[15px] text-ink no-underline ${tab.key === current ? 'border-ink font-extrabold' : 'border-transparent font-medium'}`}
+            className={`shrink-0 border-b-4 px-4 pt-3 pb-2.5 text-[15px] whitespace-nowrap text-ink no-underline ${tab.key === current ? 'border-ink font-extrabold' : 'border-transparent font-medium'}`}
           >
             {t.tabs[tab.key]}
           </a>

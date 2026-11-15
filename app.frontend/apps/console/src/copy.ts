@@ -307,7 +307,13 @@ export const copy = {
   shell: {
     scope: 'Current scope',
     wholeSchool: 'Whole school',
-    nav: { today: 'Today', settings: 'Settings' },
+    nav: { today: 'Today', people: 'People', roles: 'Roles', subjects: 'Subjects', teaching: 'Teaching' },
+    groups: { daily: 'Daily work', school: 'School' },
+    menu: 'Menu',
+    openMenu: 'Open the menu',
+    closeMenu: 'Close the menu',
+    fold: 'Fold the menu to icons (Ctrl [)',
+    unfold: 'Open the menu (Ctrl [)',
     signOut: 'Sign out',
     navLabel: 'Main',
     workIn: {

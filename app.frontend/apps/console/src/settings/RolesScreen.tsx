@@ -1,6 +1,6 @@
 import { useLoad } from '@acadly/kernel'
 import { Button, Notice, slips, Waiting } from '@acadly/ui'
-import { Fragment, useState } from 'react'
+import { Fragment, useRef, useState } from 'react'
 import { copy } from '../copy'
 import { errorFor } from '../setup/api'
 import { Input, Select } from '../setup/parts'
@@ -22,6 +22,8 @@ export function RolesScreen() {
   const [editing, setEditing] = useState<string | null>(null)
   const [message, setMessage] = useState<{ tone: 'done' | 'wrong'; text: string } | null>(null)
   const [working, setWorking] = useState(false)
+  const head = useRef<HTMLDivElement>(null)
+  const body = useRef<HTMLDivElement>(null)
 
   const loaded = useLoad('roles', () => settingsApi.roles())
   const state = loaded.data
@@ -154,16 +156,16 @@ export function RolesScreen() {
         </div>
       )}
 
-      <div className="flex-1 overflow-x-auto border-t-2 border-ink bg-sheet">
-        <div style={{ minWidth: `${300 + state.roles.length * 120}px` }}>
-          <div className="grid border-b-2 border-ink" style={{ gridTemplateColumns: cols }}>
-            <div className="label-caps flex items-end px-[clamp(16px,3vw,40px)] py-3.5 text-text-muted">{t.permission}</div>
+      <div className="flex-1 border-t-2 border-ink bg-sheet">
+        <div ref={head} className="sticky top-[60px] z-20 overflow-hidden border-b-2 border-ink bg-sheet md:top-16">
+          <div className="grid" style={{ gridTemplateColumns: cols, minWidth: `${300 + state.roles.length * 120}px` }}>
+            <div className="label-caps flex items-end bg-sheet px-[clamp(16px,3vw,40px)] py-3.5 text-text-muted md:sticky md:left-0 md:z-10 md:border-r-2 md:border-ink">{t.permission}</div>
             {state.roles.map((role) => {
               const held = role.system ? total : state.groups.reduce((n, g) => n + g.permissions.filter((p) => has(role, flips, p.key)).length, 0)
               const dirty = (flips[role.id]?.size ?? 0) > 0
 
               return (
-                <div key={role.id} className={`flex flex-col gap-1.5 border-l border-rule px-3 pt-3.5 pb-3 ${dirty ? 'bg-marigold-wash' : role.system ? 'bg-paper' : ''}`}>
+                <div key={role.id} className={`flex flex-col gap-1.5 border-l border-rule px-3 pt-3.5 pb-3 ${dirty ? 'bg-marigold-wash' : role.system ? 'bg-paper' : 'bg-sheet'}`}>
                   {role.system ? (
                     <div className="type-display min-h-10 text-xl leading-none">{role.name}</div>
                   ) : (
@@ -193,13 +195,23 @@ export function RolesScreen() {
               )
             })}
           </div>
-
+        </div>
+        <div
+          ref={body}
+          onScroll={() => {
+            if (head.current !== null && body.current !== null) head.current.scrollLeft = body.current.scrollLeft
+          }}
+          className="overflow-x-auto"
+        >
+          <div style={{ minWidth: `${300 + state.roles.length * 120}px` }}>
           {state.groups.map((group) => (
             <Fragment key={group.name}>
-              <div className="label-caps border-b border-rule bg-field px-[clamp(16px,3vw,40px)] py-2">{group.name}</div>
+              <div className="label-caps border-b border-rule bg-field px-[clamp(16px,3vw,40px)] py-2">
+                <span className="md:sticky md:left-[clamp(16px,3vw,40px)]">{group.name}</span>
+              </div>
               {group.permissions.map((p) => (
-                <div key={p.key} className={`grid border-b border-rule ${p.sight ? 'bg-marigold-wash' : ''}`} style={{ gridTemplateColumns: cols }}>
-                  <div className="px-[clamp(16px,3vw,40px)] py-3">
+                <div key={p.key} className={`group grid border-b border-rule ${p.sight ? 'bg-marigold-wash' : ''}`} style={{ gridTemplateColumns: cols }}>
+                  <div className={`border-l-4 border-l-transparent py-3 pr-[clamp(16px,3vw,40px)] pl-[calc(clamp(16px,3vw,40px)-4px)] group-hover:border-l-teal md:sticky md:left-0 md:z-10 md:border-r-2 md:border-r-ink ${p.sight ? 'bg-marigold-wash' : 'bg-sheet'}`}>
                     <div className="text-[15px] font-extrabold">
                       {p.label} {p.sight && <Tag tone="attention">{copy.settings.person.sight}</Tag>}
                     </div>
@@ -237,6 +249,7 @@ export function RolesScreen() {
               ))}
             </Fragment>
           ))}
+          </div>
         </div>
       </div>
 

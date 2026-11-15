@@ -8,6 +8,8 @@ use Acadly\Kernel\Identity\Http\MeController;
 use Acadly\Kernel\Identity\Http\PasswordResetController;
 use Acadly\Kernel\Identity\Http\SignInController;
 use Acadly\Kernel\Identity\Http\SignOutController;
+use Acadly\Kernel\Module\Http\ContextController;
+use Acadly\Kernel\Module\Http\ModulesController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', HealthController::class)->name('kernel.health');
@@ -20,4 +22,9 @@ Route::prefix('auth')->name('auth.')->group(function (): void {
     Route::post('/reset-password', [PasswordResetController::class, 'reset'])->middleware('throttle:6,1')->name('reset-password');
 });
 
-Route::get('/me', MeController::class)->middleware('auth:sanctum')->name('me');
+Route::middleware('auth:sanctum')->group(function (): void {
+    Route::get('/me', MeController::class)->name('me');
+    Route::get('/me/context', ContextController::class)->name('me.context');
+    Route::get('/modules', [ModulesController::class, 'index'])->name('modules.index');
+    Route::put('/modules/{key}', [ModulesController::class, 'update'])->where('key', '[a-z][a-z0-9_]*')->name('modules.update');
+});

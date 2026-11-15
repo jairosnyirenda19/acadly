@@ -10,6 +10,192 @@
         }
     ],
     "paths": {
+        "/v1/me/context": {
+            "get": {
+                "operationId": "me.context",
+                "description": "The school, its divisions and campuses, the modules that are on, the\nwording, the account's permissions per scope and the navigation\n(docs/architecture/03-deployment-campus-access.md \u00a75.8). Divisions,\ncampuses, wording and navigation are empty until the stages that build\nthem. The screens use this to decide what to offer; the server checks\nevery request again.",
+                "summary": "What the screens are built from",
+                "tags": [
+                    "Context"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "user": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "email"
+                                            ]
+                                        },
+                                        "school": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "name"
+                                            ]
+                                        },
+                                        "licence": {
+                                            "type": "object",
+                                            "properties": {
+                                                "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "valid",
+                                                        "expired",
+                                                        "missing",
+                                                        "development"
+                                                    ]
+                                                },
+                                                "read_only": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "status",
+                                                "read_only"
+                                            ]
+                                        },
+                                        "modules": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "divisions": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name"
+                                                ]
+                                            }
+                                        },
+                                        "campuses": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name"
+                                                ]
+                                            }
+                                        },
+                                        "vocabulary": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "navigation": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "permission": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "permission"
+                                                ]
+                                            }
+                                        },
+                                        "grants": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "permission": {
+                                                        "type": "string"
+                                                    },
+                                                    "scope_type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "institution",
+                                                            "division",
+                                                            "campus",
+                                                            "class"
+                                                        ]
+                                                    },
+                                                    "scope_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "permission",
+                                                    "scope_type",
+                                                    "scope_id"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "user",
+                                        "school",
+                                        "licence",
+                                        "modules",
+                                        "divisions",
+                                        "campuses",
+                                        "vocabulary",
+                                        "navigation",
+                                        "grants"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/auth/csrf-cookie": {
             "get": {
                 "operationId": "sanctum.csrf-cookie",
@@ -137,6 +323,185 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/modules": {
+            "get": {
+                "operationId": "modules.index",
+                "description": "`state` names the first condition that is not met: `not_offered`,\n`not_licensed` or `switched_off`.",
+                "summary": "The modules in this build and whether each is on",
+                "tags": [
+                    "Modules"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "licence": {
+                                            "type": "object",
+                                            "properties": {
+                                                "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "valid",
+                                                        "expired",
+                                                        "missing",
+                                                        "development"
+                                                    ]
+                                                },
+                                                "licensee": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "expires_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "status",
+                                                "licensee",
+                                                "expires_at"
+                                            ]
+                                        },
+                                        "modules": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "tier": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "core",
+                                                            "optional"
+                                                        ]
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "active",
+                                                            "not_installed",
+                                                            "not_offered",
+                                                            "not_licensed",
+                                                            "switched_off"
+                                                        ]
+                                                    },
+                                                    "switched_on": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "name",
+                                                    "tier",
+                                                    "state",
+                                                    "switched_on"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "licence",
+                                        "modules"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/modules/{key}": {
+            "put": {
+                "operationId": "modules.update",
+                "description": "A reason is required and is kept in the audit trail.",
+                "summary": "Switch a module on or off",
+                "tags": [
+                    "Modules"
+                ],
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "enabled": {
+                                        "type": "boolean"
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 1000
+                                    }
+                                },
+                                "required": [
+                                    "enabled",
+                                    "reason"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {
+                                            "type": "string"
+                                        },
+                                        "enabled": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "key",
+                                        "enabled"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -402,6 +767,25 @@
             },
             "AuthenticationException": {
                 "description": "Unauthenticated",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": [
+                                "message"
+                            ]
+                        }
+                    }
+                }
+            },
+            "AuthorizationException": {
+                "description": "Authorization error",
                 "content": {
                     "application/json": {
                         "schema": {

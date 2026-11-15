@@ -79,6 +79,13 @@ it('refuses a core domain that requires an optional module', function (): void {
             return 'broken_core';
         }
 
+        public function name(): string
+        {
+
+            return 'Test module';
+
+        }
+
         public function tier(): Tier
         {
             return Tier::Core;

@@ -16,6 +16,11 @@ final class ListenerModule implements Module
         return 'listener';
     }
 
+    public function name(): string
+    {
+        return 'Listener';
+    }
+
     public function tier(): Tier
     {
         return Tier::Optional;

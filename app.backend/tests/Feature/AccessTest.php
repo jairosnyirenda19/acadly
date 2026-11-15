@@ -15,6 +15,7 @@ use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Identity\User;
+use Acadly\Kernel\Module\ModuleActivation;
 use Acadly\Kernel\Module\ModuleRegistry;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
@@ -30,6 +31,13 @@ uses(DatabaseTransactions::class);
 
 beforeEach(function (): void {
     $this->artisan('acadly:sync')->assertSuccessful();
+
+    // These tests are about permissions; the module that declares them is on.
+    DB::table('module_switches')->insert([
+        'id' => Ids::next(), 'module_key' => 'attendance', 'enabled' => true,
+        'reason' => 'Test setup.', 'switched_at' => now(),
+    ]);
+    app()->forgetScopedInstances();
 });
 
 /** @param  list<Permission>  $permissions */
@@ -236,7 +244,7 @@ describe('the catalogue and sync', function (): void {
 
     it('refuses an unknown permission at check time', function (): void {
         $catalogue = new PermissionCatalogue(new ModuleRegistry([]));
-        $access = new Access($catalogue, new FlatScopeHierarchy, new Clock, app(Audit::class));
+        $access = new Access($catalogue, new FlatScopeHierarchy, new Clock, app(Audit::class), app(ModuleActivation::class));
 
         $access->allows(User::factory()->create(), AttendancePermission::Capture);
     })->throws(LogicException::class, 'not a permission in this build');

@@ -75,6 +75,9 @@ export const copy = {
     kicker: 'Signed in',
     signedInAs: 'Signed in as',
     pending: 'The staff home screen is not available yet.',
+    readOnlyTitle: 'Read-only mode',
+    readOnly: 'The licence is not current. Records can be viewed and exported, not changed.',
     signOut: 'Sign out',
+    retry: 'Try again',
   },
 } as const

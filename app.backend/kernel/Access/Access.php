@@ -7,7 +7,9 @@ namespace Acadly\Kernel\Access;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Audit\KernelAudit;
 use Acadly\Kernel\Audit\Outcome;
+use Acadly\Kernel\Http\Problem;
 use Acadly\Kernel\Identity\User;
+use Acadly\Kernel\Module\ModuleActivation;
 use Acadly\Kernel\Support\Clock;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -20,7 +22,8 @@ use LogicException;
  * Deny by default.
  *
  *  1. The account exists and is active.
- *  2. The permission is in this build's catalogue.
+ *  2. The permission is in this build's catalogue, and the module that
+ *     declares it is on at the target scope (entitlement, rule D7).
  *  3. The account holds the permission, through an active role assignment,
  *     at the target scope or at a scope that contains it.
  *
@@ -39,6 +42,7 @@ final class Access
         private readonly ScopeHierarchy $hierarchy,
         private readonly Clock $clock,
         private readonly Audit $audit,
+        private readonly ModuleActivation $modules,
     ) {}
 
     public function allows(?Authenticatable $who, Permission $permission, ?ScopeRef $at = null): bool
@@ -52,6 +56,11 @@ final class Access
         }
 
         $at ??= ScopeRef::institution();
+
+        if (! $this->modules->isActive($this->catalogue->ownerOf($permission), $at)) {
+            return false;
+        }
+
         $places = [$at, ...$this->hierarchy->ancestors($at)];
 
         foreach ($this->grants($who) as $grant) {
@@ -78,8 +87,16 @@ final class Access
     public function check(?Authenticatable $who, Permission $permission, ?ScopeRef $at = null): void
     {
         if (! $this->allows($who, $permission, $at)) {
-            $this->audit->record(KernelAudit::Refused, outcome: Outcome::Refused, refusal: 'permission:'.$permission->key(),
+            $owner = $this->catalogue->has($permission->key()) ? $this->catalogue->ownerOf($permission) : '';
+            $moduleOff = $owner !== '' && ! $this->modules->isActive($owner, $at);
+
+            $this->audit->record(KernelAudit::Refused, outcome: Outcome::Refused,
+                refusal: $moduleOff ? 'module:'.$owner : 'permission:'.$permission->key(),
                 actor: $this->audit->actorFor($who), at: $at, meta: ['permission' => $permission->key()]);
+
+            if ($moduleOff) {
+                throw Problem::moduleInactive();
+            }
 
             throw new AuthorizationException('Access is refused.');
         }

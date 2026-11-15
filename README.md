@@ -44,6 +44,12 @@ cd app.backend && php artisan queue:work
 cd app.backend && php artisan schedule:work
 ```
 
+Install the licence issued by IQ-X. A development machine with no licence key runs with every module licensed:
+
+```bash
+cd app.backend && php artisan acadly:licence path/to/licence.json
+```
+
 Create the first administrator of a new deployment. It asks for a password and runs only once:
 
 ```bash

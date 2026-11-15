@@ -21,6 +21,9 @@ interface Module
     /** Short, unique, lower-case key: 'attendance'. */
     public function key(): string;
 
+    /** The name people see, such as 'Registers'. */
+    public function name(): string;
+
     public function tier(): Tier;
 
     /**

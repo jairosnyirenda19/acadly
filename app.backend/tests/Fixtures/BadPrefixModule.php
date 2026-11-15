@@ -15,6 +15,11 @@ final class BadPrefixModule implements Module
         return 'library';
     }
 
+    public function name(): string
+    {
+        return 'Library';
+    }
+
     public function tier(): Tier
     {
         return Tier::Optional;

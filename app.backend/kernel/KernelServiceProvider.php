@@ -13,11 +13,17 @@ use Acadly\Kernel\Audit\AuditCatalogue;
 use Acadly\Kernel\Console\AuditSealCommand;
 use Acadly\Kernel\Console\AuditVerifyCommand;
 use Acadly\Kernel\Console\CreateAdministratorCommand;
+use Acadly\Kernel\Console\InstallLicenceCommand;
 use Acadly\Kernel\Console\PublishEventsCommand;
 use Acadly\Kernel\Console\SyncCommand;
 use Acadly\Kernel\Events\EventCatalogue;
 use Acadly\Kernel\Events\Outbox;
+use Acadly\Kernel\Module\Http\RequireModule;
+use Acadly\Kernel\Module\Licence\Licences;
+use Acadly\Kernel\Module\ModuleActivation;
+use Acadly\Kernel\Module\ModuleOffering;
 use Acadly\Kernel\Module\ModuleRegistry;
+use Acadly\Kernel\Module\OfferEverything;
 use Acadly\Kernel\Support\Clock;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Console\Scheduling\Schedule;
@@ -53,6 +59,13 @@ final class KernelServiceProvider extends ServiceProvider
 
         $this->app->singleton(Outbox::class);
 
+        // Until Profile Blueprints exist, every installed module is offered.
+        $this->app->bindIf(ModuleOffering::class, OfferEverything::class, true);
+
+        // One instance per request: each remembers what it has read.
+        $this->app->scoped(Licences::class);
+        $this->app->scoped(ModuleActivation::class);
+
         $this->app->bindIf(ScopeHierarchy::class, FlatScopeHierarchy::class, true);
 
         // One instance per request: it remembers the grants it has loaded.
@@ -66,7 +79,10 @@ final class KernelServiceProvider extends ServiceProvider
             __DIR__.'/Access/Database/migrations',
             __DIR__.'/Audit/Database/migrations',
             __DIR__.'/Events/Database/migrations',
+            __DIR__.'/Module/Database/migrations',
         ]);
+
+        $this->app->make('router')->aliasMiddleware('module', RequireModule::class);
 
         Password::defaults(fn (): Password => Password::min(12)->max(255));
 
@@ -84,7 +100,7 @@ final class KernelServiceProvider extends ServiceProvider
         });
 
         if ($this->app->runningInConsole()) {
-            $this->commands([SyncCommand::class, CreateAdministratorCommand::class, AuditVerifyCommand::class, AuditSealCommand::class, PublishEventsCommand::class]);
+            $this->commands([SyncCommand::class, CreateAdministratorCommand::class, AuditVerifyCommand::class, AuditSealCommand::class, PublishEventsCommand::class, InstallLicenceCommand::class]);
         }
 
         // Every night: verify the audit trail, then seal its head.

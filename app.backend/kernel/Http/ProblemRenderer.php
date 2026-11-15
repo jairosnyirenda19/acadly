@@ -40,6 +40,14 @@ final class ProblemRenderer
 
     public function render(Throwable $e): JsonResponse
     {
+        if ($e instanceof Problem) {
+            return new JsonResponse(
+                ['type' => 'about:blank', 'title' => $e->title, 'status' => $e->status, 'code' => $e->problemCode],
+                $e->status,
+                ['Content-Type' => 'application/problem+json'],
+            );
+        }
+
         $status = $this->status($e);
         $problem = self::PROBLEMS[$status] ?? self::FALLBACK;
 

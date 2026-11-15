@@ -17,6 +17,8 @@ enum KernelAudit: string implements AuditAction
     case RoleAssigned = 'access.role_assigned';
     case RoleEnded = 'access.role_ended';
     case Refused = 'access.refused';
+    case ModuleSwitched = 'modules.switched';
+    case LicenceInstalled = 'modules.licence_installed';
     case Sealed = 'audit.sealed';
     case ChainBroken = 'audit.chain_broken';
 
@@ -38,6 +40,8 @@ enum KernelAudit: string implements AuditAction
             self::RoleAssigned => 'Gave a role.',
             self::RoleEnded => 'Ended a role.',
             self::Refused => 'Attempted an action without the required permission.',
+            self::ModuleSwitched => 'Switched a module on or off.',
+            self::LicenceInstalled => 'Installed a licence.',
             self::Sealed => 'Sealed the audit trail.',
             self::ChainBroken => 'Found that the audit trail does not verify.',
         };
@@ -45,6 +49,6 @@ enum KernelAudit: string implements AuditAction
 
     public function requiresReason(): bool
     {
-        return in_array($this, [self::RoleEnded], true);
+        return in_array($this, [self::RoleEnded, self::ModuleSwitched], true);
     }
 }

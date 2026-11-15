@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Acadly\Kernel\Access;
 
+use Acadly\Kernel\Module\ModulePermission;
 use Acadly\Kernel\Module\ModuleRegistry;
 use LogicException;
 
@@ -28,6 +29,7 @@ final class PermissionCatalogue
     public function __construct(ModuleRegistry $modules)
     {
         $this->addAll(self::KERNEL_OWNER, AccessPermission::cases());
+        $this->addAll('modules', ModulePermission::cases());
 
         foreach ($modules->all() as $module) {
             $this->addAll($module->key(), $module->permissions());

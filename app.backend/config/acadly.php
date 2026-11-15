@@ -16,6 +16,12 @@ return [
     'school_name' => env('ACADLY_SCHOOL_NAME', 'School'),
 
     /*
+    | The public key that verifies the licence IQ-X issues (Ed25519, base64).
+    | With no key on a development machine, every module is licensed.
+    */
+    'licence_public_key' => env('ACADLY_LICENCE_PUBLIC_KEY'),
+
+    /*
     | Where people use the console. Password reset links point here.
     */
     'frontend_url' => env('ACADLY_FRONTEND_URL', 'http://localhost:5173'),

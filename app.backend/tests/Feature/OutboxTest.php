@@ -171,6 +171,13 @@ it('refuses a subscription to an event that is not in the build', function (): v
             return 'stray';
         }
 
+        public function name(): string
+        {
+
+            return 'Test module';
+
+        }
+
         public function tier(): Tier
         {
             return Tier::Optional;

@@ -6,6 +6,7 @@ namespace Acadly\Kernel\Events;
 
 use Acadly\Kernel\Access\Events\RoleAssigned;
 use Acadly\Kernel\Access\Events\RoleEnded;
+use Acadly\Kernel\Module\Events\ModuleSwitched;
 use Acadly\Kernel\Module\ModuleRegistry;
 use Illuminate\Contracts\Container\Container;
 use LogicException;
@@ -21,9 +22,9 @@ use LogicException;
 final class EventCatalogue
 {
     /** @var list<class-string<DomainEvent>> */
-    public const array KERNEL_EVENTS = [RoleAssigned::class, RoleEnded::class];
+    public const array KERNEL_EVENTS = [RoleAssigned::class, RoleEnded::class, ModuleSwitched::class];
 
-    public const array KERNEL_OWNERS = ['identity', 'access', 'audit'];
+    public const array KERNEL_OWNERS = ['identity', 'access', 'audit', 'modules'];
 
     /** @var array<string, class-string<DomainEvent>> */
     private array $events = [];

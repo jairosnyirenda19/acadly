@@ -19,6 +19,11 @@ final class InstitutionCore implements Module
         return 'institution';
     }
 
+    public function name(): string
+    {
+        return 'Institution';
+    }
+
     public function tier(): Tier
     {
         return Tier::Core;

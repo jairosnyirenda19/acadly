@@ -17,7 +17,7 @@ use LogicException;
 final class AuditCatalogue
 {
     /** Owners of the kernel's own actions. */
-    public const array KERNEL_OWNERS = ['identity', 'access', 'audit'];
+    public const array KERNEL_OWNERS = ['identity', 'access', 'audit', 'modules'];
 
     /** @var array<string, AuditAction> */
     private array $byKey = [];

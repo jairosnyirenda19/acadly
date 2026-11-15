@@ -1,5 +1,16 @@
-import { getAccount, getSchoolName, navigate, signOut, useLocation, type Account } from '@acadly/kernel'
-import { Button } from '@acadly/ui'
+import {
+  ContextProvider,
+  getAccount,
+  getContext,
+  getSchoolName,
+  navigate,
+  signOut,
+  useLocation,
+  useSchool,
+  type Account,
+  type AppContext,
+} from '@acadly/kernel'
+import { Button, Notice } from '@acadly/ui'
 import { useEffect, useState } from 'react'
 import { copy } from './copy'
 import { AuthLayout, Heading } from './sign-in/AuthLayout'
@@ -11,6 +22,7 @@ import { StatusScreen } from './StatusScreen'
 /** Until the staff home screen is built: who is signed in, and the way out. */
 function SignedIn({ account, onSignedOut }: { account: Account; onSignedOut: () => void }) {
   const t = copy.home
+  const { licence } = useSchool()
 
   return (
     <>
@@ -19,6 +31,11 @@ function SignedIn({ account, onSignedOut }: { account: Account; onSignedOut: () 
         <span className="text-text-muted">{t.signedInAs}</span>
         <span className="font-extrabold break-all">{account.email}</span>
       </div>
+      {licence.read_only && (
+        <Notice tone="wrong" title={t.readOnlyTitle}>
+          {t.readOnly}
+        </Notice>
+      )}
       <p className="text-text-muted">{t.pending}</p>
       <Button
         variant="secondary"
@@ -37,6 +54,8 @@ export function App() {
   const { path, query } = useLocation()
   const [account, setAccount] = useState<Account | null | undefined>(undefined)
   const [school, setSchool] = useState<string | null>(null)
+  // undefined: loading · null: could not be read
+  const [context, setContext] = useState<AppContext | null | undefined>(undefined)
 
   useEffect(() => {
     void getAccount().then(setAccount)
@@ -46,6 +65,20 @@ export function App() {
   useEffect(() => {
     if (school !== null) document.title = school
   }, [school])
+
+  // Once signed in, load what the screens are built from.
+  useEffect(() => {
+    if (account === null || account === undefined) return
+
+    let current = true
+    void getContext().then((value) => {
+      if (current) setContext(value)
+    })
+
+    return () => {
+      current = false
+    }
+  }, [account])
 
   if (path === '/status') {
     return <StatusScreen />
@@ -57,8 +90,34 @@ export function App() {
   }
 
   let screen
-  if (account !== null) {
-    screen = <SignedIn account={account} onSignedOut={() => setAccount(null)} />
+  if (account !== null && context !== null && context !== undefined) {
+    screen = (
+      <ContextProvider value={context}>
+        <SignedIn
+          account={account}
+          onSignedOut={() => {
+            setContext(undefined)
+            setAccount(null)
+          }}
+        />
+      </ContextProvider>
+    )
+  } else if (account !== null && context === null) {
+    // Signed in, but the context could not be read: say so, never wait for ever.
+    screen = (
+      <>
+        <Heading kicker={copy.home.kicker} title={account.name} />
+        <Notice tone="wrong" title={copy.signIn.unavailableTitle}>
+          {copy.signIn.unavailable}
+        </Notice>
+        <Button variant="secondary" className="h-12" onClick={() => window.location.reload()}>
+          {copy.home.retry}
+        </Button>
+      </>
+    )
+  } else if (account !== null) {
+    // Signed in; the context is still loading.
+    return <div className="min-h-screen bg-paper" />
   } else if (path === '/forgot-password') {
     screen = <ForgotPasswordScreen />
   } else if (path === '/reset-password') {

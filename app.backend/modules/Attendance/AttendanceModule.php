@@ -20,6 +20,11 @@ final class AttendanceModule implements Module
         return 'attendance';
     }
 
+    public function name(): string
+    {
+        return 'Attendance';
+    }
+
     public function tier(): Tier
     {
         return Tier::Optional;

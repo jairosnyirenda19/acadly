@@ -4,6 +4,31 @@
  */
 
 export interface paths {
+    "/v1/me/context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What the screens are built from
+         * @description The school, its divisions and campuses, the modules that are on, the
+         *     wording, the account's permissions per scope and the navigation
+         *     (docs/architecture/03-deployment-campus-access.md §5.8). Divisions,
+         *     campuses, wording and navigation are empty until the stages that build
+         *     them. The screens use this to decide what to offer; the server checks
+         *     every request again.
+         */
+        get: operations["me.context"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/csrf-cookie": {
         parameters: {
             query?: never;
@@ -57,6 +82,47 @@ export interface paths {
          */
         get: operations["me"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/modules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The modules in this build and whether each is on
+         * @description `state` names the first condition that is not met: `not_offered`,
+         *     `not_licensed` or `switched_off`.
+         */
+        get: operations["modules.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/modules/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Switch a module on or off
+         * @description A reason is required and is kept in the audit trail.
+         */
+        put: operations["modules.update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -196,6 +262,18 @@ export interface components {
                 };
             };
         };
+        /** @description Authorization error */
+        AuthorizationException: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    /** @description Error overview. */
+                    message: string;
+                };
+            };
+        };
     };
     parameters: never;
     requestBodies: never;
@@ -204,6 +282,62 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    "me.context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        user: {
+                            id: string;
+                            name: string;
+                            email: string;
+                        };
+                        school: {
+                            name: string;
+                        };
+                        licence: {
+                            /** @enum {string} */
+                            status: "valid" | "expired" | "missing" | "development";
+                            read_only: boolean;
+                        };
+                        modules: string[];
+                        divisions: {
+                            id: string;
+                            name: string;
+                        }[];
+                        campuses: {
+                            id: string;
+                            name: string;
+                        }[];
+                        vocabulary: {
+                            [key: string]: string;
+                        };
+                        navigation: {
+                            key: string;
+                            permission: string;
+                        }[];
+                        grants: {
+                            permission: string;
+                            /** @enum {string} */
+                            scope_type: "institution" | "division" | "campus" | "class";
+                            scope_id: string | null;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "sanctum.csrf-cookie": {
         parameters: {
             query?: never;
@@ -280,6 +414,76 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "modules.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        licence: {
+                            /** @enum {string} */
+                            status: "valid" | "expired" | "missing" | "development";
+                            licensee: string | null;
+                            expires_at: string | null;
+                        };
+                        modules: {
+                            key: string;
+                            name: string;
+                            /** @enum {string} */
+                            tier: "core" | "optional";
+                            /** @enum {string} */
+                            state: "active" | "not_installed" | "not_offered" | "not_licensed" | "switched_off";
+                            switched_on: boolean;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "modules.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    enabled: boolean;
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        key: string;
+                        enabled: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "auth.forgot-password": {

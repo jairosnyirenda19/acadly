@@ -7,9 +7,11 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@acadly/api-client": "workspace:*"
+    "@acadly/api-client": "workspace:*",
+    "react": "^19.3.1"
   },
   "devDependencies": {
-    "vite": "^8.3.8"
+    "vite": "^8.3.8",
+    "@types/react": "^19.3.0"
   }
 }

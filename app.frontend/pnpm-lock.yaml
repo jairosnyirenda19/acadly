@@ -292,7 +292,13 @@ importers:
       '@acadly/api-client':
         specifier: workspace:*
         version: link:../api-client
+      react:
+        specifier: ^19.3.1
+        version: 19.3.1
     devDependencies:
+      '@types/react':
+        specifier: ^19.3.0
+        version: 19.3.0
       vite:
         specifier: ^8.3.8
         version: 8.3.8(@types/node@26.6.6)(jiti@2.7.0)

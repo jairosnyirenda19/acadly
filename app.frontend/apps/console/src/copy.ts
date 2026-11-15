@@ -1,0 +1,80 @@
+/**
+ * Every word the console's sign-in screens show, in one place. Professional,
+ * clean terms; nothing about how the product is built (PRODUCT.md).
+ */
+export const copy = {
+  product: 'Acadly IQ-X',
+  panelKicker: 'School management',
+  panelText: 'Staff console. Registers, assessments, learner records and school administration.',
+  panelNotice: 'Authorised users only. Activity is recorded.',
+  schoolFallback: 'Staff console',
+
+  email: 'Email address',
+  password: 'Password',
+  show: 'Show',
+  hide: 'Hide',
+
+  signIn: {
+    kicker: 'Staff console',
+    title: 'Sign in',
+    submit: 'Sign in',
+    working: 'Signing in',
+    forgot: 'Forgot password',
+    noAccount: 'No account? The school office issues accounts.',
+    portal: 'Parent portal',
+    incorrectTitle: 'Sign-in failed',
+    incorrect: 'The email address or password is incorrect.',
+    pausedTitle: 'Sign-in is paused',
+    paused: 'Too many failed attempts. Try again in one minute, or reset the password.',
+    unavailableTitle: 'Service unavailable',
+    unavailable: 'The service cannot be reached. Try again shortly.',
+  },
+
+  forgot: {
+    back: 'Back to sign in',
+    kicker: 'Account recovery',
+    title: 'Reset password',
+    intro: 'Enter the email address of the account. A reset link is sent to that address. The link expires in 60 minutes.',
+    submit: 'Send reset link',
+    working: 'Sending',
+    sentTitle: 'Request received',
+    sent: 'If an account exists for this email address, a reset link has been sent.',
+    tips: [
+      'The link expires in 60 minutes.',
+      'Check the junk folder if the message does not arrive.',
+      'The school office can reset the password of a staff account.',
+    ],
+    again: 'Use a different email address',
+  },
+
+  reset: {
+    kicker: 'Account recovery',
+    title: 'New password',
+    account: 'Account',
+    password: 'New password',
+    confirm: 'Confirm the password',
+    rulesLabel: 'Password rules',
+    ruleLength: (n: number) => `At least 12 characters (${n} entered)`,
+    ruleMatch: 'Both entries match',
+    met: 'Met',
+    notMet: 'Not met',
+    submit: 'Set password',
+    working: 'Saving',
+    blocked: 'Both rules must be met before the password can be set.',
+    changedTitle: 'Password changed',
+    changed: 'Sign in with the new password.',
+    toSignIn: 'Go to sign in',
+    invalidTitle: 'Link not valid',
+    invalid: 'The reset link is not valid or has expired. Request a new link.',
+    requestNew: 'Request a new link',
+    rejectedTitle: 'Password not accepted',
+    rejected: 'The password does not meet the rules. Choose a different password.',
+  },
+
+  home: {
+    kicker: 'Signed in',
+    signedInAs: 'Signed in as',
+    pending: 'The staff home screen is not available yet.',
+    signOut: 'Sign out',
+  },
+} as const

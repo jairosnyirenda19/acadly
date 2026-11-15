@@ -102,6 +102,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/school": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The school this deployment serves
+         * @description The sign-in screens show the school's name. It requires no
+         *     authentication and discloses nothing else.
+         */
+        get: operations["kernel.school"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/sign-in": {
         parameters: {
             query?: never;
@@ -315,6 +336,27 @@ export interface operations {
                 content?: never;
             };
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "kernel.school": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        name: string;
+                    };
+                };
+            };
         };
     };
     "auth.sign-in": {

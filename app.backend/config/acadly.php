@@ -10,6 +10,12 @@ return [
     'version' => env('ACADLY_VERSION', '0.0.0-stage1'),
 
     /*
+    | The school this deployment serves, as the sign-in screens show it.
+    | It moves to the institution record when that is built.
+    */
+    'school_name' => env('ACADLY_SCHOOL_NAME', 'School'),
+
+    /*
     | Where people use the console. Password reset links point here.
     */
     'frontend_url' => env('ACADLY_FRONTEND_URL', 'http://localhost:5173'),

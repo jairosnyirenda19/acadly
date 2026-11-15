@@ -15,6 +15,14 @@ it('reports service status and nothing else', function (): void {
         ->assertExactJson(['status' => 'ok']);
 });
 
+it('names the school without authentication', function (): void {
+    config(['acadly.school_name' => 'Sunrise Academy']);
+
+    $this->getJson('/api/v1/school')
+        ->assertOk()
+        ->assertExactJson(['name' => 'Sunrise Academy']);
+});
+
 it('does not disclose the technology in use', function (): void {
     $this->get('/api/v1/health')->assertHeaderMissing('X-Powered-By');
 

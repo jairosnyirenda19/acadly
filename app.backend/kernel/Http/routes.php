@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Acadly\Kernel\Http\HealthController;
+use Acadly\Kernel\Http\SchoolController;
 use Acadly\Kernel\Identity\Http\MeController;
 use Acadly\Kernel\Identity\Http\PasswordResetController;
 use Acadly\Kernel\Identity\Http\SignInController;
@@ -10,6 +11,7 @@ use Acadly\Kernel\Identity\Http\SignOutController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', HealthController::class)->name('kernel.health');
+Route::get('/school', SchoolController::class)->name('kernel.school');
 
 Route::prefix('auth')->name('auth.')->group(function (): void {
     Route::post('/sign-in', SignInController::class)->name('sign-in');

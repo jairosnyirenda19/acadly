@@ -98,6 +98,11 @@
     width: 2px;
     background: var(--color-red-pen);
   }
+
+  /* The ruled lines of a register page, 40px apart. */
+  .ruled {
+    background-image: repeating-linear-gradient(to bottom, transparent 0 39px, var(--color-field) 39px 40px);
+  }
 }
 
 @layer base {

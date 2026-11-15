@@ -6,6 +6,12 @@
       "runtimeExecutable": "corepack",
       "runtimeArgs": ["pnpm", "--dir", "app.frontend", "dev"],
       "port": 5173
+    },
+    {
+      "name": "acadly-portal",
+      "runtimeExecutable": "corepack",
+      "runtimeArgs": ["pnpm", "--dir", "app.frontend", "dev:portal"],
+      "port": 5174
     }
   ]
 }

@@ -240,6 +240,36 @@
                 }
             }
         },
+        "/v1/school": {
+            "get": {
+                "operationId": "kernel.school",
+                "description": "The sign-in screens show the school's name. It requires no\nauthentication and discloses nothing else.",
+                "summary": "The school this deployment serves",
+                "tags": [
+                    "School"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "name"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/v1/auth/sign-in": {
             "post": {
                 "operationId": "auth.sign-in",

@@ -1,77 +1,78 @@
-import { getHealth } from '@acadly/kernel'
+import { getAccount, getSchoolName, navigate, signOut, useLocation, type Account } from '@acadly/kernel'
 import { Button } from '@acadly/ui'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { copy } from './copy'
+import { AuthLayout, Heading } from './sign-in/AuthLayout'
+import { ForgotPasswordScreen } from './sign-in/ForgotPasswordScreen'
+import { ResetPasswordScreen } from './sign-in/ResetPasswordScreen'
+import { SignInScreen } from './sign-in/SignInScreen'
+import { StatusScreen } from './StatusScreen'
 
-type Status = 'checking' | 'operational' | 'unavailable'
-
-const copy: Record<Status, { word: string; detail: string }> = {
-  checking: { word: 'Checking', detail: 'The status check is in progress.' },
-  operational: { word: 'Operational', detail: 'The service is available.' },
-  unavailable: { word: 'Unavailable', detail: 'The service cannot be reached. Try again shortly.' },
-}
-
-const mark: Record<Status, { glyph: string; look: string }> = {
-  checking: { glyph: '', look: 'border-2 border-dashed border-rule-dashed bg-sheet' },
-  operational: { glyph: '/', look: 'bg-teal text-sheet' },
-  unavailable: { glyph: 'O', look: 'border-[3px] border-red-pen bg-sheet text-red-pen' },
-}
-
-/**
- * Service status. A single page with no navigation: it states one fact,
- * whether the service is available. It shows no release, module or
- * technology detail.
- */
-export function App() {
-  const [status, setStatus] = useState<Status>('checking')
-  const [checkedAt, setCheckedAt] = useState<Date | null>(null)
-
-  const check = useCallback(() => {
-    setStatus('checking')
-    getHealth()
-      .then(() => setStatus('operational'))
-      .catch(() => setStatus('unavailable'))
-      .finally(() => setCheckedAt(new Date()))
-  }, [])
-
-  useEffect(check, [check])
-
-  const { word, detail } = copy[status]
-  const { glyph, look } = mark[status]
+/** Until the staff home screen is built: who is signed in, and the way out. */
+function SignedIn({ account, onSignedOut }: { account: Account; onSignedOut: () => void }) {
+  const t = copy.home
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-b-2 border-ink px-[clamp(16px,4vw,40px)] py-4">
-        <div className="type-display text-[30px]">
-          Acadly <span className="text-teal">IQ-X</span>
-        </div>
-      </header>
-
-      <main className="mx-auto flex w-full max-w-[720px] flex-1 flex-col justify-center px-[clamp(16px,4vw,40px)] py-10">
-        <h1 className="label-caps text-text-muted">Service status</h1>
-
-        <section aria-live="polite" className="mt-3 flex items-center gap-5 border-y-2 border-ink py-6">
-          <div role="img" aria-label={word} className={`grid size-24 shrink-0 place-items-center text-[64px] leading-none font-extrabold ${look}`}>
-            {glyph}
-          </div>
-          <div className="min-w-0">
-            <div className="type-display text-[clamp(44px,9vw,84px)]">{word}</div>
-            <p className="mt-2">{detail}</p>
-          </div>
-        </section>
-
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
-          <p className="text-[13px] text-text-muted">
-            {checkedAt === null ? 'Not checked yet.' : (
-              <>
-                Last checked at <span className="ref text-ink">{checkedAt.toLocaleTimeString()}</span>
-              </>
-            )}
-          </p>
-          <Button variant="secondary" onClick={check} disabled={status === 'checking'}>
-            Check again
-          </Button>
-        </div>
-      </main>
-    </div>
+    <>
+      <Heading kicker={t.kicker} title={account.name} />
+      <div className="flex justify-between gap-3 border-t-2 border-b border-t-ink border-b-rule py-2.5 text-sm">
+        <span className="text-text-muted">{t.signedInAs}</span>
+        <span className="font-extrabold break-all">{account.email}</span>
+      </div>
+      <p className="text-text-muted">{t.pending}</p>
+      <Button
+        variant="secondary"
+        className="h-12"
+        onClick={() => {
+          void signOut().then(onSignedOut)
+        }}
+      >
+        {t.signOut}
+      </Button>
+    </>
   )
+}
+
+export function App() {
+  const { path, query } = useLocation()
+  const [account, setAccount] = useState<Account | null | undefined>(undefined)
+  const [school, setSchool] = useState<string | null>(null)
+
+  useEffect(() => {
+    void getAccount().then(setAccount)
+    void getSchoolName().then(setSchool)
+  }, [])
+
+  useEffect(() => {
+    if (school !== null) document.title = school
+  }, [school])
+
+  if (path === '/status') {
+    return <StatusScreen />
+  }
+
+  // The session check is still running: show the empty page, not a wrong screen.
+  if (account === undefined) {
+    return <div className="min-h-screen bg-paper" />
+  }
+
+  let screen
+  if (account !== null) {
+    screen = <SignedIn account={account} onSignedOut={() => setAccount(null)} />
+  } else if (path === '/forgot-password') {
+    screen = <ForgotPasswordScreen />
+  } else if (path === '/reset-password') {
+    screen = <ResetPasswordScreen token={query.get('token') ?? ''} email={query.get('email') ?? ''} />
+  } else {
+    screen = (
+      <SignInScreen
+        onSignedIn={(signedIn) => {
+          setAccount(signedIn)
+          navigate('/', true)
+        }}
+      />
+    )
+  }
+
+  return <AuthLayout school={school}>{screen}</AuthLayout>
 }

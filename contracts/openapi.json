@@ -10,10 +10,469 @@
         }
     ],
     "paths": {
+        "/v1/academics": {
+            "get": {
+                "operationId": "academics.show",
+                "summary": "The academic year, its terms, and the classes of each level at each campus",
+                "tags": [
+                    "Academics"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "starts_on": {
+                                                    "type": "string"
+                                                },
+                                                "ends_on": {
+                                                    "type": "string"
+                                                },
+                                                "periods": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "starts_on": {
+                                                                "type": "string"
+                                                            },
+                                                            "ends_on": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name",
+                                                            "starts_on",
+                                                            "ends_on"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "starts_on",
+                                                "ends_on",
+                                                "periods"
+                                            ]
+                                        },
+                                        "periods_per_year": {
+                                            "type": [
+                                                "integer",
+                                                "null"
+                                            ]
+                                        },
+                                        "period_word": {
+                                            "type": "string"
+                                        },
+                                        "offerings": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "division_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "division": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus": {
+                                                        "type": "string"
+                                                    },
+                                                    "level_word": {
+                                                        "type": "string"
+                                                    },
+                                                    "group_word": {
+                                                        "type": "string"
+                                                    },
+                                                    "levels": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "code": {
+                                                                    "type": "string"
+                                                                },
+                                                                "label": {
+                                                                    "type": "string"
+                                                                },
+                                                                "streams": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "code",
+                                                                "label",
+                                                                "streams"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "classes": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "division_id",
+                                                    "division",
+                                                    "campus_id",
+                                                    "campus",
+                                                    "level_word",
+                                                    "group_word",
+                                                    "levels",
+                                                    "classes"
+                                                ]
+                                            }
+                                        },
+                                        "classes": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "year",
+                                        "periods_per_year",
+                                        "period_word",
+                                        "offerings",
+                                        "classes"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/academics/year": {
+            "put": {
+                "operationId": "academics.year",
+                "summary": "Sets the academic year and its terms: `{name, starts_on, ends_on, terms: [{name, starts_on, ends_on}]}`",
+                "tags": [
+                    "Academics"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "starts_on": {
+                                                    "type": "string"
+                                                },
+                                                "ends_on": {
+                                                    "type": "string"
+                                                },
+                                                "periods": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "starts_on",
+                                                "ends_on",
+                                                "periods"
+                                            ]
+                                        },
+                                        "periods_per_year": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "period_word": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Term"
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        "offerings": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "division_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "division": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus": {
+                                                        "type": "string"
+                                                    },
+                                                    "level_word": {
+                                                        "type": "string"
+                                                    },
+                                                    "group_word": {
+                                                        "type": "string"
+                                                    },
+                                                    "levels": {
+                                                        "type": "array",
+                                                        "items": {}
+                                                    },
+                                                    "classes": {
+                                                        "type": "integer",
+                                                        "const": 0
+                                                    }
+                                                },
+                                                "required": [
+                                                    "division_id",
+                                                    "division",
+                                                    "campus_id",
+                                                    "campus",
+                                                    "level_word",
+                                                    "group_word",
+                                                    "levels",
+                                                    "classes"
+                                                ]
+                                            }
+                                        },
+                                        "classes": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "year",
+                                        "periods_per_year",
+                                        "period_word",
+                                        "offerings",
+                                        "classes"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/academics/classes": {
+            "put": {
+                "operationId": "academics.classes",
+                "summary": "Sets the classes of one level at one campus: `{division_id, campus_id, streams: {LEVEL: [names]}}`",
+                "tags": [
+                    "Academics"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "division_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "campus_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "streams": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "division_id",
+                                    "campus_id",
+                                    "streams"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "starts_on": {
+                                                    "type": "string"
+                                                },
+                                                "ends_on": {
+                                                    "type": "string"
+                                                },
+                                                "periods": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "starts_on",
+                                                "ends_on",
+                                                "periods"
+                                            ]
+                                        },
+                                        "periods_per_year": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "period_word": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Term"
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        "offerings": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "division_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "division": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus": {
+                                                        "type": "string"
+                                                    },
+                                                    "level_word": {
+                                                        "type": "string"
+                                                    },
+                                                    "group_word": {
+                                                        "type": "string"
+                                                    },
+                                                    "levels": {
+                                                        "type": "array",
+                                                        "items": {}
+                                                    },
+                                                    "classes": {
+                                                        "type": "integer",
+                                                        "const": 0
+                                                    }
+                                                },
+                                                "required": [
+                                                    "division_id",
+                                                    "division",
+                                                    "campus_id",
+                                                    "campus",
+                                                    "level_word",
+                                                    "group_word",
+                                                    "levels",
+                                                    "classes"
+                                                ]
+                                            }
+                                        },
+                                        "classes": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "year",
+                                        "periods_per_year",
+                                        "period_word",
+                                        "offerings",
+                                        "classes"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/me/context": {
             "get": {
                 "operationId": "me.context",
-                "description": "The school, its divisions and campuses, the modules that are on, the\nwording, the account's permissions per scope and the navigation\n(docs/architecture/03-deployment-campus-access.md \u00a75.8). Divisions,\ncampuses, wording and navigation are empty until the stages that build\nthem. The screens use this to decide what to offer; the server checks\nevery request again.",
+                "description": "The school, its divisions and campuses, the modules that are on, the\nwording, the account's permissions per scope and the navigation\n(docs/architecture/03-deployment-campus-access.md \u00a75.8). `setup_required`\nholds until the school is opened. `vocabulary` is the words of the only\ndivision when there is one; with several, each division carries its own.\nNavigation is empty until the screens that fill it. The screens use this\nto decide what to offer; the server checks every request again.",
                 "summary": "What the screens are built from",
                 "tags": [
                     "Context"
@@ -50,11 +509,26 @@
                                             "properties": {
                                                 "name": {
                                                     "type": "string"
+                                                },
+                                                "short_name": {
+                                                    "type": "string"
+                                                },
+                                                "has_logo": {
+                                                    "type": "boolean"
+                                                },
+                                                "open": {
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "required": [
-                                                "name"
+                                                "name",
+                                                "short_name",
+                                                "has_logo",
+                                                "open"
                                             ]
+                                        },
+                                        "setup_required": {
+                                            "type": "boolean"
                                         },
                                         "licence": {
                                             "type": "object",
@@ -93,11 +567,30 @@
                                                     },
                                                     "name": {
                                                         "type": "string"
+                                                    },
+                                                    "vocabulary": {
+                                                        "type": "object",
+                                                        "additionalProperties": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "one": {
+                                                                    "type": "string"
+                                                                },
+                                                                "many": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "one",
+                                                                "many"
+                                                            ]
+                                                        }
                                                     }
                                                 },
                                                 "required": [
                                                     "id",
-                                                    "name"
+                                                    "name",
+                                                    "vocabulary"
                                                 ]
                                             }
                                         },
@@ -122,7 +615,19 @@
                                         "vocabulary": {
                                             "type": "object",
                                             "additionalProperties": {
-                                                "type": "string"
+                                                "type": "object",
+                                                "properties": {
+                                                    "one": {
+                                                        "type": "string"
+                                                    },
+                                                    "many": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "one",
+                                                    "many"
+                                                ]
                                             }
                                         },
                                         "navigation": {
@@ -178,6 +683,7 @@
                                     "required": [
                                         "user",
                                         "school",
+                                        "setup_required",
                                         "licence",
                                         "modules",
                                         "divisions",
@@ -637,6 +1143,1206 @@
                 }
             }
         },
+        "/v1/school/logo": {
+            "get": {
+                "operationId": "institution.logo.public",
+                "summary": "The school logo, for the sign-in page. No authentication",
+                "tags": [
+                    "Institution"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    }
+                }
+            }
+        },
+        "/v1/institution": {
+            "get": {
+                "operationId": "institution.show",
+                "summary": "The school, its levels, campuses and where each level is taught, with\nthe choices the setup screens offer",
+                "tags": [
+                    "Institution"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "school": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "short_name": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "code": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "email": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "website": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "district": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "country": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "physical_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "postal_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "has_logo": {
+                                                    "type": "boolean"
+                                                },
+                                                "open": {
+                                                    "type": "boolean"
+                                                },
+                                                "details_complete": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "short_name",
+                                                "code",
+                                                "email",
+                                                "phone",
+                                                "website",
+                                                "district",
+                                                "country",
+                                                "physical_address",
+                                                "postal_address",
+                                                "has_logo",
+                                                "open",
+                                                "details_complete"
+                                            ]
+                                        },
+                                        "countries": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "timezone": {
+                                                        "type": "string"
+                                                    },
+                                                    "districts": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "code",
+                                                    "name",
+                                                    "timezone",
+                                                    "districts"
+                                                ]
+                                            }
+                                        },
+                                        "profiles": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "summary": {
+                                                        "type": "string"
+                                                    },
+                                                    "words": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "title",
+                                                    "summary",
+                                                    "words"
+                                                ]
+                                            }
+                                        },
+                                        "divisions": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "profile": {
+                                                        "type": "string"
+                                                    },
+                                                    "words": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "profile",
+                                                    "words"
+                                                ]
+                                            }
+                                        },
+                                        "campuses": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "place": {
+                                                        "type": "string"
+                                                    },
+                                                    "address": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "place",
+                                                    "address"
+                                                ]
+                                            }
+                                        },
+                                        "offerings": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "division_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus_id": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "division_id",
+                                                    "campus_id"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "school",
+                                        "countries",
+                                        "profiles",
+                                        "divisions",
+                                        "campuses",
+                                        "offerings"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "institution.update",
+                "summary": "Saves the school details",
+                "tags": [
+                    "Institution"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "school": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "short_name": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "code": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "email": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "website": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "district": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "country": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "physical_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "postal_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "has_logo": {
+                                                    "type": "boolean"
+                                                },
+                                                "open": {
+                                                    "type": "boolean"
+                                                },
+                                                "details_complete": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "short_name",
+                                                "code",
+                                                "email",
+                                                "phone",
+                                                "website",
+                                                "district",
+                                                "country",
+                                                "physical_address",
+                                                "postal_address",
+                                                "has_logo",
+                                                "open",
+                                                "details_complete"
+                                            ]
+                                        },
+                                        "countries": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "profiles": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "divisions": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "campuses": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "offerings": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "school",
+                                        "countries",
+                                        "profiles",
+                                        "divisions",
+                                        "campuses",
+                                        "offerings"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/institution/logo": {
+            "post": {
+                "operationId": "institution.logo",
+                "summary": "Sets the school logo: a PNG or JPEG of at most 1 MB",
+                "tags": [
+                    "Institution"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "school": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "short_name": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "code": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "email": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "website": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "district": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "country": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "physical_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "postal_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "has_logo": {
+                                                    "type": "boolean"
+                                                },
+                                                "open": {
+                                                    "type": "boolean"
+                                                },
+                                                "details_complete": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "short_name",
+                                                "code",
+                                                "email",
+                                                "phone",
+                                                "website",
+                                                "district",
+                                                "country",
+                                                "physical_address",
+                                                "postal_address",
+                                                "has_logo",
+                                                "open",
+                                                "details_complete"
+                                            ]
+                                        },
+                                        "countries": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "profiles": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "divisions": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "campuses": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "offerings": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "school",
+                                        "countries",
+                                        "profiles",
+                                        "divisions",
+                                        "campuses",
+                                        "offerings"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/institution/levels": {
+            "put": {
+                "operationId": "institution.levels",
+                "summary": "Sets the levels the school runs: `levels: [{profile, name}]`",
+                "tags": [
+                    "Institution"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "levels": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "profile": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "maxLength": 80
+                                                }
+                                            },
+                                            "required": [
+                                                "profile"
+                                            ]
+                                        },
+                                        "minItems": 1
+                                    }
+                                },
+                                "required": [
+                                    "levels"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "school": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "short_name": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "code": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "email": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "website": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "district": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "country": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "physical_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "postal_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "has_logo": {
+                                                    "type": "boolean"
+                                                },
+                                                "open": {
+                                                    "type": "boolean"
+                                                },
+                                                "details_complete": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "short_name",
+                                                "code",
+                                                "email",
+                                                "phone",
+                                                "website",
+                                                "district",
+                                                "country",
+                                                "physical_address",
+                                                "postal_address",
+                                                "has_logo",
+                                                "open",
+                                                "details_complete"
+                                            ]
+                                        },
+                                        "countries": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "profiles": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "divisions": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "campuses": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "offerings": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "school",
+                                        "countries",
+                                        "profiles",
+                                        "divisions",
+                                        "campuses",
+                                        "offerings"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/institution/campuses": {
+            "post": {
+                "operationId": "institution.campuses.store",
+                "summary": "Adds a campus",
+                "tags": [
+                    "Institution"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "school": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "short_name": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "code": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "email": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "website": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "district": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "country": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "physical_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "postal_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "has_logo": {
+                                                    "type": "boolean"
+                                                },
+                                                "open": {
+                                                    "type": "boolean"
+                                                },
+                                                "details_complete": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "short_name",
+                                                "code",
+                                                "email",
+                                                "phone",
+                                                "website",
+                                                "district",
+                                                "country",
+                                                "physical_address",
+                                                "postal_address",
+                                                "has_logo",
+                                                "open",
+                                                "details_complete"
+                                            ]
+                                        },
+                                        "countries": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "profiles": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "divisions": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "campuses": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "offerings": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "school",
+                                        "countries",
+                                        "profiles",
+                                        "divisions",
+                                        "campuses",
+                                        "offerings"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/institution/campuses/{id}": {
+            "put": {
+                "operationId": "institution.campuses.update",
+                "summary": "Changes a campus",
+                "tags": [
+                    "Institution"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "school": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "short_name": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "code": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "email": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "website": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "district": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "country": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "physical_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "postal_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "has_logo": {
+                                                    "type": "boolean"
+                                                },
+                                                "open": {
+                                                    "type": "boolean"
+                                                },
+                                                "details_complete": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "short_name",
+                                                "code",
+                                                "email",
+                                                "phone",
+                                                "website",
+                                                "district",
+                                                "country",
+                                                "physical_address",
+                                                "postal_address",
+                                                "has_logo",
+                                                "open",
+                                                "details_complete"
+                                            ]
+                                        },
+                                        "countries": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "profiles": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "divisions": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "campuses": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "offerings": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "school",
+                                        "countries",
+                                        "profiles",
+                                        "divisions",
+                                        "campuses",
+                                        "offerings"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/institution/offerings": {
+            "put": {
+                "operationId": "institution.offerings",
+                "summary": "Says whether a level is taught at a campus: `{division_id, campus_id, taught}`",
+                "tags": [
+                    "Institution"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "division_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "campus_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "taught": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "division_id",
+                                    "campus_id",
+                                    "taught"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "school": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "short_name": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "code": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "email": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "website": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "district": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "country": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "physical_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "postal_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "has_logo": {
+                                                    "type": "boolean"
+                                                },
+                                                "open": {
+                                                    "type": "boolean"
+                                                },
+                                                "details_complete": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "short_name",
+                                                "code",
+                                                "email",
+                                                "phone",
+                                                "website",
+                                                "district",
+                                                "country",
+                                                "physical_address",
+                                                "postal_address",
+                                                "has_logo",
+                                                "open",
+                                                "details_complete"
+                                            ]
+                                        },
+                                        "countries": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "profiles": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "divisions": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "campuses": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "offerings": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "school",
+                                        "countries",
+                                        "profiles",
+                                        "divisions",
+                                        "campuses",
+                                        "offerings"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/me": {
             "get": {
                 "operationId": "me",
@@ -1053,7 +2759,7 @@
         "/v1/auth/reset-password": {
             "post": {
                 "operationId": "auth.reset-password",
-                "summary": "Set a new password with a reset link",
+                "summary": "Set a new password with a reset link, or a first password with an\ninvitation link (`invitation: true`)",
                 "tags": [
                     "PasswordReset"
                 ],
@@ -1075,6 +2781,9 @@
                                     },
                                     "password": {
                                         "type": "string"
+                                    },
+                                    "invitation": {
+                                        "type": "boolean"
                                     },
                                     "password_confirmation": {
                                         "type": "string"
@@ -1126,7 +2835,7 @@
         "/v1/school": {
             "get": {
                 "operationId": "kernel.school",
-                "description": "The sign-in screens show the school's name. It requires no\nauthentication and discloses nothing else.",
+                "description": "The sign-in screens show the school's name and, when there is one, its\nlogo. It requires no authentication and discloses nothing else.",
                 "summary": "The school this deployment serves",
                 "tags": [
                     "School"
@@ -1141,14 +2850,716 @@
                                     "properties": {
                                         "name": {
                                             "type": "string"
+                                        },
+                                        "has_logo": {
+                                            "type": "boolean"
                                         }
                                     },
                                     "required": [
-                                        "name"
+                                        "name",
+                                        "has_logo"
                                     ]
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/v1/setup": {
+            "get": {
+                "operationId": "setup.show",
+                "summary": "Where setup stands: each step, the staff list, the roles and places a\nperson can be invited to, and what still blocks opening",
+                "tags": [
+                    "Setup"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "open": {
+                                            "type": "boolean"
+                                        },
+                                        "steps": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "done": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "done"
+                                                ]
+                                            }
+                                        },
+                                        "blockers": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "administrators": {
+                                            "type": "integer"
+                                        },
+                                        "waiting": {
+                                            "type": "integer"
+                                        },
+                                        "staff": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    },
+                                                    "role": {
+                                                        "type": "string"
+                                                    },
+                                                    "works_in": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "signed_in",
+                                                            "active",
+                                                            "ready",
+                                                            "sent"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "email",
+                                                    "role",
+                                                    "works_in",
+                                                    "state"
+                                                ]
+                                            }
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "scope": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "name",
+                                                    "scope"
+                                                ]
+                                            }
+                                        },
+                                        "places": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "institution",
+                                                            "division",
+                                                            "campus"
+                                                        ]
+                                                    },
+                                                    "id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type",
+                                                    "id",
+                                                    "name"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "open",
+                                        "steps",
+                                        "blockers",
+                                        "administrators",
+                                        "waiting",
+                                        "staff",
+                                        "roles",
+                                        "places"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/setup/staff": {
+            "post": {
+                "operationId": "setup.staff.invite",
+                "summary": "Adds a member of staff to the list: `{name, email, role, place_type, place_id}`. The invitation is not sent yet",
+                "tags": [
+                    "Setup"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 120
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "maxLength": 60
+                                    },
+                                    "place_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "institution",
+                                            "division",
+                                            "campus"
+                                        ]
+                                    },
+                                    "place_id": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "uuid"
+                                    }
+                                },
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "role",
+                                    "place_type"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "open": {
+                                            "type": "boolean"
+                                        },
+                                        "steps": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "done": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "done"
+                                                ]
+                                            }
+                                        },
+                                        "blockers": {
+                                            "type": "array",
+                                            "items": {
+                                                "anyOf": [
+                                                    {
+                                                        "type": "string"
+                                                    },
+                                                    {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "administrator"
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "administrators": {
+                                            "type": "integer",
+                                            "minimum": 0
+                                        },
+                                        "waiting": {
+                                            "type": "integer",
+                                            "minimum": 0
+                                        },
+                                        "staff": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    },
+                                                    "role": {
+                                                        "type": "string"
+                                                    },
+                                                    "works_in": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    ""
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "signed_in",
+                                                            "active",
+                                                            "sent",
+                                                            "ready"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "email",
+                                                    "role",
+                                                    "works_in",
+                                                    "state"
+                                                ]
+                                            }
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "places": {
+                                            "type": "array",
+                                            "prefixItems": [
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "type": {
+                                                            "type": "string",
+                                                            "const": "campus"
+                                                        },
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "type",
+                                                        "id",
+                                                        "name"
+                                                    ]
+                                                }
+                                            ],
+                                            "minItems": 1,
+                                            "maxItems": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "open",
+                                        "steps",
+                                        "blockers",
+                                        "administrators",
+                                        "waiting",
+                                        "staff",
+                                        "roles",
+                                        "places"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/setup/staff/send": {
+            "post": {
+                "operationId": "setup.staff.send",
+                "summary": "Sends every invitation that is ready",
+                "tags": [
+                    "Setup"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "open": {
+                                            "type": "boolean"
+                                        },
+                                        "steps": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "done": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "done"
+                                                ]
+                                            }
+                                        },
+                                        "blockers": {
+                                            "type": "array",
+                                            "items": {
+                                                "anyOf": [
+                                                    {
+                                                        "type": "string"
+                                                    },
+                                                    {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "administrator"
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "administrators": {
+                                            "type": "integer",
+                                            "minimum": 0
+                                        },
+                                        "waiting": {
+                                            "type": "integer",
+                                            "minimum": 0
+                                        },
+                                        "staff": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    },
+                                                    "role": {
+                                                        "type": "string"
+                                                    },
+                                                    "works_in": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    ""
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "signed_in",
+                                                            "active",
+                                                            "sent",
+                                                            "ready"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "email",
+                                                    "role",
+                                                    "works_in",
+                                                    "state"
+                                                ]
+                                            }
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "places": {
+                                            "type": "array",
+                                            "prefixItems": [
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "type": {
+                                                            "type": "string",
+                                                            "const": "campus"
+                                                        },
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "type",
+                                                        "id",
+                                                        "name"
+                                                    ]
+                                                }
+                                            ],
+                                            "minItems": 1,
+                                            "maxItems": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "open",
+                                        "steps",
+                                        "blockers",
+                                        "administrators",
+                                        "waiting",
+                                        "staff",
+                                        "roles",
+                                        "places"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/setup/open": {
+            "post": {
+                "operationId": "setup.open",
+                "summary": "Opens the school. Refused with the reasons while a required step is not done",
+                "tags": [
+                    "Setup"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "open": {
+                                            "type": "boolean"
+                                        },
+                                        "steps": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "done": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "done"
+                                                ]
+                                            }
+                                        },
+                                        "blockers": {
+                                            "type": "array",
+                                            "items": {
+                                                "anyOf": [
+                                                    {
+                                                        "type": "string"
+                                                    },
+                                                    {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "administrator"
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "administrators": {
+                                            "type": "integer",
+                                            "minimum": 0
+                                        },
+                                        "waiting": {
+                                            "type": "integer",
+                                            "minimum": 0
+                                        },
+                                        "staff": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    },
+                                                    "role": {
+                                                        "type": "string"
+                                                    },
+                                                    "works_in": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    ""
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "signed_in",
+                                                            "active",
+                                                            "sent",
+                                                            "ready"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "email",
+                                                    "role",
+                                                    "works_in",
+                                                    "state"
+                                                ]
+                                            }
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "places": {
+                                            "type": "array",
+                                            "prefixItems": [
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "type": {
+                                                            "type": "string",
+                                                            "const": "campus"
+                                                        },
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "type",
+                                                        "id",
+                                                        "name"
+                                                    ]
+                                                }
+                                            ],
+                                            "minItems": 1,
+                                            "maxItems": 1
+                                        }
+                                    },
+                                    "required": [
+                                        "open",
+                                        "steps",
+                                        "blockers",
+                                        "administrators",
+                                        "waiting",
+                                        "staff",
+                                        "roles",
+                                        "places"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }

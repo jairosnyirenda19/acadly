@@ -4,6 +4,57 @@
  */
 
 export interface paths {
+    "/v1/academics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The academic year, its terms, and the classes of each level at each campus */
+        get: operations["academics.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/academics/year": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Sets the academic year and its terms: `{name, starts_on, ends_on, terms: [{name, starts_on, ends_on}]}` */
+        put: operations["academics.year"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/academics/classes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Sets the classes of one level at one campus: `{division_id, campus_id, streams: {LEVEL: [names]}}` */
+        put: operations["academics.classes"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/me/context": {
         parameters: {
             query?: never;
@@ -15,10 +66,11 @@ export interface paths {
          * What the screens are built from
          * @description The school, its divisions and campuses, the modules that are on, the
          *     wording, the account's permissions per scope and the navigation
-         *     (docs/architecture/03-deployment-campus-access.md §5.8). Divisions,
-         *     campuses, wording and navigation are empty until the stages that build
-         *     them. The screens use this to decide what to offer; the server checks
-         *     every request again.
+         *     (docs/architecture/03-deployment-campus-access.md §5.8). `setup_required`
+         *     holds until the school is opened. `vocabulary` is the words of the only
+         *     division when there is one; with several, each division carries its own.
+         *     Navigation is empty until the screens that fill it. The screens use this
+         *     to decide what to offer; the server checks every request again.
          */
         get: operations["me.context"];
         put?: never;
@@ -154,6 +206,129 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/school/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The school logo, for the sign-in page. No authentication */
+        get: operations["institution.logo.public"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/institution": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The school, its levels, campuses and where each level is taught, with
+         *     the choices the setup screens offer
+         */
+        get: operations["institution.show"];
+        /** Saves the school details */
+        put: operations["institution.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/institution/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sets the school logo: a PNG or JPEG of at most 1 MB */
+        post: operations["institution.logo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/institution/levels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Sets the levels the school runs: `levels: [{profile, name}]` */
+        put: operations["institution.levels"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/institution/campuses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adds a campus */
+        post: operations["institution.campuses.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/institution/campuses/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Changes a campus */
+        put: operations["institution.campuses.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/institution/offerings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Says whether a level is taught at a campus: `{division_id, campus_id, taught}` */
+        put: operations["institution.offerings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/me": {
         parameters: {
             query?: never;
@@ -280,7 +455,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Set a new password with a reset link */
+        /**
+         * Set a new password with a reset link, or a first password with an
+         *     invitation link (`invitation: true`)
+         */
         post: operations["auth.reset-password"];
         delete?: never;
         options?: never;
@@ -319,12 +497,83 @@ export interface paths {
         };
         /**
          * The school this deployment serves
-         * @description The sign-in screens show the school's name. It requires no
-         *     authentication and discloses nothing else.
+         * @description The sign-in screens show the school's name and, when there is one, its
+         *     logo. It requires no authentication and discloses nothing else.
          */
         get: operations["kernel.school"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Where setup stands: each step, the staff list, the roles and places a
+         *     person can be invited to, and what still blocks opening
+         */
+        get: operations["setup.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/setup/staff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adds a member of staff to the list: `{name, email, role, place_type, place_id}`. The invitation is not sent yet */
+        post: operations["setup.staff.invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/setup/staff/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sends every invitation that is ready */
+        post: operations["setup.staff.send"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/setup/open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Opens the school. Refused with the reasons while a required step is not done */
+        post: operations["setup.open"];
         delete?: never;
         options?: never;
         head?: never;
@@ -436,6 +685,152 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    "academics.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        year: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                            periods: {
+                                id: string;
+                                name: string;
+                                starts_on: string;
+                                ends_on: string;
+                            }[];
+                        } | null;
+                        periods_per_year: number | null;
+                        period_word: string;
+                        offerings: {
+                            division_id: string;
+                            division: string;
+                            campus_id: string;
+                            campus: string;
+                            level_word: string;
+                            group_word: string;
+                            levels: {
+                                code: string;
+                                label: string;
+                                streams: string[];
+                            }[];
+                            classes: number;
+                        }[];
+                        classes: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "academics.year": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        year: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                            periods: unknown[];
+                        } | null;
+                        periods_per_year: string | null;
+                        period_word: string | "Term";
+                        offerings: {
+                            division_id: string;
+                            division: string;
+                            campus_id: string;
+                            campus: string;
+                            level_word: string;
+                            group_word: string;
+                            levels: unknown[];
+                            /** @constant */
+                            classes: 0;
+                        }[];
+                        classes: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "academics.classes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    division_id: string;
+                    /** Format: uuid */
+                    campus_id: string;
+                    streams: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        year: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                            periods: unknown[];
+                        } | null;
+                        periods_per_year: string | null;
+                        period_word: string | "Term";
+                        offerings: {
+                            division_id: string;
+                            division: string;
+                            campus_id: string;
+                            campus: string;
+                            level_word: string;
+                            group_word: string;
+                            levels: unknown[];
+                            /** @constant */
+                            classes: 0;
+                        }[];
+                        classes: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
     "me.context": {
         parameters: {
             query?: never;
@@ -458,7 +853,11 @@ export interface operations {
                         };
                         school: {
                             name: string;
+                            short_name: string;
+                            has_logo: boolean;
+                            open: boolean;
                         };
+                        setup_required: boolean;
                         licence: {
                             /** @enum {string} */
                             status: "valid" | "expired" | "missing" | "development";
@@ -468,13 +867,22 @@ export interface operations {
                         divisions: {
                             id: string;
                             name: string;
+                            vocabulary: {
+                                [key: string]: {
+                                    one: string;
+                                    many: string;
+                                };
+                            };
                         }[];
                         campuses: {
                             id: string;
                             name: string;
                         }[];
                         vocabulary: {
-                            [key: string]: string;
+                            [key: string]: {
+                                one: string;
+                                many: string;
+                            };
                         };
                         navigation: {
                             key: string;
@@ -717,6 +1125,362 @@ export interface operations {
             };
         };
     };
+    "institution.logo.public": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "institution.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        school: {
+                            name: string;
+                            short_name: string | null;
+                            code: string | null;
+                            email: string | null;
+                            phone: string | null;
+                            website: string | null;
+                            district: string | null;
+                            country: string | null;
+                            physical_address: string | null;
+                            postal_address: string | null;
+                            has_logo: boolean;
+                            open: boolean;
+                            details_complete: boolean;
+                        };
+                        countries: {
+                            code: string;
+                            name: string;
+                            timezone: string;
+                            districts: string[];
+                        }[];
+                        profiles: {
+                            key: string;
+                            title: string;
+                            summary: string;
+                            words: string;
+                        }[];
+                        divisions: {
+                            id: string;
+                            name: string;
+                            profile: string;
+                            words: string;
+                        }[];
+                        campuses: {
+                            id: string;
+                            name: string;
+                            place: string;
+                            address: string | null;
+                        }[];
+                        offerings: {
+                            division_id: string;
+                            campus_id: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "institution.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        school: {
+                            name: string;
+                            short_name: string | null;
+                            code: string | null;
+                            email: string | null;
+                            phone: string | null;
+                            website: string | null;
+                            district: string | null;
+                            country: string | null;
+                            physical_address: string | null;
+                            postal_address: string | null;
+                            has_logo: boolean;
+                            open: boolean;
+                            details_complete: boolean;
+                        };
+                        countries: unknown[];
+                        profiles: unknown[];
+                        divisions: unknown[];
+                        campuses: unknown[];
+                        offerings: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "institution.logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        school: {
+                            name: string;
+                            short_name: string | null;
+                            code: string | null;
+                            email: string | null;
+                            phone: string | null;
+                            website: string | null;
+                            district: string | null;
+                            country: string | null;
+                            physical_address: string | null;
+                            postal_address: string | null;
+                            has_logo: boolean;
+                            open: boolean;
+                            details_complete: boolean;
+                        };
+                        countries: unknown[];
+                        profiles: unknown[];
+                        divisions: unknown[];
+                        campuses: unknown[];
+                        offerings: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "institution.levels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    levels: {
+                        profile: string;
+                        name?: string | null;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        school: {
+                            name: string;
+                            short_name: string | null;
+                            code: string | null;
+                            email: string | null;
+                            phone: string | null;
+                            website: string | null;
+                            district: string | null;
+                            country: string | null;
+                            physical_address: string | null;
+                            postal_address: string | null;
+                            has_logo: boolean;
+                            open: boolean;
+                            details_complete: boolean;
+                        };
+                        countries: unknown[];
+                        profiles: unknown[];
+                        divisions: unknown[];
+                        campuses: unknown[];
+                        offerings: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "institution.campuses.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        school: {
+                            name: string;
+                            short_name: string | null;
+                            code: string | null;
+                            email: string | null;
+                            phone: string | null;
+                            website: string | null;
+                            district: string | null;
+                            country: string | null;
+                            physical_address: string | null;
+                            postal_address: string | null;
+                            has_logo: boolean;
+                            open: boolean;
+                            details_complete: boolean;
+                        };
+                        countries: unknown[];
+                        profiles: unknown[];
+                        divisions: unknown[];
+                        campuses: unknown[];
+                        offerings: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "institution.campuses.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        school: {
+                            name: string;
+                            short_name: string | null;
+                            code: string | null;
+                            email: string | null;
+                            phone: string | null;
+                            website: string | null;
+                            district: string | null;
+                            country: string | null;
+                            physical_address: string | null;
+                            postal_address: string | null;
+                            has_logo: boolean;
+                            open: boolean;
+                            details_complete: boolean;
+                        };
+                        countries: unknown[];
+                        profiles: unknown[];
+                        divisions: unknown[];
+                        campuses: unknown[];
+                        offerings: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "institution.offerings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    division_id: string;
+                    /** Format: uuid */
+                    campus_id: string;
+                    taught: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        school: {
+                            name: string;
+                            short_name: string | null;
+                            code: string | null;
+                            email: string | null;
+                            phone: string | null;
+                            website: string | null;
+                            district: string | null;
+                            country: string | null;
+                            physical_address: string | null;
+                            postal_address: string | null;
+                            has_logo: boolean;
+                            open: boolean;
+                            details_complete: boolean;
+                        };
+                        countries: unknown[];
+                        profiles: unknown[];
+                        divisions: unknown[];
+                        campuses: unknown[];
+                        offerings: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
     me: {
         parameters: {
             query?: never;
@@ -913,6 +1677,7 @@ export interface operations {
                     /** Format: email */
                     email: string;
                     password: string;
+                    invitation?: boolean;
                     password_confirmation: string;
                 };
             };
@@ -963,9 +1728,214 @@ export interface operations {
                 content: {
                     "application/json": {
                         name: string;
+                        has_logo: boolean;
                     };
                 };
             };
+        };
+    };
+    "setup.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        open: boolean;
+                        steps: {
+                            key: string;
+                            done: boolean;
+                        }[];
+                        blockers: string[];
+                        administrators: number;
+                        waiting: number;
+                        staff: {
+                            id: string;
+                            name: string;
+                            email: string;
+                            role: string;
+                            works_in: string;
+                            /** @enum {string} */
+                            state: "signed_in" | "active" | "ready" | "sent";
+                        }[];
+                        roles: {
+                            key: string;
+                            name: string;
+                            scope: string;
+                        }[];
+                        places: {
+                            /** @enum {string} */
+                            type: "institution" | "division" | "campus";
+                            id: string | null;
+                            name: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "setup.staff.invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    email: string;
+                    role: string;
+                    /** @enum {string} */
+                    place_type: "institution" | "division" | "campus";
+                    /** Format: uuid */
+                    place_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        open: boolean;
+                        steps: {
+                            key: string;
+                            done: string;
+                        }[];
+                        blockers: (string | "administrator")[];
+                        administrators: number;
+                        waiting: number;
+                        staff: {
+                            id: string;
+                            name: string;
+                            email: string;
+                            role: string;
+                            works_in: string | "";
+                            /** @enum {string} */
+                            state: "signed_in" | "active" | "sent" | "ready";
+                        }[];
+                        roles: unknown[];
+                        places: [
+                            {
+                                /** @constant */
+                                type: "campus";
+                                id: string;
+                                name: string;
+                            }
+                        ];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "setup.staff.send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        open: boolean;
+                        steps: {
+                            key: string;
+                            done: string;
+                        }[];
+                        blockers: (string | "administrator")[];
+                        administrators: number;
+                        waiting: number;
+                        staff: {
+                            id: string;
+                            name: string;
+                            email: string;
+                            role: string;
+                            works_in: string | "";
+                            /** @enum {string} */
+                            state: "signed_in" | "active" | "sent" | "ready";
+                        }[];
+                        roles: unknown[];
+                        places: [
+                            {
+                                /** @constant */
+                                type: "campus";
+                                id: string;
+                                name: string;
+                            }
+                        ];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "setup.open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        open: boolean;
+                        steps: {
+                            key: string;
+                            done: string;
+                        }[];
+                        blockers: (string | "administrator")[];
+                        administrators: number;
+                        waiting: number;
+                        staff: {
+                            id: string;
+                            name: string;
+                            email: string;
+                            role: string;
+                            works_in: string | "";
+                            /** @enum {string} */
+                            state: "signed_in" | "active" | "sent" | "ready";
+                        }[];
+                        roles: unknown[];
+                        places: [
+                            {
+                                /** @constant */
+                                type: "campus";
+                                id: string;
+                                name: string;
+                            }
+                        ];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "auth.sign-in": {

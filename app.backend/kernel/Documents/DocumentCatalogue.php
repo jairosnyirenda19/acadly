@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acadly\Kernel\Documents;
 
 use Acadly\Kernel\Access\PermissionCatalogue;
+use Acadly\Kernel\Audit\FieldClass;
 use Acadly\Kernel\Module\ModuleRegistry;
 use LogicException;
 
@@ -75,6 +76,10 @@ final class DocumentCatalogue
 
         if ($kind->accepts() === [] || $kind->maxBytes() <= 0 || trim($kind->label()) === '') {
             throw new LogicException("Document kind [{$key}] needs a label, accepted types and a size limit.");
+        }
+
+        if ($kind->isPublic() && $kind->classification() !== FieldClass::Plain) {
+            throw new LogicException("Document kind [{$key}] is public, so it must be plain.");
         }
 
         if (! is_subclass_of($kind->owner(), DocumentOwner::class)) {

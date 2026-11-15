@@ -1,4 +1,5 @@
 import {
+  can,
   ContextProvider,
   getAccount,
   getContext,
@@ -16,6 +17,7 @@ import { copy } from './copy'
 import { AuthLayout, Heading } from './sign-in/AuthLayout'
 import { ForgotPasswordScreen } from './sign-in/ForgotPasswordScreen'
 import { ResetPasswordScreen } from './sign-in/ResetPasswordScreen'
+import { SetupWizard } from './setup/SetupWizard'
 import { SignInScreen } from './sign-in/SignInScreen'
 import { StatusScreen } from './StatusScreen'
 
@@ -89,6 +91,43 @@ export function App() {
     return <div className="min-h-screen bg-paper" />
   }
 
+  const signedOut = () => {
+    setContext(undefined)
+    setAccount(null)
+    navigate('/', true)
+  }
+
+  // Until the school is opened, the administrator works through setup; others wait.
+  if (account !== null && context !== null && context !== undefined && context.setup_required) {
+    if (can(context, 'institution.manage')) {
+      return (
+        <ContextProvider value={context}>
+          <SetupWizard
+            onSignedOut={signedOut}
+            onOpened={() => {
+              void getContext().then((value) => {
+                setContext(value)
+                navigate('/', true)
+              })
+            }}
+          />
+        </ContextProvider>
+      )
+    }
+
+    return (
+      <AuthLayout school={school}>
+        <Heading kicker={copy.home.kicker} title={account.name} />
+        <Notice tone="wrong" title={copy.setup.notReadyTitle}>
+          {copy.setup.notReady}
+        </Notice>
+        <Button variant="secondary" className="h-12" onClick={() => void signOut().then(signedOut)}>
+          {copy.home.signOut}
+        </Button>
+      </AuthLayout>
+    )
+  }
+
   let screen
   if (account !== null && context !== null && context !== undefined) {
     screen = (
@@ -121,7 +160,7 @@ export function App() {
   } else if (path === '/forgot-password') {
     screen = <ForgotPasswordScreen />
   } else if (path === '/reset-password') {
-    screen = <ResetPasswordScreen token={query.get('token') ?? ''} email={query.get('email') ?? ''} />
+    screen = <ResetPasswordScreen token={query.get('token') ?? ''} email={query.get('email') ?? ''} invitation={query.get('invite') === '1'} />
   } else {
     screen = (
       <SignInScreen

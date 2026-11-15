@@ -100,17 +100,18 @@ final class SyncCommand extends Command
 
         $recorded = 0;
 
-        foreach ($blueprints->journeys() as $journey) {
-            $hash = $lock->hashOf($journey->ref);
+        foreach ($blueprints->all() as $blueprint) {
+            $ref = $blueprint->reference();
+            $hash = $lock->hashOf($ref);
 
             if ($hash === null) {
                 continue;
             }
 
-            $known = DB::table('blueprint_versions')->where('ref', (string) $journey->ref)->value('hash');
+            $known = DB::table('blueprint_versions')->where('ref', (string) $ref)->value('hash');
 
             if ($known !== null && $known !== $hash) {
-                $this->components->error("The released blueprint [{$journey->ref}] differs from the version this deployment recorded.");
+                $this->components->error("The released blueprint [{$ref}] differs from the version this deployment recorded.");
 
                 return self::FAILURE;
             }
@@ -118,13 +119,13 @@ final class SyncCommand extends Command
             if ($known === null) {
                 DB::table('blueprint_versions')->insert([
                     'id' => Ids::next(),
-                    'kind' => $journey->ref->kind()->value,
-                    'ref' => (string) $journey->ref,
-                    'key' => $journey->ref->key,
-                    'version' => $journey->ref->version,
+                    'kind' => $ref->kind()->value,
+                    'ref' => (string) $ref,
+                    'key' => $ref->key,
+                    'version' => $ref->version,
                     'hash' => $hash,
-                    'compiled' => $journey->json(),
-                    'released_at' => CarbonImmutable::parse($lock->all()[(string) $journey->ref]['released_at']),
+                    'compiled' => $blueprint->json(),
+                    'released_at' => CarbonImmutable::parse($lock->all()[(string) $ref]['released_at']),
                     'recorded_at' => $clock->now(),
                 ]);
                 $recorded++;

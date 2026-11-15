@@ -42,8 +42,8 @@ final class BlueprintReleaseCommand extends Command
             return self::FAILURE;
         }
 
-        foreach ($compiler->compiled() as $journey) {
-            if (! $journey->ref->equals($ref)) {
+        foreach ($compiler->compiled() as $blueprint) {
+            if (! $blueprint->reference()->equals($ref)) {
                 continue;
             }
 
@@ -53,7 +53,7 @@ final class BlueprintReleaseCommand extends Command
                 return self::FAILURE;
             }
 
-            $compiler->lock()->release($ref, $journey->hash(), $clock->now()->utc()->toIso8601String());
+            $compiler->lock()->release($ref, $blueprint->hash(), $clock->now()->utc()->toIso8601String());
             $this->components->info("[{$ref}] is released. It can no longer change.");
 
             return self::SUCCESS;

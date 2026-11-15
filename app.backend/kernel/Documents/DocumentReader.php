@@ -74,6 +74,30 @@ final class DocumentReader
             ->values();
     }
 
+    /**
+     * The current version of a live document of a public kind, for anyone.
+     *
+     * @return array{file: DocumentFile, bytes: Generator<int, string>}
+     */
+    public function openPublic(string $id): array
+    {
+        $document = Document::query()->live()->find($id);
+
+        if (! $document instanceof Document || ! $this->kinds->has($document->kind) || ! $this->kinds->get($document->kind)->isPublic()) {
+            throw (new ModelNotFoundException)->setModel(Document::class);
+        }
+
+        $row = DB::table('document_files')->where('id', $document->current_file_id)->first(self::FILE_COLUMNS);
+
+        if ($row === null) {
+            throw (new ModelNotFoundException)->setModel(Document::class);
+        }
+
+        $file = DocumentFile::fromRow($row);
+
+        return ['file' => $file, 'bytes' => $this->blobs->read($file->sha)];
+    }
+
     /** @return list<DocumentFile> every version, newest first */
     public function versions(Document $document): array
     {

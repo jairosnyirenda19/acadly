@@ -39,16 +39,20 @@ final class ResetPassword
             actor: Actor::anonymous(), personal: ['email' => $email]);
     }
 
-    public function reset(string $email, string $token, string $password): void
+    /**
+     * With `$invitation`, the link is an invitation: it sets the first
+     * password of an invited account and makes the account active.
+     */
+    public function reset(string $email, string $token, string $password, bool $invitation = false): void
     {
-        $status = Password::broker()->reset(
+        $status = Password::broker($invitation ? 'invitations' : null)->reset(
             [
                 'email' => mb_strtolower(trim($email)),
-                'status' => AccountStatus::Active->value,
+                'status' => ($invitation ? AccountStatus::Invited : AccountStatus::Active)->value,
                 'token' => $token,
                 'password' => $password,
             ],
-            function (CanResetPassword $user, string $password): void {
+            function (CanResetPassword $user, string $password) use ($invitation): void {
                 if (! $user instanceof User) {
                     return;
                 }
@@ -58,9 +62,11 @@ final class ResetPassword
                 $user->forceFill([
                     'password' => $password,
                     'remember_token' => Str::random(60),
+                    ...($invitation ? ['status' => AccountStatus::Active, 'email_verified_at' => now()] : []),
                 ])->save();
 
-                $this->audit->record(KernelAudit::PasswordReset, subject: $user, changes: $watch->diff(), actor: $this->audit->actorFor($user));
+                $this->audit->record($invitation ? KernelAudit::InvitationAccepted : KernelAudit::PasswordReset,
+                    subject: $user, changes: $watch->diff(), actor: $this->audit->actorFor($user));
 
                 event(new PasswordReset($user));
             },
@@ -71,7 +77,7 @@ final class ResetPassword
                 actor: Actor::anonymous(), personal: ['email' => mb_strtolower(trim($email))]);
 
             throw ValidationException::withMessages([
-                'token' => ['The reset link is not valid or has expired.'],
+                'token' => [$invitation ? 'The invitation link is not valid or has expired.' : 'The reset link is not valid or has expired.'],
             ]);
         }
     }

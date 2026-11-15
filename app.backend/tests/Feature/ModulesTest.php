@@ -116,7 +116,7 @@ it('switches a module on with a reason, audits it and tells other modules', func
 
     $this->actingAs($admin)->getJson('/api/v1/me/context')
         ->assertOk()
-        ->assertJsonPath('modules', ['institution', 'attendance'])
+        ->assertJsonPath('modules', ['institution', 'academics', 'setup', 'attendance'])
         ->assertJsonPath('school.name', config('acadly.school_name'))
         ->assertJsonPath('licence.read_only', false);
 });

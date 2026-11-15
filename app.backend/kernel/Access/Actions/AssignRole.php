@@ -16,6 +16,7 @@ use Acadly\Kernel\Audit\KernelAudit;
 use Acadly\Kernel\Audit\Outcome;
 use Acadly\Kernel\Audit\Watch;
 use Acadly\Kernel\Events\Outbox;
+use Acadly\Kernel\Identity\AccountStatus;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Carbon\CarbonImmutable;
@@ -30,7 +31,8 @@ use Illuminate\Validation\ValidationException;
  *  - the assigner must hold "Give and end roles" at that scope;
  *  - the assigner must hold, at that scope, every permission in the role:
  *    nobody can give what they do not have;
- *  - the account must be active, and an end date must be in the future.
+ *  - the account must not be disabled (an invited account may hold a role
+ *    before it is first used), and an end date must be in the future.
  */
 final class AssignRole
 {
@@ -63,7 +65,7 @@ final class AssignRole
 
         $now = $this->clock->now();
 
-        if (! $to->isActive()) {
+        if ($to->status === AccountStatus::Disabled) {
             throw ValidationException::withMessages(['user' => ['The account is disabled.']]);
         }
 

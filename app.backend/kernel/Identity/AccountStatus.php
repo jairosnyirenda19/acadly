@@ -11,4 +11,7 @@ enum AccountStatus: string
 
     /** May not sign in. The account and everything it did are kept. */
     case Disabled = 'disabled';
+
+    /** Made by the school and invited. May sign in once the person sets a password with the invitation link. */
+    case Invited = 'invited';
 }

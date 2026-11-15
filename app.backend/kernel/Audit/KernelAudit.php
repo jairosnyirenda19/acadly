@@ -13,6 +13,9 @@ enum KernelAudit: string implements AuditAction
     case SignedOut = 'identity.signed_out';
     case ResetRequested = 'identity.reset_requested';
     case PasswordReset = 'identity.password_reset';
+    case AccountInvited = 'identity.account_invited';
+    case InvitationSent = 'identity.invitation_sent';
+    case InvitationAccepted = 'identity.invitation_accepted';
     case FirstAdministrator = 'access.first_administrator';
     case RoleAssigned = 'access.role_assigned';
     case RoleEnded = 'access.role_ended';
@@ -52,6 +55,9 @@ enum KernelAudit: string implements AuditAction
             self::SignedOut => 'Signed out.',
             self::ResetRequested => 'Requested a password reset link.',
             self::PasswordReset => 'Set a new password with a reset link.',
+            self::AccountInvited => 'Made an account for a member of staff.',
+            self::InvitationSent => 'Sent an invitation to set a password.',
+            self::InvitationAccepted => 'Set a first password with an invitation link.',
             self::FirstAdministrator => 'Created the first administrator of the deployment.',
             self::RoleAssigned => 'Gave a role.',
             self::RoleEnded => 'Ended a role.',

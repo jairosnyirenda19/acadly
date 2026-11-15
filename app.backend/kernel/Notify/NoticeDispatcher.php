@@ -13,6 +13,7 @@ use Acadly\Kernel\Module\ModuleActivation;
 use Acadly\Kernel\Notify\Channels\ChannelAdapters;
 use Acadly\Kernel\Notify\Channels\RenderedNotice;
 use Acadly\Kernel\Notify\Jobs\DeliverNotice;
+use Acadly\Kernel\School\SchoolProfile;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
 use Illuminate\Contracts\Container\Container;
@@ -162,7 +163,7 @@ final class NoticeDispatcher
         $actor = $actorId !== null ? User::query()->find($actorId) : null;
         $tokens = [
             ...$topic->tokens(),
-            'institution' => config()->string('acadly.school_name'),
+            'institution' => app(SchoolProfile::class)->name(),
             'actor' => $actor instanceof User ? $actor->name : null,
         ];
 

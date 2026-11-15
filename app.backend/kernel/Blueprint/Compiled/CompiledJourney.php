@@ -15,7 +15,7 @@ use LogicException;
  * hashed into the lock, and what the projections read. Made by
  * `JourneyBlueprint::compile()` or read back from the canonical JSON.
  */
-final readonly class CompiledJourney
+final readonly class CompiledJourney implements CompiledBlueprint
 {
     /**
      * @param  array<string, string>  $states  value => label, in declared order
@@ -35,6 +35,11 @@ final readonly class CompiledJourney
         public array $stages,
         public array $steps,
     ) {}
+
+    public function reference(): BlueprintRef
+    {
+        return $this->ref;
+    }
 
     public function step(string $id): CompiledStep
     {

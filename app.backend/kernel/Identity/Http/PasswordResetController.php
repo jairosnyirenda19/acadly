@@ -33,7 +33,8 @@ final class PasswordResetController
     }
 
     /**
-     * Set a new password with a reset link.
+     * Set a new password with a reset link, or a first password with an
+     * invitation link (`invitation: true`).
      */
     public function reset(Request $request, ResetPassword $reset): Response
     {
@@ -41,12 +42,14 @@ final class PasswordResetController
             'token' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255'],
             'password' => ['required', 'string', 'confirmed', PasswordRule::defaults()],
+            'invitation' => ['sometimes', 'boolean'],
         ]);
 
         $reset->reset(
             $request->string('email')->toString(),
             $request->string('token')->toString(),
             $request->string('password')->toString(),
+            $request->boolean('invitation'),
         );
 
         return response()->noContent();

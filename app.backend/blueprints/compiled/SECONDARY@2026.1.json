@@ -1,0 +1,49 @@
+{
+    "abstract": false,
+    "extends": "SCHOOL_BASE@2026.1",
+    "kind": "profile",
+    "ref": "SECONDARY@2026.1",
+    "structure": {
+        "grouping": "streams",
+        "levels": [
+            {
+                "code": "F1",
+                "label": "Form 1"
+            },
+            {
+                "code": "F2",
+                "label": "Form 2"
+            },
+            {
+                "code": "F3",
+                "label": "Form 3"
+            },
+            {
+                "code": "F4",
+                "label": "Form 4"
+            }
+        ],
+        "period_model": "terms",
+        "periods_per_year": 3
+    },
+    "summary": "Forms 1 to 4. Streams and subject teachers. Marks and report cards.",
+    "title": "Secondary",
+    "vocabulary": {
+        "group": {
+            "many": "Streams",
+            "one": "Stream"
+        },
+        "learner": {
+            "many": "Students",
+            "one": "Student"
+        },
+        "level": {
+            "many": "Forms",
+            "one": "Form"
+        },
+        "period": {
+            "many": "Terms",
+            "one": "Term"
+        }
+    }
+}

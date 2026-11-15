@@ -99,6 +99,14 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+
+        // Invitations to staff accounts: the link sets the first password. Valid for 7 days.
+        'invitations' => [
+            'provider' => 'users',
+            'table' => 'identity_invitation_tokens',
+            'expire' => 10080,
+            'throttle' => 0,
+        ],
     ],
 
     /*

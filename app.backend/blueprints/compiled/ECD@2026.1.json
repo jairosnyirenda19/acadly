@@ -1,0 +1,45 @@
+{
+    "abstract": false,
+    "extends": "SCHOOL_BASE@2026.1",
+    "kind": "profile",
+    "ref": "ECD@2026.1",
+    "structure": {
+        "grouping": "rooms",
+        "levels": [
+            {
+                "code": "BABY",
+                "label": "Baby class"
+            },
+            {
+                "code": "MIDDLE",
+                "label": "Middle class"
+            },
+            {
+                "code": "TOP",
+                "label": "Top class"
+            }
+        ],
+        "period_model": "terms",
+        "periods_per_year": 3
+    },
+    "summary": "Children from 3 to 5 years. Rooms, caregivers and observations instead of marks.",
+    "title": "Nursery",
+    "vocabulary": {
+        "group": {
+            "many": "Rooms",
+            "one": "Room"
+        },
+        "learner": {
+            "many": "Children",
+            "one": "Child"
+        },
+        "level": {
+            "many": "Age groups",
+            "one": "Age group"
+        },
+        "period": {
+            "many": "Terms",
+            "one": "Term"
+        }
+    }
+}

@@ -76,4 +76,9 @@ enum ToyDocument: string implements DocumentKind
     {
         return $this === self::Receipt;
     }
+
+    public function isPublic(): bool
+    {
+        return false;
+    }
 }

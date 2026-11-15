@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use Acadly\Core\Academics\AcademicsCore;
 use Acadly\Core\Institution\InstitutionCore;
+use Acadly\Core\Setup\SetupCore;
 use Acadly\Modules\Attendance\AttendanceModule;
 
 return [
@@ -31,6 +33,7 @@ return [
     | blueprint:compile and blueprint:release; read by the journey engine.
     */
     'blueprints' => [
+        'profiles' => base_path('blueprints/profiles'),
         'compiled' => base_path('blueprints/compiled'),
         'lock' => base_path('blueprints/blueprints.lock'),
     ],
@@ -64,6 +67,8 @@ return [
     */
     'modules' => [
         InstitutionCore::class,
+        AcademicsCore::class,
+        SetupCore::class,
         AttendanceModule::class,
     ],
 

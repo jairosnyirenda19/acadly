@@ -22,7 +22,9 @@ function Rule({ met, text }: { met: boolean; text: string }) {
   )
 }
 
-export function ResetPasswordScreen({ token, email }: { token: string; email: string }) {
+export function ResetPasswordScreen({ token, email, invitation = false }: { token: string; email: string; invitation?: boolean }) {
+  const words = invitation ? { ...t, ...copy.invite } : t
+
   const [password, setPassword] = useState('')
   const [confirmation, setConfirmation] = useState('')
   const [working, setWorking] = useState(false)
@@ -38,7 +40,7 @@ export function ResetPasswordScreen({ token, email }: { token: string; email: st
     if (!ready) return
 
     setWorking(true)
-    const result = await resetPassword({ token, email, password, password_confirmation: confirmation })
+    const result = await resetPassword({ token, email, password, password_confirmation: confirmation, invitation })
     setWorking(false)
     setOutcome(result.kind)
   }
@@ -48,9 +50,9 @@ export function ResetPasswordScreen({ token, email }: { token: string; email: st
 
     return (
       <>
-        <Heading kicker={t.kicker} title={t.title} />
-        <Notice tone={changed ? 'done' : 'wrong'} title={changed ? t.changedTitle : t.invalidTitle}>
-          {changed ? t.changed : t.invalid}
+        <Heading kicker={words.kicker} title={words.title} />
+        <Notice tone={changed ? 'done' : 'wrong'} title={changed ? words.changedTitle : words.invalidTitle}>
+          {changed ? words.changed : words.invalid}
         </Notice>
         <InLink
           to={changed ? '/' : '/forgot-password'}
@@ -64,7 +66,7 @@ export function ResetPasswordScreen({ token, email }: { token: string; email: st
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-5" noValidate>
-      <Heading kicker={t.kicker} title={t.title} />
+      <Heading kicker={words.kicker} title={words.title} />
 
       <div className="flex justify-between gap-3 border-t-2 border-b border-t-ink border-b-rule py-2.5 text-sm">
         <span className="text-text-muted">{t.account}</span>

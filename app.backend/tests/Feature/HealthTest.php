@@ -16,11 +16,9 @@ it('reports service status and nothing else', function (): void {
 });
 
 it('names the school without authentication', function (): void {
-    config(['acadly.school_name' => 'Sunrise Academy']);
-
     $this->getJson('/api/v1/school')
         ->assertOk()
-        ->assertExactJson(['name' => 'Sunrise Academy']);
+        ->assertExactJson(['name' => 'Sunrise Academy', 'has_logo' => false]);
 });
 
 it('does not disclose the technology in use', function (): void {
@@ -54,7 +52,7 @@ it('does not disclose internals when debug mode is on', function (): void {
 it('registers the modules listed in the configuration', function (): void {
     $keys = array_map(fn (Module $module): string => $module->key(), app(ModuleRegistry::class)->all());
 
-    expect($keys)->toBe(['institution', 'attendance']);
+    expect($keys)->toBe(['institution', 'academics', 'setup', 'attendance']);
 });
 
 it('passes the structural lint', function (): void {

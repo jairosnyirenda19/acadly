@@ -56,6 +56,8 @@ use Acadly\Kernel\Notify\Console\NotifySweepCommand;
 use Acadly\Kernel\Notify\NoticeCatalogue;
 use Acadly\Kernel\Notify\NoticeDispatcher;
 use Acadly\Kernel\Notify\Notifier;
+use Acadly\Kernel\School\ConfiguredSchool;
+use Acadly\Kernel\School\SchoolProfile;
 use Acadly\Kernel\Support\Clock;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Console\Scheduling\Schedule;
@@ -71,6 +73,9 @@ final class KernelServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(Clock::class);
+
+        // The school as configuration names it, until the Institution core domain binds the real one.
+        $this->app->bindIf(SchoolProfile::class, ConfiguredSchool::class);
 
         $this->app->singleton(
             PermissionCatalogue::class,
@@ -112,7 +117,7 @@ final class KernelServiceProvider extends ServiceProvider
         $this->app->bind(
             BlueprintCompiler::class,
             fn (Application $app): BlueprintCompiler => new BlueprintCompiler(
-                new Declarations($app->make(ModuleRegistry::class)),
+                new Declarations($app->make(ModuleRegistry::class), config()->string('acadly.blueprints.profiles')),
                 $app->make(JourneyLinter::class),
                 $app->make(Lock::class),
             ),

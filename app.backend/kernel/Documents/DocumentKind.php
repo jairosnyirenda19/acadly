@@ -52,4 +52,10 @@ interface DocumentKind extends BackedEnum
 
     /** Accepted even when the licence's storage is full: records the school must keep. */
     public function essential(): bool;
+
+    /**
+     * The current version may be shown to anyone, signed in or not, such as
+     * the school logo on the sign-in page. Only plain kinds may be public.
+     */
+    public function isPublic(): bool;
 }

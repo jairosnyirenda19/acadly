@@ -1,0 +1,24 @@
+{
+    "abstract": true,
+    "extends": null,
+    "kind": "profile",
+    "ref": "SCHOOL_BASE@2026.1",
+    "structure": {
+        "grouping": null,
+        "levels": [],
+        "period_model": "terms",
+        "periods_per_year": 3
+    },
+    "summary": "",
+    "title": "School",
+    "vocabulary": {
+        "group": {
+            "many": "Classes",
+            "one": "Class"
+        },
+        "period": {
+            "many": "Terms",
+            "one": "Term"
+        }
+    }
+}

@@ -92,6 +92,8 @@ export async function resetPassword(input: {
   email: string
   password: string
   password_confirmation: string
+  /** The link is an invitation: it sets the first password of a new staff account. */
+  invitation?: boolean
 }): Promise<ResetOutcome> {
   try {
     await prepare()

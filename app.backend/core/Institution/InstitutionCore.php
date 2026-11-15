@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace Acadly\Core\Institution;
 
+use Acadly\Core\Institution\Contracts\InstitutionAudit;
+use Acadly\Core\Institution\Contracts\InstitutionDocument;
+use Acadly\Core\Institution\Contracts\InstitutionPermission;
 use Acadly\Kernel\Module\Module;
 use Acadly\Kernel\Module\Tier;
 
 /**
- * Tenants, institutions, divisions and campuses
- * (docs/architecture/03-deployment-campus-access.md §1). Stage 0 holds the
- * manifest only; the domain arrives in stage 2.
+ * The school, its divisions and its campuses
+ * (docs/architecture/03-deployment-campus-access.md §1): the school's details
+ * and logo, the levels it runs (each pinned to a Profile Blueprint), its
+ * campuses, and which level is taught where.
  */
 final class InstitutionCore implements Module
 {
@@ -36,12 +40,12 @@ final class InstitutionCore implements Module
 
     public function permissions(): array
     {
-        return [];
+        return InstitutionPermission::cases();
     }
 
     public function auditActions(): array
     {
-        return [];
+        return InstitutionAudit::cases();
     }
 
     public function events(): array
@@ -66,6 +70,6 @@ final class InstitutionCore implements Module
 
     public function documentKinds(): array
     {
-        return [];
+        return InstitutionDocument::cases();
     }
 }

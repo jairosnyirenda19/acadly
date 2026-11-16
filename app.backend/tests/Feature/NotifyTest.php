@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Acadly\Core\Academics\AcademicsCore;
+use Acadly\Core\Enrolment\EnrolmentCore;
 use Acadly\Core\Institution\InstitutionCore;
 use Acadly\Kernel\Access\Actions\AssignRole;
 use Acadly\Kernel\Access\PermissionCatalogue;
@@ -59,7 +61,7 @@ uses(DatabaseTransactions::class);
 /** @param  list<Module>  $extra */
 function useToyBuild(array $extra = []): void
 {
-    app()->instance(ModuleRegistry::class, new ModuleRegistry([new InstitutionCore, new AttendanceModule, new ToyModule, ...$extra]));
+    app()->instance(ModuleRegistry::class, new ModuleRegistry([new InstitutionCore, new AcademicsCore, new EnrolmentCore, new AttendanceModule, new ToyModule, ...$extra]));
 
     foreach ([PermissionCatalogue::class, AuditCatalogue::class, EventCatalogue::class, NoticeCatalogue::class,
         Notifier::class, Audit::class, Outbox::class] as $service) {

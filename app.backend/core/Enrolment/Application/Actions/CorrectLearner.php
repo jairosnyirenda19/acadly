@@ -40,7 +40,7 @@ final class CorrectLearner
             throw ValidationException::withMessages(['reason' => ['Say why the details are corrected.']]);
         }
 
-        $details = LearnerDetails::check($input, $this->clock->now()->toDateString());
+        $details = LearnerDetails::check($input, $this->clock->today());
         $current = $this->numbers->of($learner->id);
         $wanted = trim((string) $input['admission_number']) === '' ? $current : strtoupper(trim((string) $input['admission_number']));
         $number = $wanted !== null && $wanted !== $current ? $this->numbers->checkOrNext($wanted, $learner->id) : null;

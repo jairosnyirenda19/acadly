@@ -53,7 +53,7 @@ const RECORD_ROUTES = [
  * Lists that answer every viewer with only what is inside the viewer's reach.
  * For these the test checks that nothing of campus B is in the answer.
  */
-const LIST_ROUTES = ['people.index', 'academics.teaching.index', 'learners.index'];
+const LIST_ROUTES = ['people.index', 'academics.teaching.index', 'learners.index', 'registers.index'];
 
 uses(DatabaseTransactions::class);
 
@@ -112,6 +112,7 @@ it('refuses every place-bound route to an account that holds everything, but onl
         'people.' => ['id' => $atB->id, 'assignment' => $heldAtB->id],
         'roles.' => ['id' => $clerk->id],
         'learners.' => ['id' => $learner, 'contact' => $contact],
+        'registers.' => ['id' => $school->id('class_secondary_b'), 'register' => $school->id('class_secondary_b')],
     ];
     $b = [
         'id' => $school->id('campus_b'),

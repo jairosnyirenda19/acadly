@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Acadly\Core\Academics\AcademicsCore;
+use Acadly\Core\Enrolment\EnrolmentCore;
 use Acadly\Core\Institution\InstitutionCore;
 use Acadly\Kernel\Access\PermissionCatalogue;
 use Acadly\Kernel\Access\Role;
@@ -52,7 +54,7 @@ uses(DatabaseTransactions::class);
 const TOY_REF = 'toy.errand@2026.1';
 
 beforeEach(function (): void {
-    app()->instance(ModuleRegistry::class, new ModuleRegistry([new InstitutionCore, new AttendanceModule, new ToyModule]));
+    app()->instance(ModuleRegistry::class, new ModuleRegistry([new InstitutionCore, new AcademicsCore, new EnrolmentCore, new AttendanceModule, new ToyModule]));
 
     foreach ([PermissionCatalogue::class, AuditCatalogue::class, EventCatalogue::class, NoticeCatalogue::class, Notifier::class, Audit::class, Outbox::class] as $service) {
         app()->forgetInstance($service);

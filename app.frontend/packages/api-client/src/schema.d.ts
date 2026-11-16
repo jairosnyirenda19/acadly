@@ -851,6 +851,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/registers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every register the viewer may see on a day: `?day=YYYY-MM-DD&in=type:id` */
+        get: operations["registers.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/registers/class/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One class's register on a day: `?day=YYYY-MM-DD` */
+        get: operations["registers.show"];
+        put?: never;
+        /** Submits the register: `{day, marks: [{learner_id, status, note}]}` */
+        post: operations["registers.submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/registers/{register}/corrections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Asks for a correction: `{learner_id, to, reason}` */
+        post: operations["registers.corrections.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/registers/corrections/{id}/decide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Decides on a correction: `{approve, note}` */
+        post: operations["registers.corrections.decide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/roles": {
         parameters: {
             query?: never;
@@ -3465,6 +3534,254 @@ export interface operations {
                     "application/json": 200;
                 };
             };
+        };
+    };
+    "registers.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        day: string;
+                        today: string;
+                        year: string | null;
+                        classes: {
+                            id: string;
+                            name: string;
+                            teacher: string | null;
+                            school_day: boolean;
+                            due: boolean;
+                            register: {
+                                id: string;
+                                submitted_at: string;
+                                submitted_by: string;
+                            } | null;
+                            learners: number;
+                            counts: {
+                                present: number;
+                                absent: number;
+                                late: number;
+                                excused: number;
+                            };
+                            corrections: number;
+                        }[];
+                        totals: {
+                            classes: number;
+                            due: number;
+                            taken: number;
+                            not_taken: number;
+                            present: number;
+                            absent: number;
+                            late: number;
+                            excused: number;
+                            corrections: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "registers.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        day: string;
+                        today: string;
+                        school_day: boolean;
+                        teacher: string | null;
+                        register: {
+                            id: string;
+                            submitted_at: string;
+                            submitted_by: string;
+                        } | null;
+                        days_before: string[];
+                        learners: {
+                            id: string;
+                            name: string;
+                            admission_number: string | null;
+                            history: (string | null)[];
+                            mark: {
+                                status: string;
+                                note: string | null;
+                                corrected: boolean;
+                            } | null;
+                            correction: {
+                                id: string;
+                                from: string;
+                                to: string;
+                                reason: string;
+                                state: string;
+                                requested_by: string;
+                                requested_at: string;
+                                can_decide: boolean;
+                            } | null;
+                        }[];
+                        can_take: boolean;
+                        can_request: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "registers.submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    marks?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        day: string;
+                        today: string;
+                        school_day: boolean;
+                        teacher: string | null;
+                        register: {
+                            id: string | null;
+                            submitted_at: string;
+                            submitted_by: string;
+                        } | null;
+                        days_before: string[];
+                        learners: unknown[];
+                        can_take: boolean;
+                        can_request: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "registers.corrections.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                register: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        day: string;
+                        today: string;
+                        school_day: boolean;
+                        teacher: string | null;
+                        register: {
+                            id: string | null;
+                            submitted_at: string;
+                            submitted_by: string;
+                        } | null;
+                        days_before: string[];
+                        learners: unknown[];
+                        can_take: boolean;
+                        can_request: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "registers.corrections.decide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @default false */
+                    approve?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        day: string;
+                        today: string;
+                        school_day: boolean;
+                        teacher: string | null;
+                        register: {
+                            id: string | null;
+                            submitted_at: string;
+                            submitted_by: string;
+                        } | null;
+                        days_before: string[];
+                        learners: unknown[];
+                        can_take: boolean;
+                        can_request: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "roles.index": {

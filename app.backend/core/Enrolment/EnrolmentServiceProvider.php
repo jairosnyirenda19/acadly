@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Acadly\Core\Enrolment;
 
+use Acadly\Core\Enrolment\Application\Directory;
 use Acadly\Core\Enrolment\Application\LearnerPlaces;
+use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -14,6 +16,7 @@ final class EnrolmentServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->scoped(LearnerPlaces::class);
+        $this->app->bind(EnrolmentDirectory::class, Directory::class);
     }
 
     public function boot(): void

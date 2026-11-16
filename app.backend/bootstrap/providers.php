@@ -6,6 +6,7 @@ use Acadly\Core\Institution\InstitutionServiceProvider;
 use Acadly\Core\Setup\SetupServiceProvider;
 use Acadly\Kernel\KernelServiceProvider;
 use Acadly\Kernel\Module\ModuleServiceProvider;
+use Acadly\Modules\Attendance\AttendanceServiceProvider;
 use App\Providers\AppServiceProvider;
 
 return [
@@ -16,4 +17,5 @@ return [
     AcademicsServiceProvider::class,
     EnrolmentServiceProvider::class,
     SetupServiceProvider::class,
+    AttendanceServiceProvider::class,
 ];

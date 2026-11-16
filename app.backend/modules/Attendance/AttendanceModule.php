@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace Acadly\Modules\Attendance;
 
+use Acadly\Core\Academics\AcademicsCore;
+use Acadly\Core\Enrolment\EnrolmentCore;
 use Acadly\Core\Institution\InstitutionCore;
 use Acadly\Kernel\Module\Module;
 use Acadly\Kernel\Module\Tier;
+use Acadly\Modules\Attendance\Contracts\AttendanceAudit;
 use Acadly\Modules\Attendance\Contracts\AttendancePermission;
 
 /**
- * Registers, attendance events and corrections. Stage 0 holds the manifest
- * only, so the layer checks have a real optional module to guard.
+ * Registers, the marks in them, and corrections (the approved Attendance
+ * screens, first release): the morning register of each class, taken once
+ * a school day, and corrections approved by someone else.
  */
 final class AttendanceModule implements Module
 {
@@ -32,7 +36,7 @@ final class AttendanceModule implements Module
 
     public function requires(): array
     {
-        return [InstitutionCore::class];
+        return [InstitutionCore::class, AcademicsCore::class, EnrolmentCore::class];
     }
 
     public function permissions(): array
@@ -42,7 +46,7 @@ final class AttendanceModule implements Module
 
     public function auditActions(): array
     {
-        return [];
+        return AttendanceAudit::cases();
     }
 
     public function events(): array
@@ -57,7 +61,7 @@ final class AttendanceModule implements Module
 
     public function journeys(): array
     {
-        return [];
+        return ['attendance.correction'];
     }
 
     public function topics(): array

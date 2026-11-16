@@ -147,7 +147,7 @@ final class LearnerImport
     private function checkRows(User $viewer, array $rows): array
     {
         $classes = $this->classes($viewer);
-        $today = $this->clock->now()->toDateString();
+        $today = $this->clock->today();
         $year = $this->calendar->currentYear();
         $out = [];
         $seenLearner = [];

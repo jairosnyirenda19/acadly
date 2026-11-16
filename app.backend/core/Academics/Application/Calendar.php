@@ -21,7 +21,7 @@ final class Calendar implements AcademicCalendar
 
     public function currentYear(?string $day = null): ?array
     {
-        $day ??= $this->clock->now()->toDateString();
+        $day ??= $this->clock->today();
         $year = DB::table('academic_years')->where('starts_on', '<=', $day)->where('ends_on', '>=', $day)->first()
             ?? DB::table('academic_years')->orderBy('starts_on')->first();
 

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Acadly\Core\Academics\AcademicsCore;
+use Acadly\Core\Enrolment\EnrolmentCore;
 use Acadly\Core\Institution\InstitutionCore;
 use Acadly\Kernel\Access\AccessPermission;
 use Acadly\Kernel\Access\Actions\AssignRole;
@@ -37,7 +39,7 @@ beforeEach(function (): void {
     RecordingConsumer::$fail = false;
 
     app()->instance(EventCatalogue::class, new EventCatalogue(
-        new ModuleRegistry([new InstitutionCore, new AttendanceModule, new ListenerModule]),
+        new ModuleRegistry([new InstitutionCore, new AcademicsCore, new EnrolmentCore, new AttendanceModule, new ListenerModule]),
     ));
     app()->forgetInstance(Outbox::class);
     app()->forgetInstance(OutboxPublisher::class);

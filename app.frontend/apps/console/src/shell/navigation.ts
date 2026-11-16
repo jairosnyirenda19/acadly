@@ -1,4 +1,4 @@
-import { can, type AppContext } from '@acadly/kernel'
+import { can, moduleOn, type AppContext } from '@acadly/kernel'
 import { copy } from '../copy'
 import type { IconName } from './icons'
 
@@ -36,7 +36,10 @@ export const GROUPS: NavGroup[] = [
   {
     key: 'daily',
     label: t.groups.daily,
-    items: [{ key: 'today', label: t.nav.today, path: '/', icon: 'today', show: () => true, lights: (p) => p === '/' }],
+    items: [
+      { key: 'today', label: t.nav.today, path: '/', icon: 'today', show: () => true, lights: (p) => p === '/' },
+      { key: 'registers', label: t.nav.registers, path: '/registers', icon: 'registers', show: (c) => seesRegisters(c), lights: under('/registers') },
+    ],
   },
   {
     key: 'learners',
@@ -54,6 +57,11 @@ export const GROUPS: NavGroup[] = [
     ],
   },
 ]
+
+/** Whether the account may see a register anywhere: it takes, sees or corrects registers, and the module is on. */
+export function seesRegisters(context: AppContext): boolean {
+  return moduleOn(context, 'attendance') && ['attendance.capture', 'attendance.all_classes', 'attendance.correct'].some((p) => holdsAnywhere(context, p))
+}
 
 /** The groups and items this account sees. */
 export function visibleGroups(context: AppContext): NavGroup[] {

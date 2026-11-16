@@ -1,0 +1,124 @@
+import { navigate, useLoad, useLocation } from '@acadly/kernel'
+import { Waiting } from '@acadly/ui'
+import { copy } from '../copy'
+import { Total, TotalsBand } from '../setup/parts'
+import { PageHead, Tag } from '../settings/parts'
+import { useWorkIn } from '../shell/WorkIn'
+import { clock, longDay, registersApi } from './api'
+
+const t = copy.registers
+
+const COLS = 'grid-cols-[minmax(140px,1fr)_minmax(150px,1fr)_minmax(200px,1.3fr)_70px_70px_70px_70px]'
+
+/** Every register the viewer may see on one school day (the approved design). */
+export function RegistersScreen() {
+  const { query } = useLocation()
+  const day = query.get('day')
+  const { place } = useWorkIn()
+  const inPlace = place !== null && place.key !== 'institution:' ? place.key : null
+  const loaded = useLoad(`registers:${day ?? ''}:${inPlace ?? ''}`, () => registersApi.day(day, inPlace))
+  const state = loaded.data
+
+  if (state === undefined) {
+    return <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} band={[t.bandTaken, t.bandPresent, t.bandAbsent, t.bandAttention]} rows={6} onRetry={loaded.reload} />
+  }
+
+  const totals = state.totals
+  const marked = totals.present + totals.absent + totals.late + totals.excused
+  const attention = totals.not_taken + totals.corrections
+  const go = (next: string) => navigate(next === state.today ? '/registers' : `/registers?day=${next}`)
+
+  return (
+    <>
+      <PageHead
+        kicker={t.kicker(inPlace !== null && place !== null ? place.label : null, state.year)}
+        title={t.title}
+        intro={t.intro}
+        actions={
+          <div className="flex flex-wrap items-end gap-2">
+            <label className="block">
+              <span className="label-caps mb-1.5 block text-text-muted">{t.day}</span>
+              <input
+                type="date"
+                value={state.day}
+                max={state.today}
+                onChange={(e) => e.target.value !== '' && go(e.target.value)}
+                className="h-11 border-0 border-b-2 border-ink bg-field px-3 text-[15px] text-ink outline-none focus:border-teal"
+              />
+            </label>
+            {state.day !== state.today && (
+              <button type="button" onClick={() => go(state.today)} className="h-11 border-2 border-ink px-4 text-[15px] font-extrabold hover:bg-field">
+                {t.today}
+              </button>
+            )}
+          </div>
+        }
+      />
+      <TotalsBand>
+        <Total tone="ink" label={t.bandTaken} value={String(totals.taken)} suffix={` / ${totals.due}`} note={t.bandTakenNote(longDay(state.day))} />
+        <Total label={t.bandPresent} value={String(totals.present)} note={t.bandPresentNote(marked === 0 ? null : Math.round((totals.present / marked) * 100))} />
+        <Total label={t.bandAbsent} value={String(totals.absent)} note={t.bandAbsentNote(totals.late, totals.excused)} />
+        <Total tone={attention > 0 ? 'attention' : 'plain'} label={t.bandAttention} value={String(attention)} note={t.bandAttentionNote(totals.not_taken, totals.corrections)} />
+      </TotalsBand>
+
+      <section className="flex-1 bg-sheet px-[clamp(16px,3vw,40px)] pt-4.5 pb-8">
+        <div className="overflow-x-auto">
+          <div className="min-w-[820px]">
+            <div className={`label-caps grid ${COLS} gap-3 border-b-2 border-ink px-4 pb-2 text-text-muted`}>
+              <span>{t.colClass}</span>
+              <span>{t.colTeacher}</span>
+              <span>{t.colRegister}</span>
+              <span className="text-right">{t.colPresent}</span>
+              <span className="text-right">{t.colAbsent}</span>
+              <span className="text-right">{t.colLate}</span>
+              <span className="text-right">{t.colExcused}</span>
+            </div>
+            {state.classes.length === 0 && <p className="px-4 py-4 text-sm text-text-muted">{t.none}</p>}
+            {state.classes.map((c) => {
+              const missing = c.due && c.register === null && state.day <= state.today
+              const open = () => navigate(`/registers/${c.id}${state.day !== state.today ? `?day=${state.day}` : ''}`)
+
+              return (
+                <div
+                  key={c.id}
+                  role="link"
+                  tabIndex={0}
+                  aria-label={t.open(c.name)}
+                  onClick={open}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') open()
+                  }}
+                  className={`grid cursor-pointer ${COLS} items-center gap-3 border-b border-rule px-4 py-2.5 hover:bg-paper ${missing ? 'bg-marigold-wash' : ''}`}
+                >
+                  <span className="type-display text-xl leading-none">{c.name}</span>
+                  <span className={`text-sm ${c.teacher !== null ? 'font-bold' : 'text-text-muted'}`}>{c.teacher ?? t.notGiven}</span>
+                  <span className="flex flex-wrap items-center gap-1.5">
+                    {c.register !== null ? (
+                      <>
+                        <Tag tone="done">{t.taken}</Tag>
+                        <span className="ref text-xs text-text-muted">{clock(c.register.submitted_at)}</span>
+                      </>
+                    ) : missing ? (
+                      <Tag tone="attention">{t.notTaken}</Tag>
+                    ) : !c.school_day ? (
+                      <Tag tone="plain">{t.notSchoolDay}</Tag>
+                    ) : (
+                      c.learners === 0 && <span className="text-[13px] text-text-muted">{t.noLearners}</span>
+                    )}
+                    {c.corrections > 0 && <Tag tone="attention">{t.correctionsToApprove(c.corrections)}</Tag>}
+                  </span>
+                  {(['present', 'absent', 'late', 'excused'] as const).map((k) => (
+                    <span key={k} className={`type-numeral text-right text-[26px] ${k === 'absent' && c.counts.absent > 0 ? 'text-red-pen' : ''}`}>
+                      {c.register !== null ? c.counts[k] : '–'}
+                    </span>
+                  ))}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+        <p className="mt-3 text-[13px] text-text-muted">{t.rule}</p>
+      </section>
+    </>
+  )
+}

@@ -59,11 +59,11 @@ final class AdmitLearner
 
         $at = ScopeRef::of(ScopeType::ClassGroup, $class['id']);
 
-        $details = LearnerDetails::check($input, $this->clock->now()->toDateString());
+        $details = LearnerDetails::check($input, $this->clock->today());
         $admitted = LearnerDetails::day($input['admitted_on'], 'admitted_on', 'The date admitted');
         $year = DB::table('academic_years')->where('id', $class['year_id'])->first(['starts_on', 'ends_on']);
 
-        if ($admitted > $this->clock->now()->toDateString()) {
+        if ($admitted > $this->clock->today()) {
             throw ValidationException::withMessages(['admitted_on' => ['The date admitted cannot be in the future.']]);
         }
 

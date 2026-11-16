@@ -55,7 +55,7 @@ final class ChangeClass
 
         $this->access->check($by, EnrolmentPermission::Manage, ScopeRef::of(ScopeType::ClassGroup, $target['id']));
 
-        if ($from <= $place['starts_on'] || $from > $this->clock->now()->toDateString()) {
+        if ($from <= $place['starts_on'] || $from > $this->clock->today()) {
             throw ValidationException::withMessages(['from' => ['The move must be dated after '.$place['starts_on'].' and not in the future.']]);
         }
 

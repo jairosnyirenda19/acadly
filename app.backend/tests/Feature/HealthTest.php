@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Acadly\Core\Academics\AcademicsCore;
+use Acadly\Core\Enrolment\EnrolmentCore;
 use Acadly\Core\Institution\InstitutionCore;
 use Acadly\Kernel\Module\Module;
 use Acadly\Kernel\Module\ModuleRegistry;
@@ -130,7 +132,7 @@ it('refuses a core domain that requires an optional module', function (): void {
         }
     };
 
-    new ModuleRegistry([new InstitutionCore, new AttendanceModule, $core]);
+    new ModuleRegistry([new InstitutionCore, new AcademicsCore, new EnrolmentCore, new AttendanceModule, $core]);
 })->throws(LogicException::class, 'cannot require the optional module');
 
 it('refuses a module that requires one that is not in the build', function (): void {

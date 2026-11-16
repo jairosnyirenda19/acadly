@@ -30,9 +30,9 @@ enum AttendancePermission: string implements Permission
     public function help(): string
     {
         return match ($this) {
-            self::Capture => 'Assigned classes only. Assignment follows the timetable.',
-            self::Correct => "Not available for one's own request.",
-            self::AllClasses => 'SEES EVERY REGISTER in the division. Grant to the academic office only.',
+            self::Capture => 'Take the morning register of a class where the role is given, and ask for a correction after it is submitted.',
+            self::Correct => 'Approve or decline a correction to a register. Never one the person asked for.',
+            self::AllClasses => 'See the registers of every class where the role is given, without taking them.',
         };
     }
 

@@ -21,6 +21,8 @@ import { AdmitScreen } from './learners/AdmitScreen'
 import { LearnerImportScreen } from './learners/LearnerImportScreen'
 import { LearnerScreen } from './learners/LearnerScreen'
 import { LearnersScreen } from './learners/LearnersScreen'
+import { RegisterScreen } from './registers/RegisterScreen'
+import { RegistersScreen } from './registers/RegistersScreen'
 import { PeopleImportScreen } from './settings/PeopleImportScreen'
 import { PeopleScreen } from './settings/PeopleScreen'
 import { PersonScreen } from './settings/PersonScreen'
@@ -29,6 +31,7 @@ import { SubjectsScreen } from './settings/SubjectsScreen'
 import { TeachingScreen } from './settings/TeachingScreen'
 import { SetupWizard } from './setup/SetupWizard'
 import { ConsoleShell, holdsAnywhere, settingsHome } from './shell/ConsoleShell'
+import { seesRegisters } from './shell/navigation'
 import { WorkInProvider } from './shell/WorkIn'
 import { SignInScreen } from './sign-in/SignInScreen'
 import { StatusScreen } from './StatusScreen'
@@ -44,13 +47,17 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const person = /^\/settings\/people\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const seesLearners = holdsAnywhere(context, 'enrolment.learners.view')
   const learner = /^\/learners\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const registers = seesRegisters(context)
+  const register = /^\/registers\/([0-9a-f-]{36})$/.exec(path)?.[1]
 
   useEffect(() => {
     if (path === '/settings' && home !== null) navigate(home, true)
   }, [path, home])
 
   let page
-  if (path === '/learners' && seesLearners) page = <LearnersScreen />
+  if (path === '/registers' && registers) page = <RegistersScreen />
+  else if (register !== undefined && registers) page = <RegisterScreen key={register} classId={register} />
+  else if (path === '/learners' && seesLearners) page = <LearnersScreen />
   else if (path === '/learners/admit' && holdsAnywhere(context, 'enrolment.admit')) page = <AdmitScreen />
   else if (path === '/learners/import' && holdsAnywhere(context, 'enrolment.admit')) page = <LearnerImportScreen />
   else if (learner !== undefined && seesLearners) page = <LearnerScreen key={learner} id={learner} />

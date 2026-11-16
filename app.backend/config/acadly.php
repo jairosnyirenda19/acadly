@@ -19,6 +19,12 @@ return [
     'school_name' => env('ACADLY_SCHOOL_NAME', 'School'),
 
     /*
+    | Where the school is. Moments are stored in UTC; a school day (a register,
+    | a date admitted) is the day in this timezone.
+    */
+    'timezone' => env('ACADLY_TIMEZONE', 'Africa/Blantyre'),
+
+    /*
     | The public key that verifies the licence IQ-X issues (Ed25519, base64).
     | With no key on a development machine, every module is licensed.
     */

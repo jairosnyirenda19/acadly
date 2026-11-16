@@ -1,0 +1,121 @@
+{
+    "initial": "drafted",
+    "kind": "journey",
+    "milestones": {
+        "decided": [
+            "approved",
+            "declined"
+        ]
+    },
+    "ref": "attendance.correction@2026.1",
+    "stages": [
+        {
+            "key": "request",
+            "steps": [
+                "request"
+            ],
+            "title": "Request"
+        },
+        {
+            "key": "decision",
+            "steps": [
+                "decide"
+            ],
+            "title": "Decision"
+        }
+    ],
+    "states": [
+        {
+            "id": "drafted",
+            "label": "Being written"
+        },
+        {
+            "id": "requested",
+            "label": "Awaiting approval"
+        },
+        {
+            "id": "approved",
+            "label": "Approved"
+        },
+        {
+            "id": "declined",
+            "label": "Declined"
+        }
+    ],
+    "steps": [
+        {
+            "capability": "attendance.capture",
+            "four_eyes": null,
+            "from": [
+                "drafted"
+            ],
+            "gates": [
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Modules\\Attendance\\Journeys\\Correction\\MarkStillCurrent"
+                }
+            ],
+            "id": "request",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "requested",
+                    "requires_reason": true,
+                    "title": "Ask for the correction",
+                    "to": "requested"
+                }
+            ],
+            "stage": "request",
+            "title": "Ask for a correction"
+        },
+        {
+            "capability": "attendance.correct",
+            "four_eyes": "request",
+            "from": [
+                "requested"
+            ],
+            "gates": [
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Modules\\Attendance\\Journeys\\Correction\\MarkStillCurrent"
+                }
+            ],
+            "id": "decide",
+            "outcomes": [
+                {
+                    "effects": [
+                        {
+                            "args": [],
+                            "args_class": null,
+                            "class": "Acadly\\Modules\\Attendance\\Journeys\\Correction\\RecordCorrectedMark"
+                        }
+                    ],
+                    "emits": [],
+                    "id": "approved",
+                    "requires_reason": false,
+                    "title": "Approve",
+                    "to": "approved"
+                },
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "declined",
+                    "requires_reason": true,
+                    "title": "Decline",
+                    "to": "declined"
+                }
+            ],
+            "stage": "decision",
+            "title": "Decide on the correction"
+        }
+    ],
+    "subject": "Acadly\\Modules\\Attendance\\Domain\\Correction",
+    "terminal": [
+        "approved",
+        "declined"
+    ],
+    "title": "Register correction"
+}

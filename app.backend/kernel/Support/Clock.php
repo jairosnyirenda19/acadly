@@ -16,4 +16,13 @@ final class Clock
     {
         return CarbonImmutable::now();
     }
+
+    /**
+     * The calendar day where the school is, as YYYY-MM-DD. Moments are kept
+     * in UTC; a day (a register, a date admitted) is the school's own day.
+     */
+    public function today(): string
+    {
+        return $this->now()->setTimezone(config()->string('acadly.timezone', 'UTC'))->toDateString();
+    }
 }

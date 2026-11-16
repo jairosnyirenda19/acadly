@@ -106,7 +106,7 @@ final class Messages
                 'group' => $this->modules->has($owner) ? $this->modules->get($owner)->name() : 'School',
                 'audience' => $notice->parties() !== [] ? 'contacts' : 'staff',
                 'channels' => Notice::values($notice->allowedChannels()),
-                'enabled' => $this->settings->topicEnabled($key),
+                'enabled' => $this->settings->topicEnabled($key, $notice->onAtFirst()),
                 'own_words' => in_array($key, $own, true),
             ];
         }
@@ -137,7 +137,7 @@ final class Messages
             'name' => $notice->name(),
             'audience' => $notice->parties() !== [] ? 'contacts' : 'staff',
             'channels' => Notice::values($notice->allowedChannels()),
-            'enabled' => $this->settings->topicEnabled($key),
+            'enabled' => $this->settings->topicEnabled($key, $notice->onAtFirst()),
             'can_switch_off' => $notice->optOutRule() !== OptOut::Never,
             'contacts' => $notice->parties() !== [] ? $this->settings->contacts($key) : null,
             'facts' => [...$notice->factNames(), ...array_values(array_diff(Notice::ALWAYS, ['actor']))],

@@ -24,6 +24,11 @@ import { LearnerScreen } from './learners/LearnerScreen'
 import { LearnersScreen } from './learners/LearnersScreen'
 import { RegisterScreen } from './registers/RegisterScreen'
 import { RegistersScreen } from './registers/RegistersScreen'
+import { LessonRegisterScreen } from './registers/LessonRegisterScreen'
+import { LessonsScreen } from './registers/LessonsScreen'
+import { MissedScreen } from './registers/MissedScreen'
+import { MyDayScreen } from './registers/MyDayScreen'
+import { TimetableScreen } from './settings/TimetableScreen'
 import { PeopleImportScreen } from './settings/PeopleImportScreen'
 import { PeopleScreen } from './settings/PeopleScreen'
 import { PersonScreen } from './settings/PersonScreen'
@@ -36,7 +41,7 @@ import { WordingScreen } from './messages/WordingScreen'
 import { TeachingScreen } from './settings/TeachingScreen'
 import { SetupWizard } from './setup/SetupWizard'
 import { ConsoleShell, holdsAnywhere, settingsHome } from './shell/ConsoleShell'
-import { seesRegisters } from './shell/navigation'
+import { seesRegisters, takesRegisters } from './shell/navigation'
 import { WorkInProvider } from './shell/WorkIn'
 import { SignInScreen } from './sign-in/SignInScreen'
 import { StatusScreen } from './StatusScreen'
@@ -54,13 +59,18 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const learner = /^\/learners\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const registers = seesRegisters(context)
   const register = /^\/registers\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const lesson = /^\/registers\/lesson\/([0-9a-f-]{36})$/.exec(path)?.[1]
 
   useEffect(() => {
     if (path === '/settings' && home !== null) navigate(home, true)
   }, [path, home])
 
   let page
-  if (path === '/registers' && registers) page = <RegistersScreen />
+  if (path === '/my-day' && takesRegisters(context)) page = <MyDayScreen />
+  else if (path === '/registers' && registers) page = <RegistersScreen />
+  else if (path === '/registers/lessons' && registers) page = <LessonsScreen />
+  else if (path === '/registers/missed' && registers) page = <MissedScreen />
+  else if (lesson !== undefined && registers) page = <LessonRegisterScreen key={lesson} slot={lesson} />
   else if (register !== undefined && registers) page = <RegisterScreen key={register} classId={register} />
   else if (path === '/learners' && seesLearners) page = <LearnersScreen />
   else if (path === '/learners/admit' && holdsAnywhere(context, 'enrolment.admit')) page = <AdmitScreen />
@@ -72,6 +82,8 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/settings/roles' && edits) page = <RolesScreen />
   else if (path === '/settings/subjects' && teaches) page = <SubjectsScreen />
   else if (path === '/settings/teaching' && teaches) page = <TeachingScreen />
+  else if (path === '/settings/timetable' && teaches) page = <TimetableScreen view="bells" />
+  else if (path === '/settings/timetable/classes' && teaches) page = <TimetableScreen view="classes" />
   else if (path === '/settings/modules' && can(context, 'modules.manage')) page = <ModulesScreen />
   else if (path === '/settings/messages' && can(context, 'notify.manage')) page = <ChannelsScreen />
   else if (path === '/settings/messages/wording' && can(context, 'notify.manage')) page = <WordingScreen />

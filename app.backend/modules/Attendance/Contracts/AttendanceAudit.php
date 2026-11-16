@@ -10,6 +10,9 @@ enum AttendanceAudit: string implements AuditAction
 {
     case RegisterSubmitted = 'attendance.register_submitted';
     case AbsenceFollowedUp = 'attendance.absence_followed_up';
+    case LessonRegisterSubmitted = 'attendance.lesson_register_submitted';
+    case AwaySet = 'attendance.away_set';
+    case CoverAsked = 'attendance.cover_asked';
 
     public function key(): string
     {
@@ -21,6 +24,9 @@ enum AttendanceAudit: string implements AuditAction
         return match ($this) {
             self::RegisterSubmitted => 'Submitted the register of a class.',
             self::AbsenceFollowedUp => 'Told the next contact of an absence, or recorded a call to the family.',
+            self::LessonRegisterSubmitted => 'Submitted the register of a lesson.',
+            self::AwaySet => 'Marked a member of staff away for a day, or back.',
+            self::CoverAsked => 'Asked a member of staff to cover a lesson.',
         };
     }
 

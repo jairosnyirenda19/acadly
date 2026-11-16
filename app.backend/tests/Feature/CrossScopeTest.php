@@ -53,7 +53,8 @@ const RECORD_ROUTES = [
  * Lists that answer every viewer with only what is inside the viewer's reach.
  * For these the test checks that nothing of campus B is in the answer.
  */
-const LIST_ROUTES = ['people.index', 'academics.teaching.index', 'learners.index', 'registers.index'];
+const LIST_ROUTES = ['people.index', 'academics.teaching.index', 'academics.timetable.index', 'learners.index', 'registers.index',
+    'registers.lessons', 'registers.missed', 'registers.levels'];
 
 uses(DatabaseTransactions::class);
 
@@ -106,13 +107,26 @@ it('refuses every place-bound route to an account that holds everything, but onl
     DB::table('learner_contacts')->insert(['id' => $contact, 'learner_id' => $learner, 'name' => 'Chimwemwe Blantyre', 'relationship' => 'mother',
         'phone' => '0999 000 111', 'position' => 1, 'added_at' => now()]);
 
+    // A lesson at campus B, on every school day.
+    $slot = Ids::next();
+    DB::table('academic_bell_plans')->insert(['id' => Ids::next(), 'division_id' => $school->id('secondary'), 'campus_id' => $school->id('campus_b'),
+        'name' => 'Every day', 'weekdays' => json_encode([1, 2, 3, 4, 5, 6, 7]), 'periods' => json_encode([['name' => 'Period 1', 'starts' => '00:00', 'ends' => '23:59', 'kind' => 'lesson']]),
+        'position' => 0, 'created_at' => now(), 'updated_at' => now()]);
+    $subject = Ids::next();
+    DB::table('academic_subjects')->insert(['id' => $subject, 'division_id' => $school->id('secondary'), 'short' => 'BIO', 'name' => 'Biology', 'core' => true,
+        'levels' => json_encode(['F1']), 'position' => 1, 'created_at' => now(), 'updated_at' => now()]);
+    foreach ([1, 2, 3, 4, 5, 6, 7] as $weekday) {
+        DB::table('academic_timetable')->insert(['id' => $weekday === 1 ? $slot : Ids::next(), 'class_id' => $school->id('class_secondary_b'), 'weekday' => $weekday, 'period' => 1,
+            'subject_id' => $subject, 'user_id' => $atB->id, 'starts_on' => '2026-01-01', 'set_by' => $atB->id, 'set_at' => now()]);
+    }
+
     // Values that point at campus B, for route parameters and request bodies alike;
     // a route's own values come first.
     $own = [
         'people.' => ['id' => $atB->id, 'assignment' => $heldAtB->id],
         'roles.' => ['id' => $clerk->id],
         'learners.' => ['id' => $learner, 'contact' => $contact],
-        'registers.' => ['id' => $school->id('class_secondary_b'), 'register' => $school->id('class_secondary_b'), 'learner' => $learner],
+        'registers.' => ['id' => $school->id('class_secondary_b'), 'register' => $school->id('class_secondary_b'), 'learner' => $learner, 'slot' => $slot],
     ];
     $b = [
         'id' => $school->id('campus_b'),
@@ -127,7 +141,8 @@ it('refuses every place-bound route to an account that holds everything, but onl
         'enabled' => true, 'reason' => 'Cross-scope test.', 'role_id' => $clerk->id, 'scope_type' => 'campus',
         'scope_id' => $school->id('campus_b'), 'permissions' => [], 'send' => false, 'class_id' => $school->id('class_secondary_b'),
         'first_name' => 'Wezi', 'surname' => 'Banda', 'sex' => 'female', 'date_of_birth' => '2012-02-02', 'admitted_on' => '2026-09-08',
-        'from' => '2026-10-01', 'phone' => '0999 000 222', 'relationship' => 'father'];
+        'from' => '2026-10-01', 'phone' => '0999 000 222', 'relationship' => 'father', 'slot_id' => $slot, 'user_id' => $atB->id, 'away' => true,
+        'weekday' => 1, 'period' => 1, 'subject_id' => $subject];
     $secrets = [$school->id('campus_b'), $atB->email, $atB->name, 'Blantyre'];
 
     $checked = 0;

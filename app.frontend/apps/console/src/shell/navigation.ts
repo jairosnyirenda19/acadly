@@ -37,6 +37,7 @@ export const GROUPS: NavGroup[] = [
     key: 'daily',
     label: t.groups.daily,
     items: [
+      { key: 'my-day', label: t.nav.myDay, path: '/my-day', icon: 'myDay', show: (c) => takesRegisters(c), lights: (p) => p === '/my-day' },
       { key: 'today', label: t.nav.today, path: '/', icon: 'today', show: () => true, lights: (p) => p === '/' },
       { key: 'registers', label: t.nav.registers, path: '/registers', icon: 'registers', show: (c) => seesRegisters(c), lights: under('/registers') },
     ],
@@ -54,6 +55,7 @@ export const GROUPS: NavGroup[] = [
       { key: 'roles', label: t.nav.roles, path: '/settings/roles', icon: 'roles', show: (c) => can(c, 'access.roles.manage'), lights: under('/settings/roles') },
       { key: 'subjects', label: t.nav.subjects, path: '/settings/subjects', icon: 'subjects', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/subjects') },
       { key: 'teaching', label: t.nav.teaching, path: '/settings/teaching', icon: 'teaching', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/teaching') },
+      { key: 'timetable', label: t.nav.timetable, path: '/settings/timetable', icon: 'timetable', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/timetable') },
       { key: 'messages', label: t.nav.messages, path: '/settings/messages', icon: 'messages', show: (c) => can(c, 'notify.manage'), lights: under('/settings/messages') },
       { key: 'modules', label: t.nav.modules, path: '/settings/modules', icon: 'modules', show: (c) => can(c, 'modules.manage'), lights: under('/settings/modules') },
     ],
@@ -63,6 +65,11 @@ export const GROUPS: NavGroup[] = [
 /** Whether the account may see a register anywhere: it takes, sees or corrects registers, and the module is on. */
 export function seesRegisters(context: AppContext): boolean {
   return moduleOn(context, 'attendance') && ['attendance.capture', 'attendance.all_classes', 'attendance.correct'].some((p) => holdsAnywhere(context, p))
+}
+
+/** Whether the account takes registers somewhere, with the module on: it has a day of its own. */
+export function takesRegisters(context: AppContext): boolean {
+  return moduleOn(context, 'attendance') && holdsAnywhere(context, 'attendance.capture')
 }
 
 /** The groups and items this account sees. */

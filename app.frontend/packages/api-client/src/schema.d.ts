@@ -538,6 +538,143 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/registers/levels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** How each level takes registers */
+        get: operations["registers.levels"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/registers/my-day": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The viewer's day: `?day=YYYY-MM-DD` */
+        get: operations["registers.my-day"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/registers/lessons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every lesson of the day in the classes the viewer may see: `?day=YYYY-MM-DD` */
+        get: operations["registers.lessons"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/registers/missed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Learners here this morning and absent from a lesson: `?day=YYYY-MM-DD` */
+        get: operations["registers.missed"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/registers/lesson/{slot}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One lesson's register: `?day=YYYY-MM-DD` */
+        get: operations["registers.lesson.show"];
+        put?: never;
+        /** Submits a lesson register: `{day, marks: [{learner_id, status, note}]}` */
+        post: operations["registers.lesson.submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/registers/away": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Marks someone away on a day, or back: `{user_id?, day, away, reason?}`. Without `user_id`, the viewer */
+        post: operations["registers.away"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/registers/cover/free": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Who is free to cover a lesson: `?slot_id=&day=` */
+        get: operations["registers.cover.free"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/registers/cover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Asks someone to cover a lesson: `{slot_id, day, user_id}` */
+        post: operations["registers.cover.ask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/me": {
         parameters: {
             query?: never;
@@ -1433,6 +1570,57 @@ export interface paths {
         put?: never;
         /** Copies who taught what in the year before: `{division_id, campus_id}` */
         post: operations["academics.teaching.copy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/academics/timetable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** `?division_id=&campus_id=&class_id=` choose the tab and the class; the first of each otherwise */
+        get: operations["academics.timetable.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/academics/timetable/bells": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Replaces the bell times of a level at a campus: `{division_id, campus_id, plans: [{name, weekdays, periods: [{name, starts, ends, kind}]}]}` */
+        put: operations["academics.timetable.bells"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/academics/timetable/period": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Sets one period of a class: `{class_id, weekday, period, subject_id?, user_id?}`. No subject makes it a free period */
+        put: operations["academics.timetable.period"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3041,6 +3229,506 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "registers.levels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        levels: {
+                            division: string;
+                            /** @enum {string} */
+                            mode: "daily" | "daily_and_lessons";
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "registers.my-day": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        day: string;
+                        today: string;
+                        now: string;
+                        away: {
+                            reason: string | null;
+                        } | null;
+                        morning: {
+                            class_id: string;
+                            class: string;
+                            school_day: boolean;
+                            submitted_at: string | null;
+                        }[];
+                        bells: {
+                            number: number | null;
+                            name: string;
+                            starts: string;
+                            ends: string;
+                            /** @enum {string} */
+                            kind: "lesson" | "break";
+                        }[];
+                        lessons: {
+                            slot_id: string;
+                            period: number;
+                            name: string;
+                            starts: string;
+                            ends: string;
+                            class_id: string;
+                            class: string;
+                            subject: string;
+                            subject_short: string;
+                            /** @enum {string} */
+                            state: "taken" | "cover" | "no_register" | "needs_cover" | "now" | "later";
+                            register: {
+                                id: string;
+                                present: number;
+                                total: number;
+                            } | null;
+                            mine: boolean;
+                            cover_for: string | null;
+                            asked_by: string | null;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "registers.lessons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        day: string;
+                        today: string;
+                        now: string;
+                        places: {
+                            label: string;
+                            bells: {
+                                number: number | null;
+                                name: string;
+                                starts: string;
+                                ends: string;
+                                /** @enum {string} */
+                                kind: "lesson" | "break";
+                            }[];
+                            classes: {
+                                id: string;
+                                name: string;
+                                lessons: {
+                                    slot_id: string;
+                                    period: number;
+                                    name: string;
+                                    starts: string;
+                                    ends: string;
+                                    class_id: string;
+                                    class: string;
+                                    subject: string;
+                                    subject_short: string;
+                                    /** @enum {string} */
+                                    state: "taken" | "cover" | "no_register" | "needs_cover" | "now" | "later";
+                                    register: {
+                                        id: string;
+                                        present: number;
+                                        total: number;
+                                    } | null;
+                                    teacher: string | null;
+                                    taken_by: string | null;
+                                    asked: string | null;
+                                }[];
+                            }[];
+                        }[];
+                        away: {
+                            user_id: string;
+                            name: string;
+                            reason: string | null;
+                            marked_by: string | null;
+                            marked_at: string;
+                            lessons: {
+                                slot_id: string;
+                                period: number;
+                                name: string;
+                                starts: string;
+                                ends: string;
+                                class_id: string;
+                                class: string;
+                                subject: string;
+                                subject_short: string;
+                                /** @enum {string} */
+                                state: "taken" | "cover" | "no_register" | "needs_cover" | "now" | "later";
+                                register: {
+                                    id: string;
+                                    present: number;
+                                    total: number;
+                                } | null;
+                                asked: string | null;
+                                can_arrange: boolean;
+                            }[];
+                        }[];
+                        totals: {
+                            lessons: number;
+                            so_far: number;
+                            taken: number;
+                            cover: number;
+                            no_register: number;
+                            needs_cover: number;
+                        };
+                        can_arrange: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "registers.missed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        day: string;
+                        today: string;
+                        notice_on: boolean;
+                        missed: {
+                            register_id: string;
+                            learner_id: string;
+                            learner: string;
+                            class: string;
+                            /** @enum {string} */
+                            morning: "present" | "late";
+                            subject: string;
+                            period: number;
+                            starts: string;
+                            taken_by: string;
+                            cover: boolean;
+                            told: {
+                                to: string;
+                                channel: string;
+                                /** @enum {string} */
+                                state: "delivered" | "sent" | "accepted" | "not_delivered" | "waiting" | "not_reachable";
+                                at: string;
+                            }[];
+                            follow_ups: {
+                                by: string;
+                                at: string;
+                                note: string | null;
+                            }[];
+                            can_follow_up: boolean;
+                        }[];
+                        totals: {
+                            missed: number;
+                            learners: number;
+                            followed_up: number;
+                            told: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "registers.lesson.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slot: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        lesson: {
+                            slot_id: string;
+                            period: number;
+                            name: string;
+                            starts: string;
+                            ends: string;
+                            subject: string;
+                            teacher: string | null;
+                        };
+                        day: string;
+                        today: string;
+                        school_day: boolean;
+                        morning_taken: boolean;
+                        earlier: {
+                            period: number;
+                        } | null;
+                        register: {
+                            id: string;
+                            submitted_at: string;
+                            submitted_by: string;
+                            cover: boolean;
+                        } | null;
+                        cover: boolean;
+                        learners: {
+                            id: string;
+                            name: string;
+                            admission_number: string | null;
+                            morning: string | null;
+                            earlier: string | null;
+                            mark: {
+                                status: string;
+                                note: string | null;
+                                corrected: boolean;
+                            } | null;
+                            correction: {
+                                id: string;
+                                from: string;
+                                to: string;
+                                reason: string;
+                                state: string;
+                                requested_by: string;
+                                requested_at: string;
+                                can_decide: boolean;
+                            } | null;
+                        }[];
+                        can_take: boolean;
+                        can_request: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "registers.lesson.submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slot: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    marks?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        lesson: {
+                            slot_id: string;
+                            period: number;
+                            name: string;
+                            starts: string;
+                            ends: string;
+                            subject: string;
+                            teacher: string | null;
+                        };
+                        day: string;
+                        today: string;
+                        school_day: boolean;
+                        morning_taken: boolean;
+                        earlier: {
+                            period: number;
+                        } | null;
+                        register: {
+                            id: string;
+                            submitted_at: string;
+                            submitted_by: string;
+                            cover: boolean;
+                        } | null;
+                        cover: boolean;
+                        learners: unknown[];
+                        can_take: boolean;
+                        can_request: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "registers.away": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    reason?: string;
+                    /** @default false */
+                    away?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ok: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "registers.cover.free": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        free: {
+                            id: string;
+                            name: string;
+                            lessons: number;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "registers.cover.ask": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        day: string;
+                        today: string;
+                        now: string;
+                        places: {
+                            label: string;
+                            bells: Record<string, never>[];
+                            classes: {
+                                id: string;
+                                name: string;
+                                lessons: {
+                                    slot_id: string;
+                                    period: string;
+                                    name: string;
+                                    starts: string;
+                                    ends: string;
+                                    class_id: string;
+                                    class: string;
+                                    subject: string;
+                                    subject_short: string;
+                                    state: string;
+                                    register: {
+                                        id: string;
+                                        present: number | string;
+                                        total: number | string;
+                                    } | null;
+                                    teacher: string | null;
+                                    taken_by: string | null;
+                                    asked: string | null;
+                                }[];
+                            }[];
+                        }[];
+                        away: {
+                            user_id: string;
+                            name: string;
+                            reason: string;
+                            marked_by: string | null;
+                            marked_at: string;
+                            lessons: unknown[];
+                        }[];
+                        totals: {
+                            lessons: string;
+                            so_far: string;
+                            taken: number | unknown[];
+                            cover: string;
+                            no_register: string;
+                            needs_cover: string;
+                        };
+                        can_arrange: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     me: {
         parameters: {
             query?: never;
@@ -4578,6 +5266,7 @@ export interface operations {
                         day: string;
                         today: string;
                         year: string | null;
+                        lessons: boolean;
                         classes: {
                             id: string;
                             name: string;
@@ -4776,6 +5465,37 @@ export interface operations {
                         learners: unknown[];
                         can_take: boolean;
                         can_request: boolean;
+                    } | {
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        lesson: {
+                            slot_id: string;
+                            period: number;
+                            name: string;
+                            starts: string;
+                            ends: string;
+                            subject: string;
+                            teacher: string | null;
+                        };
+                        day: string;
+                        today: string;
+                        school_day: boolean;
+                        morning_taken: boolean;
+                        earlier: {
+                            period: number;
+                        } | null;
+                        register: {
+                            id: string;
+                            submitted_at: string;
+                            submitted_by: string;
+                            cover: boolean;
+                        } | null;
+                        cover: boolean;
+                        learners: unknown[];
+                        can_take: boolean;
+                        can_request: boolean;
                     };
                 };
             };
@@ -4814,6 +5534,37 @@ export interface operations {
                             submitted_by: string;
                         } | null;
                         days_before: string[];
+                        learners: unknown[];
+                        can_take: boolean;
+                        can_request: boolean;
+                    } | {
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        lesson: {
+                            slot_id: string;
+                            period: number;
+                            name: string;
+                            starts: string;
+                            ends: string;
+                            subject: string;
+                            teacher: string | null;
+                        };
+                        day: string;
+                        today: string;
+                        school_day: boolean;
+                        morning_taken: boolean;
+                        earlier: {
+                            period: number;
+                        } | null;
+                        register: {
+                            id: string;
+                            submitted_at: string;
+                            submitted_by: string;
+                            cover: boolean;
+                        } | null;
+                        cover: boolean;
                         learners: unknown[];
                         can_take: boolean;
                         can_request: boolean;
@@ -4864,6 +5615,37 @@ export interface operations {
                         learners: unknown[];
                         can_take: boolean;
                         can_request: boolean;
+                    } | {
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        lesson: {
+                            slot_id: string;
+                            period: number;
+                            name: string;
+                            starts: string;
+                            ends: string;
+                            subject: string;
+                            teacher: string | null;
+                        };
+                        day: string;
+                        today: string;
+                        school_day: boolean;
+                        morning_taken: boolean;
+                        earlier: {
+                            period: number;
+                        } | null;
+                        register: {
+                            id: string;
+                            submitted_at: string;
+                            submitted_by: string;
+                            cover: boolean;
+                        } | null;
+                        cover: boolean;
+                        learners: unknown[];
+                        can_take: boolean;
+                        can_request: boolean;
                     };
                 };
             };
@@ -4908,6 +5690,37 @@ export interface operations {
                             submitted_by: string;
                         } | null;
                         days_before: string[];
+                        learners: unknown[];
+                        can_take: boolean;
+                        can_request: boolean;
+                    } | {
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        lesson: {
+                            slot_id: string;
+                            period: number;
+                            name: string;
+                            starts: string;
+                            ends: string;
+                            subject: string;
+                            teacher: string | null;
+                        };
+                        day: string;
+                        today: string;
+                        school_day: boolean;
+                        morning_taken: boolean;
+                        earlier: {
+                            period: number;
+                        } | null;
+                        register: {
+                            id: string;
+                            submitted_at: string;
+                            submitted_by: string;
+                            cover: boolean;
+                        } | null;
+                        cover: boolean;
                         learners: unknown[];
                         can_take: boolean;
                         can_request: boolean;
@@ -5645,6 +6458,198 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "academics.timetable.index": {
+        parameters: {
+            query?: {
+                division_id?: string | null;
+                campus_id?: string | null;
+                class_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        tabs: {
+                            division_id: string;
+                            campus_id: string;
+                            label: string;
+                        }[];
+                        current: {
+                            division_id: string;
+                            campus_id: string;
+                            label: string;
+                        } | null;
+                        year: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        plans: {
+                            name: string;
+                            weekdays: number[];
+                            periods: {
+                                name: string;
+                                starts: string;
+                                ends: string;
+                                /** @enum {string} */
+                                kind: "lesson" | "break";
+                            }[];
+                        }[];
+                        classes: {
+                            id: string;
+                            name: string;
+                        }[];
+                        class: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        days: {
+                            weekday: number;
+                            lessons: number;
+                            plan: string;
+                        }[];
+                        subjects: {
+                            id: string;
+                            short: string;
+                            name: string;
+                        }[];
+                        teachers: {
+                            id: string;
+                            name: string;
+                        }[];
+                        teaching: {
+                            [key: string]: string;
+                        };
+                        grid: {
+                            weekday: number;
+                            period: number;
+                            subject_id: string;
+                            user_id: string | null;
+                        }[];
+                        counts: {
+                            subject_id: string;
+                            periods: number;
+                        }[];
+                        free: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["NotFoundHttpException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "academics.timetable.bells": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    plans?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        tabs: {
+                            division_id: string;
+                            campus_id: string;
+                            label: string;
+                        }[] | unknown;
+                        current: string | unknown;
+                        year: ({
+                            id: string;
+                            name: string;
+                        } | null) | unknown;
+                        plans: unknown[] | unknown;
+                        classes: unknown[] | unknown;
+                        class: ({
+                            id: string;
+                            name: string;
+                        } | null) | unknown;
+                        days: {
+                            weekday: string;
+                            lessons: number;
+                            plan: string;
+                        }[] | unknown;
+                    } & {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "academics.timetable.period": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @default 0 */
+                    weekday?: number;
+                    /** @default 0 */
+                    period?: number;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        tabs: {
+                            division_id: string;
+                            campus_id: string;
+                            label: string;
+                        }[] | unknown;
+                        current: string | unknown;
+                        year: ({
+                            id: string;
+                            name: string;
+                        } | null) | unknown;
+                        plans: unknown[] | unknown;
+                        classes: unknown[] | unknown;
+                        class: ({
+                            id: string;
+                            name: string;
+                        } | null) | unknown;
+                        days: {
+                            weekday: string;
+                            lessons: number;
+                            plan: string;
+                        }[] | unknown;
+                    } & {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
 }

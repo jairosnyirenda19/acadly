@@ -188,7 +188,7 @@ R = required by the profile, O = optional, – = not offered. The Profile Bluepr
 | DataImport | Optional | O | O | O | O | CSV templates |
 | SafeRelease | Optional | O | O | – | – | Child collection and release |
 | Programmes | Optional | – | – | – | R | Departments, programmes, course catalogue, course registration |
-| Fees · Timetable · Transport · Hostel · StrideBridge · Insights | Later | | | | | Slots reserved. Not in MVP |
+| Fees · Timetable · Transport · Hostel · StrideBridge · Insights | Later | | | | | Slots reserved. Not in MVP. A typed timetable (bell times and class timetables) is in the Academics core (D-071); the Timetable module slot is for generation |
 
 **Shared, not copied.** Attendance is one module used by four profiles. The differences are bindings (document 02 §3), never a fork and never an `if ($level === …)`.
 

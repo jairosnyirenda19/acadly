@@ -1,5 +1,8 @@
 {
     "abstract": false,
+    "bindings": {
+        "attendance.mode": "daily_and_lessons"
+    },
     "extends": "SCHOOL_BASE@2026.1",
     "kind": "profile",
     "ref": "SECONDARY@2026.1",

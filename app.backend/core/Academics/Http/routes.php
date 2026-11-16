@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Acadly\Core\Academics\Http\AcademicsController;
 use Acadly\Core\Academics\Http\SubjectsController;
 use Acadly\Core\Academics\Http\TeachingController;
+use Acadly\Core\Academics\Http\TimetableController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->prefix('academics')->name('academics.')->group(function (): void {
@@ -22,4 +23,8 @@ Route::middleware('auth:sanctum')->prefix('academics')->name('academics.')->grou
     Route::get('/teaching', [TeachingController::class, 'index'])->name('teaching.index');
     Route::put('/teaching', [TeachingController::class, 'give'])->name('teaching.give');
     Route::post('/teaching/copy', [TeachingController::class, 'copy'])->name('teaching.copy');
+
+    Route::get('/timetable', [TimetableController::class, 'index'])->name('timetable.index');
+    Route::put('/timetable/bells', [TimetableController::class, 'bells'])->name('timetable.bells');
+    Route::put('/timetable/period', [TimetableController::class, 'period'])->name('timetable.period');
 });

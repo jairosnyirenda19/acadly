@@ -16,6 +16,8 @@ enum AcademicsAudit: string implements AuditAction
     case SubjectRetired = 'academics.subject_retired';
     case TeachingGiven = 'academics.teaching_given';
     case TeachingCopied = 'academics.teaching_copied';
+    case BellsSaved = 'academics.bells_saved';
+    case TimetableSet = 'academics.timetable_set';
 
     public function key(): string
     {
@@ -33,6 +35,8 @@ enum AcademicsAudit: string implements AuditAction
             self::SubjectRetired => 'Retired a subject.',
             self::TeachingGiven => 'Gave a subject or a class to a teacher, or took it back.',
             self::TeachingCopied => 'Copied who teaches what from the year before.',
+            self::BellsSaved => 'Set the bell times of a level at a campus.',
+            self::TimetableSet => 'Set a period of a class timetable.',
         };
     }
 

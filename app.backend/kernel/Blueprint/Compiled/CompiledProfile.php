@@ -7,12 +7,15 @@ namespace Acadly\Kernel\Blueprint\Compiled;
 use Acadly\Kernel\Blueprint\BlueprintKind;
 use Acadly\Kernel\Blueprint\BlueprintRef;
 use Acadly\Kernel\Blueprint\Canonical;
+use Acadly\Kernel\Blueprint\Profile\BindingSlot;
+use BackedEnum;
 use InvalidArgumentException;
 
 /**
  * A Profile Blueprint in its compiled form, with what it extends already
  * merged in (02 §2). What a division is: its words, its period model, its
- * ladder of levels, how classes are grouped, and the subjects it starts with.
+ * ladder of levels, how classes are grouped, the subjects it starts with,
+ * and the values it binds to the slots modules declare.
  */
 final readonly class CompiledProfile implements CompiledBlueprint
 {
@@ -20,6 +23,7 @@ final readonly class CompiledProfile implements CompiledBlueprint
      * @param  array<string, array{one: string, many: string}>  $vocabulary  term => words
      * @param  list<array{code: string, label: string}>  $levels  in order, lowest first
      * @param  list<array{short: string, name: string, core: bool, levels: list<string>}>  $subjects  the starter subjects
+     * @param  array<string, string>  $bindings  slot key => bound value
      */
     public function __construct(
         public BlueprintRef $ref,
@@ -33,7 +37,17 @@ final readonly class CompiledProfile implements CompiledBlueprint
         public array $levels,
         public ?string $grouping,
         public array $subjects = [],
+        public array $bindings = [],
     ) {}
+
+    /** The value bound to a slot, or the slot's own when the profile binds none. */
+    public function binding(BindingSlot $slot): BackedEnum
+    {
+        $value = $this->bindings[$slot->key()] ?? null;
+        $enum = $slot->accepts();
+
+        return ($value !== null ? $enum::tryFrom($value) : null) ?? $slot->fallback();
+    }
 
     public function reference(): BlueprintRef
     {
@@ -98,6 +112,7 @@ final readonly class CompiledProfile implements CompiledBlueprint
                 'grouping' => $this->grouping,
             ],
             'subjects' => $this->subjects,
+            'bindings' => $this->bindings === [] ? (object) [] : $this->bindings,
         ];
     }
 
@@ -132,6 +147,14 @@ final readonly class CompiledProfile implements CompiledBlueprint
             Shape::records($data, 'subjects'),
         );
 
+        $bindings = [];
+
+        foreach (is_array($data['bindings'] ?? null) ? $data['bindings'] : [] as $slot => $value) {
+            if (is_string($slot) && is_string($value)) {
+                $bindings[$slot] = $value;
+            }
+        }
+
         return new self(
             BlueprintRef::parse(Shape::string($data, 'ref')),
             Shape::string($data, 'title'),
@@ -144,6 +167,7 @@ final readonly class CompiledProfile implements CompiledBlueprint
             $levels,
             Shape::nullableString($structure, 'grouping'),
             $subjects,
+            $bindings,
         );
     }
 }

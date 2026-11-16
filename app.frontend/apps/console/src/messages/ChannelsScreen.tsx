@@ -4,7 +4,7 @@ import { useState, type FormEvent } from 'react'
 import { copy } from '../copy'
 import { errorFor, type Saved } from '../setup/api'
 import { Input, Select, Total, TotalsBand } from '../setup/parts'
-import { SmallButton, Tag } from '../settings/parts'
+import { SettingsTabs, SmallButton, Tag } from '../settings/parts'
 import { clock, messagesApi, type ChannelsState } from './api'
 import { Facts, Heading, MessagesHead } from './parts'
 
@@ -17,7 +17,12 @@ export function ChannelsScreen() {
   const state = loaded.data
 
   if (state === undefined) {
-    return <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} band={[t.bandSms, t.bandDelivered, t.bandEmails, t.bandAttention]} rows={6} onRetry={loaded.reload} />
+    return (
+      <>
+        <SettingsTabs current="messages" />
+        <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} band={[t.bandSms, t.bandDelivered, t.bandEmails, t.bandAttention]} rows={6} onRetry={loaded.reload} />
+      </>
+    )
   }
 
   const m = state.month

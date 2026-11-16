@@ -186,7 +186,7 @@ it('lists the messages of a day, and sends one again once when it was not delive
     $day = $this->actingAs($this->admin)->getJson('/api/v1/messages/sent?day='.MSG_TODAY)->assertOk()->json();
 
     expect($day['totals'])->toBe(['sent' => 2, 'delivered' => 0, 'waiting' => 0, 'attention' => 1])
-        ->and(collect($day['messages'])->pluck('state', 'to')->all())->toBe(['Ruth Banda' => 'accepted', 'Ruth Chisale' => 'not_delivered'])
+        ->and(collect($day['messages'])->pluck('state', 'to')->all())->toEqual(['Ruth Banda' => 'accepted', 'Ruth Chisale' => 'not_delivered'])
         ->and(collect($day['messages'])->firstWhere('to', 'Ruth Chisale')['address'])->toBe('0991 234 567');
 
     $this->actingAs($this->admin)->postJson("/api/v1/messages/sent/{$failed->id}/again")->assertOk()->assertJsonPath('sent_again.state', 'sent');

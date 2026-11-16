@@ -143,11 +143,12 @@ final class MessageSettings
         ];
     }
 
-    public function topicEnabled(string $topicKey): bool
+    /** Whether the school sends a notice: its own choice, or the notice's own when it made none. */
+    public function topicEnabled(string $topicKey, bool $onAtFirst = true): bool
     {
         $enabled = DB::table('institution_topic_settings')->where('topic_key', $topicKey)->value('enabled');
 
-        return $enabled === null || (bool) $enabled;
+        return $enabled === null ? $onAtFirst : (bool) $enabled;
     }
 
     /** Which contacts of a party hear the notice: the main contact only (the default), or every contact. */

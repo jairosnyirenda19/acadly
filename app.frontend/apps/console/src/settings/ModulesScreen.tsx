@@ -3,6 +3,7 @@ import { Button, slips, Waiting } from '@acadly/ui'
 import { useState } from 'react'
 import { copy } from '../copy'
 import { errorFor, read, settle } from '../setup/api'
+import { lessonsApi } from '../registers/api'
 import { Input } from '../setup/parts'
 import { PageHead, SettingsTabs, SmallButton, Tag } from './parts'
 
@@ -24,15 +25,20 @@ export function ModulesScreen() {
   const state = loaded.data
 
   if (state === undefined) {
-    return <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} rows={6} onRetry={loaded.reload} />
+    return (
+      <>
+        <SettingsTabs current="modules" />
+        <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} rows={6} onRetry={loaded.reload} />
+      </>
+    )
   }
 
   const module = state.modules.find((m) => m.key === chosen) ?? null
 
   return (
     <>
-      <PageHead kicker={t.kicker} title={t.title} intro={t.intro} />
       <SettingsTabs current="modules" />
+      <PageHead kicker={t.kicker} title={t.title} intro={t.intro} />
       <div className="mx-3 mt-4 mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-2 border-ink bg-sheet px-4 py-3 md:mx-[clamp(16px,3vw,40px)]">
         <Tag tone={state.licence.status === 'valid' || state.licence.status === 'development' ? 'done' : 'attention'}>{t.licence[state.licence.status]}</Tag>
         <span className="text-sm font-bold">{t.licensee(state.licence.licensee, state.licence.expires_at !== null ? day(state.licence.expires_at) : null)}</span>
@@ -50,6 +56,7 @@ export function ModulesScreen() {
           {state.modules.map((m) => (
             <Row key={m.key} module={m} chosen={m.key === chosen} onChoose={() => setChosen(chosen === m.key ? null : m.key)} />
           ))}
+          {state.modules.some((m) => m.key === 'attendance' && m.state === 'active') && <Levels />}
         </section>
         <section className="min-w-0 flex-[1_1_340px] border-ink bg-paper px-3 pt-4 pb-6 max-[959px]:border-t-2 md:px-[clamp(16px,3vw,32px)] min-[960px]:border-l-2">
           {module !== null && module.tier === 'optional' && (
@@ -167,5 +174,37 @@ function SwitchPanel({ module: m, onCancel, onDone }: { module: ModuleRow; onCan
         </Button>
       </div>
     </form>
+  )
+}
+
+/** How registers are taken at each level (the approved design): set by the level's profile, not switched here. */
+function Levels() {
+  const loaded = useLoad('registers:levels', () => lessonsApi.levels())
+  const levels = loaded.data?.levels ?? []
+
+  if (levels.length === 0) return null
+
+  return (
+    <div className="mt-6 border-2 border-ink bg-sheet">
+      <div className="px-4 pt-3.5 pb-2">
+        <h2 className="type-display text-[26px] leading-none">{t.levelsTitle}</h2>
+        <p className="mt-1.5 text-[13px] text-text-muted">{t.levelsIntro}</p>
+      </div>
+      <div className="label-caps hidden gap-3 border-y-2 border-ink px-4 py-2 text-text-muted md:grid md:grid-cols-[minmax(120px,0.8fr)_minmax(160px,1fr)_minmax(240px,2fr)]">
+        <span>{t.colLevel}</span>
+        <span>{t.colRegisters}</span>
+        <span>{t.colMeans}</span>
+      </div>
+      {levels.map((l) => (
+        <div key={l.division} className="grid gap-1.5 border-b border-rule px-4 py-3 md:grid-cols-[minmax(120px,0.8fr)_minmax(160px,1fr)_minmax(240px,2fr)] md:items-center md:gap-3">
+          <span className="type-display text-xl leading-none">{l.division}</span>
+          <span>
+            <Tag tone="plain">{t.mode[l.mode] ?? l.mode}</Tag>
+          </span>
+          <span className="text-sm leading-normal">{t.modeMeans[l.mode] ?? ''}</span>
+        </div>
+      ))}
+      <p className="px-4 py-3 text-[13px] text-text-muted">{t.levelsNote}</p>
+    </div>
   )
 }

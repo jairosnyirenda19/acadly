@@ -36,6 +36,7 @@ final class Registers
         private readonly SchoolDays $days,
         private readonly Marks $marks,
         private readonly Reach $reach,
+        private readonly Modes $modes,
         private readonly Deliveries $deliveries,
         private readonly Clock $clock,
     ) {}
@@ -43,7 +44,7 @@ final class Registers
     /**
      * Every register the viewer may see on a day.
      *
-     * @return array{day: string, today: string, year: string|null, classes: list<array{id: string, name: string, division: string, campus: string, teacher: string|null, school_day: bool, due: bool, register: array{id: string, submitted_at: string, submitted_by: string}|null, learners: int, counts: array{present: int, absent: int, late: int, excused: int}, corrections: int}>, totals: array{classes: int, due: int, taken: int, not_taken: int, present: int, absent: int, late: int, excused: int, corrections: int}}
+     * @return array{day: string, today: string, year: string|null, lessons: bool, classes: list<array{id: string, name: string, division: string, campus: string, teacher: string|null, school_day: bool, due: bool, register: array{id: string, submitted_at: string, submitted_by: string}|null, learners: int, counts: array{present: int, absent: int, late: int, excused: int}, corrections: int}>, totals: array{classes: int, due: int, taken: int, not_taken: int, present: int, absent: int, late: int, excused: int, corrections: int}}
      */
     public function day(User $viewer, string $day, ?ScopeRef $in): array
     {
@@ -120,7 +121,9 @@ final class Registers
             $totals['excused'] += $counts['excused'];
         }
 
-        return ['day' => $day, 'today' => $this->today(), 'year' => $year['name'] ?? null, 'classes' => $rows, 'totals' => $totals];
+        $lessons = array_filter($classes, fn (array $c): bool => $this->modes->takesLessons($c['division_id'])) !== [];
+
+        return ['day' => $day, 'today' => $this->today(), 'year' => $year['name'] ?? null, 'lessons' => $lessons, 'classes' => $rows, 'totals' => $totals];
     }
 
     /**
@@ -144,7 +147,7 @@ final class Registers
         $marks = $registerId !== null ? ($this->marks->inForce([$registerId])[$registerId] ?? []) : [];
         $before = $this->days->before($class['division_id'], $day, 4);
         $history = $this->history($ids, $before);
-        $corrections = $registerId === null ? [] : $this->corrections($viewer, $registerId);
+        $corrections = $registerId === null ? [] : $this->correctionsOf($viewer, $registerId);
         $teacher = $this->calendar->classTeacherId($classId);
         $names = $this->userNames(array_values(array_filter([$teacher, $register !== null ? Row::text($register, 'submitted_by') : null])));
         $schoolDay = $this->days->isSchoolDay($class['division_id'], $day);
@@ -256,7 +259,7 @@ final class Registers
     }
 
     /** @return array<string, array{id: string, from: string, to: string, reason: string, state: string, requested_by: string, requested_at: string, can_decide: bool}> learner id => the latest correction */
-    private function corrections(User $viewer, string $registerId): array
+    public function correctionsOf(User $viewer, string $registerId): array
     {
         $rows = Correction::query()->where('register_id', $registerId)->orderBy('created_at')->get();
         $names = $this->userNames(array_values(array_map(fn (Correction $c): string => $c->requested_by, $rows->all())));

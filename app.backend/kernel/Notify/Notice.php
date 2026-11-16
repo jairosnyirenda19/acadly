@@ -60,6 +60,8 @@ final class Notice
 
     private bool $urgent = false;
 
+    private bool $startsOff = false;
+
     /** @var list<Channel> */
     private array $fallback = [];
 
@@ -191,6 +193,20 @@ final class Notice
         $this->optOut = $optOut;
 
         return $this;
+    }
+
+    /** Off until the school switches it on, on the Messages page. */
+    public function startsOff(): self
+    {
+        $this->startsOff = true;
+
+        return $this;
+    }
+
+    /** True unless the notice starts off. */
+    public function onAtFirst(): bool
+    {
+        return ! $this->startsOff;
     }
 
     /** Passes quiet hours. When a channel fails, the next channel in the chain is tried. */
@@ -329,6 +345,7 @@ final class Notice
             'allowed_channels' => self::values($this->allowedChannels),
             'opt_out' => $this->optOut->value,
             'urgent' => $this->urgent,
+            'starts_off' => $this->startsOff,
             'fallback' => self::values($this->fallback),
         ];
     }

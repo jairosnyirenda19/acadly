@@ -4,6 +4,8 @@
  */
 const PATHS = {
   today: 'M4 5h16v15H4z M4 10h16 M9 3v4 M15 3v4 M8 14h3v3H8z',
+  myDay: 'M4 4h16v16H4z M12 8v4l3 3 M4 9h3',
+  timetable: 'M3 4h18v17H3z M3 9h18 M8 2v4 M16 2v4 M9 9v12 M15 9v12 M3 15h18',
   registers: 'M4 4h16v16H4z M4 10h16 M4 15h16 M10 4v16',
   learners: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1',
   people: 'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M3 20v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1 M16 5a3 3 0 0 1 0 6 M18 14a5 5 0 0 1 3 5v1',

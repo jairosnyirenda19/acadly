@@ -47,6 +47,9 @@ final class ProfileBlueprint
     /** @var list<array{short: string, name: string, core: bool, levels: list<string>|null}>|null */
     private ?array $subjects = null;
 
+    /** @var array<string, string> slot key => bound value */
+    private array $bindings = [];
+
     private function __construct(
         public readonly BlueprintRef $ref,
         public readonly bool $abstract,
@@ -134,6 +137,18 @@ final class ProfileBlueprint
         return $this;
     }
 
+    /** Binds a value to a slot a module declares (02 §2.4). */
+    public function bind(BindingSlot $slot, BackedEnum $value): self
+    {
+        if (! $value instanceof ($slot->accepts())) {
+            throw new InvalidArgumentException("{$this->ref}: the slot [{$slot->key()}] takes a ".$slot->accepts().'.');
+        }
+
+        $this->bindings[$slot->key()] = self::value($value);
+
+        return $this;
+    }
+
     public function extendsRef(): ?BlueprintRef
     {
         return $this->extends;
@@ -171,6 +186,7 @@ final class ProfileBlueprint
             $levels,
             $this->grouping ?? $parent?->grouping,
             $subjects,
+            [...($parent->bindings ?? []), ...$this->bindings],
         );
     }
 

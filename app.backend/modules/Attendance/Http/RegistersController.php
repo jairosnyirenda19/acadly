@@ -12,7 +12,9 @@ use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Row;
 use Acadly\Modules\Attendance\Application\Actions\AbsenceFollowUp;
 use Acadly\Modules\Attendance\Application\Actions\CorrectionActions;
+use Acadly\Modules\Attendance\Application\Actions\SubmitLessonRegister;
 use Acadly\Modules\Attendance\Application\Actions\SubmitRegister;
+use Acadly\Modules\Attendance\Application\Lessons;
 use Acadly\Modules\Attendance\Application\Registers;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
@@ -27,13 +29,14 @@ final class RegistersController
 {
     public function __construct(
         private readonly Registers $registers,
+        private readonly Lessons $lessons,
         private readonly Clock $clock,
     ) {}
 
     /**
      * Every register the viewer may see on a day: `?day=YYYY-MM-DD&in=type:id`.
      *
-     * @response array{day: string, today: string, year: string|null, classes: list<array{id: string, name: string, division: string, campus: string, teacher: string|null, school_day: bool, due: bool, register: array{id: string, submitted_at: string, submitted_by: string}|null, learners: int, counts: array{present: int, absent: int, late: int, excused: int}, corrections: int}>, totals: array{classes: int, due: int, taken: int, not_taken: int, present: int, absent: int, late: int, excused: int, corrections: int}}
+     * @response array{day: string, today: string, year: string|null, lessons: bool, classes: list<array{id: string, name: string, division: string, campus: string, teacher: string|null, school_day: bool, due: bool, register: array{id: string, submitted_at: string, submitted_by: string}|null, learners: int, counts: array{present: int, absent: int, late: int, excused: int}, corrections: int}>, totals: array{classes: int, due: int, taken: int, not_taken: int, present: int, absent: int, late: int, excused: int, corrections: int}}
      */
     public function index(Request $request, WorkPlaces $places): JsonResponse
     {
@@ -57,7 +60,7 @@ final class RegistersController
     {
         $viewer = self::user($request);
         $day = $this->day($request);
-        $submit->handle($viewer, $id, $day, self::marks($request->input('marks')));
+        $submit->handle($viewer, $id, $day, self::marksOf($request->input('marks')));
 
         return response()->json($this->registers->register($viewer, $id, $day));
     }
@@ -82,7 +85,11 @@ final class RegistersController
 
     private function registerOf(User $viewer, string $registerId): JsonResponse
     {
-        $row = DB::table('attendance_registers')->where('id', $registerId)->first(['class_id', 'day']) ?? throw new NotFoundHttpException;
+        $row = DB::table('attendance_registers')->where('id', $registerId)->first(['class_id', 'day', 'kind', 'slot_id']) ?? throw new NotFoundHttpException;
+
+        if (Row::text($row, 'kind') === SubmitLessonRegister::KIND) {
+            return response()->json($this->lessons->lesson($viewer, Row::text($row, 'slot_id'), substr(Row::text($row, 'day'), 0, 10), $this->registers));
+        }
 
         return response()->json($this->registers->register($viewer, Row::text($row, 'class_id'), substr(Row::text($row, 'day'), 0, 10)));
     }
@@ -120,7 +127,7 @@ final class RegistersController
     }
 
     /** @return list<array{learner_id: string, status: string, note: string|null}> */
-    private static function marks(mixed $value): array
+    public static function marksOf(mixed $value): array
     {
         if (! is_array($value) || ! array_is_list($value) || count($value) > 500) {
             return [];

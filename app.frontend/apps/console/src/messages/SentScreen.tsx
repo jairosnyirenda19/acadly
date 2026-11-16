@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { copy } from '../copy'
 import { longDay } from '../registers/api'
 import { Total, TotalsBand } from '../setup/parts'
-import { Tag } from '../settings/parts'
+import { SettingsTabs, Tag } from '../settings/parts'
 import { clock, clockSeconds, messagesApi, type MessageState, type SentState } from './api'
 import { Facts, Heading, MessagesHead } from './parts'
 
@@ -36,7 +36,12 @@ export function SentScreen() {
   const data = loaded.data
 
   if (data === undefined) {
-    return <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} band={[t.bandSentToday, t.bandDeliveredToday, t.bandWaiting, t.bandAttentionToday]} rows={8} onRetry={loaded.reload} />
+    return (
+      <>
+        <SettingsTabs current="messages" />
+        <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} band={[t.bandSentToday, t.bandDeliveredToday, t.bandWaiting, t.bandAttentionToday]} rows={8} onRetry={loaded.reload} />
+      </>
+    )
   }
 
   const go = (patch: Record<string, string | null>) => {

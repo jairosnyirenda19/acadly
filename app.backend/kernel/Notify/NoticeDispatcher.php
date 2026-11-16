@@ -175,7 +175,7 @@ final class NoticeDispatcher
             return;
         }
 
-        if ($notice->optOutRule() !== OptOut::Never && ! $this->settings->topicEnabled($key)) {
+        if ($notice->optOutRule() !== OptOut::Never && ! $this->settings->topicEnabled($key, $notice->onAtFirst())) {
             $this->marker($base, DeliveryStatus::Suppressed, 'switched_off');
 
             return;

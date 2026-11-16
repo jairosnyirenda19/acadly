@@ -13,8 +13,8 @@ const paths: Record<Tab, string> = { channels: '/settings/messages', wording: '/
 export function MessagesHead({ current, intro }: { current: Tab; intro: ReactNode }) {
   return (
     <>
-      <PageHead kicker={t.kicker} title={t.title} intro={intro} />
       <SettingsTabs current="messages" />
+      <PageHead kicker={t.kicker} title={t.title} intro={intro} />
       <nav aria-label={t.tabsLabel} className="flex gap-1 overflow-x-auto border-b-2 border-ink bg-sheet px-3 [scrollbar-width:none] md:px-[clamp(16px,3vw,40px)]">
         {(Object.keys(paths) as Tab[]).map((tab) => (
           <a

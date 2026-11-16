@@ -1,5 +1,6 @@
 {
     "abstract": false,
+    "bindings": {},
     "extends": "SCHOOL_BASE@2026.1",
     "kind": "profile",
     "ref": "PRIMARY@2026.1",

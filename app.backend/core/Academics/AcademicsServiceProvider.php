@@ -6,7 +6,9 @@ namespace Acadly\Core\Academics;
 
 use Acadly\Core\Academics\Application\Calendar;
 use Acadly\Core\Academics\Application\ClassScopes;
+use Acadly\Core\Academics\Application\Timetables;
 use Acadly\Core\Academics\Contracts\AcademicCalendar;
+use Acadly\Core\Academics\Contracts\Timetable;
 use Acadly\Kernel\Access\ScopeTree;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -18,6 +20,8 @@ final class AcademicsServiceProvider extends ServiceProvider
     {
         $this->app->scoped(Calendar::class);
         $this->app->bind(AcademicCalendar::class, Calendar::class);
+        $this->app->scoped(Timetables::class);
+        $this->app->bind(Timetable::class, Timetables::class);
         $this->app->tag(ClassScopes::class, ScopeTree::PARENTS);
     }
 

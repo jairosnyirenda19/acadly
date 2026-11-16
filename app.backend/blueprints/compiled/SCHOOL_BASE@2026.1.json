@@ -1,5 +1,6 @@
 {
     "abstract": true,
+    "bindings": {},
     "extends": null,
     "kind": "profile",
     "ref": "SCHOOL_BASE@2026.1",

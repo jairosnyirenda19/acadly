@@ -4,7 +4,7 @@ import { useRef, useState } from 'react'
 import { copy } from '../copy'
 import { errorFor, type Saved } from '../setup/api'
 import { Input, TextArea } from '../setup/parts'
-import { Tag } from '../settings/parts'
+import { SettingsTabs, Tag } from '../settings/parts'
 import { fill, messagesApi, smsLength, type NoticesState, type NoticeState } from './api'
 import { Choice, Heading, MessagesHead } from './parts'
 
@@ -18,7 +18,12 @@ export function WordingScreen() {
   const list = loaded.data
 
   if (list === undefined) {
-    return <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} rows={8} onRetry={loaded.reload} />
+    return (
+      <>
+        <SettingsTabs current="messages" />
+        <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} rows={8} onRetry={loaded.reload} />
+      </>
+    )
   }
 
   const chosen = query.get('notice') ?? list.notices.find((n) => n.audience === 'contacts')?.key ?? list.notices[0]?.key ?? null

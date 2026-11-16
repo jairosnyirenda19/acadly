@@ -16,6 +16,7 @@ use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Kernel\Support\Row;
 use Acadly\Modules\Attendance\Application\Marks;
+use Acadly\Modules\Attendance\Application\MarkSheet;
 use Acadly\Modules\Attendance\Application\SchoolDays;
 use Acadly\Modules\Attendance\Contracts\AttendanceAudit;
 use Acadly\Modules\Attendance\Contracts\AttendancePermission;
@@ -68,36 +69,7 @@ final class SubmitRegister
             throw ValidationException::withMessages(['day' => ['This is not a school day: it is a weekend or outside the terms.']]);
         }
 
-        $expected = array_column($this->learners->learnersIn($classId, $day), 'name', 'id');
-        $given = [];
-
-        foreach ($marks as $i => $mark) {
-            if (! isset($expected[$mark['learner_id']])) {
-                throw ValidationException::withMessages(["marks.{$i}" => ['This learner is not in the class on this day.']]);
-            }
-
-            if (isset($given[$mark['learner_id']])) {
-                throw ValidationException::withMessages(["marks.{$i}" => ['This learner is marked twice.']]);
-            }
-
-            if (Mark::tryFrom($mark['status']) === null) {
-                throw ValidationException::withMessages(["marks.{$i}" => ['Choose present, absent, late or excused.']]);
-            }
-
-            $note = trim((string) $mark['note']);
-
-            if (mb_strlen($note) > 255) {
-                throw ValidationException::withMessages(["marks.{$i}" => ['A reason can be up to 255 characters.']]);
-            }
-
-            $given[$mark['learner_id']] = ['status' => $mark['status'], 'note' => $note !== '' ? $note : null];
-        }
-
-        $missing = count(array_diff_key($expected, $given));
-
-        if ($missing > 0) {
-            throw ValidationException::withMessages(['marks' => [($missing === 1 ? '1 learner is' : "{$missing} learners are").' not marked. Mark every learner, then submit.']]);
-        }
+        $given = MarkSheet::check(array_column($this->learners->learnersIn($classId, $day), 'name', 'id'), $marks);
 
         return DB::transaction(function () use ($by, $classId, $day, $given, $at): string {
             $existing = DB::table('attendance_registers')->where('class_id', $classId)->where('day', $day)->where('kind', self::KIND)->lockForUpdate()->first(['id', 'submitted_at']);

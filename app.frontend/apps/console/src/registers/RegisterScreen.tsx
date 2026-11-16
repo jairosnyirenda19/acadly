@@ -2,19 +2,20 @@ import { navigate, useLoad, useLocation } from '@acadly/kernel'
 import { Button, Notice, slips, Waiting } from '@acadly/ui'
 import { useEffect, useState } from 'react'
 import { copy } from '../copy'
-import { errorFor, type Saved } from '../setup/api'
-import { Input, nn, Select, Total, TotalsBand } from '../setup/parts'
+import { errorFor } from '../setup/api'
+import { Input, nn, Total, TotalsBand } from '../setup/parts'
 import { PageHead, SmallButton, Tag } from '../settings/parts'
 import { clock, longDay, markLook, MARKS, registersApi, shortDay, unreached, type Absence, type MarkValue, type RegisterLearner, type RegisterState } from './api'
+import { AskForm, DecideCard, Glyph, useSave } from './parts'
 
 const t = copy.registers
 const s = copy.settings
 
-type Draft = Record<string, { status: MarkValue; note: string }>
+export type Draft = Record<string, { status: MarkValue; note: string }>
 
 const draftKey = (classId: string, day: string) => `acadly.register.${classId}.${day}`
 
-function readDraft(key: string): Draft {
+export function readDraft(key: string): Draft {
   try {
     const raw = window.localStorage.getItem(key)
     const parsed: unknown = raw === null ? null : JSON.parse(raw)
@@ -25,7 +26,7 @@ function readDraft(key: string): Draft {
   }
 }
 
-function writeDraft(key: string, draft: Draft | null): void {
+export function writeDraft(key: string, draft: Draft | null): void {
   try {
     if (draft === null) window.localStorage.removeItem(key)
     else window.localStorage.setItem(key, JSON.stringify(draft))
@@ -46,16 +47,6 @@ export function RegisterScreen({ classId }: { classId: string }) {
   }
 
   return state.can_take ? <TakeRegister state={state} onDone={loaded.set} /> : <SubmittedRegister state={state} onChange={loaded.set} />
-}
-
-function Glyph({ mark, size = 'size-9 text-[17px]' }: { mark: string | null; size?: string }) {
-  const look = mark !== null && mark in markLook ? markLook[mark as MarkValue] : markLook.none
-
-  return (
-    <span aria-label={mark !== null ? (t.marks[mark] ?? mark) : t.notMarked} className={`ref inline-flex shrink-0 items-center justify-center font-extrabold ${size} ${look}`}>
-      {mark !== null ? t.glyph[mark] : ''}
-    </span>
-  )
 }
 
 function History({ learner, days }: { learner: RegisterLearner; days: string[] }) {
@@ -271,27 +262,6 @@ function TakeRegister({ state, onDone }: { state: RegisterState; onDone: (next: 
   )
 }
 
-function useSave() {
-  const [failed, setFailed] = useState<string | null>(null)
-  const [errors, setErrors] = useState<Record<string, string[]>>({})
-  const [working, setWorking] = useState(false)
-
-  const run = async (request: Promise<Saved<RegisterState>>, onDone: (next: RegisterState) => void) => {
-    setWorking(true)
-    setFailed(null)
-    const result = await request
-    setWorking(false)
-
-    if (result.kind === 'saved') onDone(result.data)
-    else if (result.kind === 'invalid') {
-      setErrors(result.errors)
-      if (Object.keys(result.errors).length === 0) setFailed(t.changed)
-    } else setFailed(result.kind === 'refused' ? t.otherPerson : s.failed)
-  }
-
-  return { failed, errors, working, run }
-}
-
 function SubmittedRegister({ state, onChange }: { state: RegisterState; onChange: (next: RegisterState) => void }) {
   const [asking, setAsking] = useState<string | null>(null)
   const marks = state.learners.map((l) => l.mark?.status).filter((m): m is string => m !== undefined)
@@ -357,7 +327,7 @@ function SubmittedRegister({ state, onChange }: { state: RegisterState; onChange
                   {l.absence !== null && <Told absence={l.absence} />}
                   {asking === l.id && state.register !== null && l.mark !== null && (
                     <AskForm
-                      registerId={state.register.id}
+                      send={(body) => registersApi.requestCorrection(state.register?.id ?? '', body)}
                       learner={l}
                       onDone={(next) => {
                         setAsking(null)
@@ -382,106 +352,23 @@ function SubmittedRegister({ state, onChange }: { state: RegisterState; onChange
             <div className="grid gap-4">
               {toReach.length > 0 && state.register !== null && <ReachCard registerId={state.register.id} learners={toReach} onDone={onChange} />}
               {toDecide.map((l) => (
-                <DecideCard key={l.id} learner={l} className={state.class.name} day={state.day} onDone={onChange} />
+                <DecideCard
+                  key={l.id}
+                  learner={l}
+                  className={state.class.name}
+                  day={state.day}
+                  decide={registersApi.decide}
+                  onDone={(next, approve) => {
+                    onChange(next)
+                    slips.done({ word: copy.slips.saved, title: approve ? t.approved : t.declined })
+                  }}
+                />
               ))}
             </div>
           </section>
         )}
       </div>
     </>
-  )
-}
-
-function AskForm({ registerId, learner, onDone, onCancel }: { registerId: string; learner: RegisterLearner; onDone: (next: RegisterState) => void; onCancel: () => void }) {
-  const current = learner.mark?.status ?? ''
-  const options = MARKS.filter((m) => m !== current)
-  const [to, setTo] = useState<MarkValue>(options[0] ?? 'present')
-  const [reason, setReason] = useState('')
-  const save = useSave()
-
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault()
-        void save.run(registersApi.requestCorrection(registerId, { learner_id: learner.id, to, reason }), onDone)
-      }}
-      className="mt-2.5 mb-1 grid gap-3 border-2 border-ink bg-sheet p-3.5 md:ml-[60px] md:grid-cols-[160px_1fr_auto] md:items-end"
-    >
-      <Select label={t.newMark} value={to} onChange={(e) => setTo(e.target.value as MarkValue)} error={errorFor(save.errors, 'to')}>
-        {options.map((m) => (
-          <option key={m} value={m}>
-            {t.marks[m]}
-          </option>
-        ))}
-      </Select>
-      <Input label={t.why} required value={reason} onChange={(e) => setReason(e.target.value)} error={errorFor(save.errors, 'reason') ?? errorFor(save.errors, 'learner_id')} maxLength={255} />
-      <div className="flex gap-2">
-        <Button type="submit" busy={save.working}>
-          {save.working ? s.saving : t.sendRequest}
-        </Button>
-        <Button variant="secondary" onClick={onCancel}>
-          {s.cancel}
-        </Button>
-      </div>
-      {save.failed !== null && <p className="text-[13px] font-bold text-red-text md:col-span-3">{save.failed}</p>}
-    </form>
-  )
-}
-
-function DecideCard({ learner, className, day, onDone }: { learner: RegisterLearner; className: string; day: string; onDone: (next: RegisterState) => void }) {
-  const c = learner.correction
-  const [note, setNote] = useState('')
-  const save = useSave()
-
-  if (c === null) return null
-
-  const decide = (approve: boolean) =>
-    void save.run(registersApi.decide(c.id, approve, note), (next) => {
-      onDone(next)
-      slips.done({ word: copy.slips.saved, title: approve ? t.approved : t.declined })
-    })
-
-  return (
-    <div className="border-2 border-ink bg-sheet px-4 pt-3.5 pb-4">
-      <div className="label-caps text-text-muted">{t.approveTitle}</div>
-      <div className="type-display mt-1 mb-2.5 text-[22px] leading-none">
-        {learner.name} · {className}
-      </div>
-      <dl className="mb-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-sm">
-        <dt className="text-text-muted">{t.colRegister}</dt>
-        <dd className="font-bold">{longDay(day)}</dd>
-        <dt className="text-text-muted">{t.from}</dt>
-        <dd className="flex items-center gap-2">
-          <Glyph mark={c.from} size="size-6 text-sm" /> {t.marks[c.from]}
-        </dd>
-        <dt className="text-text-muted">{t.to}</dt>
-        <dd className="flex items-center gap-2">
-          <Glyph mark={c.to} size="size-6 text-sm" /> {t.marks[c.to]}
-        </dd>
-        <dt className="text-text-muted">{t.colReason}</dt>
-        <dd>{c.reason}</dd>
-        <dt className="text-text-muted">{t.askedBy}</dt>
-        <dd>
-          {c.requested_by}, {clock(c.requested_at)}
-        </dd>
-      </dl>
-      <Input label={t.note} hint={t.noteHint} value={note} onChange={(e) => setNote(e.target.value)} error={errorFor(save.errors, 'reason')} maxLength={255} />
-      {save.failed !== null && <p className="mt-2 text-[13px] font-bold text-red-text">{save.failed}</p>}
-      <div className="mt-3 flex flex-wrap gap-2">
-        <Button busy={save.working} onClick={() => decide(true)}>
-          {t.approve}
-        </Button>
-        <button
-          type="button"
-          disabled={save.working}
-          onClick={() => decide(false)}
-          className="h-11 border-2 border-red-pen bg-sheet px-[18px] text-[15px] font-extrabold text-red-text hover:bg-red-wash disabled:opacity-60"
-        >
-          {t.decline}
-        </button>
-      </div>
-      <p className="mt-3 text-[13px] text-text-muted">{t.approveNote}</p>
-    </div>
   )
 }
 
@@ -525,7 +412,7 @@ function Told({ absence }: { absence: Absence }) {
 function ReachCard({ registerId, learners, onDone }: { registerId: string; learners: RegisterLearner[]; onDone: (next: RegisterState) => void }) {
   const [calling, setCalling] = useState<string | null>(null)
   const [note, setNote] = useState('')
-  const save = useSave()
+  const save = useSave<RegisterState>()
 
   return (
     <div className="border-2 border-ink bg-marigold-wash px-4 pt-3.5 pb-4">

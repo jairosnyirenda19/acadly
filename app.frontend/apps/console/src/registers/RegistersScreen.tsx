@@ -3,9 +3,10 @@ import { Waiting } from '@acadly/ui'
 import { Fragment } from 'react'
 import { copy } from '../copy'
 import { Total, TotalsBand } from '../setup/parts'
-import { PageHead, Tag } from '../settings/parts'
+import { Tag } from '../settings/parts'
 import { useWorkIn } from '../shell/WorkIn'
 import { clock, type DayState, longDay, registersApi } from './api'
+import { RegistersHead } from './parts'
 
 const t = copy.registers
 
@@ -29,33 +30,16 @@ export function RegistersScreen() {
   const attention = totals.not_taken + totals.corrections
   // Viewers who see more than one division or campus read the classes under each place.
   const grouped = new Set(state.classes.map((c) => `${c.division} · ${c.campus}`)).size > 1
-  const go = (next: string) => navigate(next === state.today ? '/registers' : `/registers?day=${next}`)
 
   return (
     <>
-      <PageHead
+      <RegistersHead
         kicker={t.kicker(inPlace !== null && place !== null ? place.label : null, state.year)}
-        title={t.title}
         intro={t.intro}
-        actions={
-          <div className="flex flex-wrap items-end gap-2">
-            <label className="block">
-              <span className="label-caps mb-1.5 block text-text-muted">{t.day}</span>
-              <input
-                type="date"
-                value={state.day}
-                max={state.today}
-                onChange={(e) => e.target.value !== '' && go(e.target.value)}
-                className="h-11 border-0 border-b-2 border-ink bg-field px-3 text-[15px] text-ink outline-none focus:border-teal"
-              />
-            </label>
-            {state.day !== state.today && (
-              <button type="button" onClick={() => go(state.today)} className="h-11 border-2 border-ink px-4 text-[15px] font-extrabold hover:bg-field">
-                {t.today}
-              </button>
-            )}
-          </div>
-        }
+        day={state.day}
+        today={state.today}
+        current="morning"
+        tabs={state.lessons}
       />
       <TotalsBand>
         <Total tone="ink" label={t.bandTaken} value={String(totals.taken)} suffix={` / ${totals.due}`} note={t.bandTakenNote(longDay(state.day))} />

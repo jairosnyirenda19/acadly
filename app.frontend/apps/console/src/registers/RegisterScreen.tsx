@@ -315,7 +315,10 @@ function SubmittedRegister({ state, onChange }: { state: RegisterState; onChange
                     </span>
                     <span className="text-right">
                       {pending ? (
-                        <Tag tone="attention">{t.awaiting}</Tag>
+                        <>
+                          <Tag tone="attention">{t.awaiting}</Tag>
+                          {c?.waiting_for != null && <span className="mt-0.5 block text-xs text-text-muted">{t.waitingFor(c.waiting_for)}</span>}
+                        </>
                       ) : (
                         state.can_request &&
                         l.mark !== null && (

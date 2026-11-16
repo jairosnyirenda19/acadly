@@ -41,6 +41,7 @@ export const GROUPS: NavGroup[] = [
       { key: 'today', label: t.nav.today, path: '/', icon: 'today', show: () => true, lights: (p) => p === '/' },
       { key: 'registers', label: t.nav.registers, path: '/registers', icon: 'registers', show: (c) => seesRegisters(c), lights: under('/registers') },
       { key: 'marks', label: t.nav.marks, path: '/marks', icon: 'marks', show: (c) => seesMarks(c), lights: under('/marks') },
+      { key: 'to-approve', label: t.nav.toApprove, path: '/approvals', icon: 'approvals', show: (c) => decides(c), lights: under('/approvals') },
     ],
   },
   {
@@ -59,10 +60,20 @@ export const GROUPS: NavGroup[] = [
       { key: 'timetable', label: t.nav.timetable, path: '/settings/timetable', icon: 'timetable', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/timetable') },
       { key: 'messages', label: t.nav.messages, path: '/settings/messages', icon: 'messages', show: (c) => can(c, 'notify.manage'), lights: under('/settings/messages') },
       { key: 'assessment', label: t.nav.assessment, path: '/settings/assessment', icon: 'assessment', show: (c) => keepsGrading(c), lights: under('/settings/assessment') },
+      { key: 'approvals', label: t.nav.approvals, path: '/settings/approvals', icon: 'roles', show: (c) => can(c, 'access.approvals.manage'), lights: under('/settings/approvals') },
       { key: 'modules', label: t.nav.modules, path: '/settings/modules', icon: 'modules', show: (c) => can(c, 'modules.manage'), lights: under('/settings/modules') },
     ],
   },
 ]
+
+/**
+ * Whether the account may be asked to approve something: it holds a permission
+ * that decides a kind of request, with its module on. Being asked comes from
+ * the school's chains; holding the permission is what makes it possible.
+ */
+export function decides(context: AppContext): boolean {
+  return (moduleOn(context, 'attendance') && holdsAnywhere(context, 'attendance.correct')) || (moduleOn(context, 'assessment') && holdsAnywhere(context, 'assessment.lock'))
+}
 
 /** Whether the account may see a register anywhere: it takes, sees or corrects registers, and the module is on. */
 export function seesRegisters(context: AppContext): boolean {

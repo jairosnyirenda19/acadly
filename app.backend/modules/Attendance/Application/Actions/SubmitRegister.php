@@ -17,11 +17,13 @@ use Acadly\Kernel\Support\Ids;
 use Acadly\Kernel\Support\Row;
 use Acadly\Modules\Attendance\Application\Marks;
 use Acadly\Modules\Attendance\Application\MarkSheet;
+use Acadly\Modules\Attendance\Application\Reach;
 use Acadly\Modules\Attendance\Application\SchoolDays;
 use Acadly\Modules\Attendance\Contracts\AttendanceAudit;
 use Acadly\Modules\Attendance\Contracts\AttendancePermission;
 use Acadly\Modules\Attendance\Contracts\Mark;
 use Acadly\Modules\Attendance\Notifications\LearnerAbsent;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -45,6 +47,7 @@ final class SubmitRegister
         private readonly Audit $audit,
         private readonly Notifier $notifier,
         private readonly Clock $clock,
+        private readonly Reach $reach,
     ) {}
 
     /**
@@ -59,6 +62,10 @@ final class SubmitRegister
 
         if ($class === null) {
             throw ValidationException::withMessages(['class_id' => ['The class does not exist or has ended.']]);
+        }
+
+        if (! $this->reach->takesMorning($by, $class['id'])) {
+            throw new AuthorizationException('The class teacher takes this register. Someone who arranges cover may take it in their place.');
         }
 
         if ($day > $this->clock->today()) {

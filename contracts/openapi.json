@@ -594,6 +594,1001 @@
                 }
             }
         },
+        "/v1/approvals/waiting": {
+            "get": {
+                "operationId": "approvals.waiting",
+                "summary": "Everything waiting for your answer, oldest first",
+                "tags": [
+                    "Approvals"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "waiting": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "area": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "where": {
+                                                        "type": "string"
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "asked_by": {
+                                                        "type": "string"
+                                                    },
+                                                    "step": {
+                                                        "type": "integer"
+                                                    },
+                                                    "steps": {
+                                                        "type": "integer"
+                                                    },
+                                                    "step_label": {
+                                                        "type": "string"
+                                                    },
+                                                    "asked_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "kind",
+                                                    "area",
+                                                    "title",
+                                                    "where",
+                                                    "reason",
+                                                    "asked_by",
+                                                    "step",
+                                                    "steps",
+                                                    "step_label",
+                                                    "asked_at"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "waiting"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/approvals/topics": {
+            "get": {
+                "operationId": "approvals.topics",
+                "summary": "The catalogue: every kind of request that needs an approval, with its chain",
+                "tags": [
+                    "Approvals"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "areas": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "area": {
+                                                        "type": "string"
+                                                    },
+                                                    "topics": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "key": {
+                                                                    "type": "string"
+                                                                },
+                                                                "title": {
+                                                                    "type": "string"
+                                                                },
+                                                                "description": {
+                                                                    "type": "string"
+                                                                },
+                                                                "steps": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "changed": {
+                                                                    "type": "boolean"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "key",
+                                                                "title",
+                                                                "description",
+                                                                "steps",
+                                                                "changed"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "area",
+                                                    "topics"
+                                                ]
+                                            }
+                                        },
+                                        "can_edit": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "areas",
+                                        "can_edit"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/approvals/topics/{key}": {
+            "get": {
+                "operationId": "approvals.topic",
+                "summary": "One kind of request: its chain and every choice for its steps",
+                "tags": [
+                    "Approvals"
+                ],
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {
+                                            "type": "string"
+                                        },
+                                        "title": {
+                                            "type": "string"
+                                        },
+                                        "area": {
+                                            "type": "string"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "permission": {
+                                            "type": "string"
+                                        },
+                                        "chain": {
+                                            "type": "object",
+                                            "properties": {
+                                                "steps": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "kind": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "anyone",
+                                                                    "relation",
+                                                                    "role",
+                                                                    "person"
+                                                                ]
+                                                            },
+                                                            "target": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "needs": {
+                                                                "type": "integer"
+                                                            },
+                                                            "when": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "kind",
+                                                            "target",
+                                                            "needs",
+                                                            "when"
+                                                        ]
+                                                    }
+                                                },
+                                                "fallback_role_id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "changed": {
+                                                    "type": "boolean"
+                                                },
+                                                "saved_by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "saved_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "steps",
+                                                "fallback_role_id",
+                                                "changed",
+                                                "saved_by",
+                                                "saved_at"
+                                            ]
+                                        },
+                                        "labels": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "relations": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label"
+                                                ]
+                                            }
+                                        },
+                                        "facts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label"
+                                                ]
+                                            }
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name"
+                                                ]
+                                            }
+                                        },
+                                        "people": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name"
+                                                ]
+                                            }
+                                        },
+                                        "can_edit": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "key",
+                                        "title",
+                                        "area",
+                                        "description",
+                                        "permission",
+                                        "chain",
+                                        "labels",
+                                        "relations",
+                                        "facts",
+                                        "roles",
+                                        "people",
+                                        "can_edit"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "approvals.topic.save",
+                "summary": "Saves the chain of a kind of request: `{steps: [{kind, target, needs, when}], fallback_role_id}`. No steps puts the default back",
+                "tags": [
+                    "Approvals"
+                ],
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "steps": {
+                                        "type": "string"
+                                    },
+                                    "fallback_role_id": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {
+                                            "type": "string"
+                                        },
+                                        "title": {
+                                            "type": "string"
+                                        },
+                                        "area": {
+                                            "type": "string"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "permission": {
+                                            "type": "string"
+                                        },
+                                        "chain": {
+                                            "type": "object",
+                                            "properties": {
+                                                "steps": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "kind": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "anyone",
+                                                                    "relation",
+                                                                    "role",
+                                                                    "person"
+                                                                ]
+                                                            },
+                                                            "target": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "needs": {
+                                                                "type": "integer"
+                                                            },
+                                                            "when": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "kind",
+                                                            "target",
+                                                            "needs",
+                                                            "when"
+                                                        ]
+                                                    }
+                                                },
+                                                "fallback_role_id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "changed": {
+                                                    "type": "boolean"
+                                                },
+                                                "saved_by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "saved_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "steps",
+                                                "fallback_role_id",
+                                                "changed",
+                                                "saved_by",
+                                                "saved_at"
+                                            ]
+                                        },
+                                        "labels": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "relations": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label"
+                                                ]
+                                            }
+                                        },
+                                        "facts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label"
+                                                ]
+                                            }
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name"
+                                                ]
+                                            }
+                                        },
+                                        "people": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name"
+                                                ]
+                                            }
+                                        },
+                                        "can_edit": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "key",
+                                        "title",
+                                        "area",
+                                        "description",
+                                        "permission",
+                                        "chain",
+                                        "labels",
+                                        "relations",
+                                        "facts",
+                                        "roles",
+                                        "people",
+                                        "can_edit"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/approvals/{id}": {
+            "get": {
+                "operationId": "approvals.show",
+                "summary": "One request and how its chain stands",
+                "tags": [
+                    "Approvals"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "kind": {
+                                            "type": "string"
+                                        },
+                                        "area": {
+                                            "type": "string"
+                                        },
+                                        "title": {
+                                            "type": "string"
+                                        },
+                                        "where": {
+                                            "type": "string"
+                                        },
+                                        "reason": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "link": {
+                                            "type": "string"
+                                        },
+                                        "state": {
+                                            "type": "string",
+                                            "enum": [
+                                                "waiting",
+                                                "approved",
+                                                "declined"
+                                            ]
+                                        },
+                                        "asked_by": {
+                                            "type": "string"
+                                        },
+                                        "asked_at": {
+                                            "type": "string"
+                                        },
+                                        "decided_at": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "steps": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "position": {
+                                                        "type": "integer"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "pending",
+                                                            "waiting",
+                                                            "approved",
+                                                            "declined",
+                                                            "skipped"
+                                                        ]
+                                                    },
+                                                    "needs": {
+                                                        "type": "integer"
+                                                    },
+                                                    "asked": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "note": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "answers": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "by": {
+                                                                    "type": "string"
+                                                                },
+                                                                "answer": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "approved",
+                                                                        "declined"
+                                                                    ]
+                                                                },
+                                                                "reason": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "at": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "by",
+                                                                "answer",
+                                                                "reason",
+                                                                "at"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "position",
+                                                    "label",
+                                                    "state",
+                                                    "needs",
+                                                    "asked",
+                                                    "note",
+                                                    "answers"
+                                                ]
+                                            }
+                                        },
+                                        "can_answer": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "kind",
+                                        "area",
+                                        "title",
+                                        "where",
+                                        "reason",
+                                        "link",
+                                        "state",
+                                        "asked_by",
+                                        "asked_at",
+                                        "decided_at",
+                                        "steps",
+                                        "can_answer"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/approvals/{id}/answer": {
+            "post": {
+                "operationId": "approvals.answer",
+                "summary": "Answers the step waiting for you: `{approve, reason}`. A decline needs a reason. The response is the request as it now stands",
+                "tags": [
+                    "Approvals"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "reason": {
+                                        "type": "string"
+                                    },
+                                    "approve": {
+                                        "type": "boolean",
+                                        "default": false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "kind": {
+                                            "type": "string"
+                                        },
+                                        "area": {
+                                            "type": "string"
+                                        },
+                                        "title": {
+                                            "type": "string"
+                                        },
+                                        "where": {
+                                            "type": "string"
+                                        },
+                                        "reason": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "link": {
+                                            "type": "string"
+                                        },
+                                        "state": {
+                                            "type": "string",
+                                            "enum": [
+                                                "waiting",
+                                                "approved",
+                                                "declined"
+                                            ]
+                                        },
+                                        "asked_by": {
+                                            "type": "string"
+                                        },
+                                        "asked_at": {
+                                            "type": "string"
+                                        },
+                                        "decided_at": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "steps": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "position": {
+                                                        "type": "integer"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "pending",
+                                                            "waiting",
+                                                            "approved",
+                                                            "declined",
+                                                            "skipped"
+                                                        ]
+                                                    },
+                                                    "needs": {
+                                                        "type": "integer"
+                                                    },
+                                                    "asked": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "note": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "answers": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "by": {
+                                                                    "type": "string"
+                                                                },
+                                                                "answer": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "approved",
+                                                                        "declined"
+                                                                    ]
+                                                                },
+                                                                "reason": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "at": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "by",
+                                                                "answer",
+                                                                "reason",
+                                                                "at"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "position",
+                                                    "label",
+                                                    "state",
+                                                    "needs",
+                                                    "asked",
+                                                    "note",
+                                                    "answers"
+                                                ]
+                                            }
+                                        },
+                                        "can_answer": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "kind",
+                                        "area",
+                                        "title",
+                                        "where",
+                                        "reason",
+                                        "link",
+                                        "state",
+                                        "asked_by",
+                                        "asked_at",
+                                        "decided_at",
+                                        "steps",
+                                        "can_answer"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/assessment/mine": {
             "get": {
                 "operationId": "assessment.mine",
@@ -11268,6 +12263,12 @@
                                                             },
                                                             "can_decide": {
                                                                 "type": "boolean"
+                                                            },
+                                                            "waiting_for": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
                                                             }
                                                         },
                                                         "required": [
@@ -11278,7 +12279,8 @@
                                                             "state",
                                                             "requested_by",
                                                             "requested_at",
-                                                            "can_decide"
+                                                            "can_decide",
+                                                            "waiting_for"
                                                         ]
                                                     }
                                                 },
@@ -17793,6 +18795,12 @@
                                                             },
                                                             "can_decide": {
                                                                 "type": "boolean"
+                                                            },
+                                                            "waiting_for": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
                                                             }
                                                         },
                                                         "required": [
@@ -17803,7 +18811,8 @@
                                                             "state",
                                                             "requested_by",
                                                             "requested_at",
-                                                            "can_decide"
+                                                            "can_decide",
+                                                            "waiting_for"
                                                         ]
                                                     },
                                                     "absence": {

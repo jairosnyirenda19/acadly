@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace Acadly\Modules\Assessment\Application\Actions;
 
+use Acadly\Kernel\Approvals\Actions\ApprovalActions;
 use Acadly\Kernel\Audit\NotAudited;
 use Acadly\Kernel\Blueprint\Engine\JourneyEngine;
 use Acadly\Kernel\Identity\User;
+use Acadly\Modules\Assessment\Application\LockApproval;
 use Acadly\Modules\Assessment\Application\Reach;
 use Acadly\Modules\Assessment\Application\Sheets;
 use Acadly\Modules\Assessment\Domain\Assessment;
 use Acadly\Modules\Assessment\Journeys\Marks\OutcomeId;
+use Acadly\Modules\Assessment\Journeys\Marks\State;
 use Acadly\Modules\Assessment\Journeys\Marks\StepId;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Submits, locks and returns the marks of an assessment (the approved Marks
@@ -27,6 +32,7 @@ final class MarksSteps
         private readonly JourneyEngine $engine,
         private readonly Sheets $sheets,
         private readonly Reach $reach,
+        private readonly ApprovalActions $approvals,
     ) {}
 
     /** The teacher whose assessment it is submits its marks. */
@@ -38,24 +44,39 @@ final class MarksSteps
             throw new AuthorizationException('Access is refused.');
         }
 
-        $this->engine->perform($a, $by, StepId::Submit, OutcomeId::Submitted);
+        DB::transaction(function () use ($a, $by): void {
+            $this->engine->perform($a, $by, StepId::Submit, OutcomeId::Submitted);
+            // Who locks is the school's chain for locking marks (Settings › Approvals).
+            $this->approvals->open(LockApproval::KEY, $a->id);
+        });
 
         return $a;
     }
 
+    /** A yes to the step of the lock's approval that asks this person; the last yes locks the marks. */
     public function lock(User $by, string $id): Assessment
     {
-        $a = $this->sheets->find($by, $id);
-        $this->engine->perform($a, $by, StepId::Lock, OutcomeId::Locked);
-
-        return $a;
+        return $this->answer($by, $id, true, null);
     }
 
+    /** A no: the marks go back to the teacher with the reason. */
     public function return(User $by, string $id, string $reason): Assessment
     {
-        $a = $this->sheets->find($by, $id);
-        $this->engine->perform($a, $by, StepId::Return, OutcomeId::Returned, trim($reason) !== '' ? ['reason' => mb_substr(trim($reason), 0, 255)] : []);
+        return $this->answer($by, $id, false, trim($reason) !== '' ? mb_substr(trim($reason), 0, 255) : null);
+    }
 
-        return $a;
+    private function answer(User $by, string $id, bool $approve, ?string $reason): Assessment
+    {
+        $a = $this->sheets->find($by, $id);
+
+        if ($a->state !== State::Submitted->value) {
+            throw ValidationException::withMessages(['assessment' => ['These marks are not waiting to be locked.']]);
+        }
+
+        // Marks submitted before approvals existed get their chain now.
+        $request = $this->approvals->open(LockApproval::KEY, $a->id);
+        $this->approvals->answer($by, $request, $approve, $reason);
+
+        return $a->refresh();
     }
 }

@@ -11,6 +11,7 @@ use Acadly\Core\Institution\Contracts\SchoolDirectory;
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
+use Acadly\Kernel\Approvals\ApprovalRequests;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Notify\Deliveries;
 use Acadly\Kernel\Support\Clock;
@@ -39,6 +40,7 @@ final class Registers
         private readonly Modes $modes,
         private readonly Deliveries $deliveries,
         private readonly Clock $clock,
+        private readonly ApprovalRequests $approvals,
     ) {}
 
     /**
@@ -54,7 +56,7 @@ final class Registers
         foreach ($year === null ? [] : $this->calendar->classesInYear($year['id']) as $class) {
             $at = ScopeRef::of(ScopeType::ClassGroup, $class['id']);
 
-            if ($this->reach->sees($viewer, $class['id']) && ($in === null || $this->within($at, $in))) {
+            if ($this->reach->lists($viewer, $class['id']) && ($in === null || $this->within($at, $in))) {
                 $classes[] = $class;
             }
         }
@@ -151,7 +153,7 @@ final class Registers
         $teacher = $this->calendar->classTeacherId($classId);
         $names = $this->userNames(array_values(array_filter([$teacher, $register !== null ? Row::text($register, 'submitted_by') : null])));
         $schoolDay = $this->days->isSchoolDay($class['division_id'], $day);
-        $mayTake = $this->reach->may($viewer, AttendancePermission::Capture, $classId);
+        $mayTake = $this->reach->takesMorning($viewer, $classId);
         $absences = $registerId === null ? [] : $this->absences($registerId);
         $mayFollow = $mayTake || $this->reach->may($viewer, AttendancePermission::Correct, $classId);
 
@@ -258,7 +260,7 @@ final class Registers
         return $out;
     }
 
-    /** @return array<string, array{id: string, from: string, to: string, reason: string, state: string, requested_by: string, requested_at: string, can_decide: bool}> learner id => the latest correction */
+    /** @return array<string, array{id: string, from: string, to: string, reason: string, state: string, requested_by: string, requested_at: string, can_decide: bool, waiting_for: string|null}> learner id => the latest correction */
     public function correctionsOf(User $viewer, string $registerId): array
     {
         $rows = Correction::query()->where('register_id', $registerId)->orderBy('created_at')->get();
@@ -266,11 +268,15 @@ final class Registers
         $out = [];
 
         foreach ($rows as $c) {
+            $requested = $c->state === State::Requested->value;
+            // While the approval waits, its chain decides who is asked now.
+            $asked = $requested ? $this->approvals->asks(CorrectionApproval::KEY, $c->id, $viewer) : null;
             $out[$c->learner_id] = [
                 'id' => $c->id, 'from' => $c->from_status, 'to' => $c->to_status, 'reason' => $c->reason, 'state' => $c->state,
                 'requested_by' => $names[$c->requested_by] ?? '', 'requested_at' => $c->created_at?->toIso8601String() ?? '',
-                'can_decide' => $c->state === State::Requested->value && $c->requested_by !== $viewer->id
+                'can_decide' => $asked !== null ? $asked['asks'] : $requested && $c->requested_by !== $viewer->id
                     && $this->reach->may($viewer, AttendancePermission::Correct, $c->class_id),
+                'waiting_for' => $asked !== null && ! $asked['asks'] ? $asked['step'] : null,
             ];
         }
 

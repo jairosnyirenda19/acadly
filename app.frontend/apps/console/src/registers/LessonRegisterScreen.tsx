@@ -418,7 +418,10 @@ function SubmittedLesson({ state, back, onChange }: { state: LessonState; back: 
                     </span>
                     <span className="text-right">
                       {pending ? (
-                        <Tag tone="attention">{t.awaiting}</Tag>
+                        <>
+                          <Tag tone="attention">{t.awaiting}</Tag>
+                          {c?.waiting_for != null && <span className="mt-0.5 block text-xs text-text-muted">{t.waitingFor(c.waiting_for)}</span>}
+                        </>
                       ) : (
                         state.can_request &&
                         l.mark !== null && <SmallButton onClick={() => setAsking(asking === l.id ? null : l.id)}>{t.requestChange}</SmallButton>

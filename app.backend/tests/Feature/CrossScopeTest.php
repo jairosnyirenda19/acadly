@@ -31,7 +31,7 @@ const OPEN_ROUTES = [
 ];
 
 /** Routes about the account itself, not about a place. */
-const OWN_ROUTES = ['auth.sign-out', 'me', 'me.context', 'me.notifications', 'me.notifications.read', 'view-as.leave'];
+const OWN_ROUTES = ['auth.sign-out', 'me', 'me.context', 'me.notifications', 'me.notifications.read', 'view-as.leave', 'approvals.waiting'];
 
 /** Routes decided per record by the owning domain, and proved in its own tests. */
 const RECORD_ROUTES = [

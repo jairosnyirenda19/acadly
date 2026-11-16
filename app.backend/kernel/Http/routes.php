@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Acadly\Kernel\Access\Http\RolesController;
+use Acadly\Kernel\Approvals\Http\ApprovalsController;
 use Acadly\Kernel\Documents\Http\DocumentsController;
 use Acadly\Kernel\Grid\GridsController;
 use Acadly\Kernel\Http\HealthController;
@@ -35,6 +36,15 @@ Route::prefix('auth')->name('auth.')->group(function (): void {
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/me', MeController::class)->name('me');
     Route::get('/me/context', ContextController::class)->name('me.context');
+
+    Route::prefix('approvals')->name('approvals.')->group(function (): void {
+        Route::get('/waiting', [ApprovalsController::class, 'waiting'])->name('waiting');
+        Route::get('/topics', [ApprovalsController::class, 'topics'])->name('topics');
+        Route::get('/topics/{key}', [ApprovalsController::class, 'topic'])->where('key', '[a-z][a-z0-9_.]*')->name('topic');
+        Route::put('/topics/{key}', [ApprovalsController::class, 'save'])->where('key', '[a-z][a-z0-9_.]*')->name('topic.save');
+        Route::get('/{id}', [ApprovalsController::class, 'show'])->whereUuid('id')->name('show');
+        Route::post('/{id}/answer', [ApprovalsController::class, 'answer'])->whereUuid('id')->name('answer');
+    });
 
     // View as (development only; 404 wherever it is not available).
     Route::get('/view-as/people', [ViewAsController::class, 'candidates'])->name('view-as.people');

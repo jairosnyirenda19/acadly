@@ -7,6 +7,7 @@ namespace Acadly\Modules\Assessment\Application;
 use Acadly\Core\Academics\Contracts\AcademicCalendar;
 use Acadly\Core\Academics\Contracts\Teaching;
 use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
+use Acadly\Kernel\Approvals\ApprovalRequests;
 use Acadly\Kernel\Blueprint\Engine\JourneyEngine;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
@@ -41,6 +42,7 @@ final class Sheets
         private readonly Scales $scales,
         private readonly JourneyEngine $engine,
         private readonly Clock $clock,
+        private readonly ApprovalRequests $approvals,
     ) {}
 
     /** The assessment, when the viewer may see its class; otherwise "not found". */
@@ -128,6 +130,7 @@ final class Sheets
         $lock = $steps[StepId::Lock->value] ?? null;
         $return = $steps[StepId::Return->value] ?? null;
         $mayLock = $this->reach->may($viewer, AssessmentPermission::Lock, $a->class_id);
+        $asked = $state === State::Submitted ? $this->approvals->asks(LockApproval::KEY, $a->id, $viewer) : null;
         $history = $this->history($a);
 
         return [
@@ -156,9 +159,11 @@ final class Sheets
             'can_enter' => $state->open() && $a->heldOn() <= $this->clock->today() && $owns && $this->reach->may($viewer, AssessmentPermission::Enter, $a->class_id),
             'can_submit' => $submit !== null && $submit->permitted && $owns && $submit->blockedReason === null,
             'submit_blocked' => $submit !== null && $submit->blockedReason !== null ? ['reason' => $submit->blockedReason, 'remedy' => (string) $submit->remedy] : null,
-            'can_lock' => $lock !== null && $lock->permitted,
-            'can_return' => $return !== null && $return->permitted,
-            'lock_note' => $lock !== null && ! $lock->permitted && $mayLock ? 'You cannot lock marks you submitted.' : null,
+            // While the lock's approval waits, its chain decides who is asked now.
+            'can_lock' => $asked !== null ? $asked['asks'] : $lock !== null && $lock->permitted,
+            'can_return' => $asked !== null ? $asked['asks'] : $return !== null && $return->permitted,
+            'lock_note' => $lock !== null && ! $lock->permitted && $mayLock ? 'You cannot lock marks you submitted.'
+                : ($asked !== null && ! $asked['asks'] && $mayLock ? "Waiting for: {$asked['step']}." : null),
             'can_correct' => $state === State::Locked && $mayLock,
         ];
     }

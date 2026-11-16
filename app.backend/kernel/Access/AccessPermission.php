@@ -9,6 +9,7 @@ enum AccessPermission: string implements Permission
 {
     case AssignRoles = 'access.roles.assign';
     case ManageRoles = 'access.roles.manage';
+    case ManageApprovals = 'access.approvals.manage';
 
     public function key(): string
     {
@@ -20,6 +21,7 @@ enum AccessPermission: string implements Permission
         return match ($this) {
             self::AssignRoles => 'Give and end roles',
             self::ManageRoles => 'Create and edit roles',
+            self::ManageApprovals => 'Decide who approves',
         };
     }
 
@@ -28,6 +30,7 @@ enum AccessPermission: string implements Permission
         return match ($this) {
             self::AssignRoles => 'Limited to roles and scopes held by the assigner.',
             self::ManageRoles => 'Custom roles only. System roles are locked.',
+            self::ManageApprovals => 'Change the chain of approvers for each kind of request, for the whole school.',
         };
     }
 

@@ -24,6 +24,7 @@ const PATHS = {
   down: 'M6 9l6 6 6-6',
   right: 'M9 6l6 6-6 6',
   switch: 'M4 8h13 M14 4l4 4-4 4 M20 16H7 M10 12l-4 4 4 4',
+  approvals: 'M4 4h16v16H4z M8 12l3 3 5-6 M4 9h3',
   search: 'M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13z M15.5 15.5L21 21',
 } as const
 

@@ -104,6 +104,25 @@ it('takes the register once a school day, with every learner marked', function (
         ->and(collect($day['classes'])->firstWhere('id', $this->school->id('class_primary_b'))['due'])->toBeFalse();
 });
 
+it('gives the morning register to the class teacher; others who may take registers there do not see it, unless they arrange cover', function (): void {
+    $url = "/api/v1/registers/class/{$this->class}";
+    $campus = attendanceStaff(ScopeRef::institution(), [AttendancePermission::Capture], 'Charles Kachingwe');
+    $deputy = attendanceStaff(ScopeRef::institution(), [AttendancePermission::Capture, AttendancePermission::Cover], 'Deputy');
+    DB::table('academic_teaching')->insert(['id' => Ids::next(), 'class_id' => $this->class, 'subject_id' => null, 'user_id' => $this->teacher->id,
+        'given_by' => $this->admin->id, 'given_at' => now()->subMonth()]);
+
+    $listed = fn (User $who): array => array_column($this->actingAs($who)->getJson('/api/v1/registers?day='.SCHOOL_DAY)->assertOk()->json('classes'), 'id');
+    expect($listed($campus))->not->toContain($this->class)
+        ->and($listed($this->teacher))->toContain($this->class)
+        ->and($this->actingAs($this->teacher)->getJson("{$url}?day=".SCHOOL_DAY)->json('can_take'))->toBeTrue()
+        ->and($this->actingAs($campus)->getJson("{$url}?day=".SCHOOL_DAY)->json('can_take'))->toBeFalse();
+
+    $marks = ['day' => SCHOOL_DAY, 'marks' => marksFor($this->learners, ['present', 'present', 'present'])];
+    $this->actingAs($campus)->postJson($url, $marks)->assertForbidden();
+    // Someone who arranges cover steps in for an absent class teacher.
+    $this->actingAs($deputy)->postJson($url, $marks)->assertOk()->assertJsonPath('register.submitted_by', 'Deputy');
+});
+
 it('corrects a mark through the journey, approved by someone else, keeping the first mark', function (): void {
     $this->actingAs($this->teacher)->postJson("/api/v1/registers/class/{$this->class}", ['day' => SCHOOL_DAY, 'marks' => marksFor($this->learners, ['present', 'present', 'absent'])])->assertOk();
     $registerId = DB::table('attendance_registers')->value('id');

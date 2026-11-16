@@ -72,6 +72,92 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/approvals/waiting": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Everything waiting for your answer, oldest first */
+        get: operations["approvals.waiting"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/approvals/topics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The catalogue: every kind of request that needs an approval, with its chain */
+        get: operations["approvals.topics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/approvals/topics/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One kind of request: its chain and every choice for its steps */
+        get: operations["approvals.topic"];
+        /** Saves the chain of a kind of request: `{steps: [{kind, target, needs, when}], fallback_role_id}`. No steps puts the default back */
+        put: operations["approvals.topic.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/approvals/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One request and how its chain stands */
+        get: operations["approvals.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/approvals/{id}/answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Answers the step waiting for you: `{approve, reason}`. A decline needs a reason. The response is the request as it now stands */
+        post: operations["approvals.answer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/assessment/mine": {
         parameters: {
             query?: never;
@@ -2449,6 +2535,309 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "approvals.waiting": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        waiting: {
+                            id: string;
+                            kind: string;
+                            area: string;
+                            title: string;
+                            where: string;
+                            reason: string | null;
+                            asked_by: string;
+                            step: number;
+                            steps: number;
+                            step_label: string;
+                            asked_at: string | null;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "approvals.topics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        areas: {
+                            area: string;
+                            topics: {
+                                key: string;
+                                title: string;
+                                description: string;
+                                steps: string[];
+                                changed: boolean;
+                            }[];
+                        }[];
+                        can_edit: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "approvals.topic": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        key: string;
+                        title: string;
+                        area: string;
+                        description: string;
+                        permission: string;
+                        chain: {
+                            steps: {
+                                /** @enum {string} */
+                                kind: "anyone" | "relation" | "role" | "person";
+                                target: string | null;
+                                needs: number;
+                                when: string | null;
+                            }[];
+                            fallback_role_id: string | null;
+                            changed: boolean;
+                            saved_by: string | null;
+                            saved_at: string | null;
+                        };
+                        labels: string[];
+                        relations: {
+                            key: string;
+                            label: string;
+                        }[];
+                        facts: {
+                            key: string;
+                            label: string;
+                        }[];
+                        roles: {
+                            id: string;
+                            name: string;
+                        }[];
+                        people: {
+                            id: string;
+                            name: string;
+                        }[];
+                        can_edit: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "approvals.topic.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    steps?: string;
+                    fallback_role_id?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        key: string;
+                        title: string;
+                        area: string;
+                        description: string;
+                        permission: string;
+                        chain: {
+                            steps: {
+                                /** @enum {string} */
+                                kind: "anyone" | "relation" | "role" | "person";
+                                target: string | null;
+                                needs: number;
+                                when: string | null;
+                            }[];
+                            fallback_role_id: string | null;
+                            changed: boolean;
+                            saved_by: string | null;
+                            saved_at: string | null;
+                        };
+                        labels: string[];
+                        relations: {
+                            key: string;
+                            label: string;
+                        }[];
+                        facts: {
+                            key: string;
+                            label: string;
+                        }[];
+                        roles: {
+                            id: string;
+                            name: string;
+                        }[];
+                        people: {
+                            id: string;
+                            name: string;
+                        }[];
+                        can_edit: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "approvals.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        kind: string;
+                        area: string;
+                        title: string;
+                        where: string;
+                        reason: string | null;
+                        link: string;
+                        /** @enum {string} */
+                        state: "waiting" | "approved" | "declined";
+                        asked_by: string;
+                        asked_at: string;
+                        decided_at: string | null;
+                        steps: {
+                            position: number;
+                            label: string;
+                            /** @enum {string} */
+                            state: "pending" | "waiting" | "approved" | "declined" | "skipped";
+                            needs: number;
+                            asked: string[];
+                            note: string | null;
+                            answers: {
+                                by: string;
+                                /** @enum {string} */
+                                answer: "approved" | "declined";
+                                reason: string | null;
+                                at: string;
+                            }[];
+                        }[];
+                        can_answer: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "approvals.answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    reason?: string;
+                    /** @default false */
+                    approve?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        kind: string;
+                        area: string;
+                        title: string;
+                        where: string;
+                        reason: string | null;
+                        link: string;
+                        /** @enum {string} */
+                        state: "waiting" | "approved" | "declined";
+                        asked_by: string;
+                        asked_at: string;
+                        decided_at: string | null;
+                        steps: {
+                            position: number;
+                            label: string;
+                            /** @enum {string} */
+                            state: "pending" | "waiting" | "approved" | "declined" | "skipped";
+                            needs: number;
+                            asked: string[];
+                            note: string | null;
+                            answers: {
+                                by: string;
+                                /** @enum {string} */
+                                answer: "approved" | "declined";
+                                reason: string | null;
+                                at: string;
+                            }[];
+                        }[];
+                        can_answer: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "assessment.mine": {
@@ -5594,6 +5983,7 @@ export interface operations {
                                 requested_by: string;
                                 requested_at: string;
                                 can_decide: boolean;
+                                waiting_for: string | null;
                             } | null;
                         }[];
                         can_take: boolean;
@@ -7591,6 +7981,7 @@ export interface operations {
                                 requested_by: string;
                                 requested_at: string;
                                 can_decide: boolean;
+                                waiting_for: string | null;
                             } | null;
                             absence: {
                                 told: {

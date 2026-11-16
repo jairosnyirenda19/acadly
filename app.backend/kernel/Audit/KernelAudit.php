@@ -57,6 +57,9 @@ enum KernelAudit: string implements AuditAction
     case ChainBroken = 'audit.chain_broken';
     case ExportRequested = 'documents.export_requested';
     case ExportDownloaded = 'documents.export_downloaded';
+    case ApprovalAsked = 'approvals.asked';
+    case ApprovalAnswered = 'approvals.answered';
+    case ChainSaved = 'approvals.chain_saved';
 
     public function key(): string
     {
@@ -116,6 +119,9 @@ enum KernelAudit: string implements AuditAction
             self::ChainBroken => 'Found that the audit trail does not verify.',
             self::ExportRequested => 'Asked for an export of a list.',
             self::ExportDownloaded => 'Downloaded an export of a list.',
+            self::ApprovalAsked => 'Asked for an approval.',
+            self::ApprovalAnswered => 'Approved or declined a step of an approval.',
+            self::ChainSaved => 'Changed who approves a kind of request.',
         };
     }
 

@@ -45,6 +45,8 @@ import { ChannelsScreen } from './messages/ChannelsScreen'
 import { SentScreen } from './messages/SentScreen'
 import { WordingScreen } from './messages/WordingScreen'
 import { TeachingScreen } from './settings/TeachingScreen'
+import { ApprovalScreen, ApprovalsScreen } from './approvals/ApprovalsScreen'
+import { ApprovalSettingsScreen } from './approvals/ApprovalSettingsScreen'
 import { SetupWizard } from './setup/SetupWizard'
 import { ConsoleShell, holdsAnywhere, settingsHome } from './shell/ConsoleShell'
 import { keepsGrading, seesMarks, seesRegisters, takesRegisters } from './shell/navigation'
@@ -69,6 +71,7 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const sheet = /^\/marks\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const marks = seesMarks(context)
   const exported = /^\/exports\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const approval = /^\/approvals\/([0-9a-f-]{36})$/.exec(path)?.[1]
 
   useEffect(() => {
     if (path === '/settings' && home !== null) navigate(home, true)
@@ -104,6 +107,10 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (sheet !== undefined && marks) page = <SheetScreen key={sheet} id={sheet} />
   else if (path === '/settings/assessment' && keepsGrading(context)) page = <AssessmentSettingsScreen view="plans" />
   else if (path === '/settings/assessment/scales' && keepsGrading(context)) page = <AssessmentSettingsScreen view="scales" />
+  else if (path === '/settings/approvals' && can(context, 'access.approvals.manage')) page = <ApprovalSettingsScreen />
+  else if (path === '/approvals') page = <ApprovalsScreen />
+  // A request is shown to the person who asked, those asked, and those who may decide it; the server decides.
+  else if (approval !== undefined) page = <ApprovalScreen key={approval} id={approval} />
   // Anyone signed in may open an export; the server shows each person only their own.
   else if (exported !== undefined) page = <ExportScreen key={exported} id={exported} />
 

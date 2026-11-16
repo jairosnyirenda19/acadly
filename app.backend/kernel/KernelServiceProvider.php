@@ -182,6 +182,7 @@ final class KernelServiceProvider extends ServiceProvider
             __DIR__.'/Notify/Database/migrations',
             __DIR__.'/Documents/Database/migrations',
             __DIR__.'/Grid/Database/migrations',
+            __DIR__.'/Approvals/Database/migrations',
         ]);
 
         $this->app->make('router')->aliasMiddleware('module', RequireModule::class);

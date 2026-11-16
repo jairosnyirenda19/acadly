@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Acadly\Modules\Assessment;
 
 use Acadly\Core\Enrolment\Contracts\LearnerRecordPart;
+use Acadly\Kernel\Approvals\ApprovalTopic;
 use Acadly\Kernel\Console\SyncStep;
 use Acadly\Kernel\Grid\Grids;
 use Acadly\Modules\Assessment\Application\AssessmentsGrid;
 use Acadly\Modules\Assessment\Application\LearnerResults;
+use Acadly\Modules\Assessment\Application\LockApproval;
 use Acadly\Modules\Assessment\Application\Plans;
 use Acadly\Modules\Assessment\Application\Reach;
 use Acadly\Modules\Assessment\Application\Scales;
@@ -27,6 +29,7 @@ final class AssessmentServiceProvider extends ServiceProvider
         $this->app->scoped(LearnerResults::class);
         $this->app->tag([LearnerResults::class], LearnerRecordPart::TAG);
         $this->app->tag([AssessmentsGrid::class], Grids::TAG);
+        $this->app->tag([LockApproval::class], ApprovalTopic::TAG);
         $this->app->tag([ScaleSeeds::class], SyncStep::TAG);
     }
 

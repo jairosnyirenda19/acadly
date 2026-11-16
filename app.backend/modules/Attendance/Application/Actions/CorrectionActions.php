@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Acadly\Modules\Attendance\Application\Actions;
 
+use Acadly\Kernel\Approvals\Actions\ApprovalActions;
 use Acadly\Kernel\Audit\NotAudited;
 use Acadly\Kernel\Blueprint\Blueprints;
 use Acadly\Kernel\Blueprint\Engine\JourneyEngine;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Row;
+use Acadly\Modules\Attendance\Application\CorrectionApproval;
 use Acadly\Modules\Attendance\Application\Marks;
 use Acadly\Modules\Attendance\Application\Reach;
 use Acadly\Modules\Attendance\Contracts\Mark;
@@ -34,6 +36,7 @@ final class CorrectionActions
         private readonly Blueprints $blueprints,
         private readonly Marks $marks,
         private readonly Reach $reach,
+        private readonly ApprovalActions $approvals,
     ) {}
 
     public function request(User $by, string $registerId, string $learnerId, string $to, string $reason): Correction
@@ -72,11 +75,17 @@ final class CorrectionActions
                 'state' => State::Drafted->value, 'journey_ref' => (string) $this->blueprints->newest('attendance.correction'),
             ]);
             $this->engine->perform($correction, $by, StepId::Request, OutcomeId::Requested, ['reason' => trim($reason)]);
+            // Who decides is the school's chain for register corrections (Settings › Approvals).
+            $this->approvals->open(CorrectionApproval::KEY, $correction->id);
 
             return $correction;
         });
     }
 
+    /**
+     * Answers the step of the correction's approval that asks this person. The
+     * last yes, or any no, performs the journey's decision (CorrectionApproval).
+     */
     public function decide(User $by, string $correctionId, bool $approve, string $note): Correction
     {
         $correction = Correction::query()->find($correctionId);
@@ -85,9 +94,14 @@ final class CorrectionActions
             throw (new ModelNotFoundException)->setModel(Correction::class);
         }
 
-        $this->engine->perform($correction, $by, StepId::Decide, $approve ? OutcomeId::Approved : OutcomeId::Declined,
-            trim($note) !== '' ? ['reason' => trim($note)] : []);
+        if ($correction->state !== State::Requested->value) {
+            throw ValidationException::withMessages(['correction' => ['This correction has already been decided.']]);
+        }
 
-        return $correction;
+        // A correction asked for before approvals existed gets its chain now.
+        $request = $this->approvals->open(CorrectionApproval::KEY, $correction->id);
+        $this->approvals->answer($by, $request, $approve, trim($note) !== '' ? trim($note) : null);
+
+        return $correction->refresh();
     }
 }

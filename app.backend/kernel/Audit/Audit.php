@@ -7,6 +7,7 @@ namespace Acadly\Kernel\Audit;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Identity\User;
+use Acadly\Kernel\Identity\ViewAs;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -95,7 +96,7 @@ final class Audit
             'actor_kind' => $actor->kind->value,
             'actor_label' => mb_substr($actor->label, 0, 255),
             'actor_roles' => $actor->roles,
-            'acting_for_user_id' => null,
+            'acting_for_user_id' => $actor->actingForUserId,
             'support_grant_id' => null,
             ...$context,
             'subject_type' => $subject?->auditType(),
@@ -170,7 +171,32 @@ final class Audit
             ->values()
             ->all();
 
+        // View as (development only): an act done in a viewed session is the
+        // administrator's, acting for the account viewed. It must never read
+        // as that person's own, and no caller can forget it, because no
+        // caller supplies it.
+        $by = $this->viewingAs($who);
+
+        if ($by !== null) {
+            return new Actor(ActorKind::User, $by->id, "{$by->name}, viewing as {$who->name}", $roles, actingForUserId: $who->id);
+        }
+
         return new Actor(ActorKind::User, $who->id, $who->name, $roles);
+    }
+
+    /** The administrator behind the current session, when it views as $who. */
+    private function viewingAs(User $who): ?User
+    {
+        $request = app()->bound('request') ? app('request') : null;
+
+        if (! $request instanceof Request || ! $request->hasSession()) {
+            return null;
+        }
+
+        $by = $request->session()->get(ViewAs::BY);
+        $current = Auth::guard('web')->id();
+
+        return is_string($by) && $current === $who->id ? User::query()->find($by) : null;
     }
 
     private function currentActor(): Actor

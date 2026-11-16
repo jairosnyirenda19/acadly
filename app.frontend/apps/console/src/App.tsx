@@ -20,6 +20,11 @@ import { ForgotPasswordScreen } from './sign-in/ForgotPasswordScreen'
 import { ResetPasswordScreen } from './sign-in/ResetPasswordScreen'
 import { AdmitScreen } from './learners/AdmitScreen'
 import { ExportScreen } from './exports/ExportScreen'
+import { MarksScreen } from './assessment/MarksScreen'
+import { NewAssessmentScreen } from './assessment/NewAssessmentScreen'
+import { ResultsScreen } from './assessment/ResultsScreen'
+import { SheetScreen } from './assessment/SheetScreen'
+import { AssessmentSettingsScreen } from './settings/AssessmentSettingsScreen'
 import { LearnerImportScreen } from './learners/LearnerImportScreen'
 import { LearnerScreen } from './learners/LearnerScreen'
 import { LearnersScreen } from './learners/LearnersScreen'
@@ -42,7 +47,7 @@ import { WordingScreen } from './messages/WordingScreen'
 import { TeachingScreen } from './settings/TeachingScreen'
 import { SetupWizard } from './setup/SetupWizard'
 import { ConsoleShell, holdsAnywhere, settingsHome } from './shell/ConsoleShell'
-import { seesRegisters, takesRegisters } from './shell/navigation'
+import { keepsGrading, seesMarks, seesRegisters, takesRegisters } from './shell/navigation'
 import { WorkInProvider } from './shell/WorkIn'
 import { SignInScreen } from './sign-in/SignInScreen'
 import { StatusScreen } from './StatusScreen'
@@ -61,6 +66,8 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const registers = seesRegisters(context)
   const register = /^\/registers\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const lesson = /^\/registers\/lesson\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const sheet = /^\/marks\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const marks = seesMarks(context)
   const exported = /^\/exports\/([0-9a-f-]{36})$/.exec(path)?.[1]
 
   useEffect(() => {
@@ -90,6 +97,13 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/settings/messages' && can(context, 'notify.manage')) page = <ChannelsScreen />
   else if (path === '/settings/messages/wording' && can(context, 'notify.manage')) page = <WordingScreen />
   else if (path === '/settings/messages/sent' && can(context, 'notify.manage')) page = <SentScreen />
+  else if (path === '/marks' && marks) page = <MarksScreen view="mine" />
+  else if (path === '/marks/all' && marks) page = <MarksScreen view="all" />
+  else if (path === '/marks/new' && marks) page = <NewAssessmentScreen />
+  else if (path === '/marks/results' && marks) page = <ResultsScreen />
+  else if (sheet !== undefined && marks) page = <SheetScreen key={sheet} id={sheet} />
+  else if (path === '/settings/assessment' && keepsGrading(context)) page = <AssessmentSettingsScreen view="plans" />
+  else if (path === '/settings/assessment/scales' && keepsGrading(context)) page = <AssessmentSettingsScreen view="scales" />
   // Anyone signed in may open an export; the server shows each person only their own.
   else if (exported !== undefined) page = <ExportScreen key={exported} id={exported} />
 

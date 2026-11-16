@@ -1,0 +1,134 @@
+{
+    "initial": "marking",
+    "kind": "journey",
+    "milestones": [],
+    "ref": "assessment.marks@2026.1",
+    "stages": [
+        {
+            "key": "marking",
+            "steps": [
+                "submit"
+            ],
+            "title": "Marking"
+        },
+        {
+            "key": "check",
+            "steps": [
+                "lock",
+                "return"
+            ],
+            "title": "Check"
+        }
+    ],
+    "states": [
+        {
+            "id": "marking",
+            "label": "Marking"
+        },
+        {
+            "id": "submitted",
+            "label": "Submitted"
+        },
+        {
+            "id": "returned",
+            "label": "Returned"
+        },
+        {
+            "id": "locked",
+            "label": "Locked"
+        }
+    ],
+    "steps": [
+        {
+            "capability": "assessment.enter",
+            "four_eyes": null,
+            "from": [
+                "marking",
+                "returned"
+            ],
+            "gates": [
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Modules\\Assessment\\Journeys\\Marks\\EveryLearnerMarked"
+                }
+            ],
+            "id": "submit",
+            "outcomes": [
+                {
+                    "effects": [
+                        {
+                            "args": {
+                                "topic": "Acadly\\Modules\\Assessment\\Notifications\\MarksSubmitted"
+                            },
+                            "args_class": "Acadly\\Kernel\\Notify\\TopicArgs",
+                            "class": "Acadly\\Kernel\\Notify\\SendTopic"
+                        }
+                    ],
+                    "emits": [],
+                    "id": "submitted",
+                    "requires_reason": false,
+                    "title": "Submit",
+                    "to": "submitted"
+                }
+            ],
+            "stage": "marking",
+            "title": "Submit the marks"
+        },
+        {
+            "capability": "assessment.lock",
+            "four_eyes": "submit",
+            "from": [
+                "submitted"
+            ],
+            "gates": [],
+            "id": "lock",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "locked",
+                    "requires_reason": false,
+                    "title": "Lock",
+                    "to": "locked"
+                }
+            ],
+            "stage": "check",
+            "title": "Lock the marks"
+        },
+        {
+            "capability": "assessment.lock",
+            "four_eyes": null,
+            "from": [
+                "submitted"
+            ],
+            "gates": [],
+            "id": "return",
+            "outcomes": [
+                {
+                    "effects": [
+                        {
+                            "args": {
+                                "topic": "Acadly\\Modules\\Assessment\\Notifications\\MarksReturned"
+                            },
+                            "args_class": "Acadly\\Kernel\\Notify\\TopicArgs",
+                            "class": "Acadly\\Kernel\\Notify\\SendTopic"
+                        }
+                    ],
+                    "emits": [],
+                    "id": "returned",
+                    "requires_reason": true,
+                    "title": "Return",
+                    "to": "returned"
+                }
+            ],
+            "stage": "check",
+            "title": "Return the marks to the teacher"
+        }
+    ],
+    "subject": "Acadly\\Modules\\Assessment\\Domain\\Assessment",
+    "terminal": [
+        "locked"
+    ],
+    "title": "Marks of an assessment"
+}

@@ -5,6 +5,8 @@ declare(strict_types=1);
 use Acadly\Core\Institution\Contracts\Grouping;
 use Acadly\Core\Institution\Contracts\Term;
 use Acadly\Kernel\Blueprint\Profile\ProfileBlueprint;
+use Acadly\Modules\Assessment\Contracts\AssessmentModel;
+use Acadly\Modules\Assessment\Contracts\AssessmentSlot;
 
 return ProfileBlueprint::make('ECD@2026.1')
     ->title('Nursery')
@@ -16,6 +18,7 @@ return ProfileBlueprint::make('ECD@2026.1')
     ->levels(['BABY' => 'Baby class', 'MIDDLE' => 'Middle class', 'TOP' => 'Top class'])
     ->term(Term::Subject, 'Learning area', 'Learning areas')
     ->grouping(Grouping::Rooms)
+    ->bind(AssessmentSlot::Model, AssessmentModel::Observational)
     ->subject('LAN', 'Language and communication')
     ->subject('NUM', 'Numeracy')
     ->subject('CRE', 'Creative arts')

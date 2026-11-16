@@ -1,6 +1,8 @@
 {
     "abstract": false,
-    "bindings": {},
+    "bindings": {
+        "assessment.model": "observational"
+    },
     "extends": "SCHOOL_BASE@2026.1",
     "kind": "profile",
     "ref": "ECD@2026.1",

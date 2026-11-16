@@ -3,6 +3,7 @@ import { LoadingRule } from '@acadly/ui'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { copy } from '../copy'
 import { Icon } from './icons'
+import { ViewAsBar, ViewAsKey } from './ViewAs'
 import { holdsAnywhere, settingsHome, visibleGroups, type NavGroup } from './navigation'
 import { WorkInButton, WorkInPanel, useWorkIn } from './WorkIn'
 
@@ -326,6 +327,7 @@ export function ConsoleShell({ children, onSignedOut }: { children: ReactNode; o
       {choosing && <WorkInPanel onClose={closeChoosing} className={width === 'phone' ? 'left-0 w-full' : overlay ? 'left-[312px]' : railFolded ? 'left-16' : 'left-[248px]'} />}
 
       <div className="flex min-w-0 flex-1 flex-col">
+        <ViewAsBar name={context.user.name} />
         <header className="sticky top-0 z-30 flex h-[60px] items-center gap-2.5 border-b-2 border-ink bg-paper px-3 md:h-16 md:gap-3 md:px-[clamp(16px,3vw,40px)]">
           <LoadingRule active={busy} />
           {width === 'phone' && (
@@ -338,7 +340,10 @@ export function ConsoleShell({ children, onSignedOut }: { children: ReactNode; o
               </span>
             </>
           )}
-          <div className="ml-auto flex items-center gap-2.5" title={context.user.name}>
+          <div className="ml-auto">
+            <ViewAsKey />
+          </div>
+          <div className="flex items-center gap-2.5" title={context.user.name}>
             <span className="hidden w-[176px] text-right leading-tight sm:block">
               <span className="block truncate text-sm font-extrabold">{context.user.name}</span>
               <span className="block truncate text-xs text-text-muted">{context.user.email}</span>

@@ -40,6 +40,7 @@ export const GROUPS: NavGroup[] = [
       { key: 'my-day', label: t.nav.myDay, path: '/my-day', icon: 'myDay', show: (c) => takesRegisters(c), lights: (p) => p === '/my-day' },
       { key: 'today', label: t.nav.today, path: '/', icon: 'today', show: () => true, lights: (p) => p === '/' },
       { key: 'registers', label: t.nav.registers, path: '/registers', icon: 'registers', show: (c) => seesRegisters(c), lights: under('/registers') },
+      { key: 'marks', label: t.nav.marks, path: '/marks', icon: 'marks', show: (c) => seesMarks(c), lights: under('/marks') },
     ],
   },
   {
@@ -57,6 +58,7 @@ export const GROUPS: NavGroup[] = [
       { key: 'teaching', label: t.nav.teaching, path: '/settings/teaching', icon: 'teaching', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/teaching') },
       { key: 'timetable', label: t.nav.timetable, path: '/settings/timetable', icon: 'timetable', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/timetable') },
       { key: 'messages', label: t.nav.messages, path: '/settings/messages', icon: 'messages', show: (c) => can(c, 'notify.manage'), lights: under('/settings/messages') },
+      { key: 'assessment', label: t.nav.assessment, path: '/settings/assessment', icon: 'assessment', show: (c) => keepsGrading(c), lights: under('/settings/assessment') },
       { key: 'modules', label: t.nav.modules, path: '/settings/modules', icon: 'modules', show: (c) => can(c, 'modules.manage'), lights: under('/settings/modules') },
     ],
   },
@@ -70,6 +72,21 @@ export function seesRegisters(context: AppContext): boolean {
 /** Whether the account takes registers somewhere, with the module on: it has a day of its own. */
 export function takesRegisters(context: AppContext): boolean {
   return moduleOn(context, 'attendance') && holdsAnywhere(context, 'attendance.capture')
+}
+
+/** Whether the account works with marks anywhere: sets, enters, locks or sees assessments, with the module on. */
+export function seesMarks(context: AppContext): boolean {
+  return moduleOn(context, 'assessment') && ['assessment.create', 'assessment.enter', 'assessment.lock', 'assessment.view'].some((p) => holdsAnywhere(context, p))
+}
+
+/** Whether the account sees every assessment of its classes: the office's list, with lock and return. */
+export function seesAllMarks(context: AppContext): boolean {
+  return moduleOn(context, 'assessment') && ['assessment.lock', 'assessment.view'].some((p) => holdsAnywhere(context, p))
+}
+
+/** Whether the account keeps the scales and grading plans somewhere, with the module on. */
+export function keepsGrading(context: AppContext): boolean {
+  return moduleOn(context, 'assessment') && holdsAnywhere(context, 'assessment.plan')
 }
 
 /** The groups and items this account sees. */

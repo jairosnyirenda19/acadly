@@ -1,12 +1,12 @@
 import { can, navigate, useAppContext } from '@acadly/kernel'
 import type { ReactNode } from 'react'
 import { copy } from '../copy'
-import { holdsAnywhere } from '../shell/navigation'
+import { holdsAnywhere, keepsGrading } from '../shell/navigation'
 import type { PersonStateName } from './api'
 
 const t = copy.settings
 
-export type SettingsTab = 'people' | 'roles' | 'subjects' | 'teaching' | 'timetable' | 'messages' | 'modules'
+export type SettingsTab = 'people' | 'roles' | 'subjects' | 'teaching' | 'timetable' | 'messages' | 'assessment' | 'modules'
 
 /** The settings tabs that are built and that the account may use. */
 export function SettingsTabs({ current }: { current: SettingsTab }) {
@@ -18,6 +18,7 @@ export function SettingsTabs({ current }: { current: SettingsTab }) {
     { key: 'teaching' as const, path: '/settings/teaching', show: holdsAnywhere(context, 'academics.manage') },
     { key: 'timetable' as const, path: '/settings/timetable', show: holdsAnywhere(context, 'academics.manage') },
     { key: 'messages' as const, path: '/settings/messages', show: can(context, 'notify.manage') },
+    { key: 'assessment' as const, path: '/settings/assessment', show: keepsGrading(context) },
     { key: 'modules' as const, path: '/settings/modules', show: can(context, 'modules.manage') },
   ]
 

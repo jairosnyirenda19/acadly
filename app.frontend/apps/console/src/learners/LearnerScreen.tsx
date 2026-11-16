@@ -171,9 +171,9 @@ export function LearnerScreen({ id }: { id: string }) {
       {cells.length > 0 && (
         <>
           <div className="hidden md:block">
-            <TotalsBand>
+            <TotalsBand compact>
               {cells.map((c, i) => (
-                <Total key={`${c.label}-${i}`} tone={i === 0 ? 'ink' : c.tone === 'attention' ? 'attention' : 'plain'} label={c.label} value={c.value} note={c.note} />
+                <Total key={`${c.label}-${i}`} compact tone={i === 0 ? 'ink' : c.tone === 'attention' ? 'attention' : 'plain'} label={c.label} value={c.value} note={c.note} />
               ))}
             </TotalsBand>
           </div>

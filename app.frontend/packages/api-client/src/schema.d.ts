@@ -72,6 +72,176 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/assessment/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The viewer's assessments this term, with how far each is marked */
+        get: operations["assessment.mine"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The classes and subjects the viewer may set an assessment for, the kinds, and where each kind lands in the term grade */
+        get: operations["assessment.options"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/grid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The assessments as a data grid: `?page=&per_page=&sort=&dir=&q=&filter[state]=submitted&filter[level]=division:F3&filter[subject]=id&filter[kind]=mid_term&filter[held]=from..to` */
+        get: operations["assessment.grid"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/assessments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sets an assessment: `{class_id, subject_id, kind, title, held_on, out_of, counts}`. Answers with its marks sheet */
+        post: operations["assessment.assessments.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/assessments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The marks sheet: learners, the marks in force, the numbers, the ladder and what the viewer may do */
+        get: operations["assessment.assessments.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/assessments/{id}/marks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Saves marks: `{marks: [{learner_id, value, reason}]}`. Only a mark that changed adds a row */
+        put: operations["assessment.assessments.marks"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/assessments/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submits the marks */
+        post: operations["assessment.assessments.submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/assessments/{id}/lock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Locks submitted marks. Never marks the viewer submitted */
+        post: operations["assessment.assessments.lock"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/assessments/{id}/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Returns submitted marks to the teacher: `{reason}` */
+        post: operations["assessment.assessments.return"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/assessments/{id}/correct": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Corrects a locked mark: `{learner_id, value, reason, note}` */
+        post: operations["assessment.assessments.correct"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/me/context": {
         parameters: {
             query?: never;
@@ -856,6 +1026,9 @@ export interface paths {
          * The signed-in account and its access
          * @description Grants list each permission with the scope it is held at. The screens
          *     use them to decide what to offer; the server checks every request again.
+         *
+         *     `view_as` says whether this account may view as others (development
+         *     only), and, while it does, who is really signed in and when it ends.
          */
         get: operations["me"];
         put?: never;
@@ -1510,6 +1683,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/assessment/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A class's term grades, learner by subject, with what is not ready: `?class_id=&period_id=` */
+        get: operations["assessment.results"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/results/working": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** How one learner's term grade in one subject is made: `?class_id=&learner_id=&subject_id=&period_id=` */
+        get: operations["assessment.results.working"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/learner/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One learner's term so far: a grade per subject, and this term's assessments with the learner's mark once locked */
+        get: operations["assessment.learner"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/roles": {
         parameters: {
             query?: never;
@@ -1560,6 +1784,76 @@ export interface paths {
         get: operations["kernel.school"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/scales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every scale with the levels that use it, and every level with its scale */
+        get: operations["assessment.scales.index"];
+        /** Adds a scale: `{name, overall, pass_from, track, bands: [{grade, word, from, to}]}` */
+        put: operations["assessment.scales.store"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/scales/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Changes a scale, or retires it: `{name, overall, pass_from, track, bands, retired}` */
+        put: operations["assessment.scales.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/level-scales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Chooses the scale of a level: `{division_id, level_code, scale_id}` */
+        put: operations["assessment.level-scales"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The grading plan of a level in a term, or of one of its subjects: `?division_id=&level_code=&period_id=&subject_id=` */
+        get: operations["assessment.plans.index"];
+        put?: never;
+        /** Saves a new version of a grading plan: `{division_id, level_code, period_id, subject_id, mode, parts: [{key, label, weight, kinds, rule, best_n, missing}], reason}` */
+        post: operations["assessment.plans.store"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1826,6 +2120,57 @@ export interface paths {
         put: operations["academics.timetable.period"];
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/view-as/people": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Who an administrator may view as: `?search=` by name or email. Never an administrator, never yourself */
+        get: operations["view-as.people"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/view-as/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Steps into another account. The response is the same as GET /me, for that account */
+        post: operations["view-as.start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/view-as": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Steps back into your own account. The response is the same as GET /me */
+        delete: operations["view-as.leave"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2104,6 +2449,919 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "assessment.mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        today: string;
+                        totals: {
+                            all: number;
+                            to_finish: number;
+                            submitted: number;
+                            locked: number;
+                        };
+                        assessments: {
+                            id: string;
+                            class_id: string;
+                            class: string;
+                            subject: string;
+                            kind: string;
+                            kind_label: string;
+                            title: string;
+                            held_on: string;
+                            out_of: number;
+                            /** @enum {string} */
+                            state: "marking" | "submitted" | "returned" | "locked";
+                            state_label: string;
+                            learners: number;
+                            marked: number;
+                            absent: number;
+                        }[];
+                        can_set: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        today: string;
+                        kinds: {
+                            value: string;
+                            label: string;
+                        }[];
+                        choices: {
+                            class_id: string;
+                            class: string;
+                            level: string;
+                            subject_id: string;
+                            subject: string;
+                            period: {
+                                id: string;
+                                name: string;
+                                starts_on: string;
+                                ends_on: string;
+                            } | null;
+                            /** @enum {string} */
+                            mode: "continuous" | "exam_only";
+                            lands: {
+                                kind: string;
+                                counts: boolean;
+                                part_key: string | null;
+                                part_label: string | null;
+                                weight: number | null;
+                                rule: string | null;
+                                others: number;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.grid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        rows: {
+                            id: string;
+                            class_id: string;
+                            class: string;
+                            level: string;
+                            subject: string;
+                            kind: string;
+                            kind_label: string;
+                            title: string;
+                            teacher: string | null;
+                            held_on: string;
+                            out_of: number;
+                            counts: boolean;
+                            marked: number;
+                            learners: number;
+                            average: number | null;
+                            /** @enum {string} */
+                            state: "marking" | "submitted" | "returned" | "locked";
+                            state_label: string;
+                        }[];
+                        total: number;
+                        page: number;
+                        per_page: number;
+                        pages: number;
+                        sort: string;
+                        /** @enum {string} */
+                        dir: "asc" | "desc";
+                        q: string;
+                        filters: {
+                            [key: string]: string[];
+                        };
+                        columns: {
+                            key: string;
+                            label: string;
+                            sortable: boolean;
+                            shown: boolean;
+                            always: boolean;
+                        }[];
+                        filter_options: {
+                            key: string;
+                            label: string;
+                            /** @enum {string} */
+                            kind: "choice" | "dates";
+                            options: {
+                                value: string;
+                                label: string;
+                                count: number;
+                            }[];
+                        }[];
+                        views: {
+                            id: string;
+                            name: string;
+                            state: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        bulk: {
+                            key: string;
+                            label: string;
+                        }[];
+                        can_export: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.assessments.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        assessment: {
+                            id: string;
+                            class_id: string;
+                            class: string;
+                            level: string;
+                            subject_id: string;
+                            subject: string;
+                            kind: string;
+                            kind_label: string;
+                            title: string;
+                            held_on: string;
+                            out_of: number;
+                            counts: boolean;
+                            part: {
+                                key: string;
+                                label: string;
+                                weight: number;
+                            } | null;
+                            /** @enum {string} */
+                            state: "marking" | "submitted" | "returned" | "locked";
+                            state_label: string;
+                            set_by: string;
+                        };
+                        learners: {
+                            id: string;
+                            name: string;
+                            admission_number: string | null;
+                            value: number | null;
+                            /** @enum {string|null} */
+                            reason: "absent" | "excused" | "exempt" | null;
+                            percent: number | null;
+                            grade: string | null;
+                            entered_by: string | null;
+                            entered_at: string | null;
+                            corrected: boolean;
+                            note: string | null;
+                        }[];
+                        stats: {
+                            learners: number;
+                            marked: number;
+                            missing: number;
+                            absent: number;
+                            average: number | null;
+                            highest: number | null;
+                            lowest: number | null;
+                            below_half: number;
+                        };
+                        scale: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        ladder: {
+                            key: string;
+                            label: string;
+                            done: boolean;
+                            current: boolean;
+                            by: string | null;
+                            at: string | null;
+                        }[];
+                        history: {
+                            step: string;
+                            outcome: string;
+                            by: string;
+                            at: string;
+                            reason: string | null;
+                        }[];
+                        reasons: {
+                            value: string;
+                            label: string;
+                        }[];
+                        can_enter: boolean;
+                        can_submit: boolean;
+                        submit_blocked: {
+                            reason: string;
+                            remedy: string;
+                        } | null;
+                        can_lock: boolean;
+                        can_return: boolean;
+                        lock_note: string | null;
+                        can_correct: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.assessments.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        assessment: {
+                            id: string;
+                            class_id: string;
+                            class: string;
+                            level: string;
+                            subject_id: string;
+                            subject: string;
+                            kind: string;
+                            kind_label: string;
+                            title: string;
+                            held_on: string;
+                            out_of: number;
+                            counts: boolean;
+                            part: {
+                                key: string;
+                                label: string;
+                                weight: number;
+                            } | null;
+                            /** @enum {string} */
+                            state: "marking" | "submitted" | "returned" | "locked";
+                            state_label: string;
+                            set_by: string;
+                        };
+                        learners: {
+                            id: string;
+                            name: string;
+                            admission_number: string | null;
+                            value: number | null;
+                            /** @enum {string|null} */
+                            reason: "absent" | "excused" | "exempt" | null;
+                            percent: number | null;
+                            grade: string | null;
+                            entered_by: string | null;
+                            entered_at: string | null;
+                            corrected: boolean;
+                            note: string | null;
+                        }[];
+                        stats: {
+                            learners: number;
+                            marked: number;
+                            missing: number;
+                            absent: number;
+                            average: number | null;
+                            highest: number | null;
+                            lowest: number | null;
+                            below_half: number;
+                        };
+                        scale: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        ladder: {
+                            key: string;
+                            label: string;
+                            done: boolean;
+                            current: boolean;
+                            by: string | null;
+                            at: string | null;
+                        }[];
+                        history: {
+                            step: string;
+                            outcome: string;
+                            by: string;
+                            at: string;
+                            reason: string | null;
+                        }[];
+                        reasons: {
+                            value: string;
+                            label: string;
+                        }[];
+                        can_enter: boolean;
+                        can_submit: boolean;
+                        submit_blocked: {
+                            reason: string;
+                            remedy: string;
+                        } | null;
+                        can_lock: boolean;
+                        can_return: boolean;
+                        lock_note: string | null;
+                        can_correct: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.assessments.marks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    marks?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: number;
+                        sheet: {
+                            assessment: {
+                                id: string;
+                                class_id: string;
+                                class: string;
+                                level: string;
+                                subject_id: string;
+                                subject: string;
+                                kind: string;
+                                kind_label: string;
+                                title: string;
+                                held_on: string;
+                                out_of: number;
+                                counts: boolean;
+                                part: {
+                                    key: string;
+                                    label: string;
+                                    weight: number;
+                                } | null;
+                                /** @enum {string} */
+                                state: "marking" | "submitted" | "returned" | "locked";
+                                state_label: string;
+                                set_by: string;
+                            };
+                            learners: {
+                                id: string;
+                                name: string;
+                                admission_number: string | null;
+                                value: number | null;
+                                /** @enum {string|null} */
+                                reason: "absent" | "excused" | "exempt" | null;
+                                percent: number | null;
+                                grade: string | null;
+                                entered_by: string | null;
+                                entered_at: string | null;
+                                corrected: boolean;
+                                note: string | null;
+                            }[];
+                            stats: {
+                                learners: number;
+                                marked: number;
+                                missing: number;
+                                absent: number;
+                                average: number | null;
+                                highest: number | null;
+                                lowest: number | null;
+                                below_half: number;
+                            };
+                            scale: {
+                                id: string;
+                                name: string;
+                            } | null;
+                            ladder: {
+                                key: string;
+                                label: string;
+                                done: boolean;
+                                current: boolean;
+                                by: string | null;
+                                at: string | null;
+                            }[];
+                            history: {
+                                step: string;
+                                outcome: string;
+                                by: string;
+                                at: string;
+                                reason: string | null;
+                            }[];
+                            reasons: {
+                                value: string;
+                                label: string;
+                            }[];
+                            can_enter: boolean;
+                            can_submit: boolean;
+                            submit_blocked: {
+                                reason: string;
+                                remedy: string;
+                            } | null;
+                            can_lock: boolean;
+                            can_return: boolean;
+                            lock_note: string | null;
+                            can_correct: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.assessments.submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        assessment: {
+                            id: string;
+                            class_id: string;
+                            class: string;
+                            level: string;
+                            subject_id: string;
+                            subject: string;
+                            kind: string;
+                            kind_label: string;
+                            title: string;
+                            held_on: string;
+                            out_of: number;
+                            counts: boolean;
+                            part: {
+                                key: string;
+                                label: string;
+                                weight: number;
+                            } | null;
+                            /** @enum {string} */
+                            state: "marking" | "submitted" | "returned" | "locked";
+                            state_label: string;
+                            set_by: string;
+                        };
+                        learners: {
+                            id: string;
+                            name: string;
+                            admission_number: string | null;
+                            value: number | null;
+                            /** @enum {string|null} */
+                            reason: "absent" | "excused" | "exempt" | null;
+                            percent: number | null;
+                            grade: string | null;
+                            entered_by: string | null;
+                            entered_at: string | null;
+                            corrected: boolean;
+                            note: string | null;
+                        }[];
+                        stats: {
+                            learners: number;
+                            marked: number;
+                            missing: number;
+                            absent: number;
+                            average: number | null;
+                            highest: number | null;
+                            lowest: number | null;
+                            below_half: number;
+                        };
+                        scale: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        ladder: {
+                            key: string;
+                            label: string;
+                            done: boolean;
+                            current: boolean;
+                            by: string | null;
+                            at: string | null;
+                        }[];
+                        history: {
+                            step: string;
+                            outcome: string;
+                            by: string;
+                            at: string;
+                            reason: string | null;
+                        }[];
+                        reasons: {
+                            value: string;
+                            label: string;
+                        }[];
+                        can_enter: boolean;
+                        can_submit: boolean;
+                        submit_blocked: {
+                            reason: string;
+                            remedy: string;
+                        } | null;
+                        can_lock: boolean;
+                        can_return: boolean;
+                        lock_note: string | null;
+                        can_correct: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.assessments.lock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        assessment: {
+                            id: string;
+                            class_id: string;
+                            class: string;
+                            level: string;
+                            subject_id: string;
+                            subject: string;
+                            kind: string;
+                            kind_label: string;
+                            title: string;
+                            held_on: string;
+                            out_of: number;
+                            counts: boolean;
+                            part: {
+                                key: string;
+                                label: string;
+                                weight: number;
+                            } | null;
+                            /** @enum {string} */
+                            state: "marking" | "submitted" | "returned" | "locked";
+                            state_label: string;
+                            set_by: string;
+                        };
+                        learners: {
+                            id: string;
+                            name: string;
+                            admission_number: string | null;
+                            value: number | null;
+                            /** @enum {string|null} */
+                            reason: "absent" | "excused" | "exempt" | null;
+                            percent: number | null;
+                            grade: string | null;
+                            entered_by: string | null;
+                            entered_at: string | null;
+                            corrected: boolean;
+                            note: string | null;
+                        }[];
+                        stats: {
+                            learners: number;
+                            marked: number;
+                            missing: number;
+                            absent: number;
+                            average: number | null;
+                            highest: number | null;
+                            lowest: number | null;
+                            below_half: number;
+                        };
+                        scale: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        ladder: {
+                            key: string;
+                            label: string;
+                            done: boolean;
+                            current: boolean;
+                            by: string | null;
+                            at: string | null;
+                        }[];
+                        history: {
+                            step: string;
+                            outcome: string;
+                            by: string;
+                            at: string;
+                            reason: string | null;
+                        }[];
+                        reasons: {
+                            value: string;
+                            label: string;
+                        }[];
+                        can_enter: boolean;
+                        can_submit: boolean;
+                        submit_blocked: {
+                            reason: string;
+                            remedy: string;
+                        } | null;
+                        can_lock: boolean;
+                        can_return: boolean;
+                        lock_note: string | null;
+                        can_correct: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.assessments.return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        assessment: {
+                            id: string;
+                            class_id: string;
+                            class: string;
+                            level: string;
+                            subject_id: string;
+                            subject: string;
+                            kind: string;
+                            kind_label: string;
+                            title: string;
+                            held_on: string;
+                            out_of: number;
+                            counts: boolean;
+                            part: {
+                                key: string;
+                                label: string;
+                                weight: number;
+                            } | null;
+                            /** @enum {string} */
+                            state: "marking" | "submitted" | "returned" | "locked";
+                            state_label: string;
+                            set_by: string;
+                        };
+                        learners: {
+                            id: string;
+                            name: string;
+                            admission_number: string | null;
+                            value: number | null;
+                            /** @enum {string|null} */
+                            reason: "absent" | "excused" | "exempt" | null;
+                            percent: number | null;
+                            grade: string | null;
+                            entered_by: string | null;
+                            entered_at: string | null;
+                            corrected: boolean;
+                            note: string | null;
+                        }[];
+                        stats: {
+                            learners: number;
+                            marked: number;
+                            missing: number;
+                            absent: number;
+                            average: number | null;
+                            highest: number | null;
+                            lowest: number | null;
+                            below_half: number;
+                        };
+                        scale: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        ladder: {
+                            key: string;
+                            label: string;
+                            done: boolean;
+                            current: boolean;
+                            by: string | null;
+                            at: string | null;
+                        }[];
+                        history: {
+                            step: string;
+                            outcome: string;
+                            by: string;
+                            at: string;
+                            reason: string | null;
+                        }[];
+                        reasons: {
+                            value: string;
+                            label: string;
+                        }[];
+                        can_enter: boolean;
+                        can_submit: boolean;
+                        submit_blocked: {
+                            reason: string;
+                            remedy: string;
+                        } | null;
+                        can_lock: boolean;
+                        can_return: boolean;
+                        lock_note: string | null;
+                        can_correct: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.assessments.correct": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    reason?: string;
+                    value?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        assessment: {
+                            id: string;
+                            class_id: string;
+                            class: string;
+                            level: string;
+                            subject_id: string;
+                            subject: string;
+                            kind: string;
+                            kind_label: string;
+                            title: string;
+                            held_on: string;
+                            out_of: number;
+                            counts: boolean;
+                            part: {
+                                key: string;
+                                label: string;
+                                weight: number;
+                            } | null;
+                            /** @enum {string} */
+                            state: "marking" | "submitted" | "returned" | "locked";
+                            state_label: string;
+                            set_by: string;
+                        };
+                        learners: {
+                            id: string;
+                            name: string;
+                            admission_number: string | null;
+                            value: number | null;
+                            /** @enum {string|null} */
+                            reason: "absent" | "excused" | "exempt" | null;
+                            percent: number | null;
+                            grade: string | null;
+                            entered_by: string | null;
+                            entered_at: string | null;
+                            corrected: boolean;
+                            note: string | null;
+                        }[];
+                        stats: {
+                            learners: number;
+                            marked: number;
+                            missing: number;
+                            absent: number;
+                            average: number | null;
+                            highest: number | null;
+                            lowest: number | null;
+                            below_half: number;
+                        };
+                        scale: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        ladder: {
+                            key: string;
+                            label: string;
+                            done: boolean;
+                            current: boolean;
+                            by: string | null;
+                            at: string | null;
+                        }[];
+                        history: {
+                            step: string;
+                            outcome: string;
+                            by: string;
+                            at: string;
+                            reason: string | null;
+                        }[];
+                        reasons: {
+                            value: string;
+                            label: string;
+                        }[];
+                        can_enter: boolean;
+                        can_submit: boolean;
+                        submit_blocked: {
+                            reason: string;
+                            remedy: string;
+                        } | null;
+                        can_lock: boolean;
+                        can_return: boolean;
+                        lock_note: string | null;
+                        can_correct: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "me.context": {
@@ -4572,6 +5830,14 @@ export interface operations {
                             scope_type: "institution" | "division" | "campus" | "class";
                             scope_id: string | null;
                         }[];
+                        view_as: {
+                            available: boolean;
+                            by: {
+                                id: string;
+                                name: string;
+                            } | null;
+                            ends_at: string | null;
+                        };
                     };
                 };
             };
@@ -6743,6 +8009,257 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "assessment.results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            id: string;
+                            name: string;
+                            level: string;
+                        };
+                        period: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                        };
+                        scale: {
+                            id: string;
+                            name: string;
+                            /** @enum {string} */
+                            overall: "average_percent" | "average_grade" | "best_six";
+                            pass_from: string | null;
+                        } | null;
+                        /** @enum {string} */
+                        summary_kind: "average_percent" | "average_grade" | "best_six";
+                        subjects: {
+                            id: string;
+                            name: string;
+                            short: string;
+                            ready: boolean;
+                            waiting: string | null;
+                        }[];
+                        learners: {
+                            id: string;
+                            name: string;
+                            grades: {
+                                subject_id: string;
+                                percent: number | null;
+                                grade: string | null;
+                                ready: boolean;
+                                passes: boolean | null;
+                            }[];
+                            summary: {
+                                /** @enum {string} */
+                                kind: "average_percent" | "average_grade" | "best_six";
+                                value: number | null;
+                                of: number;
+                            };
+                            total: {
+                                total: number;
+                                out_of: number;
+                                complete: boolean;
+                            };
+                            position: {
+                                position: number;
+                                of: number;
+                                shared: boolean;
+                            } | null;
+                            below_pass: boolean;
+                        }[];
+                        totals: {
+                            learners: number;
+                            ranked: number;
+                            subjects: number;
+                            subjects_ready: number;
+                            below_pass: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.results.working": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        learner: {
+                            id: string;
+                            name: string;
+                        };
+                        subject: {
+                            id: string;
+                            name: string;
+                        };
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        period: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                        };
+                        scale: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        working: {
+                            ready: boolean;
+                            not_ready: string | null;
+                            plan: {
+                                version: number;
+                                /** @enum {string} */
+                                mode: "continuous" | "exam_only";
+                                default: boolean;
+                                summary: string;
+                            };
+                            parts: {
+                                key: string;
+                                label: string;
+                                weight: number;
+                                rule: string;
+                                rule_label: string;
+                                missing: string;
+                                missing_label: string;
+                                score: number | null;
+                                assessments: {
+                                    id: string;
+                                    title: string;
+                                    kind: string;
+                                    kind_label: string;
+                                    held_on: string;
+                                    value: number | null;
+                                    reason: string | null;
+                                    out_of: number;
+                                    percent: number | null;
+                                    counted: boolean;
+                                    note: string | null;
+                                }[];
+                            }[];
+                            percent: number | null;
+                            grade: string | null;
+                            word: string | null;
+                            passes: boolean | null;
+                            pending: {
+                                id: string;
+                                title: string;
+                                state: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.learner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        learner_id: string;
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        period: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                        } | null;
+                        scale: {
+                            id: string;
+                            name: string;
+                            /** @enum {string} */
+                            overall: "average_percent" | "average_grade" | "best_six";
+                        } | null;
+                        grades: {
+                            subject_id: string;
+                            subject: string;
+                            percent: number | null;
+                            grade: string | null;
+                            word: string | null;
+                            ready: boolean;
+                            not_ready: string | null;
+                            passes: boolean | null;
+                        }[];
+                        summary: {
+                            /** @enum {string} */
+                            kind: "average_percent" | "average_grade" | "best_six";
+                            value: number | null;
+                            of: number;
+                        };
+                        total: {
+                            total: number;
+                            out_of: number;
+                            complete: boolean;
+                        } | null;
+                        position: {
+                            position: number;
+                            of: number;
+                            shared: boolean;
+                        } | null;
+                        assessments: {
+                            id: string;
+                            held_on: string;
+                            subject: string;
+                            kind: string;
+                            kind_label: string;
+                            title: string;
+                            counts: boolean;
+                            /** @enum {string} */
+                            state: "marking" | "submitted" | "returned" | "locked";
+                            locked: boolean;
+                            out_of: number;
+                            value: number | null;
+                            reason: string | null;
+                            percent: number | null;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "roles.index": {
         parameters: {
             query?: never;
@@ -6902,6 +8419,446 @@ export interface operations {
                     };
                 };
             };
+        };
+    };
+    "assessment.scales.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        scales: {
+                            id: string;
+                            name: string;
+                            /** @enum {string} */
+                            overall: "average_percent" | "average_grade" | "best_six";
+                            pass_from: string | null;
+                            bands: {
+                                grade: string;
+                                word: string;
+                                from: number;
+                                to: number;
+                            }[];
+                            track: string;
+                            position: number;
+                            retired: boolean;
+                            used_by: {
+                                division_id: string;
+                                division: string;
+                                level_code: string;
+                                level: string;
+                            }[];
+                        }[];
+                        levels: {
+                            division_id: string;
+                            division: string;
+                            level_code: string;
+                            level: string;
+                            scale_id: string | null;
+                            takes_marks: boolean;
+                        }[];
+                        can_edit: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.scales.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        scales: {
+                            id: string;
+                            name: string;
+                            /** @enum {string} */
+                            overall: "average_percent" | "average_grade" | "best_six";
+                            pass_from: string | null;
+                            bands: {
+                                grade: string;
+                                word: string;
+                                from: number;
+                                to: number;
+                            }[];
+                            track: string;
+                            position: number;
+                            retired: boolean;
+                            used_by: {
+                                division_id: string;
+                                division: string;
+                                level_code: string;
+                                level: string;
+                            }[];
+                        }[];
+                        levels: {
+                            division_id: string;
+                            division: string;
+                            level_code: string;
+                            level: string;
+                            scale_id: string | null;
+                            takes_marks: boolean;
+                        }[];
+                        can_edit: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.scales.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        scales: {
+                            id: string;
+                            name: string;
+                            /** @enum {string} */
+                            overall: "average_percent" | "average_grade" | "best_six";
+                            pass_from: string | null;
+                            bands: {
+                                grade: string;
+                                word: string;
+                                from: number;
+                                to: number;
+                            }[];
+                            track: string;
+                            position: number;
+                            retired: boolean;
+                            used_by: {
+                                division_id: string;
+                                division: string;
+                                level_code: string;
+                                level: string;
+                            }[];
+                        }[];
+                        levels: {
+                            division_id: string;
+                            division: string;
+                            level_code: string;
+                            level: string;
+                            scale_id: string | null;
+                            takes_marks: boolean;
+                        }[];
+                        can_edit: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.level-scales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        scales: {
+                            id: string;
+                            name: string;
+                            /** @enum {string} */
+                            overall: "average_percent" | "average_grade" | "best_six";
+                            pass_from: string | null;
+                            bands: {
+                                grade: string;
+                                word: string;
+                                from: number;
+                                to: number;
+                            }[];
+                            track: string;
+                            position: number;
+                            retired: boolean;
+                            used_by: {
+                                division_id: string;
+                                division: string;
+                                level_code: string;
+                                level: string;
+                            }[];
+                        }[];
+                        levels: {
+                            division_id: string;
+                            division: string;
+                            level_code: string;
+                            level: string;
+                            scale_id: string | null;
+                            takes_marks: boolean;
+                        }[];
+                        can_edit: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.plans.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        division: {
+                            id: string;
+                            name: string;
+                        };
+                        level: {
+                            code: string;
+                            label: string;
+                        };
+                        period: {
+                            id: string;
+                            name: string;
+                            division_id: string;
+                            year_id: string;
+                            starts_on: string;
+                            ends_on: string;
+                        };
+                        begun: boolean;
+                        subject_id: string | null;
+                        plan: {
+                            id: string | null;
+                            version: number;
+                            /** @enum {string} */
+                            mode: "continuous" | "exam_only";
+                            parts: {
+                                key: string;
+                                label: string;
+                                weight: number;
+                                kinds: string[];
+                                /** @enum {string} */
+                                rule: "average" | "best_n" | "weighted_by_max" | "single";
+                                best_n: number | null;
+                                /** @enum {string} */
+                                missing: "left_out" | "zero" | "ask";
+                            }[];
+                            reason: string | null;
+                            created_by: string | null;
+                            created_at: string | null;
+                            default: boolean;
+                            subject_id: string | null;
+                            summary: string;
+                        };
+                        versions: {
+                            id: string | null;
+                            version: number;
+                            /** @enum {string} */
+                            mode: "continuous" | "exam_only";
+                            parts: {
+                                key: string;
+                                label: string;
+                                weight: number;
+                                kinds: string[];
+                                /** @enum {string} */
+                                rule: "average" | "best_n" | "weighted_by_max" | "single";
+                                best_n: number | null;
+                                /** @enum {string} */
+                                missing: "left_out" | "zero" | "ask";
+                            }[];
+                            reason: string | null;
+                            created_by: string | null;
+                            created_at: string | null;
+                            default: boolean;
+                            subject_id: string | null;
+                            summary: string;
+                        }[];
+                        subjects: {
+                            id: string;
+                            name: string;
+                            short: string;
+                            own: {
+                                version: number;
+                                summary: string;
+                            } | null;
+                        }[];
+                        scale: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        kinds: {
+                            value: string;
+                            label: string;
+                        }[];
+                        modes: {
+                            value: string;
+                            label: string;
+                        }[];
+                        rules: {
+                            value: string;
+                            label: string;
+                        }[];
+                        missing: {
+                            value: string;
+                            label: string;
+                        }[];
+                        can_edit: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.plans.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        division: {
+                            id: string;
+                            name: string;
+                        };
+                        level: {
+                            code: string;
+                            label: string;
+                        };
+                        period: {
+                            id: string;
+                            name: string;
+                            division_id: string;
+                            year_id: string;
+                            starts_on: string;
+                            ends_on: string;
+                        };
+                        begun: boolean;
+                        subject_id: string | null;
+                        plan: {
+                            id: string | null;
+                            version: number;
+                            /** @enum {string} */
+                            mode: "continuous" | "exam_only";
+                            parts: {
+                                key: string;
+                                label: string;
+                                weight: number;
+                                kinds: string[];
+                                /** @enum {string} */
+                                rule: "average" | "best_n" | "weighted_by_max" | "single";
+                                best_n: number | null;
+                                /** @enum {string} */
+                                missing: "left_out" | "zero" | "ask";
+                            }[];
+                            reason: string | null;
+                            created_by: string | null;
+                            created_at: string | null;
+                            default: boolean;
+                            subject_id: string | null;
+                            summary: string;
+                        };
+                        versions: {
+                            id: string | null;
+                            version: number;
+                            /** @enum {string} */
+                            mode: "continuous" | "exam_only";
+                            parts: {
+                                key: string;
+                                label: string;
+                                weight: number;
+                                kinds: string[];
+                                /** @enum {string} */
+                                rule: "average" | "best_n" | "weighted_by_max" | "single";
+                                best_n: number | null;
+                                /** @enum {string} */
+                                missing: "left_out" | "zero" | "ask";
+                            }[];
+                            reason: string | null;
+                            created_by: string | null;
+                            created_at: string | null;
+                            default: boolean;
+                            subject_id: string | null;
+                            summary: string;
+                        }[];
+                        subjects: {
+                            id: string;
+                            name: string;
+                            short: string;
+                            own: {
+                                version: number;
+                                summary: string;
+                            } | null;
+                        }[];
+                        scale: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        kinds: {
+                            value: string;
+                            label: string;
+                        }[];
+                        modes: {
+                            value: string;
+                            label: string;
+                        }[];
+                        rules: {
+                            value: string;
+                            label: string;
+                        }[];
+                        missing: {
+                            value: string;
+                            label: string;
+                        }[];
+                        can_edit: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "setup.show": {
@@ -7132,6 +9089,14 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        view_as: {
+                            available: boolean;
+                            by: {
+                                id: string;
+                                name: string;
+                            } | null;
+                            ends_at: null;
+                        };
                         user: {
                             id: string;
                             name: string;
@@ -7665,6 +9630,122 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "view-as.people": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        people: {
+                            id: string;
+                            name: string;
+                            email: string;
+                            roles: {
+                                role: string;
+                                where: string;
+                            }[];
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "view-as.start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        user: {
+                            id: string;
+                            name: string;
+                            email: string;
+                        };
+                        grants: {
+                            permission: string;
+                            /** @enum {string} */
+                            scope_type: "institution" | "division" | "campus" | "class";
+                            scope_id: string | null;
+                        }[];
+                        view_as: {
+                            available: boolean;
+                            by: {
+                                id: string;
+                                name: string;
+                            } | null;
+                            ends_at: string | null;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "view-as.leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        user: {
+                            id: string;
+                            name: string;
+                            email: string;
+                        };
+                        grants: {
+                            permission: string;
+                            /** @enum {string} */
+                            scope_type: "institution" | "division" | "campus" | "class";
+                            scope_id: string | null;
+                        }[];
+                        view_as: {
+                            available: boolean;
+                            by: {
+                                id: string;
+                                name: string;
+                            } | null;
+                            ends_at: string | null;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
         };
     };
 }

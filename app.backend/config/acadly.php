@@ -8,6 +8,7 @@ use Acadly\Core\Institution\InstitutionCore;
 use Acadly\Core\Setup\SetupCore;
 use Acadly\Kernel\Notify\Sms\AfricasTalkingProvider;
 use Acadly\Kernel\Notify\Sms\MeTicketProvider;
+use Acadly\Modules\Assessment\AssessmentModule;
 use Acadly\Modules\Attendance\AttendanceModule;
 
 return [
@@ -106,6 +107,11 @@ return [
         'admin_email' => env('DEV_ADMIN_EMAIL'),
         'admin_name' => env('DEV_ADMIN_NAME', 'Development Administrator'),
         'admin_password' => env('DEV_ADMIN_PASSWORD'),
+
+        // View as: an administrator steps into another account to test what
+        // it sees. Off unless turned on here, and never in production.
+        'view_as' => (bool) env('DEV_VIEW_AS', false),
+        'view_as_minutes' => (int) env('DEV_VIEW_AS_MINUTES', 60),
     ],
 
     /*
@@ -118,6 +124,7 @@ return [
         EnrolmentCore::class,
         SetupCore::class,
         AttendanceModule::class,
+        AssessmentModule::class,
     ],
 
 ];

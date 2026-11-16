@@ -13,6 +13,7 @@ use Acadly\Kernel\Identity\Http\PasswordResetController;
 use Acadly\Kernel\Identity\Http\PeopleController;
 use Acadly\Kernel\Identity\Http\SignInController;
 use Acadly\Kernel\Identity\Http\SignOutController;
+use Acadly\Kernel\Identity\Http\ViewAsController;
 use Acadly\Kernel\Module\Http\ContextController;
 use Acadly\Kernel\Module\Http\ModulesController;
 use Acadly\Kernel\Notify\Http\MessagesController;
@@ -34,6 +35,11 @@ Route::prefix('auth')->name('auth.')->group(function (): void {
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/me', MeController::class)->name('me');
     Route::get('/me/context', ContextController::class)->name('me.context');
+
+    // View as (development only; 404 wherever it is not available).
+    Route::get('/view-as/people', [ViewAsController::class, 'candidates'])->name('view-as.people');
+    Route::post('/view-as/{id}', [ViewAsController::class, 'start'])->whereUuid('id')->name('view-as.start');
+    Route::delete('/view-as', [ViewAsController::class, 'leave'])->name('view-as.leave');
     Route::get('/me/notifications', [NotificationsController::class, 'index'])->name('me.notifications');
     Route::post('/me/notifications/{id}/read', [NotificationsController::class, 'read'])->whereUuid('id')->name('me.notifications.read');
 

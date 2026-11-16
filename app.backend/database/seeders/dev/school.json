@@ -1,0 +1,5530 @@
+{
+  "_about": "The development school: roles, staff, who teaches what, and learners. Read by DevelopmentSchoolSeeder in local and testing only. Classes are named \"Campus/Class\"; scopes are \"school\", \"campus:Name\", \"division:Name\" or \"class:Campus/Class\". Staff get no password: use View as.",
+  "roles": [
+    {
+      "name": "Head teacher",
+      "description": "Leads a division: learners, registers and results.",
+      "permissions": [
+        "enrolment.learners.view",
+        "enrolment.admit",
+        "enrolment.manage",
+        "enrolment.export",
+        "attendance.all_classes",
+        "attendance.correct",
+        "attendance.cover",
+        "assessment.view",
+        "assessment.lock"
+      ]
+    },
+    {
+      "name": "Academic officer",
+      "description": "Locks marks, keeps scales and grading plans, and watches registers.",
+      "permissions": [
+        "enrolment.learners.view",
+        "attendance.all_classes",
+        "attendance.correct",
+        "attendance.cover",
+        "assessment.view",
+        "assessment.lock",
+        "assessment.plan"
+      ]
+    },
+    {
+      "name": "Admissions officer",
+      "description": "Admits learners and keeps their records.",
+      "permissions": [
+        "enrolment.learners.view",
+        "enrolment.admit",
+        "enrolment.manage",
+        "enrolment.export"
+      ]
+    },
+    {
+      "name": "Subject teacher",
+      "description": "Teaches subjects: lesson registers, assessments and marks.",
+      "permissions": [
+        "enrolment.learners.view",
+        "academics.teach",
+        "attendance.capture",
+        "assessment.create",
+        "assessment.enter"
+      ]
+    },
+    {
+      "name": "Class teacher",
+      "description": "Keeps the morning register of one class.",
+      "permissions": [
+        "enrolment.learners.view",
+        "attendance.capture"
+      ]
+    }
+  ],
+  "staff": [
+    {
+      "name": "Martha Kalua",
+      "email": "martha.kalua@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Academic officer",
+          "at": "school"
+        }
+      ]
+    },
+    {
+      "name": "Lameck Mbewe",
+      "email": "lameck.mbewe@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Admissions officer",
+          "at": "school"
+        }
+      ]
+    },
+    {
+      "name": "Agnes Chilembwe",
+      "email": "agnes.chilembwe@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Head teacher",
+          "at": "division:Primary"
+        }
+      ]
+    },
+    {
+      "name": "Francis Msiska",
+      "email": "francis.msiska@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Head teacher",
+          "at": "division:Secondary"
+        }
+      ]
+    },
+    {
+      "name": "Ellen Mwale",
+      "email": "ellen.mwale@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "division:Primary"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Main campus/Standard 1"
+        }
+      ]
+    },
+    {
+      "name": "Joyce Tembo",
+      "email": "joyce.tembo@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "division:Primary"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Main campus/Standard 2"
+        }
+      ]
+    },
+    {
+      "name": "Rose Nkhoma",
+      "email": "rose.nkhoma@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "division:Primary"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Main campus/Standard 3"
+        }
+      ]
+    },
+    {
+      "name": "Doreen Sakala",
+      "email": "doreen.sakala@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "division:Primary"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Main campus/Standard 4"
+        }
+      ]
+    },
+    {
+      "name": "Catherine Mtambo",
+      "email": "catherine.mtambo@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "division:Primary"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Main campus/Standard 5"
+        }
+      ]
+    },
+    {
+      "name": "Henry Chavula",
+      "email": "henry.chavula@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "division:Primary"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Main campus/Standard 6"
+        }
+      ]
+    },
+    {
+      "name": "Wilson Kamanga",
+      "email": "wilson.kamanga@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "division:Primary"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Main campus/Standard 7"
+        }
+      ]
+    },
+    {
+      "name": "Esnart Moyo",
+      "email": "esnart.moyo@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "division:Primary"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Main campus/Standard 8"
+        }
+      ]
+    },
+    {
+      "name": "Tadala Mvula",
+      "email": "tadala.mvula@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "campus:Main campus"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Main campus/Form 1 East"
+        }
+      ]
+    },
+    {
+      "name": "Chisomo Phiri",
+      "email": "chisomo.phiri@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "campus:Main campus"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Main campus/Form 1 West"
+        }
+      ]
+    },
+    {
+      "name": "Joseph Nyirenda",
+      "email": "joseph.nyirenda@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "campus:Main campus"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Main campus/Form 2"
+        }
+      ]
+    },
+    {
+      "name": "Loveness Gondwe",
+      "email": "loveness.gondwe@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "campus:Main campus"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Main campus/Form 3"
+        }
+      ]
+    },
+    {
+      "name": "Moses Munthali",
+      "email": "moses.munthali@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "campus:Main campus"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Main campus/Form 4"
+        }
+      ]
+    },
+    {
+      "name": "Annie Kapito",
+      "email": "annie.kapito@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "campus:Main campus"
+        }
+      ]
+    },
+    {
+      "name": "Charles Kachingwe",
+      "email": "charles.kachingwe@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "campus:Blantyre Campus"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Blantyre Campus/Form 1"
+        }
+      ]
+    },
+    {
+      "name": "Fanny Mhango",
+      "email": "fanny.mhango@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "campus:Blantyre Campus"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Blantyre Campus/Form 2"
+        }
+      ]
+    },
+    {
+      "name": "George Ngwira",
+      "email": "george.ngwira@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "campus:Blantyre Campus"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Blantyre Campus/Form 3"
+        }
+      ]
+    },
+    {
+      "name": "Eneless Chisale",
+      "email": "eneless.chisale@sunrise-dev.mw",
+      "roles": [
+        {
+          "role": "Subject teacher",
+          "at": "campus:Blantyre Campus"
+        },
+        {
+          "role": "Class teacher",
+          "at": "class:Blantyre Campus/Form 4"
+        }
+      ]
+    }
+  ],
+  "teaching": [
+    {
+      "class": "Main campus/Standard 1",
+      "subject": null,
+      "teacher": "ellen.mwale@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "subject": "CHI",
+      "teacher": "ellen.mwale@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "subject": "ENG",
+      "teacher": "ellen.mwale@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "subject": "MAT",
+      "teacher": "ellen.mwale@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "subject": "EXA",
+      "teacher": "ellen.mwale@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "subject": "LSK",
+      "teacher": "ellen.mwale@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "subject": "SCT",
+      "teacher": "ellen.mwale@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "subject": "SES",
+      "teacher": "ellen.mwale@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "subject": null,
+      "teacher": "joyce.tembo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "subject": "CHI",
+      "teacher": "joyce.tembo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "subject": "ENG",
+      "teacher": "joyce.tembo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "subject": "MAT",
+      "teacher": "joyce.tembo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "subject": "EXA",
+      "teacher": "joyce.tembo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "subject": "LSK",
+      "teacher": "joyce.tembo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "subject": "SCT",
+      "teacher": "joyce.tembo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "subject": "SES",
+      "teacher": "joyce.tembo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "subject": null,
+      "teacher": "rose.nkhoma@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "subject": "CHI",
+      "teacher": "rose.nkhoma@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "subject": "ENG",
+      "teacher": "rose.nkhoma@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "subject": "MAT",
+      "teacher": "rose.nkhoma@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "subject": "EXA",
+      "teacher": "rose.nkhoma@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "subject": "LSK",
+      "teacher": "rose.nkhoma@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "subject": "SCT",
+      "teacher": "rose.nkhoma@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "subject": "SES",
+      "teacher": "rose.nkhoma@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "subject": null,
+      "teacher": "doreen.sakala@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "subject": "CHI",
+      "teacher": "doreen.sakala@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "subject": "ENG",
+      "teacher": "doreen.sakala@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "subject": "MAT",
+      "teacher": "doreen.sakala@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "subject": "EXA",
+      "teacher": "doreen.sakala@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "subject": "LSK",
+      "teacher": "doreen.sakala@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "subject": "SCT",
+      "teacher": "doreen.sakala@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "subject": "SES",
+      "teacher": "doreen.sakala@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "subject": null,
+      "teacher": "catherine.mtambo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "subject": "CHI",
+      "teacher": "catherine.mtambo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "subject": "ENG",
+      "teacher": "catherine.mtambo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "subject": "MAT",
+      "teacher": "catherine.mtambo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "subject": "EXA",
+      "teacher": "catherine.mtambo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "subject": "LSK",
+      "teacher": "catherine.mtambo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "subject": "SCT",
+      "teacher": "catherine.mtambo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "subject": "SES",
+      "teacher": "catherine.mtambo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "subject": "AGR",
+      "teacher": "catherine.mtambo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "subject": null,
+      "teacher": "henry.chavula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "subject": "CHI",
+      "teacher": "henry.chavula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "subject": "ENG",
+      "teacher": "henry.chavula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "subject": "MAT",
+      "teacher": "henry.chavula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "subject": "EXA",
+      "teacher": "henry.chavula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "subject": "LSK",
+      "teacher": "henry.chavula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "subject": "SCT",
+      "teacher": "henry.chavula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "subject": "SES",
+      "teacher": "henry.chavula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "subject": "AGR",
+      "teacher": "henry.chavula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "subject": null,
+      "teacher": "wilson.kamanga@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "subject": "CHI",
+      "teacher": "wilson.kamanga@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "subject": "ENG",
+      "teacher": "wilson.kamanga@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "subject": "MAT",
+      "teacher": "wilson.kamanga@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "subject": "EXA",
+      "teacher": "wilson.kamanga@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "subject": "LSK",
+      "teacher": "wilson.kamanga@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "subject": "SCT",
+      "teacher": "wilson.kamanga@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "subject": "SES",
+      "teacher": "wilson.kamanga@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "subject": "AGR",
+      "teacher": "wilson.kamanga@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "subject": null,
+      "teacher": "esnart.moyo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "subject": "CHI",
+      "teacher": "esnart.moyo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "subject": "ENG",
+      "teacher": "esnart.moyo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "subject": "MAT",
+      "teacher": "esnart.moyo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "subject": "EXA",
+      "teacher": "esnart.moyo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "subject": "LSK",
+      "teacher": "esnart.moyo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "subject": "SCT",
+      "teacher": "esnart.moyo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "subject": "SES",
+      "teacher": "esnart.moyo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "subject": "AGR",
+      "teacher": "esnart.moyo@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "subject": "BIO",
+      "teacher": "tadala.mvula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "subject": "AGR",
+      "teacher": "tadala.mvula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "subject": "BIO",
+      "teacher": "tadala.mvula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "subject": "AGR",
+      "teacher": "tadala.mvula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 2",
+      "subject": "BIO",
+      "teacher": "tadala.mvula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 2",
+      "subject": "AGR",
+      "teacher": "tadala.mvula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 3",
+      "subject": "BIO",
+      "teacher": "tadala.mvula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 3",
+      "subject": "AGR",
+      "teacher": "tadala.mvula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 4",
+      "subject": "BIO",
+      "teacher": "tadala.mvula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 4",
+      "subject": "AGR",
+      "teacher": "tadala.mvula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "subject": null,
+      "teacher": "tadala.mvula@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "subject": "MAT",
+      "teacher": "chisomo.phiri@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "subject": "PHS",
+      "teacher": "chisomo.phiri@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "subject": "MAT",
+      "teacher": "chisomo.phiri@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "subject": "PHS",
+      "teacher": "chisomo.phiri@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 2",
+      "subject": "MAT",
+      "teacher": "chisomo.phiri@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 2",
+      "subject": "PHS",
+      "teacher": "chisomo.phiri@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 3",
+      "subject": "MAT",
+      "teacher": "chisomo.phiri@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 3",
+      "subject": "PHS",
+      "teacher": "chisomo.phiri@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 4",
+      "subject": "MAT",
+      "teacher": "chisomo.phiri@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 4",
+      "subject": "PHS",
+      "teacher": "chisomo.phiri@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "subject": null,
+      "teacher": "chisomo.phiri@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "subject": "ENG",
+      "teacher": "joseph.nyirenda@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "subject": "LSK",
+      "teacher": "joseph.nyirenda@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "subject": "ENG",
+      "teacher": "joseph.nyirenda@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "subject": "LSK",
+      "teacher": "joseph.nyirenda@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 2",
+      "subject": "ENG",
+      "teacher": "joseph.nyirenda@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 2",
+      "subject": "LSK",
+      "teacher": "joseph.nyirenda@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 3",
+      "subject": "ENG",
+      "teacher": "joseph.nyirenda@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 3",
+      "subject": "LSK",
+      "teacher": "joseph.nyirenda@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 4",
+      "subject": "ENG",
+      "teacher": "joseph.nyirenda@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 4",
+      "subject": "LSK",
+      "teacher": "joseph.nyirenda@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 2",
+      "subject": null,
+      "teacher": "joseph.nyirenda@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "subject": "CHI",
+      "teacher": "loveness.gondwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "subject": "BK",
+      "teacher": "loveness.gondwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "subject": "CHI",
+      "teacher": "loveness.gondwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "subject": "BK",
+      "teacher": "loveness.gondwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 2",
+      "subject": "CHI",
+      "teacher": "loveness.gondwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 2",
+      "subject": "BK",
+      "teacher": "loveness.gondwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 3",
+      "subject": "CHI",
+      "teacher": "loveness.gondwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 3",
+      "subject": "BK",
+      "teacher": "loveness.gondwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 4",
+      "subject": "CHI",
+      "teacher": "loveness.gondwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 4",
+      "subject": "BK",
+      "teacher": "loveness.gondwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 3",
+      "subject": null,
+      "teacher": "loveness.gondwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "subject": "GEO",
+      "teacher": "moses.munthali@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "subject": "SOS",
+      "teacher": "moses.munthali@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "subject": "GEO",
+      "teacher": "moses.munthali@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "subject": "SOS",
+      "teacher": "moses.munthali@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 2",
+      "subject": "GEO",
+      "teacher": "moses.munthali@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 2",
+      "subject": "SOS",
+      "teacher": "moses.munthali@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 3",
+      "subject": "GEO",
+      "teacher": "moses.munthali@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 3",
+      "subject": "SOS",
+      "teacher": "moses.munthali@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 4",
+      "subject": "GEO",
+      "teacher": "moses.munthali@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 4",
+      "subject": "SOS",
+      "teacher": "moses.munthali@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 4",
+      "subject": null,
+      "teacher": "moses.munthali@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "subject": "HIS",
+      "teacher": "annie.kapito@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "subject": "HIS",
+      "teacher": "annie.kapito@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 2",
+      "subject": "HIS",
+      "teacher": "annie.kapito@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 3",
+      "subject": "HIS",
+      "teacher": "annie.kapito@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 3",
+      "subject": "CST",
+      "teacher": "annie.kapito@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 4",
+      "subject": "HIS",
+      "teacher": "annie.kapito@sunrise-dev.mw"
+    },
+    {
+      "class": "Main campus/Form 4",
+      "subject": "CST",
+      "teacher": "annie.kapito@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "subject": null,
+      "teacher": "charles.kachingwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "subject": "MAT",
+      "teacher": "charles.kachingwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "subject": "PHS",
+      "teacher": "charles.kachingwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "subject": "AGR",
+      "teacher": "charles.kachingwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "subject": "MAT",
+      "teacher": "charles.kachingwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "subject": "PHS",
+      "teacher": "charles.kachingwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "subject": "AGR",
+      "teacher": "charles.kachingwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "subject": "MAT",
+      "teacher": "charles.kachingwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "subject": "PHS",
+      "teacher": "charles.kachingwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "subject": "AGR",
+      "teacher": "charles.kachingwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "subject": "MAT",
+      "teacher": "charles.kachingwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "subject": "PHS",
+      "teacher": "charles.kachingwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "subject": "AGR",
+      "teacher": "charles.kachingwe@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "subject": null,
+      "teacher": "fanny.mhango@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "subject": "ENG",
+      "teacher": "fanny.mhango@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "subject": "LSK",
+      "teacher": "fanny.mhango@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "subject": "CHI",
+      "teacher": "fanny.mhango@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "subject": "ENG",
+      "teacher": "fanny.mhango@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "subject": "LSK",
+      "teacher": "fanny.mhango@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "subject": "CHI",
+      "teacher": "fanny.mhango@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "subject": "ENG",
+      "teacher": "fanny.mhango@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "subject": "LSK",
+      "teacher": "fanny.mhango@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "subject": "CHI",
+      "teacher": "fanny.mhango@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "subject": "ENG",
+      "teacher": "fanny.mhango@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "subject": "LSK",
+      "teacher": "fanny.mhango@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "subject": "CHI",
+      "teacher": "fanny.mhango@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "subject": null,
+      "teacher": "george.ngwira@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "subject": "BIO",
+      "teacher": "george.ngwira@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "subject": "GEO",
+      "teacher": "george.ngwira@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "subject": "SOS",
+      "teacher": "george.ngwira@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "subject": "BIO",
+      "teacher": "george.ngwira@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "subject": "GEO",
+      "teacher": "george.ngwira@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "subject": "SOS",
+      "teacher": "george.ngwira@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "subject": "BIO",
+      "teacher": "george.ngwira@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "subject": "GEO",
+      "teacher": "george.ngwira@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "subject": "SOS",
+      "teacher": "george.ngwira@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "subject": "BIO",
+      "teacher": "george.ngwira@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "subject": "GEO",
+      "teacher": "george.ngwira@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "subject": "SOS",
+      "teacher": "george.ngwira@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "subject": null,
+      "teacher": "eneless.chisale@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "subject": "HIS",
+      "teacher": "eneless.chisale@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "subject": "BK",
+      "teacher": "eneless.chisale@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "subject": "HIS",
+      "teacher": "eneless.chisale@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "subject": "BK",
+      "teacher": "eneless.chisale@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "subject": "HIS",
+      "teacher": "eneless.chisale@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "subject": "BK",
+      "teacher": "eneless.chisale@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "subject": "HIS",
+      "teacher": "eneless.chisale@sunrise-dev.mw"
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "subject": "BK",
+      "teacher": "eneless.chisale@sunrise-dev.mw"
+    }
+  ],
+  "learners": [
+    {
+      "class": "Main campus/Standard 1",
+      "first_name": "Dalitso",
+      "surname": "Tembo",
+      "sex": "female",
+      "date_of_birth": "2020-09-17",
+      "contacts": [
+        {
+          "name": "Annie Tembo",
+          "relationship": "mother",
+          "phone": "0991 200 001",
+          "main": true
+        },
+        {
+          "name": "Felix Tembo",
+          "relationship": "father",
+          "phone": "0888 400 001",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "first_name": "Daniel",
+      "surname": "Sakala",
+      "sex": "male",
+      "date_of_birth": "2020-04-20",
+      "contacts": [
+        {
+          "name": "Rose Sakala",
+          "relationship": "mother",
+          "phone": "0991 200 002",
+          "main": true
+        },
+        {
+          "name": "Lameck Sakala",
+          "relationship": "father",
+          "phone": "0888 400 002",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "first_name": "Ruth",
+      "surname": "Munthali",
+      "sex": "female",
+      "date_of_birth": "2020-10-18",
+      "contacts": [
+        {
+          "name": "Joyce Munthali",
+          "relationship": "mother",
+          "phone": "0991 200 003",
+          "main": true
+        },
+        {
+          "name": "Wilson Munthali",
+          "relationship": "father",
+          "phone": "0888 400 003",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "first_name": "Kondwani",
+      "surname": "Jere",
+      "sex": "male",
+      "date_of_birth": "2020-08-25",
+      "contacts": [
+        {
+          "name": "Fanny Jere",
+          "relationship": "mother",
+          "phone": "0991 200 004",
+          "main": true
+        },
+        {
+          "name": "Mike Jere",
+          "relationship": "father",
+          "phone": "0888 400 004",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "first_name": "Tamanda",
+      "surname": "Lungu",
+      "sex": "female",
+      "date_of_birth": "2020-01-20",
+      "contacts": [
+        {
+          "name": "Mary Lungu",
+          "relationship": "mother",
+          "phone": "0991 200 005",
+          "main": true
+        },
+        {
+          "name": "John Lungu",
+          "relationship": "father",
+          "phone": "0888 400 005",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "first_name": "Limbani",
+      "surname": "Chavula",
+      "sex": "male",
+      "date_of_birth": "2020-02-15",
+      "contacts": [
+        {
+          "name": "Ruth Chavula",
+          "relationship": "mother",
+          "phone": "0991 200 006",
+          "main": true
+        },
+        {
+          "name": "Felix Chavula",
+          "relationship": "father",
+          "phone": "0888 400 006",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "first_name": "Zione",
+      "surname": "Mkandawire",
+      "sex": "female",
+      "date_of_birth": "2020-11-11",
+      "contacts": [
+        {
+          "name": "Esnart Mkandawire",
+          "relationship": "mother",
+          "phone": "0991 200 007",
+          "main": true
+        },
+        {
+          "name": "George Mkandawire",
+          "relationship": "father",
+          "phone": "0888 400 007",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "first_name": "Kumbukani",
+      "surname": "Kachingwe",
+      "sex": "male",
+      "date_of_birth": "2020-06-26",
+      "contacts": [
+        {
+          "name": "Eneless Kachingwe",
+          "relationship": "mother",
+          "phone": "0991 200 008",
+          "main": true
+        },
+        {
+          "name": "Wilson Kachingwe",
+          "relationship": "father",
+          "phone": "0888 400 008",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "first_name": "Tiwonge",
+      "surname": "Mbewe",
+      "sex": "female",
+      "date_of_birth": "2020-02-24",
+      "contacts": [
+        {
+          "name": "Margaret Mbewe",
+          "relationship": "mother",
+          "phone": "0991 200 009",
+          "main": true
+        },
+        {
+          "name": "John Mbewe",
+          "relationship": "father",
+          "phone": "0888 400 009",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "first_name": "Thokozani",
+      "surname": "Kalua",
+      "sex": "male",
+      "date_of_birth": "2020-05-10",
+      "contacts": [
+        {
+          "name": "Catherine Kalua",
+          "relationship": "mother",
+          "phone": "0991 200 010",
+          "main": true
+        },
+        {
+          "name": "James Kalua",
+          "relationship": "father",
+          "phone": "0888 400 010",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "first_name": "Yamikani",
+      "surname": "Kaunda",
+      "sex": "female",
+      "date_of_birth": "2020-12-19",
+      "contacts": [
+        {
+          "name": "Loveness Kaunda",
+          "relationship": "mother",
+          "phone": "0991 200 011",
+          "main": true
+        },
+        {
+          "name": "Peter Kaunda",
+          "relationship": "father",
+          "phone": "0888 400 011",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 1",
+      "first_name": "Hastings",
+      "surname": "Kaunda",
+      "sex": "male",
+      "date_of_birth": "2020-06-12",
+      "contacts": [
+        {
+          "name": "Catherine Kaunda",
+          "relationship": "mother",
+          "phone": "0991 200 012",
+          "main": true
+        },
+        {
+          "name": "George Kaunda",
+          "relationship": "father",
+          "phone": "0888 400 012",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "first_name": "Chisomo",
+      "surname": "Msiska",
+      "sex": "female",
+      "date_of_birth": "2019-10-18",
+      "contacts": [
+        {
+          "name": "Catherine Msiska",
+          "relationship": "mother",
+          "phone": "0991 200 013",
+          "main": true
+        },
+        {
+          "name": "Felix Msiska",
+          "relationship": "father",
+          "phone": "0888 400 013",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "first_name": "Daniel",
+      "surname": "Mhango",
+      "sex": "male",
+      "date_of_birth": "2019-09-26",
+      "contacts": [
+        {
+          "name": "Fanny Mhango",
+          "relationship": "mother",
+          "phone": "0991 200 014",
+          "main": true
+        },
+        {
+          "name": "Felix Mhango",
+          "relationship": "father",
+          "phone": "0888 400 014",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "first_name": "Wezi",
+      "surname": "Sakala",
+      "sex": "female",
+      "date_of_birth": "2019-08-13",
+      "contacts": [
+        {
+          "name": "Ellen Sakala",
+          "relationship": "mother",
+          "phone": "0991 200 015",
+          "main": true
+        },
+        {
+          "name": "Charles Sakala",
+          "relationship": "father",
+          "phone": "0888 400 015",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "first_name": "Hastings",
+      "surname": "Mhango",
+      "sex": "male",
+      "date_of_birth": "2019-10-16",
+      "contacts": [
+        {
+          "name": "Ellen Mhango",
+          "relationship": "mother",
+          "phone": "0991 200 016",
+          "main": true
+        },
+        {
+          "name": "Lameck Mhango",
+          "relationship": "father",
+          "phone": "0888 400 016",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "first_name": "Pemphero",
+      "surname": "Banda",
+      "sex": "female",
+      "date_of_birth": "2019-10-08",
+      "contacts": [
+        {
+          "name": "Fanny Banda",
+          "relationship": "mother",
+          "phone": "0991 200 017",
+          "main": true
+        },
+        {
+          "name": "James Banda",
+          "relationship": "father",
+          "phone": "0888 400 017",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "first_name": "Lusayo",
+      "surname": "Phiri",
+      "sex": "male",
+      "date_of_birth": "2019-12-17",
+      "contacts": [
+        {
+          "name": "Annie Phiri",
+          "relationship": "mother",
+          "phone": "0991 200 018",
+          "main": true
+        },
+        {
+          "name": "John Phiri",
+          "relationship": "father",
+          "phone": "0888 400 018",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "first_name": "Chimwemwe",
+      "surname": "Ngwira",
+      "sex": "female",
+      "date_of_birth": "2019-07-16",
+      "contacts": [
+        {
+          "name": "Agnes Ngwira",
+          "relationship": "mother",
+          "phone": "0991 200 019",
+          "main": true
+        },
+        {
+          "name": "Henry Ngwira",
+          "relationship": "father",
+          "phone": "0888 400 019",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "first_name": "Joseph",
+      "surname": "Nkhoma",
+      "sex": "male",
+      "date_of_birth": "2019-02-21",
+      "contacts": [
+        {
+          "name": "Doreen Nkhoma",
+          "relationship": "mother",
+          "phone": "0991 200 020",
+          "main": true
+        },
+        {
+          "name": "Henry Nkhoma",
+          "relationship": "father",
+          "phone": "0888 400 020",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "first_name": "Chimwemwe",
+      "surname": "Kapito",
+      "sex": "female",
+      "date_of_birth": "2019-09-09",
+      "contacts": [
+        {
+          "name": "Ellen Kapito",
+          "relationship": "mother",
+          "phone": "0991 200 021",
+          "main": true
+        },
+        {
+          "name": "George Kapito",
+          "relationship": "father",
+          "phone": "0888 400 021",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "first_name": "Zikomo",
+      "surname": "Zulu",
+      "sex": "male",
+      "date_of_birth": "2019-09-26",
+      "contacts": [
+        {
+          "name": "Annie Zulu",
+          "relationship": "mother",
+          "phone": "0991 200 022",
+          "main": true
+        },
+        {
+          "name": "Lameck Zulu",
+          "relationship": "father",
+          "phone": "0888 400 022",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "first_name": "Chimwemwe",
+      "surname": "Mkandawire",
+      "sex": "female",
+      "date_of_birth": "2019-07-14",
+      "contacts": [
+        {
+          "name": "Esnart Mkandawire",
+          "relationship": "mother",
+          "phone": "0991 200 023",
+          "main": true
+        },
+        {
+          "name": "Charles Mkandawire",
+          "relationship": "father",
+          "phone": "0888 400 023",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 2",
+      "first_name": "Lusayo",
+      "surname": "Mvula",
+      "sex": "male",
+      "date_of_birth": "2019-01-02",
+      "contacts": [
+        {
+          "name": "Agnes Mvula",
+          "relationship": "mother",
+          "phone": "0991 200 024",
+          "main": true
+        },
+        {
+          "name": "Raphael Mvula",
+          "relationship": "father",
+          "phone": "0888 400 024",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "first_name": "Wezi",
+      "surname": "Kamanga",
+      "sex": "female",
+      "date_of_birth": "2018-09-16",
+      "contacts": [
+        {
+          "name": "Margaret Kamanga",
+          "relationship": "mother",
+          "phone": "0991 200 025",
+          "main": true
+        },
+        {
+          "name": "Moses Kamanga",
+          "relationship": "father",
+          "phone": "0888 400 025",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "first_name": "Kumbukani",
+      "surname": "Kaunda",
+      "sex": "male",
+      "date_of_birth": "2018-08-15",
+      "contacts": [
+        {
+          "name": "Ellen Kaunda",
+          "relationship": "mother",
+          "phone": "0991 200 026",
+          "main": true
+        },
+        {
+          "name": "Austin Kaunda",
+          "relationship": "father",
+          "phone": "0888 400 026",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "first_name": "Temwa",
+      "surname": "Mkandawire",
+      "sex": "female",
+      "date_of_birth": "2018-07-18",
+      "contacts": [
+        {
+          "name": "Annie Mkandawire",
+          "relationship": "mother",
+          "phone": "0991 200 027",
+          "main": true
+        },
+        {
+          "name": "Peter Mkandawire",
+          "relationship": "father",
+          "phone": "0888 400 027",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "first_name": "Lusayo",
+      "surname": "Zulu",
+      "sex": "male",
+      "date_of_birth": "2018-06-15",
+      "contacts": [
+        {
+          "name": "Fanny Zulu",
+          "relationship": "mother",
+          "phone": "0991 200 028",
+          "main": true
+        },
+        {
+          "name": "John Zulu",
+          "relationship": "father",
+          "phone": "0888 400 028",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "first_name": "Tamanda",
+      "surname": "Kaunda",
+      "sex": "female",
+      "date_of_birth": "2018-12-26",
+      "contacts": [
+        {
+          "name": "Ellen Kaunda",
+          "relationship": "mother",
+          "phone": "0991 200 029",
+          "main": true
+        },
+        {
+          "name": "Charles Kaunda",
+          "relationship": "father",
+          "phone": "0888 400 029",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "first_name": "Sangwani",
+      "surname": "Kapito",
+      "sex": "male",
+      "date_of_birth": "2018-03-14",
+      "contacts": [
+        {
+          "name": "Joyce Kapito",
+          "relationship": "mother",
+          "phone": "0991 200 030",
+          "main": true
+        },
+        {
+          "name": "Wilson Kapito",
+          "relationship": "father",
+          "phone": "0888 400 030",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "first_name": "Thandiwe",
+      "surname": "Mwale",
+      "sex": "female",
+      "date_of_birth": "2018-11-09",
+      "contacts": [
+        {
+          "name": "Catherine Mwale",
+          "relationship": "mother",
+          "phone": "0991 200 031",
+          "main": true
+        },
+        {
+          "name": "Francis Mwale",
+          "relationship": "father",
+          "phone": "0888 400 031",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "first_name": "Daniel",
+      "surname": "Kumwenda",
+      "sex": "male",
+      "date_of_birth": "2018-12-28",
+      "contacts": [
+        {
+          "name": "Eneless Kumwenda",
+          "relationship": "mother",
+          "phone": "0991 200 032",
+          "main": true
+        },
+        {
+          "name": "James Kumwenda",
+          "relationship": "father",
+          "phone": "0888 400 032",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "first_name": "Tamanda",
+      "surname": "Kapito",
+      "sex": "female",
+      "date_of_birth": "2018-01-03",
+      "contacts": [
+        {
+          "name": "Ruth Kapito",
+          "relationship": "mother",
+          "phone": "0991 200 033",
+          "main": true
+        },
+        {
+          "name": "Henry Kapito",
+          "relationship": "father",
+          "phone": "0888 400 033",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "first_name": "Upile",
+      "surname": "Kalua",
+      "sex": "male",
+      "date_of_birth": "2018-02-20",
+      "contacts": [
+        {
+          "name": "Fanny Kalua",
+          "relationship": "mother",
+          "phone": "0991 200 034",
+          "main": true
+        },
+        {
+          "name": "Moses Kalua",
+          "relationship": "father",
+          "phone": "0888 400 034",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "first_name": "Hope",
+      "surname": "Chirwa",
+      "sex": "female",
+      "date_of_birth": "2018-10-02",
+      "contacts": [
+        {
+          "name": "Fanny Chirwa",
+          "relationship": "mother",
+          "phone": "0991 200 035",
+          "main": true
+        },
+        {
+          "name": "Lameck Chirwa",
+          "relationship": "father",
+          "phone": "0888 400 035",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 3",
+      "first_name": "Kumbukani",
+      "surname": "Chisale",
+      "sex": "male",
+      "date_of_birth": "2018-11-12",
+      "contacts": [
+        {
+          "name": "Agnes Chisale",
+          "relationship": "mother",
+          "phone": "0991 200 036",
+          "main": true
+        },
+        {
+          "name": "Peter Chisale",
+          "relationship": "father",
+          "phone": "0888 400 036",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "first_name": "Madalitso",
+      "surname": "Chisale",
+      "sex": "female",
+      "date_of_birth": "2017-10-19",
+      "contacts": [
+        {
+          "name": "Fanny Chisale",
+          "relationship": "mother",
+          "phone": "0991 200 037",
+          "main": true
+        },
+        {
+          "name": "Felix Chisale",
+          "relationship": "father",
+          "phone": "0888 400 037",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "first_name": "Steven",
+      "surname": "Kaunda",
+      "sex": "male",
+      "date_of_birth": "2017-12-05",
+      "contacts": [
+        {
+          "name": "Ellen Kaunda",
+          "relationship": "mother",
+          "phone": "0991 200 038",
+          "main": true
+        },
+        {
+          "name": "Moses Kaunda",
+          "relationship": "father",
+          "phone": "0888 400 038",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "first_name": "Thandiwe",
+      "surname": "Moyo",
+      "sex": "female",
+      "date_of_birth": "2017-03-20",
+      "contacts": [
+        {
+          "name": "Doreen Moyo",
+          "relationship": "mother",
+          "phone": "0991 200 039",
+          "main": true
+        },
+        {
+          "name": "Lameck Moyo",
+          "relationship": "father",
+          "phone": "0888 400 039",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "first_name": "Limbani",
+      "surname": "Mwale",
+      "sex": "male",
+      "date_of_birth": "2017-07-22",
+      "contacts": [
+        {
+          "name": "Agnes Mwale",
+          "relationship": "mother",
+          "phone": "0991 200 040",
+          "main": true
+        },
+        {
+          "name": "James Mwale",
+          "relationship": "father",
+          "phone": "0888 400 040",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "first_name": "Pemphero",
+      "surname": "Munthali",
+      "sex": "female",
+      "date_of_birth": "2017-10-10",
+      "contacts": [
+        {
+          "name": "Ellen Munthali",
+          "relationship": "mother",
+          "phone": "0991 200 041",
+          "main": true
+        },
+        {
+          "name": "George Munthali",
+          "relationship": "father",
+          "phone": "0888 400 041",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "first_name": "Patrick",
+      "surname": "Munthali",
+      "sex": "male",
+      "date_of_birth": "2017-03-17",
+      "contacts": [
+        {
+          "name": "Fanny Munthali",
+          "relationship": "mother",
+          "phone": "0991 200 042",
+          "main": true
+        },
+        {
+          "name": "Moses Munthali",
+          "relationship": "father",
+          "phone": "0888 400 042",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "first_name": "Natasha",
+      "surname": "Banda",
+      "sex": "female",
+      "date_of_birth": "2017-02-13",
+      "contacts": [
+        {
+          "name": "Mary Banda",
+          "relationship": "mother",
+          "phone": "0991 200 043",
+          "main": true
+        },
+        {
+          "name": "Peter Banda",
+          "relationship": "father",
+          "phone": "0888 400 043",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "first_name": "Lusayo",
+      "surname": "Kachingwe",
+      "sex": "male",
+      "date_of_birth": "2017-11-12",
+      "contacts": [
+        {
+          "name": "Fanny Kachingwe",
+          "relationship": "mother",
+          "phone": "0991 200 044",
+          "main": true
+        },
+        {
+          "name": "Peter Kachingwe",
+          "relationship": "father",
+          "phone": "0888 400 044",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "first_name": "Alinafe",
+      "surname": "Chilembwe",
+      "sex": "female",
+      "date_of_birth": "2017-08-11",
+      "contacts": [
+        {
+          "name": "Annie Chilembwe",
+          "relationship": "mother",
+          "phone": "0991 200 045",
+          "main": true
+        },
+        {
+          "name": "Charles Chilembwe",
+          "relationship": "father",
+          "phone": "0888 400 045",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "first_name": "Sangwani",
+      "surname": "Tembo",
+      "sex": "male",
+      "date_of_birth": "2017-02-16",
+      "contacts": [
+        {
+          "name": "Catherine Tembo",
+          "relationship": "mother",
+          "phone": "0991 200 046",
+          "main": true
+        },
+        {
+          "name": "Mike Tembo",
+          "relationship": "father",
+          "phone": "0888 400 046",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "first_name": "Wezi",
+      "surname": "Munthali",
+      "sex": "female",
+      "date_of_birth": "2017-03-05",
+      "contacts": [
+        {
+          "name": "Rose Munthali",
+          "relationship": "mother",
+          "phone": "0991 200 047",
+          "main": true
+        },
+        {
+          "name": "Lameck Munthali",
+          "relationship": "father",
+          "phone": "0888 400 047",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 4",
+      "first_name": "Innocent",
+      "surname": "Mhango",
+      "sex": "male",
+      "date_of_birth": "2017-10-11",
+      "contacts": [
+        {
+          "name": "Catherine Mhango",
+          "relationship": "mother",
+          "phone": "0991 200 048",
+          "main": true
+        },
+        {
+          "name": "Mike Mhango",
+          "relationship": "father",
+          "phone": "0888 400 048",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "first_name": "Hope",
+      "surname": "Chisale",
+      "sex": "female",
+      "date_of_birth": "2016-12-03",
+      "contacts": [
+        {
+          "name": "Ellen Chisale",
+          "relationship": "mother",
+          "phone": "0991 200 049",
+          "main": true
+        },
+        {
+          "name": "George Chisale",
+          "relationship": "father",
+          "phone": "0888 400 049",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "first_name": "Chifundo",
+      "surname": "Kumwenda",
+      "sex": "male",
+      "date_of_birth": "2016-11-06",
+      "contacts": [
+        {
+          "name": "Ruth Kumwenda",
+          "relationship": "mother",
+          "phone": "0991 200 050",
+          "main": true
+        },
+        {
+          "name": "Raphael Kumwenda",
+          "relationship": "father",
+          "phone": "0888 400 050",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "first_name": "Towera",
+      "surname": "Kapito",
+      "sex": "female",
+      "date_of_birth": "2016-01-15",
+      "contacts": [
+        {
+          "name": "Joyce Kapito",
+          "relationship": "mother",
+          "phone": "0991 200 051",
+          "main": true
+        },
+        {
+          "name": "Austin Kapito",
+          "relationship": "father",
+          "phone": "0888 400 051",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "first_name": "Yohane",
+      "surname": "Kumwenda",
+      "sex": "male",
+      "date_of_birth": "2016-08-23",
+      "contacts": [
+        {
+          "name": "Annie Kumwenda",
+          "relationship": "mother",
+          "phone": "0991 200 052",
+          "main": true
+        },
+        {
+          "name": "Peter Kumwenda",
+          "relationship": "father",
+          "phone": "0888 400 052",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "first_name": "Esther",
+      "surname": "Mbewe",
+      "sex": "female",
+      "date_of_birth": "2016-09-07",
+      "contacts": [
+        {
+          "name": "Fanny Mbewe",
+          "relationship": "mother",
+          "phone": "0991 200 053",
+          "main": true
+        },
+        {
+          "name": "Lameck Mbewe",
+          "relationship": "father",
+          "phone": "0888 400 053",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "first_name": "Emmanuel",
+      "surname": "Nyirenda",
+      "sex": "male",
+      "date_of_birth": "2016-11-28",
+      "contacts": [
+        {
+          "name": "Agnes Nyirenda",
+          "relationship": "mother",
+          "phone": "0991 200 054",
+          "main": true
+        },
+        {
+          "name": "George Nyirenda",
+          "relationship": "father",
+          "phone": "0888 400 054",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "first_name": "Kondwani",
+      "surname": "Mhango",
+      "sex": "female",
+      "date_of_birth": "2016-09-14",
+      "contacts": [
+        {
+          "name": "Joyce Mhango",
+          "relationship": "mother",
+          "phone": "0991 200 055",
+          "main": true
+        },
+        {
+          "name": "John Mhango",
+          "relationship": "father",
+          "phone": "0888 400 055",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "first_name": "Patrick",
+      "surname": "Zulu",
+      "sex": "male",
+      "date_of_birth": "2016-03-12",
+      "contacts": [
+        {
+          "name": "Agnes Zulu",
+          "relationship": "mother",
+          "phone": "0991 200 056",
+          "main": true
+        },
+        {
+          "name": "Charles Zulu",
+          "relationship": "father",
+          "phone": "0888 400 056",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "first_name": "Tamanda",
+      "surname": "Mkandawire",
+      "sex": "female",
+      "date_of_birth": "2016-07-10",
+      "contacts": [
+        {
+          "name": "Catherine Mkandawire",
+          "relationship": "mother",
+          "phone": "0991 200 057",
+          "main": true
+        },
+        {
+          "name": "James Mkandawire",
+          "relationship": "father",
+          "phone": "0888 400 057",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "first_name": "Mayeso",
+      "surname": "Chilembwe",
+      "sex": "male",
+      "date_of_birth": "2016-08-15",
+      "contacts": [
+        {
+          "name": "Mary Chilembwe",
+          "relationship": "mother",
+          "phone": "0991 200 058",
+          "main": true
+        },
+        {
+          "name": "Lameck Chilembwe",
+          "relationship": "father",
+          "phone": "0888 400 058",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "first_name": "Pemphero",
+      "surname": "Chilembwe",
+      "sex": "female",
+      "date_of_birth": "2016-05-27",
+      "contacts": [
+        {
+          "name": "Mary Chilembwe",
+          "relationship": "mother",
+          "phone": "0991 200 059",
+          "main": true
+        },
+        {
+          "name": "Felix Chilembwe",
+          "relationship": "father",
+          "phone": "0888 400 059",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 5",
+      "first_name": "Innocent",
+      "surname": "Lungu",
+      "sex": "male",
+      "date_of_birth": "2016-01-03",
+      "contacts": [
+        {
+          "name": "Catherine Lungu",
+          "relationship": "mother",
+          "phone": "0991 200 060",
+          "main": true
+        },
+        {
+          "name": "Raphael Lungu",
+          "relationship": "father",
+          "phone": "0888 400 060",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "first_name": "Madalitso",
+      "surname": "Mhango",
+      "sex": "female",
+      "date_of_birth": "2015-09-26",
+      "contacts": [
+        {
+          "name": "Joyce Mhango",
+          "relationship": "mother",
+          "phone": "0991 200 061",
+          "main": true
+        },
+        {
+          "name": "Felix Mhango",
+          "relationship": "father",
+          "phone": "0888 400 061",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "first_name": "Hastings",
+      "surname": "Chisale",
+      "sex": "male",
+      "date_of_birth": "2015-03-01",
+      "contacts": [
+        {
+          "name": "Margaret Chisale",
+          "relationship": "mother",
+          "phone": "0991 200 062",
+          "main": true
+        },
+        {
+          "name": "Felix Chisale",
+          "relationship": "father",
+          "phone": "0888 400 062",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "first_name": "Faith",
+      "surname": "Kachingwe",
+      "sex": "female",
+      "date_of_birth": "2015-09-22",
+      "contacts": [
+        {
+          "name": "Rose Kachingwe",
+          "relationship": "mother",
+          "phone": "0991 200 063",
+          "main": true
+        },
+        {
+          "name": "Austin Kachingwe",
+          "relationship": "father",
+          "phone": "0888 400 063",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "first_name": "Thokozani",
+      "surname": "Kumwenda",
+      "sex": "male",
+      "date_of_birth": "2015-02-20",
+      "contacts": [
+        {
+          "name": "Doreen Kumwenda",
+          "relationship": "mother",
+          "phone": "0991 200 064",
+          "main": true
+        },
+        {
+          "name": "Charles Kumwenda",
+          "relationship": "father",
+          "phone": "0888 400 064",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "first_name": "Towera",
+      "surname": "Jere",
+      "sex": "female",
+      "date_of_birth": "2015-10-24",
+      "contacts": [
+        {
+          "name": "Esnart Jere",
+          "relationship": "mother",
+          "phone": "0991 200 065",
+          "main": true
+        },
+        {
+          "name": "Mike Jere",
+          "relationship": "father",
+          "phone": "0888 400 065",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "first_name": "Limbani",
+      "surname": "Moyo",
+      "sex": "male",
+      "date_of_birth": "2015-05-22",
+      "contacts": [
+        {
+          "name": "Ellen Moyo",
+          "relationship": "mother",
+          "phone": "0991 200 066",
+          "main": true
+        },
+        {
+          "name": "James Moyo",
+          "relationship": "father",
+          "phone": "0888 400 066",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "first_name": "Dalitso",
+      "surname": "Munthali",
+      "sex": "female",
+      "date_of_birth": "2015-05-04",
+      "contacts": [
+        {
+          "name": "Eneless Munthali",
+          "relationship": "mother",
+          "phone": "0991 200 067",
+          "main": true
+        },
+        {
+          "name": "James Munthali",
+          "relationship": "father",
+          "phone": "0888 400 067",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "first_name": "Daniel",
+      "surname": "Chisale",
+      "sex": "male",
+      "date_of_birth": "2015-01-25",
+      "contacts": [
+        {
+          "name": "Margaret Chisale",
+          "relationship": "mother",
+          "phone": "0991 200 068",
+          "main": true
+        },
+        {
+          "name": "Wilson Chisale",
+          "relationship": "father",
+          "phone": "0888 400 068",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "first_name": "Pemphero",
+      "surname": "Nyirenda",
+      "sex": "female",
+      "date_of_birth": "2015-11-21",
+      "contacts": [
+        {
+          "name": "Mary Nyirenda",
+          "relationship": "mother",
+          "phone": "0991 200 069",
+          "main": true
+        },
+        {
+          "name": "Lameck Nyirenda",
+          "relationship": "father",
+          "phone": "0888 400 069",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "first_name": "Mayeso",
+      "surname": "Mvula",
+      "sex": "male",
+      "date_of_birth": "2015-10-27",
+      "contacts": [
+        {
+          "name": "Mary Mvula",
+          "relationship": "mother",
+          "phone": "0991 200 070",
+          "main": true
+        },
+        {
+          "name": "Charles Mvula",
+          "relationship": "father",
+          "phone": "0888 400 070",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "first_name": "Madalitso",
+      "surname": "Nyirenda",
+      "sex": "female",
+      "date_of_birth": "2015-05-09",
+      "contacts": [
+        {
+          "name": "Mary Nyirenda",
+          "relationship": "mother",
+          "phone": "0991 200 071",
+          "main": true
+        },
+        {
+          "name": "Peter Nyirenda",
+          "relationship": "father",
+          "phone": "0888 400 071",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 6",
+      "first_name": "Precious",
+      "surname": "Nkhoma",
+      "sex": "male",
+      "date_of_birth": "2015-05-14",
+      "contacts": [
+        {
+          "name": "Ruth Nkhoma",
+          "relationship": "mother",
+          "phone": "0991 200 072",
+          "main": true
+        },
+        {
+          "name": "Peter Nkhoma",
+          "relationship": "father",
+          "phone": "0888 400 072",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "first_name": "Dalitso",
+      "surname": "Lungu",
+      "sex": "female",
+      "date_of_birth": "2014-01-10",
+      "contacts": [
+        {
+          "name": "Mary Lungu",
+          "relationship": "mother",
+          "phone": "0991 200 073",
+          "main": true
+        },
+        {
+          "name": "John Lungu",
+          "relationship": "father",
+          "phone": "0888 400 073",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "first_name": "Zikomo",
+      "surname": "Kalua",
+      "sex": "male",
+      "date_of_birth": "2014-10-28",
+      "contacts": [
+        {
+          "name": "Margaret Kalua",
+          "relationship": "mother",
+          "phone": "0991 200 074",
+          "main": true
+        },
+        {
+          "name": "Francis Kalua",
+          "relationship": "father",
+          "phone": "0888 400 074",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "first_name": "Atupele",
+      "surname": "Kamanga",
+      "sex": "female",
+      "date_of_birth": "2014-10-21",
+      "contacts": [
+        {
+          "name": "Annie Kamanga",
+          "relationship": "mother",
+          "phone": "0991 200 075",
+          "main": true
+        },
+        {
+          "name": "Wilson Kamanga",
+          "relationship": "father",
+          "phone": "0888 400 075",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "first_name": "Wongani",
+      "surname": "Phiri",
+      "sex": "male",
+      "date_of_birth": "2014-07-11",
+      "contacts": [
+        {
+          "name": "Rose Phiri",
+          "relationship": "mother",
+          "phone": "0991 200 076",
+          "main": true
+        },
+        {
+          "name": "Moses Phiri",
+          "relationship": "father",
+          "phone": "0888 400 076",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "first_name": "Ruth",
+      "surname": "Chisale",
+      "sex": "female",
+      "date_of_birth": "2014-02-22",
+      "contacts": [
+        {
+          "name": "Margaret Chisale",
+          "relationship": "mother",
+          "phone": "0991 200 077",
+          "main": true
+        },
+        {
+          "name": "Felix Chisale",
+          "relationship": "father",
+          "phone": "0888 400 077",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "first_name": "Tawonga",
+      "surname": "Chisale",
+      "sex": "male",
+      "date_of_birth": "2014-05-13",
+      "contacts": [
+        {
+          "name": "Loveness Chisale",
+          "relationship": "mother",
+          "phone": "0991 200 078",
+          "main": true
+        },
+        {
+          "name": "Felix Chisale",
+          "relationship": "father",
+          "phone": "0888 400 078",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "first_name": "Mphatso",
+      "surname": "Phiri",
+      "sex": "female",
+      "date_of_birth": "2014-12-23",
+      "contacts": [
+        {
+          "name": "Eneless Phiri",
+          "relationship": "mother",
+          "phone": "0991 200 079",
+          "main": true
+        },
+        {
+          "name": "Peter Phiri",
+          "relationship": "father",
+          "phone": "0888 400 079",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "first_name": "Limbani",
+      "surname": "Kaunda",
+      "sex": "male",
+      "date_of_birth": "2014-06-10",
+      "contacts": [
+        {
+          "name": "Doreen Kaunda",
+          "relationship": "mother",
+          "phone": "0991 200 080",
+          "main": true
+        },
+        {
+          "name": "Austin Kaunda",
+          "relationship": "father",
+          "phone": "0888 400 080",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "first_name": "Pemphero",
+      "surname": "Kapito",
+      "sex": "female",
+      "date_of_birth": "2014-02-10",
+      "contacts": [
+        {
+          "name": "Fanny Kapito",
+          "relationship": "mother",
+          "phone": "0991 200 081",
+          "main": true
+        },
+        {
+          "name": "George Kapito",
+          "relationship": "father",
+          "phone": "0888 400 081",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "first_name": "Mayeso",
+      "surname": "Moyo",
+      "sex": "male",
+      "date_of_birth": "2014-01-18",
+      "contacts": [
+        {
+          "name": "Margaret Moyo",
+          "relationship": "mother",
+          "phone": "0991 200 082",
+          "main": true
+        },
+        {
+          "name": "Moses Moyo",
+          "relationship": "father",
+          "phone": "0888 400 082",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "first_name": "Towera",
+      "surname": "Phiri",
+      "sex": "female",
+      "date_of_birth": "2014-12-04",
+      "contacts": [
+        {
+          "name": "Agnes Phiri",
+          "relationship": "mother",
+          "phone": "0991 200 083",
+          "main": true
+        },
+        {
+          "name": "Mike Phiri",
+          "relationship": "father",
+          "phone": "0888 400 083",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 7",
+      "first_name": "Daniel",
+      "surname": "Chirwa",
+      "sex": "male",
+      "date_of_birth": "2014-01-05",
+      "contacts": [
+        {
+          "name": "Ellen Chirwa",
+          "relationship": "mother",
+          "phone": "0991 200 084",
+          "main": true
+        },
+        {
+          "name": "Francis Chirwa",
+          "relationship": "father",
+          "phone": "0888 400 084",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "first_name": "Wezi",
+      "surname": "Mbewe",
+      "sex": "female",
+      "date_of_birth": "2013-11-10",
+      "contacts": [
+        {
+          "name": "Ruth Mbewe",
+          "relationship": "mother",
+          "phone": "0991 200 085",
+          "main": true
+        },
+        {
+          "name": "George Mbewe",
+          "relationship": "father",
+          "phone": "0888 400 085",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "first_name": "Upile",
+      "surname": "Gondwe",
+      "sex": "male",
+      "date_of_birth": "2013-06-14",
+      "contacts": [
+        {
+          "name": "Eneless Gondwe",
+          "relationship": "mother",
+          "phone": "0991 200 086",
+          "main": true
+        },
+        {
+          "name": "George Gondwe",
+          "relationship": "father",
+          "phone": "0888 400 086",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "first_name": "Hope",
+      "surname": "Jere",
+      "sex": "female",
+      "date_of_birth": "2013-07-22",
+      "contacts": [
+        {
+          "name": "Esnart Jere",
+          "relationship": "mother",
+          "phone": "0991 200 087",
+          "main": true
+        },
+        {
+          "name": "Austin Jere",
+          "relationship": "father",
+          "phone": "0888 400 087",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "first_name": "Thokozani",
+      "surname": "Banda",
+      "sex": "male",
+      "date_of_birth": "2013-11-23",
+      "contacts": [
+        {
+          "name": "Ellen Banda",
+          "relationship": "mother",
+          "phone": "0991 200 088",
+          "main": true
+        },
+        {
+          "name": "Raphael Banda",
+          "relationship": "father",
+          "phone": "0888 400 088",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "first_name": "Towera",
+      "surname": "Msiska",
+      "sex": "female",
+      "date_of_birth": "2013-05-26",
+      "contacts": [
+        {
+          "name": "Agnes Msiska",
+          "relationship": "mother",
+          "phone": "0991 200 089",
+          "main": true
+        },
+        {
+          "name": "Moses Msiska",
+          "relationship": "father",
+          "phone": "0888 400 089",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "first_name": "Blessings",
+      "surname": "Banda",
+      "sex": "male",
+      "date_of_birth": "2013-05-18",
+      "contacts": [
+        {
+          "name": "Catherine Banda",
+          "relationship": "mother",
+          "phone": "0991 200 090",
+          "main": true
+        },
+        {
+          "name": "George Banda",
+          "relationship": "father",
+          "phone": "0888 400 090",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "first_name": "Kondwani",
+      "surname": "Tembo",
+      "sex": "female",
+      "date_of_birth": "2013-03-21",
+      "contacts": [
+        {
+          "name": "Rose Tembo",
+          "relationship": "mother",
+          "phone": "0991 200 091",
+          "main": true
+        },
+        {
+          "name": "John Tembo",
+          "relationship": "father",
+          "phone": "0888 400 091",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "first_name": "Lusayo",
+      "surname": "Nyirenda",
+      "sex": "male",
+      "date_of_birth": "2013-09-02",
+      "contacts": [
+        {
+          "name": "Annie Nyirenda",
+          "relationship": "mother",
+          "phone": "0991 200 092",
+          "main": true
+        },
+        {
+          "name": "Felix Nyirenda",
+          "relationship": "father",
+          "phone": "0888 400 092",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "first_name": "Temwa",
+      "surname": "Chilembwe",
+      "sex": "female",
+      "date_of_birth": "2013-05-11",
+      "contacts": [
+        {
+          "name": "Annie Chilembwe",
+          "relationship": "mother",
+          "phone": "0991 200 093",
+          "main": true
+        },
+        {
+          "name": "Lameck Chilembwe",
+          "relationship": "father",
+          "phone": "0888 400 093",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "first_name": "Kondwani",
+      "surname": "Mtambo",
+      "sex": "male",
+      "date_of_birth": "2013-06-02",
+      "contacts": [
+        {
+          "name": "Annie Mtambo",
+          "relationship": "mother",
+          "phone": "0991 200 094",
+          "main": true
+        },
+        {
+          "name": "Felix Mtambo",
+          "relationship": "father",
+          "phone": "0888 400 094",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "first_name": "Alinafe",
+      "surname": "Mbewe",
+      "sex": "female",
+      "date_of_birth": "2013-04-16",
+      "contacts": [
+        {
+          "name": "Ruth Mbewe",
+          "relationship": "mother",
+          "phone": "0991 200 095",
+          "main": true
+        },
+        {
+          "name": "Moses Mbewe",
+          "relationship": "father",
+          "phone": "0888 400 095",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Standard 8",
+      "first_name": "Zikomo",
+      "surname": "Chilembwe",
+      "sex": "male",
+      "date_of_birth": "2013-03-24",
+      "contacts": [
+        {
+          "name": "Joyce Chilembwe",
+          "relationship": "mother",
+          "phone": "0991 200 096",
+          "main": true
+        },
+        {
+          "name": "George Chilembwe",
+          "relationship": "father",
+          "phone": "0888 400 096",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "first_name": "Chimwemwe",
+      "surname": "Kachingwe",
+      "sex": "female",
+      "date_of_birth": "2012-04-18",
+      "contacts": [
+        {
+          "name": "Joyce Kachingwe",
+          "relationship": "mother",
+          "phone": "0991 200 097",
+          "main": true
+        },
+        {
+          "name": "Charles Kachingwe",
+          "relationship": "father",
+          "phone": "0888 400 097",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "first_name": "Mayeso",
+      "surname": "Nkhoma",
+      "sex": "male",
+      "date_of_birth": "2012-04-12",
+      "contacts": [
+        {
+          "name": "Margaret Nkhoma",
+          "relationship": "mother",
+          "phone": "0991 200 098",
+          "main": true
+        },
+        {
+          "name": "Henry Nkhoma",
+          "relationship": "father",
+          "phone": "0888 400 098",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "first_name": "Yamikani",
+      "surname": "Kamanga",
+      "sex": "female",
+      "date_of_birth": "2012-09-26",
+      "contacts": [
+        {
+          "name": "Catherine Kamanga",
+          "relationship": "mother",
+          "phone": "0991 200 099",
+          "main": true
+        },
+        {
+          "name": "Austin Kamanga",
+          "relationship": "father",
+          "phone": "0888 400 099",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "first_name": "Zikomo",
+      "surname": "Moyo",
+      "sex": "male",
+      "date_of_birth": "2012-05-07",
+      "contacts": [
+        {
+          "name": "Agnes Moyo",
+          "relationship": "mother",
+          "phone": "0991 200 100",
+          "main": true
+        },
+        {
+          "name": "Raphael Moyo",
+          "relationship": "father",
+          "phone": "0888 400 100",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "first_name": "Ruth",
+      "surname": "Gondwe",
+      "sex": "female",
+      "date_of_birth": "2012-08-01",
+      "contacts": [
+        {
+          "name": "Margaret Gondwe",
+          "relationship": "mother",
+          "phone": "0991 200 101",
+          "main": true
+        },
+        {
+          "name": "Felix Gondwe",
+          "relationship": "father",
+          "phone": "0888 400 101",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "first_name": "Lusayo",
+      "surname": "Chilembwe",
+      "sex": "male",
+      "date_of_birth": "2012-12-14",
+      "contacts": [
+        {
+          "name": "Fanny Chilembwe",
+          "relationship": "mother",
+          "phone": "0991 200 102",
+          "main": true
+        },
+        {
+          "name": "Peter Chilembwe",
+          "relationship": "father",
+          "phone": "0888 400 102",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "first_name": "Yamikani",
+      "surname": "Nyirenda",
+      "sex": "female",
+      "date_of_birth": "2012-02-10",
+      "contacts": [
+        {
+          "name": "Margaret Nyirenda",
+          "relationship": "mother",
+          "phone": "0991 200 103",
+          "main": true
+        },
+        {
+          "name": "Lameck Nyirenda",
+          "relationship": "father",
+          "phone": "0888 400 103",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "first_name": "Fumbani",
+      "surname": "Mvula",
+      "sex": "male",
+      "date_of_birth": "2012-03-23",
+      "contacts": [
+        {
+          "name": "Doreen Mvula",
+          "relationship": "mother",
+          "phone": "0991 200 104",
+          "main": true
+        },
+        {
+          "name": "John Mvula",
+          "relationship": "father",
+          "phone": "0888 400 104",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "first_name": "Alinafe",
+      "surname": "Kalua",
+      "sex": "female",
+      "date_of_birth": "2012-04-28",
+      "contacts": [
+        {
+          "name": "Joyce Kalua",
+          "relationship": "mother",
+          "phone": "0991 200 105",
+          "main": true
+        },
+        {
+          "name": "Wilson Kalua",
+          "relationship": "father",
+          "phone": "0888 400 105",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "first_name": "Upile",
+      "surname": "Zulu",
+      "sex": "male",
+      "date_of_birth": "2012-10-02",
+      "contacts": [
+        {
+          "name": "Eneless Zulu",
+          "relationship": "mother",
+          "phone": "0991 200 106",
+          "main": true
+        },
+        {
+          "name": "George Zulu",
+          "relationship": "father",
+          "phone": "0888 400 106",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "first_name": "Towera",
+      "surname": "Chilembwe",
+      "sex": "female",
+      "date_of_birth": "2012-11-22",
+      "contacts": [
+        {
+          "name": "Agnes Chilembwe",
+          "relationship": "mother",
+          "phone": "0991 200 107",
+          "main": true
+        },
+        {
+          "name": "Lameck Chilembwe",
+          "relationship": "father",
+          "phone": "0888 400 107",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 East",
+      "first_name": "Daniel",
+      "surname": "Mwale",
+      "sex": "male",
+      "date_of_birth": "2012-03-24",
+      "contacts": [
+        {
+          "name": "Eneless Mwale",
+          "relationship": "mother",
+          "phone": "0991 200 108",
+          "main": true
+        },
+        {
+          "name": "Francis Mwale",
+          "relationship": "father",
+          "phone": "0888 400 108",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "first_name": "Towera",
+      "surname": "Mvula",
+      "sex": "female",
+      "date_of_birth": "2012-05-02",
+      "contacts": [
+        {
+          "name": "Doreen Mvula",
+          "relationship": "mother",
+          "phone": "0991 200 109",
+          "main": true
+        },
+        {
+          "name": "Mike Mvula",
+          "relationship": "father",
+          "phone": "0888 400 109",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "first_name": "Zikomo",
+      "surname": "Munthali",
+      "sex": "male",
+      "date_of_birth": "2012-04-06",
+      "contacts": [
+        {
+          "name": "Loveness Munthali",
+          "relationship": "mother",
+          "phone": "0991 200 110",
+          "main": true
+        },
+        {
+          "name": "Charles Munthali",
+          "relationship": "father",
+          "phone": "0888 400 110",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "first_name": "Towera",
+      "surname": "Zulu",
+      "sex": "female",
+      "date_of_birth": "2012-06-05",
+      "contacts": [
+        {
+          "name": "Eneless Zulu",
+          "relationship": "mother",
+          "phone": "0991 200 111",
+          "main": true
+        },
+        {
+          "name": "Moses Zulu",
+          "relationship": "father",
+          "phone": "0888 400 111",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "first_name": "Fumbani",
+      "surname": "Mbewe",
+      "sex": "male",
+      "date_of_birth": "2012-01-28",
+      "contacts": [
+        {
+          "name": "Rose Mbewe",
+          "relationship": "mother",
+          "phone": "0991 200 112",
+          "main": true
+        },
+        {
+          "name": "Raphael Mbewe",
+          "relationship": "father",
+          "phone": "0888 400 112",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "first_name": "Thandiwe",
+      "surname": "Mhango",
+      "sex": "female",
+      "date_of_birth": "2012-06-26",
+      "contacts": [
+        {
+          "name": "Fanny Mhango",
+          "relationship": "mother",
+          "phone": "0991 200 113",
+          "main": true
+        },
+        {
+          "name": "Austin Mhango",
+          "relationship": "father",
+          "phone": "0888 400 113",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "first_name": "Thokozani",
+      "surname": "Nyirenda",
+      "sex": "male",
+      "date_of_birth": "2012-12-17",
+      "contacts": [
+        {
+          "name": "Ruth Nyirenda",
+          "relationship": "mother",
+          "phone": "0991 200 114",
+          "main": true
+        },
+        {
+          "name": "James Nyirenda",
+          "relationship": "father",
+          "phone": "0888 400 114",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "first_name": "Madalitso",
+      "surname": "Kalua",
+      "sex": "female",
+      "date_of_birth": "2012-03-06",
+      "contacts": [
+        {
+          "name": "Ruth Kalua",
+          "relationship": "mother",
+          "phone": "0991 200 115",
+          "main": true
+        },
+        {
+          "name": "John Kalua",
+          "relationship": "father",
+          "phone": "0888 400 115",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "first_name": "Chisomo",
+      "surname": "Mbewe",
+      "sex": "male",
+      "date_of_birth": "2012-01-27",
+      "contacts": [
+        {
+          "name": "Margaret Mbewe",
+          "relationship": "mother",
+          "phone": "0991 200 116",
+          "main": true
+        },
+        {
+          "name": "John Mbewe",
+          "relationship": "father",
+          "phone": "0888 400 116",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "first_name": "Mphatso",
+      "surname": "Zulu",
+      "sex": "female",
+      "date_of_birth": "2012-04-18",
+      "contacts": [
+        {
+          "name": "Agnes Zulu",
+          "relationship": "mother",
+          "phone": "0991 200 117",
+          "main": true
+        },
+        {
+          "name": "Mike Zulu",
+          "relationship": "father",
+          "phone": "0888 400 117",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "first_name": "Wongani",
+      "surname": "Lungu",
+      "sex": "male",
+      "date_of_birth": "2012-03-04",
+      "contacts": [
+        {
+          "name": "Margaret Lungu",
+          "relationship": "mother",
+          "phone": "0991 200 118",
+          "main": true
+        },
+        {
+          "name": "Henry Lungu",
+          "relationship": "father",
+          "phone": "0888 400 118",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "first_name": "Dalitso",
+      "surname": "Nkhoma",
+      "sex": "female",
+      "date_of_birth": "2012-12-03",
+      "contacts": [
+        {
+          "name": "Eneless Nkhoma",
+          "relationship": "mother",
+          "phone": "0991 200 119",
+          "main": true
+        },
+        {
+          "name": "Charles Nkhoma",
+          "relationship": "father",
+          "phone": "0888 400 119",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 1 West",
+      "first_name": "Wongani",
+      "surname": "Zulu",
+      "sex": "male",
+      "date_of_birth": "2012-11-04",
+      "contacts": [
+        {
+          "name": "Margaret Zulu",
+          "relationship": "mother",
+          "phone": "0991 200 120",
+          "main": true
+        },
+        {
+          "name": "Henry Zulu",
+          "relationship": "father",
+          "phone": "0888 400 120",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 2",
+      "first_name": "Thandiwe",
+      "surname": "Chirwa",
+      "sex": "female",
+      "date_of_birth": "2011-09-17",
+      "contacts": [
+        {
+          "name": "Esnart Chirwa",
+          "relationship": "mother",
+          "phone": "0991 200 121",
+          "main": true
+        },
+        {
+          "name": "Felix Chirwa",
+          "relationship": "father",
+          "phone": "0888 400 121",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 2",
+      "first_name": "Mphatso",
+      "surname": "Chisale",
+      "sex": "male",
+      "date_of_birth": "2011-08-19",
+      "contacts": [
+        {
+          "name": "Margaret Chisale",
+          "relationship": "mother",
+          "phone": "0991 200 122",
+          "main": true
+        },
+        {
+          "name": "John Chisale",
+          "relationship": "father",
+          "phone": "0888 400 122",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 2",
+      "first_name": "Chisomo",
+      "surname": "Jere",
+      "sex": "female",
+      "date_of_birth": "2011-02-26",
+      "contacts": [
+        {
+          "name": "Catherine Jere",
+          "relationship": "mother",
+          "phone": "0991 200 123",
+          "main": true
+        },
+        {
+          "name": "Austin Jere",
+          "relationship": "father",
+          "phone": "0888 400 123",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 2",
+      "first_name": "Limbani",
+      "surname": "Mvula",
+      "sex": "male",
+      "date_of_birth": "2011-11-08",
+      "contacts": [
+        {
+          "name": "Agnes Mvula",
+          "relationship": "mother",
+          "phone": "0991 200 124",
+          "main": true
+        },
+        {
+          "name": "Francis Mvula",
+          "relationship": "father",
+          "phone": "0888 400 124",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 2",
+      "first_name": "Ruth",
+      "surname": "Chilembwe",
+      "sex": "female",
+      "date_of_birth": "2011-09-11",
+      "contacts": [
+        {
+          "name": "Margaret Chilembwe",
+          "relationship": "mother",
+          "phone": "0991 200 125",
+          "main": true
+        },
+        {
+          "name": "Wilson Chilembwe",
+          "relationship": "father",
+          "phone": "0888 400 125",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 2",
+      "first_name": "Zikomo",
+      "surname": "Nkhoma",
+      "sex": "male",
+      "date_of_birth": "2011-08-13",
+      "contacts": [
+        {
+          "name": "Margaret Nkhoma",
+          "relationship": "mother",
+          "phone": "0991 200 126",
+          "main": true
+        },
+        {
+          "name": "James Nkhoma",
+          "relationship": "father",
+          "phone": "0888 400 126",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 2",
+      "first_name": "Grace",
+      "surname": "Munthali",
+      "sex": "female",
+      "date_of_birth": "2011-08-08",
+      "contacts": [
+        {
+          "name": "Joyce Munthali",
+          "relationship": "mother",
+          "phone": "0991 200 127",
+          "main": true
+        },
+        {
+          "name": "Wilson Munthali",
+          "relationship": "father",
+          "phone": "0888 400 127",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 2",
+      "first_name": "Mphatso",
+      "surname": "Jere",
+      "sex": "male",
+      "date_of_birth": "2011-06-14",
+      "contacts": [
+        {
+          "name": "Joyce Jere",
+          "relationship": "mother",
+          "phone": "0991 200 128",
+          "main": true
+        },
+        {
+          "name": "Austin Jere",
+          "relationship": "father",
+          "phone": "0888 400 128",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 2",
+      "first_name": "Tadala",
+      "surname": "Msiska",
+      "sex": "female",
+      "date_of_birth": "2011-04-05",
+      "contacts": [
+        {
+          "name": "Catherine Msiska",
+          "relationship": "mother",
+          "phone": "0991 200 129",
+          "main": true
+        },
+        {
+          "name": "Wilson Msiska",
+          "relationship": "father",
+          "phone": "0888 400 129",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 2",
+      "first_name": "Upile",
+      "surname": "Chisale",
+      "sex": "male",
+      "date_of_birth": "2011-12-05",
+      "contacts": [
+        {
+          "name": "Eneless Chisale",
+          "relationship": "mother",
+          "phone": "0991 200 130",
+          "main": true
+        },
+        {
+          "name": "Charles Chisale",
+          "relationship": "father",
+          "phone": "0888 400 130",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 2",
+      "first_name": "Madalitso",
+      "surname": "Chavula",
+      "sex": "female",
+      "date_of_birth": "2011-02-11",
+      "contacts": [
+        {
+          "name": "Loveness Chavula",
+          "relationship": "mother",
+          "phone": "0991 200 131",
+          "main": true
+        },
+        {
+          "name": "Felix Chavula",
+          "relationship": "father",
+          "phone": "0888 400 131",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 2",
+      "first_name": "Hastings",
+      "surname": "Kamanga",
+      "sex": "male",
+      "date_of_birth": "2011-05-05",
+      "contacts": [
+        {
+          "name": "Ellen Kamanga",
+          "relationship": "mother",
+          "phone": "0991 200 132",
+          "main": true
+        },
+        {
+          "name": "Raphael Kamanga",
+          "relationship": "father",
+          "phone": "0888 400 132",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 3",
+      "first_name": "Kondwani",
+      "surname": "Lungu",
+      "sex": "female",
+      "date_of_birth": "2010-06-05",
+      "contacts": [
+        {
+          "name": "Ellen Lungu",
+          "relationship": "mother",
+          "phone": "0991 200 133",
+          "main": true
+        },
+        {
+          "name": "Austin Lungu",
+          "relationship": "father",
+          "phone": "0888 400 133",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 3",
+      "first_name": "Daniel",
+      "surname": "Mvula",
+      "sex": "male",
+      "date_of_birth": "2010-05-19",
+      "contacts": [
+        {
+          "name": "Catherine Mvula",
+          "relationship": "mother",
+          "phone": "0991 200 134",
+          "main": true
+        },
+        {
+          "name": "Raphael Mvula",
+          "relationship": "father",
+          "phone": "0888 400 134",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 3",
+      "first_name": "Natasha",
+      "surname": "Msiska",
+      "sex": "female",
+      "date_of_birth": "2010-01-18",
+      "contacts": [
+        {
+          "name": "Doreen Msiska",
+          "relationship": "mother",
+          "phone": "0991 200 135",
+          "main": true
+        },
+        {
+          "name": "Francis Msiska",
+          "relationship": "father",
+          "phone": "0888 400 135",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 3",
+      "first_name": "Zikomo",
+      "surname": "Mhango",
+      "sex": "male",
+      "date_of_birth": "2010-06-04",
+      "contacts": [
+        {
+          "name": "Annie Mhango",
+          "relationship": "mother",
+          "phone": "0991 200 136",
+          "main": true
+        },
+        {
+          "name": "Austin Mhango",
+          "relationship": "father",
+          "phone": "0888 400 136",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 3",
+      "first_name": "Thandiwe",
+      "surname": "Kapito",
+      "sex": "female",
+      "date_of_birth": "2010-11-28",
+      "contacts": [
+        {
+          "name": "Annie Kapito",
+          "relationship": "mother",
+          "phone": "0991 200 137",
+          "main": true
+        },
+        {
+          "name": "Felix Kapito",
+          "relationship": "father",
+          "phone": "0888 400 137",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 3",
+      "first_name": "Zikomo",
+      "surname": "Jere",
+      "sex": "male",
+      "date_of_birth": "2010-09-17",
+      "contacts": [
+        {
+          "name": "Esnart Jere",
+          "relationship": "mother",
+          "phone": "0991 200 138",
+          "main": true
+        },
+        {
+          "name": "George Jere",
+          "relationship": "father",
+          "phone": "0888 400 138",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 3",
+      "first_name": "Mphatso",
+      "surname": "Mbewe",
+      "sex": "female",
+      "date_of_birth": "2010-06-02",
+      "contacts": [
+        {
+          "name": "Eneless Mbewe",
+          "relationship": "mother",
+          "phone": "0991 200 139",
+          "main": true
+        },
+        {
+          "name": "Wilson Mbewe",
+          "relationship": "father",
+          "phone": "0888 400 139",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 3",
+      "first_name": "Gift",
+      "surname": "Banda",
+      "sex": "male",
+      "date_of_birth": "2010-05-18",
+      "contacts": [
+        {
+          "name": "Doreen Banda",
+          "relationship": "mother",
+          "phone": "0991 200 140",
+          "main": true
+        },
+        {
+          "name": "Charles Banda",
+          "relationship": "father",
+          "phone": "0888 400 140",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 3",
+      "first_name": "Esther",
+      "surname": "Tembo",
+      "sex": "female",
+      "date_of_birth": "2010-10-21",
+      "contacts": [
+        {
+          "name": "Rose Tembo",
+          "relationship": "mother",
+          "phone": "0991 200 141",
+          "main": true
+        },
+        {
+          "name": "George Tembo",
+          "relationship": "father",
+          "phone": "0888 400 141",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 3",
+      "first_name": "Lusayo",
+      "surname": "Jere",
+      "sex": "male",
+      "date_of_birth": "2010-08-28",
+      "contacts": [
+        {
+          "name": "Catherine Jere",
+          "relationship": "mother",
+          "phone": "0991 200 142",
+          "main": true
+        },
+        {
+          "name": "Francis Jere",
+          "relationship": "father",
+          "phone": "0888 400 142",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 3",
+      "first_name": "Alinafe",
+      "surname": "Phiri",
+      "sex": "female",
+      "date_of_birth": "2010-04-21",
+      "contacts": [
+        {
+          "name": "Mary Phiri",
+          "relationship": "mother",
+          "phone": "0991 200 143",
+          "main": true
+        },
+        {
+          "name": "Raphael Phiri",
+          "relationship": "father",
+          "phone": "0888 400 143",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 3",
+      "first_name": "Hastings",
+      "surname": "Mvula",
+      "sex": "male",
+      "date_of_birth": "2010-06-01",
+      "contacts": [
+        {
+          "name": "Fanny Mvula",
+          "relationship": "mother",
+          "phone": "0991 200 144",
+          "main": true
+        },
+        {
+          "name": "Moses Mvula",
+          "relationship": "father",
+          "phone": "0888 400 144",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 4",
+      "first_name": "Pemphero",
+      "surname": "Kamanga",
+      "sex": "female",
+      "date_of_birth": "2009-09-09",
+      "contacts": [
+        {
+          "name": "Rose Kamanga",
+          "relationship": "mother",
+          "phone": "0991 200 145",
+          "main": true
+        },
+        {
+          "name": "Raphael Kamanga",
+          "relationship": "father",
+          "phone": "0888 400 145",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 4",
+      "first_name": "Mphatso",
+      "surname": "Mwale",
+      "sex": "male",
+      "date_of_birth": "2009-09-23",
+      "contacts": [
+        {
+          "name": "Esnart Mwale",
+          "relationship": "mother",
+          "phone": "0991 200 146",
+          "main": true
+        },
+        {
+          "name": "Lameck Mwale",
+          "relationship": "father",
+          "phone": "0888 400 146",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 4",
+      "first_name": "Atupele",
+      "surname": "Banda",
+      "sex": "female",
+      "date_of_birth": "2009-02-05",
+      "contacts": [
+        {
+          "name": "Margaret Banda",
+          "relationship": "mother",
+          "phone": "0991 200 147",
+          "main": true
+        },
+        {
+          "name": "Moses Banda",
+          "relationship": "father",
+          "phone": "0888 400 147",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 4",
+      "first_name": "Sangwani",
+      "surname": "Kumwenda",
+      "sex": "male",
+      "date_of_birth": "2009-10-22",
+      "contacts": [
+        {
+          "name": "Agnes Kumwenda",
+          "relationship": "mother",
+          "phone": "0991 200 148",
+          "main": true
+        },
+        {
+          "name": "Wilson Kumwenda",
+          "relationship": "father",
+          "phone": "0888 400 148",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 4",
+      "first_name": "Lusungu",
+      "surname": "Mwale",
+      "sex": "female",
+      "date_of_birth": "2009-10-14",
+      "contacts": [
+        {
+          "name": "Doreen Mwale",
+          "relationship": "mother",
+          "phone": "0991 200 149",
+          "main": true
+        },
+        {
+          "name": "Lameck Mwale",
+          "relationship": "father",
+          "phone": "0888 400 149",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 4",
+      "first_name": "Thokozani",
+      "surname": "Gondwe",
+      "sex": "male",
+      "date_of_birth": "2009-02-01",
+      "contacts": [
+        {
+          "name": "Loveness Gondwe",
+          "relationship": "mother",
+          "phone": "0991 200 150",
+          "main": true
+        },
+        {
+          "name": "George Gondwe",
+          "relationship": "father",
+          "phone": "0888 400 150",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 4",
+      "first_name": "Chikondi",
+      "surname": "Nyirenda",
+      "sex": "female",
+      "date_of_birth": "2009-09-24",
+      "contacts": [
+        {
+          "name": "Ellen Nyirenda",
+          "relationship": "mother",
+          "phone": "0991 200 151",
+          "main": true
+        },
+        {
+          "name": "Moses Nyirenda",
+          "relationship": "father",
+          "phone": "0888 400 151",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 4",
+      "first_name": "Steven",
+      "surname": "Chisale",
+      "sex": "male",
+      "date_of_birth": "2009-11-11",
+      "contacts": [
+        {
+          "name": "Margaret Chisale",
+          "relationship": "mother",
+          "phone": "0991 200 152",
+          "main": true
+        },
+        {
+          "name": "Francis Chisale",
+          "relationship": "father",
+          "phone": "0888 400 152",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 4",
+      "first_name": "Madalitso",
+      "surname": "Ngwira",
+      "sex": "female",
+      "date_of_birth": "2009-08-09",
+      "contacts": [
+        {
+          "name": "Catherine Ngwira",
+          "relationship": "mother",
+          "phone": "0991 200 153",
+          "main": true
+        },
+        {
+          "name": "Francis Ngwira",
+          "relationship": "father",
+          "phone": "0888 400 153",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 4",
+      "first_name": "Chifundo",
+      "surname": "Mbewe",
+      "sex": "male",
+      "date_of_birth": "2009-08-05",
+      "contacts": [
+        {
+          "name": "Ruth Mbewe",
+          "relationship": "mother",
+          "phone": "0991 200 154",
+          "main": true
+        },
+        {
+          "name": "Henry Mbewe",
+          "relationship": "father",
+          "phone": "0888 400 154",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 4",
+      "first_name": "Pemphero",
+      "surname": "Kachingwe",
+      "sex": "female",
+      "date_of_birth": "2009-05-27",
+      "contacts": [
+        {
+          "name": "Fanny Kachingwe",
+          "relationship": "mother",
+          "phone": "0991 200 155",
+          "main": true
+        },
+        {
+          "name": "Henry Kachingwe",
+          "relationship": "father",
+          "phone": "0888 400 155",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Main campus/Form 4",
+      "first_name": "Innocent",
+      "surname": "Kachingwe",
+      "sex": "male",
+      "date_of_birth": "2009-05-17",
+      "contacts": [
+        {
+          "name": "Joyce Kachingwe",
+          "relationship": "mother",
+          "phone": "0991 200 156",
+          "main": true
+        },
+        {
+          "name": "Wilson Kachingwe",
+          "relationship": "father",
+          "phone": "0888 400 156",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "first_name": "Natasha",
+      "surname": "Zulu",
+      "sex": "female",
+      "date_of_birth": "2012-04-19",
+      "contacts": [
+        {
+          "name": "Ruth Zulu",
+          "relationship": "mother",
+          "phone": "0991 200 157",
+          "main": true
+        },
+        {
+          "name": "Felix Zulu",
+          "relationship": "father",
+          "phone": "0888 400 157",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "first_name": "Chikumbutso",
+      "surname": "Mtambo",
+      "sex": "male",
+      "date_of_birth": "2012-12-21",
+      "contacts": [
+        {
+          "name": "Annie Mtambo",
+          "relationship": "mother",
+          "phone": "0991 200 158",
+          "main": true
+        },
+        {
+          "name": "Lameck Mtambo",
+          "relationship": "father",
+          "phone": "0888 400 158",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "first_name": "Zione",
+      "surname": "Kalua",
+      "sex": "female",
+      "date_of_birth": "2012-05-16",
+      "contacts": [
+        {
+          "name": "Rose Kalua",
+          "relationship": "mother",
+          "phone": "0991 200 159",
+          "main": true
+        },
+        {
+          "name": "John Kalua",
+          "relationship": "father",
+          "phone": "0888 400 159",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "first_name": "Hastings",
+      "surname": "Chilembwe",
+      "sex": "male",
+      "date_of_birth": "2012-09-20",
+      "contacts": [
+        {
+          "name": "Margaret Chilembwe",
+          "relationship": "mother",
+          "phone": "0991 200 160",
+          "main": true
+        },
+        {
+          "name": "Henry Chilembwe",
+          "relationship": "father",
+          "phone": "0888 400 160",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "first_name": "Madalitso",
+      "surname": "Kachingwe",
+      "sex": "female",
+      "date_of_birth": "2012-03-03",
+      "contacts": [
+        {
+          "name": "Ellen Kachingwe",
+          "relationship": "mother",
+          "phone": "0991 200 161",
+          "main": true
+        },
+        {
+          "name": "Felix Kachingwe",
+          "relationship": "father",
+          "phone": "0888 400 161",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "first_name": "Mabvuto",
+      "surname": "Nyirenda",
+      "sex": "male",
+      "date_of_birth": "2012-05-28",
+      "contacts": [
+        {
+          "name": "Ellen Nyirenda",
+          "relationship": "mother",
+          "phone": "0991 200 162",
+          "main": true
+        },
+        {
+          "name": "Lameck Nyirenda",
+          "relationship": "father",
+          "phone": "0888 400 162",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "first_name": "Martha",
+      "surname": "Msiska",
+      "sex": "female",
+      "date_of_birth": "2012-11-04",
+      "contacts": [
+        {
+          "name": "Rose Msiska",
+          "relationship": "mother",
+          "phone": "0991 200 163",
+          "main": true
+        },
+        {
+          "name": "Moses Msiska",
+          "relationship": "father",
+          "phone": "0888 400 163",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "first_name": "Blessings",
+      "surname": "Kamanga",
+      "sex": "male",
+      "date_of_birth": "2012-04-07",
+      "contacts": [
+        {
+          "name": "Eneless Kamanga",
+          "relationship": "mother",
+          "phone": "0991 200 164",
+          "main": true
+        },
+        {
+          "name": "Lameck Kamanga",
+          "relationship": "father",
+          "phone": "0888 400 164",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "first_name": "Martha",
+      "surname": "Chilembwe",
+      "sex": "female",
+      "date_of_birth": "2012-03-17",
+      "contacts": [
+        {
+          "name": "Esnart Chilembwe",
+          "relationship": "mother",
+          "phone": "0991 200 165",
+          "main": true
+        },
+        {
+          "name": "Austin Chilembwe",
+          "relationship": "father",
+          "phone": "0888 400 165",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "first_name": "Kondwani",
+      "surname": "Nkhoma",
+      "sex": "male",
+      "date_of_birth": "2012-12-16",
+      "contacts": [
+        {
+          "name": "Agnes Nkhoma",
+          "relationship": "mother",
+          "phone": "0991 200 166",
+          "main": true
+        },
+        {
+          "name": "Lameck Nkhoma",
+          "relationship": "father",
+          "phone": "0888 400 166",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "first_name": "Zione",
+      "surname": "Chavula",
+      "sex": "female",
+      "date_of_birth": "2012-06-12",
+      "contacts": [
+        {
+          "name": "Annie Chavula",
+          "relationship": "mother",
+          "phone": "0991 200 167",
+          "main": true
+        },
+        {
+          "name": "George Chavula",
+          "relationship": "father",
+          "phone": "0888 400 167",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 1",
+      "first_name": "Thokozani",
+      "surname": "Ngwira",
+      "sex": "male",
+      "date_of_birth": "2012-12-18",
+      "contacts": [
+        {
+          "name": "Esnart Ngwira",
+          "relationship": "mother",
+          "phone": "0991 200 168",
+          "main": true
+        },
+        {
+          "name": "James Ngwira",
+          "relationship": "father",
+          "phone": "0888 400 168",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "first_name": "Wezi",
+      "surname": "Kalua",
+      "sex": "female",
+      "date_of_birth": "2011-12-05",
+      "contacts": [
+        {
+          "name": "Doreen Kalua",
+          "relationship": "mother",
+          "phone": "0991 200 169",
+          "main": true
+        },
+        {
+          "name": "James Kalua",
+          "relationship": "father",
+          "phone": "0888 400 169",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "first_name": "Emmanuel",
+      "surname": "Munthali",
+      "sex": "male",
+      "date_of_birth": "2011-11-19",
+      "contacts": [
+        {
+          "name": "Ruth Munthali",
+          "relationship": "mother",
+          "phone": "0991 200 170",
+          "main": true
+        },
+        {
+          "name": "Austin Munthali",
+          "relationship": "father",
+          "phone": "0888 400 170",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "first_name": "Zione",
+      "surname": "Nkhoma",
+      "sex": "female",
+      "date_of_birth": "2011-01-09",
+      "contacts": [
+        {
+          "name": "Fanny Nkhoma",
+          "relationship": "mother",
+          "phone": "0991 200 171",
+          "main": true
+        },
+        {
+          "name": "Charles Nkhoma",
+          "relationship": "father",
+          "phone": "0888 400 171",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "first_name": "Emmanuel",
+      "surname": "Mvula",
+      "sex": "male",
+      "date_of_birth": "2011-09-23",
+      "contacts": [
+        {
+          "name": "Margaret Mvula",
+          "relationship": "mother",
+          "phone": "0991 200 172",
+          "main": true
+        },
+        {
+          "name": "James Mvula",
+          "relationship": "father",
+          "phone": "0888 400 172",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "first_name": "Tamanda",
+      "surname": "Nyirenda",
+      "sex": "female",
+      "date_of_birth": "2011-03-23",
+      "contacts": [
+        {
+          "name": "Ruth Nyirenda",
+          "relationship": "mother",
+          "phone": "0991 200 173",
+          "main": true
+        },
+        {
+          "name": "Austin Nyirenda",
+          "relationship": "father",
+          "phone": "0888 400 173",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "first_name": "Gift",
+      "surname": "Chisale",
+      "sex": "male",
+      "date_of_birth": "2011-03-14",
+      "contacts": [
+        {
+          "name": "Annie Chisale",
+          "relationship": "mother",
+          "phone": "0991 200 174",
+          "main": true
+        },
+        {
+          "name": "Mike Chisale",
+          "relationship": "father",
+          "phone": "0888 400 174",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "first_name": "Towera",
+      "surname": "Banda",
+      "sex": "female",
+      "date_of_birth": "2011-05-08",
+      "contacts": [
+        {
+          "name": "Ellen Banda",
+          "relationship": "mother",
+          "phone": "0991 200 175",
+          "main": true
+        },
+        {
+          "name": "Francis Banda",
+          "relationship": "father",
+          "phone": "0888 400 175",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "first_name": "Thokozani",
+      "surname": "Mwale",
+      "sex": "male",
+      "date_of_birth": "2011-08-22",
+      "contacts": [
+        {
+          "name": "Doreen Mwale",
+          "relationship": "mother",
+          "phone": "0991 200 176",
+          "main": true
+        },
+        {
+          "name": "George Mwale",
+          "relationship": "father",
+          "phone": "0888 400 176",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "first_name": "Esther",
+      "surname": "Sakala",
+      "sex": "female",
+      "date_of_birth": "2011-06-05",
+      "contacts": [
+        {
+          "name": "Doreen Sakala",
+          "relationship": "mother",
+          "phone": "0991 200 177",
+          "main": true
+        },
+        {
+          "name": "Lameck Sakala",
+          "relationship": "father",
+          "phone": "0888 400 177",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "first_name": "Chifundo",
+      "surname": "Mkandawire",
+      "sex": "male",
+      "date_of_birth": "2011-01-02",
+      "contacts": [
+        {
+          "name": "Mary Mkandawire",
+          "relationship": "mother",
+          "phone": "0991 200 178",
+          "main": true
+        },
+        {
+          "name": "Francis Mkandawire",
+          "relationship": "father",
+          "phone": "0888 400 178",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "first_name": "Tadala",
+      "surname": "Nkhoma",
+      "sex": "female",
+      "date_of_birth": "2011-12-23",
+      "contacts": [
+        {
+          "name": "Joyce Nkhoma",
+          "relationship": "mother",
+          "phone": "0991 200 179",
+          "main": true
+        },
+        {
+          "name": "Felix Nkhoma",
+          "relationship": "father",
+          "phone": "0888 400 179",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 2",
+      "first_name": "Kumbukani",
+      "surname": "Tembo",
+      "sex": "male",
+      "date_of_birth": "2011-01-06",
+      "contacts": [
+        {
+          "name": "Ellen Tembo",
+          "relationship": "mother",
+          "phone": "0991 200 180",
+          "main": true
+        },
+        {
+          "name": "Moses Tembo",
+          "relationship": "father",
+          "phone": "0888 400 180",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "first_name": "Martha",
+      "surname": "Chavula",
+      "sex": "female",
+      "date_of_birth": "2010-02-14",
+      "contacts": [
+        {
+          "name": "Annie Chavula",
+          "relationship": "mother",
+          "phone": "0991 200 181",
+          "main": true
+        },
+        {
+          "name": "George Chavula",
+          "relationship": "father",
+          "phone": "0888 400 181",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "first_name": "Innocent",
+      "surname": "Chavula",
+      "sex": "male",
+      "date_of_birth": "2010-03-08",
+      "contacts": [
+        {
+          "name": "Esnart Chavula",
+          "relationship": "mother",
+          "phone": "0991 200 182",
+          "main": true
+        },
+        {
+          "name": "Raphael Chavula",
+          "relationship": "father",
+          "phone": "0888 400 182",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "first_name": "Thandiwe",
+      "surname": "Kumwenda",
+      "sex": "female",
+      "date_of_birth": "2010-06-06",
+      "contacts": [
+        {
+          "name": "Ellen Kumwenda",
+          "relationship": "mother",
+          "phone": "0991 200 183",
+          "main": true
+        },
+        {
+          "name": "Felix Kumwenda",
+          "relationship": "father",
+          "phone": "0888 400 183",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "first_name": "Precious",
+      "surname": "Mtambo",
+      "sex": "male",
+      "date_of_birth": "2010-07-15",
+      "contacts": [
+        {
+          "name": "Joyce Mtambo",
+          "relationship": "mother",
+          "phone": "0991 200 184",
+          "main": true
+        },
+        {
+          "name": "Francis Mtambo",
+          "relationship": "father",
+          "phone": "0888 400 184",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "first_name": "Chimwemwe",
+      "surname": "Kumwenda",
+      "sex": "female",
+      "date_of_birth": "2010-05-21",
+      "contacts": [
+        {
+          "name": "Doreen Kumwenda",
+          "relationship": "mother",
+          "phone": "0991 200 185",
+          "main": true
+        },
+        {
+          "name": "Henry Kumwenda",
+          "relationship": "father",
+          "phone": "0888 400 185",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "first_name": "Steven",
+      "surname": "Mwale",
+      "sex": "male",
+      "date_of_birth": "2010-04-24",
+      "contacts": [
+        {
+          "name": "Esnart Mwale",
+          "relationship": "mother",
+          "phone": "0991 200 186",
+          "main": true
+        },
+        {
+          "name": "John Mwale",
+          "relationship": "father",
+          "phone": "0888 400 186",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "first_name": "Atupele",
+      "surname": "Mwale",
+      "sex": "female",
+      "date_of_birth": "2010-06-23",
+      "contacts": [
+        {
+          "name": "Annie Mwale",
+          "relationship": "mother",
+          "phone": "0991 200 187",
+          "main": true
+        },
+        {
+          "name": "Mike Mwale",
+          "relationship": "father",
+          "phone": "0888 400 187",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "first_name": "Chisomo",
+      "surname": "Nyirenda",
+      "sex": "male",
+      "date_of_birth": "2010-02-06",
+      "contacts": [
+        {
+          "name": "Esnart Nyirenda",
+          "relationship": "mother",
+          "phone": "0991 200 188",
+          "main": true
+        },
+        {
+          "name": "Raphael Nyirenda",
+          "relationship": "father",
+          "phone": "0888 400 188",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "first_name": "Ruth",
+      "surname": "Kumwenda",
+      "sex": "female",
+      "date_of_birth": "2010-07-01",
+      "contacts": [
+        {
+          "name": "Ellen Kumwenda",
+          "relationship": "mother",
+          "phone": "0991 200 189",
+          "main": true
+        },
+        {
+          "name": "James Kumwenda",
+          "relationship": "father",
+          "phone": "0888 400 189",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "first_name": "Yohane",
+      "surname": "Sakala",
+      "sex": "male",
+      "date_of_birth": "2010-11-26",
+      "contacts": [
+        {
+          "name": "Loveness Sakala",
+          "relationship": "mother",
+          "phone": "0991 200 190",
+          "main": true
+        },
+        {
+          "name": "Charles Sakala",
+          "relationship": "father",
+          "phone": "0888 400 190",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "first_name": "Takondwa",
+      "surname": "Kachingwe",
+      "sex": "female",
+      "date_of_birth": "2010-07-01",
+      "contacts": [
+        {
+          "name": "Catherine Kachingwe",
+          "relationship": "mother",
+          "phone": "0991 200 191",
+          "main": true
+        },
+        {
+          "name": "Lameck Kachingwe",
+          "relationship": "father",
+          "phone": "0888 400 191",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 3",
+      "first_name": "Sangwani",
+      "surname": "Sakala",
+      "sex": "male",
+      "date_of_birth": "2010-05-27",
+      "contacts": [
+        {
+          "name": "Margaret Sakala",
+          "relationship": "mother",
+          "phone": "0991 200 192",
+          "main": true
+        },
+        {
+          "name": "Henry Sakala",
+          "relationship": "father",
+          "phone": "0888 400 192",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "first_name": "Esther",
+      "surname": "Chirwa",
+      "sex": "female",
+      "date_of_birth": "2009-03-18",
+      "contacts": [
+        {
+          "name": "Esnart Chirwa",
+          "relationship": "mother",
+          "phone": "0991 200 193",
+          "main": true
+        },
+        {
+          "name": "Francis Chirwa",
+          "relationship": "father",
+          "phone": "0888 400 193",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "first_name": "Sangwani",
+      "surname": "Msiska",
+      "sex": "male",
+      "date_of_birth": "2009-10-21",
+      "contacts": [
+        {
+          "name": "Rose Msiska",
+          "relationship": "mother",
+          "phone": "0991 200 194",
+          "main": true
+        },
+        {
+          "name": "Peter Msiska",
+          "relationship": "father",
+          "phone": "0888 400 194",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "first_name": "Chimwemwe",
+      "surname": "Chisale",
+      "sex": "female",
+      "date_of_birth": "2009-09-11",
+      "contacts": [
+        {
+          "name": "Fanny Chisale",
+          "relationship": "mother",
+          "phone": "0991 200 195",
+          "main": true
+        },
+        {
+          "name": "Charles Chisale",
+          "relationship": "father",
+          "phone": "0888 400 195",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "first_name": "Zikomo",
+      "surname": "Mwale",
+      "sex": "male",
+      "date_of_birth": "2009-08-15",
+      "contacts": [
+        {
+          "name": "Margaret Mwale",
+          "relationship": "mother",
+          "phone": "0991 200 196",
+          "main": true
+        },
+        {
+          "name": "Lameck Mwale",
+          "relationship": "father",
+          "phone": "0888 400 196",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "first_name": "Temwa",
+      "surname": "Munthali",
+      "sex": "female",
+      "date_of_birth": "2009-09-27",
+      "contacts": [
+        {
+          "name": "Ellen Munthali",
+          "relationship": "mother",
+          "phone": "0991 200 197",
+          "main": true
+        },
+        {
+          "name": "John Munthali",
+          "relationship": "father",
+          "phone": "0888 400 197",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "first_name": "Limbani",
+      "surname": "Phiri",
+      "sex": "male",
+      "date_of_birth": "2009-02-19",
+      "contacts": [
+        {
+          "name": "Ruth Phiri",
+          "relationship": "mother",
+          "phone": "0991 200 198",
+          "main": true
+        },
+        {
+          "name": "John Phiri",
+          "relationship": "father",
+          "phone": "0888 400 198",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "first_name": "Tiwonge",
+      "surname": "Kapito",
+      "sex": "female",
+      "date_of_birth": "2009-08-19",
+      "contacts": [
+        {
+          "name": "Mary Kapito",
+          "relationship": "mother",
+          "phone": "0991 200 199",
+          "main": true
+        },
+        {
+          "name": "George Kapito",
+          "relationship": "father",
+          "phone": "0888 400 199",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "first_name": "Mabvuto",
+      "surname": "Mbewe",
+      "sex": "male",
+      "date_of_birth": "2009-10-15",
+      "contacts": [
+        {
+          "name": "Rose Mbewe",
+          "relationship": "mother",
+          "phone": "0991 200 200",
+          "main": true
+        },
+        {
+          "name": "Henry Mbewe",
+          "relationship": "father",
+          "phone": "0888 400 200",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "first_name": "Madalitso",
+      "surname": "Gondwe",
+      "sex": "female",
+      "date_of_birth": "2009-01-04",
+      "contacts": [
+        {
+          "name": "Eneless Gondwe",
+          "relationship": "mother",
+          "phone": "0991 200 201",
+          "main": true
+        },
+        {
+          "name": "John Gondwe",
+          "relationship": "father",
+          "phone": "0888 400 201",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "first_name": "Gift",
+      "surname": "Kalua",
+      "sex": "male",
+      "date_of_birth": "2009-05-01",
+      "contacts": [
+        {
+          "name": "Ruth Kalua",
+          "relationship": "mother",
+          "phone": "0991 200 202",
+          "main": true
+        },
+        {
+          "name": "Wilson Kalua",
+          "relationship": "father",
+          "phone": "0888 400 202",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "first_name": "Wezi",
+      "surname": "Chilembwe",
+      "sex": "female",
+      "date_of_birth": "2009-02-24",
+      "contacts": [
+        {
+          "name": "Joyce Chilembwe",
+          "relationship": "mother",
+          "phone": "0991 200 203",
+          "main": true
+        },
+        {
+          "name": "Francis Chilembwe",
+          "relationship": "father",
+          "phone": "0888 400 203",
+          "main": false
+        }
+      ]
+    },
+    {
+      "class": "Blantyre Campus/Form 4",
+      "first_name": "Chisomo",
+      "surname": "Gondwe",
+      "sex": "male",
+      "date_of_birth": "2009-05-16",
+      "contacts": [
+        {
+          "name": "Esnart Gondwe",
+          "relationship": "mother",
+          "phone": "0991 200 204",
+          "main": true
+        },
+        {
+          "name": "Francis Gondwe",
+          "relationship": "father",
+          "phone": "0888 400 204",
+          "main": false
+        }
+      ]
+    }
+  ]
+}

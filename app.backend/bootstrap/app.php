@@ -1,5 +1,6 @@
 <?php
 
+use Acadly\Kernel\Http\Middleware\EndViewAsWhenDue;
 use Acadly\Kernel\Http\Middleware\RemoveServerSignature;
 use Acadly\Kernel\Http\ProblemRenderer;
 use Illuminate\Foundation\Application;
@@ -17,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // The web apps sign in with a session cookie (Sanctum, stateful).
         $middleware->statefulApi();
+
+        // View as (development only) ends on time, before the request is handled.
+        $middleware->api(append: [EndViewAsWhenDue::class]);
 
         // An API has no sign-in page: a guest gets 401, never a redirect.
         $middleware->redirectGuestsTo(fn (): ?string => null);

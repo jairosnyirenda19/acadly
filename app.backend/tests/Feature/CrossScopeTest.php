@@ -31,7 +31,7 @@ const OPEN_ROUTES = [
 ];
 
 /** Routes about the account itself, not about a place. */
-const OWN_ROUTES = ['auth.sign-out', 'me', 'me.context', 'me.notifications', 'me.notifications.read'];
+const OWN_ROUTES = ['auth.sign-out', 'me', 'me.context', 'me.notifications', 'me.notifications.read', 'view-as.leave'];
 
 /** Routes decided per record by the owning domain, and proved in its own tests. */
 const RECORD_ROUTES = [
@@ -62,7 +62,7 @@ const RECORD_ROUTES = [
  * For these the test checks that nothing of campus B is in the answer.
  */
 const LIST_ROUTES = ['people.index', 'academics.teaching.index', 'academics.timetable.index', 'learners.index', 'learners.grid', 'people.grid', 'registers.index',
-    'registers.lessons', 'registers.missed', 'registers.levels'];
+    'registers.lessons', 'registers.missed', 'registers.levels', 'assessment.mine', 'assessment.options', 'assessment.grid'];
 
 uses(DatabaseTransactions::class);
 
@@ -88,6 +88,7 @@ it('lists only routes that exist, and every open route needs no sign-in', functi
 it('refuses every place-bound route to an account that holds everything, but only at another campus', function (): void {
     $this->artisan('acadly:sync')->assertSuccessful();
     DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'attendance', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
+    DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'assessment', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
     $school = TwoCampusSchool::make();
 
     $everything = Role::query()->create(['key' => 'everything_at_a', 'name' => 'Everything at campus A']);
@@ -128,6 +129,17 @@ it('refuses every place-bound route to an account that holds everything, but onl
             'subject_id' => $subject, 'user_id' => $atB->id, 'starts_on' => '2026-01-01', 'set_by' => $atB->id, 'set_at' => now()]);
     }
 
+    // A term of Secondary, and an assessment with a mark in the class at campus B.
+    $term = Ids::next();
+    DB::table('academic_periods')->insert(['id' => $term, 'year_id' => $school->id('year'), 'division_id' => $school->id('secondary'), 'name' => 'Term 1', 'position' => 1,
+        'starts_on' => '2026-09-07', 'ends_on' => '2026-12-11', 'created_at' => now(), 'updated_at' => now()]);
+    $assessment = Ids::next();
+    DB::table('assessments')->insert(['id' => $assessment, 'class_id' => $school->id('class_secondary_b'), 'subject_id' => $subject, 'period_id' => $term,
+        'kind' => 'class_test', 'title' => 'Cells', 'held_on' => '2026-10-01', 'out_of' => 20, 'counts' => true, 'part_key' => 'continuous', 'created_by' => $atB->id,
+        'state' => 'marking', 'journey_ref' => 'assessment.marks@2026.1', 'created_at' => now(), 'updated_at' => now()]);
+    DB::table('assessment_marks')->insert(['id' => Ids::next(), 'assessment_id' => $assessment, 'learner_id' => $learner, 'value' => 15, 'reason' => null,
+        'entered_by' => $atB->id, 'entered_at' => now()]);
+
     // Values that point at campus B, for route parameters and request bodies alike;
     // a route's own values come first.
     $own = [
@@ -135,6 +147,8 @@ it('refuses every place-bound route to an account that holds everything, but onl
         'roles.' => ['id' => $clerk->id],
         'learners.' => ['id' => $learner, 'contact' => $contact],
         'registers.' => ['id' => $school->id('class_secondary_b'), 'register' => $school->id('class_secondary_b'), 'learner' => $learner, 'slot' => $slot],
+        'assessment.' => ['id' => $assessment],
+        'assessment.learner' => ['id' => $learner],
     ];
     $b = [
         'id' => $school->id('campus_b'),
@@ -150,7 +164,10 @@ it('refuses every place-bound route to an account that holds everything, but onl
         'scope_id' => $school->id('campus_b'), 'permissions' => [], 'send' => false, 'class_id' => $school->id('class_secondary_b'),
         'first_name' => 'Wezi', 'surname' => 'Banda', 'sex' => 'female', 'date_of_birth' => '2012-02-02', 'admitted_on' => '2026-09-08',
         'from' => '2026-10-01', 'phone' => '0999 000 222', 'relationship' => 'father', 'slot_id' => $slot, 'user_id' => $atB->id, 'away' => true,
-        'weekday' => 1, 'period' => 1, 'subject_id' => $subject];
+        'weekday' => 1, 'period' => 1, 'subject_id' => $subject, 'level_code' => 'F1', 'period_id' => $term, 'learner_id' => $learner,
+        'kind' => 'class_test', 'title' => 'Cells', 'held_on' => '2026-10-01', 'out_of' => 20, 'counts' => true, 'value' => 10, 'note' => 'Cross-scope test.',
+        'scale_id' => (string) DB::table('assessment_scales')->value('id'), 'mode' => 'continuous', 'marks' => [['learner_id' => $learner, 'value' => 10, 'reason' => null]],
+        'bands' => [['grade' => 'P', 'word' => 'Pass', 'from' => 50, 'to' => 100], ['grade' => 'F', 'word' => 'Fail', 'from' => 0, 'to' => 49]]];
     $secrets = [$school->id('campus_b'), $atB->email, $atB->name, 'Blantyre'];
 
     $checked = 0;

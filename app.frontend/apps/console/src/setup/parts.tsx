@@ -248,15 +248,31 @@ export function ReadOnly({ label, value, hint }: { label: string; value: string;
 }
 
 /** One cell of a totals band. `tone` ink is the first cell; marigold needs attention. */
-export function Total({ label, value, note, tone = 'plain', suffix }: { label: string; value: string; note: string; tone?: 'ink' | 'plain' | 'attention'; suffix?: string | undefined }) {
+export function Total({
+  label,
+  value,
+  note,
+  tone = 'plain',
+  suffix,
+  compact = false,
+}: {
+  label: string
+  value: string
+  note: string
+  tone?: 'ink' | 'plain' | 'attention'
+  suffix?: string | undefined
+  /** For a band of many cells: a smaller number that stays on one line. */
+  compact?: boolean
+}) {
   const box = tone === 'ink' ? 'bg-ink text-sheet' : tone === 'attention' ? 'bg-marigold' : ''
   const labelColour = tone === 'ink' ? 'text-on-ink-muted' : tone === 'attention' ? '' : 'text-text-muted'
   const noteColour = tone === 'ink' ? 'text-on-ink-soft' : tone === 'attention' ? 'font-semibold' : 'text-text-muted'
+  const size = compact ? 'text-[clamp(44px,4vw,64px)] whitespace-nowrap my-1' : 'text-[clamp(64px,7vw,104px)]'
 
   return (
-    <section className={`border-ink px-[clamp(16px,3vw,24px)] pt-4.5 pb-5 not-first:border-l-2 ${box}`}>
+    <section className={`min-w-0 border-ink px-[clamp(16px,3vw,24px)] ${compact ? 'border-b-2 border-l-2 pt-3.5 pb-4' : 'pt-4.5 pb-5 not-first:border-l-2'} ${box}`}>
       <h2 className={`label-caps ${labelColour}`}>{label}</h2>
-      <div className={`type-numeral text-[clamp(64px,7vw,104px)] ${tone === 'ink' ? 'text-teal-bright' : ''}`}>
+      <div className={`type-numeral ${size} ${tone === 'ink' ? 'text-teal-bright' : ''}`}>
         {value}
         {suffix !== undefined && <span className={`text-[44px] ${tone === 'ink' ? 'text-sheet' : 'text-text-muted'}`}>{suffix}</span>}
       </div>
@@ -265,7 +281,16 @@ export function Total({ label, value, note, tone = 'plain', suffix }: { label: s
   )
 }
 
-export function TotalsBand({ children }: { children: ReactNode }) {
+export function TotalsBand({ children, compact = false }: { children: ReactNode; compact?: boolean }) {
+  if (compact) {
+    // Cells may wrap to a second row: each cell rules its left and bottom edge, and the outer edges are clipped.
+    return (
+      <div className="overflow-hidden border-y-2 border-ink">
+        <div className="-mb-[2px] -ml-[2px] grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">{children}</div>
+      </div>
+    )
+  }
+
   return <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] border-y-2 border-ink">{children}</div>
 }
 

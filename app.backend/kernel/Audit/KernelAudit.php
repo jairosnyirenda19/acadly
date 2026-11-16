@@ -19,6 +19,8 @@ enum KernelAudit: string implements AuditAction
     case AccountDisabled = 'identity.account_disabled';
     case ResetSent = 'identity.reset_sent';
     case PeopleImported = 'identity.people_imported';
+    case ViewAsStarted = 'identity.view_as_started';
+    case ViewAsEnded = 'identity.view_as_ended';
     case FirstAdministrator = 'access.first_administrator';
     case RoleAssigned = 'access.role_assigned';
     case RoleEnded = 'access.role_ended';
@@ -76,6 +78,8 @@ enum KernelAudit: string implements AuditAction
             self::AccountDisabled => 'Disabled an account.',
             self::ResetSent => 'Sent a password reset link to a member of staff.',
             self::PeopleImported => 'Invited people and gave roles from a spreadsheet.',
+            self::ViewAsStarted => 'Began to view the system as another account, for testing.',
+            self::ViewAsEnded => 'Stopped viewing the system as another account.',
             self::FirstAdministrator => 'Created the first administrator of the deployment.',
             self::RoleAssigned => 'Gave a role.',
             self::RoleEnded => 'Ended a role.',

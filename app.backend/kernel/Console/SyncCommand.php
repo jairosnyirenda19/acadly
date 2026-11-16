@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\DB;
  *  - Blueprints: every released version in the lock is recorded in
  *    blueprint_versions, once. A recorded version whose hash differs from
  *    the build stops the sync: a released version never changes.
+ *  - Seeds: each step a domain tags `SyncStep::TAG` adds what is missing.
  */
 final class SyncCommand extends Command
 {
@@ -133,6 +134,12 @@ final class SyncCommand extends Command
         }
 
         $this->components->info("Released blueprint versions recorded now: {$recorded}.");
+
+        foreach (app()->tagged(SyncStep::TAG) as $step) {
+            if ($step instanceof SyncStep) {
+                $this->components->info(DB::transaction(fn (): string => $step->sync()));
+            }
+        }
 
         return self::SUCCESS;
     }

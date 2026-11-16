@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 import type { LearnerState } from '../api'
 import { AttendanceSummary, AttendanceTab } from './AttendancePart'
+import { ResultsSummary, ResultsTab } from './ResultsPart'
 
 /**
  * The parts of a learner's record the console can draw, by the key the server
@@ -17,4 +18,5 @@ export interface PartView {
 
 export const PART_VIEWS: Partial<Record<string, PartView>> = {
   attendance: { Summary: AttendanceSummary, Tab: AttendanceTab },
+  assessment: { Summary: ResultsSummary, Tab: ResultsTab },
 }

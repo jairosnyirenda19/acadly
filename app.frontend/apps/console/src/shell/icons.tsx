@@ -7,6 +7,8 @@ const PATHS = {
   myDay: 'M4 4h16v16H4z M12 8v4l3 3 M4 9h3',
   timetable: 'M3 4h18v17H3z M3 9h18 M8 2v4 M16 2v4 M9 9v12 M15 9v12 M3 15h18',
   registers: 'M4 4h16v16H4z M4 10h16 M4 15h16 M10 4v16',
+  marks: 'M4 20h16 M7 20V11 M12 20V6 M17 20v-6',
+  assessment: 'M4 6h9 M4 12h16 M4 18h6 M17 3v6 M14 15v6',
   learners: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1',
   people: 'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M3 20v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1 M16 5a3 3 0 0 1 0 6 M18 14a5 5 0 0 1 3 5v1',
   roles: 'M4 4h16v16H4z M8 12l3 3 5-6',
@@ -21,6 +23,8 @@ const PATHS = {
   chevrons: 'M8 9l4-4 4 4 M8 15l4 4 4-4',
   down: 'M6 9l6 6 6-6',
   right: 'M9 6l6 6-6 6',
+  switch: 'M4 8h13 M14 4l4 4-4 4 M20 16H7 M10 12l-4 4 4 4',
+  search: 'M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13z M15.5 15.5L21 21',
 } as const
 
 export type IconName = keyof typeof PATHS

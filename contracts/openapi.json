@@ -4840,8 +4840,12 @@
                                                         "type": "string",
                                                         "enum": [
                                                             "lesson",
-                                                            "break"
+                                                            "break",
+                                                            "activity"
                                                         ]
+                                                    },
+                                                    "register": {
+                                                        "type": "boolean"
                                                     }
                                                 },
                                                 "required": [
@@ -4849,7 +4853,8 @@
                                                     "name",
                                                     "starts",
                                                     "ends",
-                                                    "kind"
+                                                    "kind",
+                                                    "register"
                                                 ]
                                             }
                                         },
@@ -4885,12 +4890,26 @@
                                                     "subject_short": {
                                                         "type": "string"
                                                     },
+                                                    "kind": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "lesson",
+                                                            "activity"
+                                                        ]
+                                                    },
+                                                    "whole_level": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "required": {
+                                                        "type": "boolean"
+                                                    },
                                                     "state": {
                                                         "type": "string",
                                                         "enum": [
                                                             "taken",
                                                             "cover",
                                                             "no_register",
+                                                            "not_needed",
                                                             "needs_cover",
                                                             "now",
                                                             "later"
@@ -4944,6 +4963,9 @@
                                                     "class",
                                                     "subject",
                                                     "subject_short",
+                                                    "kind",
+                                                    "whole_level",
+                                                    "required",
                                                     "state",
                                                     "register",
                                                     "mine",
@@ -5028,8 +5050,12 @@
                                                                     "type": "string",
                                                                     "enum": [
                                                                         "lesson",
-                                                                        "break"
+                                                                        "break",
+                                                                        "activity"
                                                                     ]
+                                                                },
+                                                                "register": {
+                                                                    "type": "boolean"
                                                                 }
                                                             },
                                                             "required": [
@@ -5037,7 +5063,8 @@
                                                                 "name",
                                                                 "starts",
                                                                 "ends",
-                                                                "kind"
+                                                                "kind",
+                                                                "register"
                                                             ]
                                                         }
                                                     },
@@ -5084,12 +5111,26 @@
                                                                             "subject_short": {
                                                                                 "type": "string"
                                                                             },
+                                                                            "kind": {
+                                                                                "type": "string",
+                                                                                "enum": [
+                                                                                    "lesson",
+                                                                                    "activity"
+                                                                                ]
+                                                                            },
+                                                                            "whole_level": {
+                                                                                "type": "boolean"
+                                                                            },
+                                                                            "required": {
+                                                                                "type": "boolean"
+                                                                            },
                                                                             "state": {
                                                                                 "type": "string",
                                                                                 "enum": [
                                                                                     "taken",
                                                                                     "cover",
                                                                                     "no_register",
+                                                                                    "not_needed",
                                                                                     "needs_cover",
                                                                                     "now",
                                                                                     "later"
@@ -5146,6 +5187,9 @@
                                                                             "class",
                                                                             "subject",
                                                                             "subject_short",
+                                                                            "kind",
+                                                                            "whole_level",
+                                                                            "required",
                                                                             "state",
                                                                             "register",
                                                                             "teacher",
@@ -5228,12 +5272,26 @@
                                                                 "subject_short": {
                                                                     "type": "string"
                                                                 },
+                                                                "kind": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "lesson",
+                                                                        "activity"
+                                                                    ]
+                                                                },
+                                                                "whole_level": {
+                                                                    "type": "boolean"
+                                                                },
+                                                                "required": {
+                                                                    "type": "boolean"
+                                                                },
                                                                 "state": {
                                                                     "type": "string",
                                                                     "enum": [
                                                                         "taken",
                                                                         "cover",
                                                                         "no_register",
+                                                                        "not_needed",
                                                                         "needs_cover",
                                                                         "now",
                                                                         "later"
@@ -5281,6 +5339,9 @@
                                                                 "class",
                                                                 "subject",
                                                                 "subject_short",
+                                                                "kind",
+                                                                "whole_level",
+                                                                "required",
                                                                 "state",
                                                                 "register",
                                                                 "asked",
@@ -5595,6 +5656,19 @@
                                                 "ends": {
                                                     "type": "string"
                                                 },
+                                                "kind": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "lesson",
+                                                        "activity"
+                                                    ]
+                                                },
+                                                "whole_level": {
+                                                    "type": "boolean"
+                                                },
+                                                "required": {
+                                                    "type": "boolean"
+                                                },
                                                 "subject": {
                                                     "type": "string"
                                                 },
@@ -5611,8 +5685,44 @@
                                                 "name",
                                                 "starts",
                                                 "ends",
+                                                "kind",
+                                                "whole_level",
+                                                "required",
                                                 "subject",
                                                 "teacher"
+                                            ]
+                                        },
+                                        "previous": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "kind": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "lesson",
+                                                        "morning"
+                                                    ]
+                                                },
+                                                "name": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "by": {
+                                                    "type": "string"
+                                                },
+                                                "at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "kind",
+                                                "name",
+                                                "by",
+                                                "at"
                                             ]
                                         },
                                         "day": {
@@ -5699,6 +5809,12 @@
                                                             "null"
                                                         ]
                                                     },
+                                                    "before": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
                                                     "mark": {
                                                         "type": [
                                                             "object",
@@ -5773,6 +5889,7 @@
                                                     "admission_number",
                                                     "morning",
                                                     "earlier",
+                                                    "before",
                                                     "mark",
                                                     "correction"
                                                 ]
@@ -5788,6 +5905,7 @@
                                     "required": [
                                         "class",
                                         "lesson",
+                                        "previous",
                                         "day",
                                         "today",
                                         "school_day",
@@ -5879,6 +5997,19 @@
                                                 "ends": {
                                                     "type": "string"
                                                 },
+                                                "kind": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "activity",
+                                                        "lesson"
+                                                    ]
+                                                },
+                                                "whole_level": {
+                                                    "type": "boolean"
+                                                },
+                                                "required": {
+                                                    "type": "boolean"
+                                                },
                                                 "subject": {
                                                     "type": "string"
                                                 },
@@ -5895,8 +6026,44 @@
                                                 "name",
                                                 "starts",
                                                 "ends",
+                                                "kind",
+                                                "whole_level",
+                                                "required",
                                                 "subject",
                                                 "teacher"
+                                            ]
+                                        },
+                                        "previous": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "kind": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "lesson",
+                                                        "morning"
+                                                    ]
+                                                },
+                                                "name": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "by": {
+                                                    "type": "string"
+                                                },
+                                                "at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "kind",
+                                                "name",
+                                                "by",
+                                                "at"
                                             ]
                                         },
                                         "day": {
@@ -5968,6 +6135,7 @@
                                     "required": [
                                         "class",
                                         "lesson",
+                                        "previous",
                                         "day",
                                         "today",
                                         "school_day",
@@ -6177,6 +6345,15 @@
                                                                             "subject_short": {
                                                                                 "type": "string"
                                                                             },
+                                                                            "kind": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "whole_level": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "required": {
+                                                                                "type": "string"
+                                                                            },
                                                                             "state": {
                                                                                 "type": "string"
                                                                             },
@@ -6237,6 +6414,9 @@
                                                                             "class",
                                                                             "subject",
                                                                             "subject_short",
+                                                                            "kind",
+                                                                            "whole_level",
+                                                                            "required",
                                                                             "state",
                                                                             "register",
                                                                             "teacher",
@@ -12061,6 +12241,19 @@
                                                         "ends": {
                                                             "type": "string"
                                                         },
+                                                        "kind": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "activity",
+                                                                "lesson"
+                                                            ]
+                                                        },
+                                                        "whole_level": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "required": {
+                                                            "type": "boolean"
+                                                        },
                                                         "subject": {
                                                             "type": "string"
                                                         },
@@ -12077,8 +12270,44 @@
                                                         "name",
                                                         "starts",
                                                         "ends",
+                                                        "kind",
+                                                        "whole_level",
+                                                        "required",
                                                         "subject",
                                                         "teacher"
+                                                    ]
+                                                },
+                                                "previous": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "kind": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "lesson",
+                                                                "morning"
+                                                            ]
+                                                        },
+                                                        "name": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "by": {
+                                                            "type": "string"
+                                                        },
+                                                        "at": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "kind",
+                                                        "name",
+                                                        "by",
+                                                        "at"
                                                     ]
                                                 },
                                                 "day": {
@@ -12150,6 +12379,7 @@
                                             "required": [
                                                 "class",
                                                 "lesson",
+                                                "previous",
                                                 "day",
                                                 "today",
                                                 "school_day",
@@ -12329,6 +12559,19 @@
                                                         "ends": {
                                                             "type": "string"
                                                         },
+                                                        "kind": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "activity",
+                                                                "lesson"
+                                                            ]
+                                                        },
+                                                        "whole_level": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "required": {
+                                                            "type": "boolean"
+                                                        },
                                                         "subject": {
                                                             "type": "string"
                                                         },
@@ -12345,8 +12588,44 @@
                                                         "name",
                                                         "starts",
                                                         "ends",
+                                                        "kind",
+                                                        "whole_level",
+                                                        "required",
                                                         "subject",
                                                         "teacher"
+                                                    ]
+                                                },
+                                                "previous": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "kind": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "lesson",
+                                                                "morning"
+                                                            ]
+                                                        },
+                                                        "name": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "by": {
+                                                            "type": "string"
+                                                        },
+                                                        "at": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "kind",
+                                                        "name",
+                                                        "by",
+                                                        "at"
                                                     ]
                                                 },
                                                 "day": {
@@ -12418,6 +12697,7 @@
                                             "required": [
                                                 "class",
                                                 "lesson",
+                                                "previous",
                                                 "day",
                                                 "today",
                                                 "school_day",
@@ -12611,6 +12891,19 @@
                                                         "ends": {
                                                             "type": "string"
                                                         },
+                                                        "kind": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "activity",
+                                                                "lesson"
+                                                            ]
+                                                        },
+                                                        "whole_level": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "required": {
+                                                            "type": "boolean"
+                                                        },
                                                         "subject": {
                                                             "type": "string"
                                                         },
@@ -12627,8 +12920,44 @@
                                                         "name",
                                                         "starts",
                                                         "ends",
+                                                        "kind",
+                                                        "whole_level",
+                                                        "required",
                                                         "subject",
                                                         "teacher"
+                                                    ]
+                                                },
+                                                "previous": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "kind": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "lesson",
+                                                                "morning"
+                                                            ]
+                                                        },
+                                                        "name": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "by": {
+                                                            "type": "string"
+                                                        },
+                                                        "at": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "kind",
+                                                        "name",
+                                                        "by",
+                                                        "at"
                                                     ]
                                                 },
                                                 "day": {
@@ -12700,6 +13029,7 @@
                                             "required": [
                                                 "class",
                                                 "lesson",
+                                                "previous",
                                                 "day",
                                                 "today",
                                                 "school_day",
@@ -12886,6 +13216,19 @@
                                                         "ends": {
                                                             "type": "string"
                                                         },
+                                                        "kind": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "activity",
+                                                                "lesson"
+                                                            ]
+                                                        },
+                                                        "whole_level": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "required": {
+                                                            "type": "boolean"
+                                                        },
                                                         "subject": {
                                                             "type": "string"
                                                         },
@@ -12902,8 +13245,44 @@
                                                         "name",
                                                         "starts",
                                                         "ends",
+                                                        "kind",
+                                                        "whole_level",
+                                                        "required",
                                                         "subject",
                                                         "teacher"
+                                                    ]
+                                                },
+                                                "previous": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "kind": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "lesson",
+                                                                "morning"
+                                                            ]
+                                                        },
+                                                        "name": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "by": {
+                                                            "type": "string"
+                                                        },
+                                                        "at": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "kind",
+                                                        "name",
+                                                        "by",
+                                                        "at"
                                                     ]
                                                 },
                                                 "day": {
@@ -12975,6 +13354,7 @@
                                             "required": [
                                                 "class",
                                                 "lesson",
+                                                "previous",
                                                 "day",
                                                 "today",
                                                 "school_day",
@@ -15190,15 +15570,20 @@
                                                                     "type": "string",
                                                                     "enum": [
                                                                         "lesson",
-                                                                        "break"
+                                                                        "break",
+                                                                        "activity"
                                                                     ]
+                                                                },
+                                                                "register": {
+                                                                    "type": "boolean"
                                                                 }
                                                             },
                                                             "required": [
                                                                 "name",
                                                                 "starts",
                                                                 "ends",
-                                                                "kind"
+                                                                "kind",
+                                                                "register"
                                                             ]
                                                         }
                                                     }
@@ -15326,7 +15711,16 @@
                                                         "type": "integer"
                                                     },
                                                     "subject_id": {
-                                                        "type": "string"
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "activity": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
                                                     },
                                                     "user_id": {
                                                         "type": [
@@ -15339,6 +15733,7 @@
                                                     "weekday",
                                                     "period",
                                                     "subject_id",
+                                                    "activity",
                                                     "user_id"
                                                 ]
                                             }
@@ -15576,7 +15971,7 @@
         "/v1/academics/timetable/period": {
             "put": {
                 "operationId": "academics.timetable.period",
-                "summary": "Sets one period of a class: `{class_id, weekday, period, subject_id?, user_id?}`. No subject makes it a free period",
+                "summary": "Sets one period of a class: `{class_id, weekday, period, subject_id?, activity?, user_id?}`. Neither a subject nor an activity makes it a free period",
                 "tags": [
                     "Timetable"
                 ],

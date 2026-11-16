@@ -1618,7 +1618,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Sets one period of a class: `{class_id, weekday, period, subject_id?, user_id?}`. No subject makes it a free period */
+        /** Sets one period of a class: `{class_id, weekday, period, subject_id?, activity?, user_id?}`. Neither a subject nor an activity makes it a free period */
         put: operations["academics.timetable.period"];
         post?: never;
         delete?: never;
@@ -3288,7 +3288,8 @@ export interface operations {
                             starts: string;
                             ends: string;
                             /** @enum {string} */
-                            kind: "lesson" | "break";
+                            kind: "lesson" | "break" | "activity";
+                            register: boolean;
                         }[];
                         lessons: {
                             slot_id: string;
@@ -3301,7 +3302,11 @@ export interface operations {
                             subject: string;
                             subject_short: string;
                             /** @enum {string} */
-                            state: "taken" | "cover" | "no_register" | "needs_cover" | "now" | "later";
+                            kind: "lesson" | "activity";
+                            whole_level: boolean;
+                            required: boolean;
+                            /** @enum {string} */
+                            state: "taken" | "cover" | "no_register" | "not_needed" | "needs_cover" | "now" | "later";
                             register: {
                                 id: string;
                                 present: number;
@@ -3343,7 +3348,8 @@ export interface operations {
                                 starts: string;
                                 ends: string;
                                 /** @enum {string} */
-                                kind: "lesson" | "break";
+                                kind: "lesson" | "break" | "activity";
+                                register: boolean;
                             }[];
                             classes: {
                                 id: string;
@@ -3359,7 +3365,11 @@ export interface operations {
                                     subject: string;
                                     subject_short: string;
                                     /** @enum {string} */
-                                    state: "taken" | "cover" | "no_register" | "needs_cover" | "now" | "later";
+                                    kind: "lesson" | "activity";
+                                    whole_level: boolean;
+                                    required: boolean;
+                                    /** @enum {string} */
+                                    state: "taken" | "cover" | "no_register" | "not_needed" | "needs_cover" | "now" | "later";
                                     register: {
                                         id: string;
                                         present: number;
@@ -3388,7 +3398,11 @@ export interface operations {
                                 subject: string;
                                 subject_short: string;
                                 /** @enum {string} */
-                                state: "taken" | "cover" | "no_register" | "needs_cover" | "now" | "later";
+                                kind: "lesson" | "activity";
+                                whole_level: boolean;
+                                required: boolean;
+                                /** @enum {string} */
+                                state: "taken" | "cover" | "no_register" | "not_needed" | "needs_cover" | "now" | "later";
                                 register: {
                                     id: string;
                                     present: number;
@@ -3496,9 +3510,20 @@ export interface operations {
                             name: string;
                             starts: string;
                             ends: string;
+                            /** @enum {string} */
+                            kind: "lesson" | "activity";
+                            whole_level: boolean;
+                            required: boolean;
                             subject: string;
                             teacher: string | null;
                         };
+                        previous: {
+                            /** @enum {string} */
+                            kind: "lesson" | "morning";
+                            name: string | null;
+                            by: string;
+                            at: string;
+                        } | null;
                         day: string;
                         today: string;
                         school_day: boolean;
@@ -3519,6 +3544,7 @@ export interface operations {
                             admission_number: string | null;
                             morning: string | null;
                             earlier: string | null;
+                            before: string | null;
                             mark: {
                                 status: string;
                                 note: string | null;
@@ -3576,9 +3602,20 @@ export interface operations {
                             name: string;
                             starts: string;
                             ends: string;
+                            /** @enum {string} */
+                            kind: "activity" | "lesson";
+                            whole_level: boolean;
+                            required: boolean;
                             subject: string;
                             teacher: string | null;
                         };
+                        previous: {
+                            /** @enum {string} */
+                            kind: "lesson" | "morning";
+                            name: string | null;
+                            by: string;
+                            at: string;
+                        } | null;
                         day: string;
                         today: string;
                         school_day: boolean;
@@ -3694,6 +3731,9 @@ export interface operations {
                                     class: string;
                                     subject: string;
                                     subject_short: string;
+                                    kind: string;
+                                    whole_level: string;
+                                    required: string;
                                     state: string;
                                     register: {
                                         id: string;
@@ -5476,9 +5516,20 @@ export interface operations {
                             name: string;
                             starts: string;
                             ends: string;
+                            /** @enum {string} */
+                            kind: "activity" | "lesson";
+                            whole_level: boolean;
+                            required: boolean;
                             subject: string;
                             teacher: string | null;
                         };
+                        previous: {
+                            /** @enum {string} */
+                            kind: "lesson" | "morning";
+                            name: string | null;
+                            by: string;
+                            at: string;
+                        } | null;
                         day: string;
                         today: string;
                         school_day: boolean;
@@ -5548,9 +5599,20 @@ export interface operations {
                             name: string;
                             starts: string;
                             ends: string;
+                            /** @enum {string} */
+                            kind: "activity" | "lesson";
+                            whole_level: boolean;
+                            required: boolean;
                             subject: string;
                             teacher: string | null;
                         };
+                        previous: {
+                            /** @enum {string} */
+                            kind: "lesson" | "morning";
+                            name: string | null;
+                            by: string;
+                            at: string;
+                        } | null;
                         day: string;
                         today: string;
                         school_day: boolean;
@@ -5626,9 +5688,20 @@ export interface operations {
                             name: string;
                             starts: string;
                             ends: string;
+                            /** @enum {string} */
+                            kind: "activity" | "lesson";
+                            whole_level: boolean;
+                            required: boolean;
                             subject: string;
                             teacher: string | null;
                         };
+                        previous: {
+                            /** @enum {string} */
+                            kind: "lesson" | "morning";
+                            name: string | null;
+                            by: string;
+                            at: string;
+                        } | null;
                         day: string;
                         today: string;
                         school_day: boolean;
@@ -5704,9 +5777,20 @@ export interface operations {
                             name: string;
                             starts: string;
                             ends: string;
+                            /** @enum {string} */
+                            kind: "activity" | "lesson";
+                            whole_level: boolean;
+                            required: boolean;
                             subject: string;
                             teacher: string | null;
                         };
+                        previous: {
+                            /** @enum {string} */
+                            kind: "lesson" | "morning";
+                            name: string | null;
+                            by: string;
+                            at: string;
+                        } | null;
                         day: string;
                         today: string;
                         school_day: boolean;
@@ -6501,7 +6585,8 @@ export interface operations {
                                 starts: string;
                                 ends: string;
                                 /** @enum {string} */
-                                kind: "lesson" | "break";
+                                kind: "lesson" | "break" | "activity";
+                                register: boolean;
                             }[];
                         }[];
                         classes: {
@@ -6532,7 +6617,8 @@ export interface operations {
                         grid: {
                             weekday: number;
                             period: number;
-                            subject_id: string;
+                            subject_id: string | null;
+                            activity: string | null;
                             user_id: string | null;
                         }[];
                         counts: {

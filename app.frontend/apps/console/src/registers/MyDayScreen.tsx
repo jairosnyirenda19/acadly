@@ -3,7 +3,7 @@ import { Button, Notice, slips, Waiting } from '@acadly/ui'
 import { useState, type ReactNode } from 'react'
 import { copy } from '../copy'
 import { Attention, Input } from '../setup/parts'
-import { Tag } from '../settings/parts'
+import { ActivityTag, STRIPE, Tag } from '../settings/parts'
 import { clock, lessonsApi, longDay, type MyDayState, type MyLesson } from './api'
 
 const t = copy.registers
@@ -12,14 +12,34 @@ const s = copy.settings
 
 type Tone = 'done' | 'attention' | 'wrong' | 'plain'
 
-/** The tag of a lesson in the viewer's day: a word on a colour, never colour alone. */
+/** Whether the viewer takes this lesson for someone else. */
+const covering = (l: MyLesson) => !l.mine && (l.cover_for !== null || l.asked_by !== null)
+
+/** The tag of a lesson in the viewer's day: a word on a colour, never colour alone. Null when no register is needed. */
 function lessonTag(l: MyLesson): { tone: Tone; word: string } | null {
   if (l.register !== null) return { tone: 'done', word: t.lessonState.taken ?? '' }
-  if (!l.mine) return { tone: 'attention', word: t.lessonState.cover ?? '' }
-  const tones: Record<MyLesson['state'], Tone | null> = { taken: 'done', cover: 'done', now: 'plain', later: null, no_register: 'attention', needs_cover: 'attention' }
+  const tones: Partial<Record<MyLesson['state'], Tone>> = { no_register: 'attention', needs_cover: 'attention' }
   const tone = tones[l.state]
+  if (tone !== undefined) return { tone, word: t.lessonState[l.state] ?? l.state }
+  if (!l.required) return null
+  if (covering(l)) return { tone: 'attention', word: t.lessonState.cover ?? '' }
 
-  return tone === null ? null : { tone, word: t.lessonState[l.state] ?? l.state }
+  return { tone: 'attention', word: d.registerTag }
+}
+
+/** What a lesson is called in a sentence: Period 4, or the activity's name. */
+const lessonName = (l: MyLesson) => (l.kind === 'activity' ? l.subject : d.periodName(l.period))
+
+/** Class and subject; a whole-level activity names the level instead of a class. */
+const lessonTitle = (l: MyLesson) => (l.kind === 'activity' && l.whole_level ? d.wholeLevel(l.subject) : `${l.class} · ${l.subject}`)
+
+/** The line under a lesson: cover, duty, or how many were present. */
+function lessonSub(l: MyLesson): string {
+  if (covering(l)) return d.coverFor(l.cover_for, l.asked_by)
+  if (l.register !== null) return d.presentOf(l.register.present, l.register.total)
+  if (l.kind === 'activity' && l.mine) return d.onDuty
+
+  return ''
 }
 
 /** A teacher's day (the approved design, phone first): the class register, the lesson now, the rest of the day, and away. */
@@ -37,6 +57,7 @@ export function MyDayScreen() {
   const open = (l: MyLesson) => navigate(`/registers/lesson/${l.slot_id}?day=${state.day}&from=my-day`)
   const now = state.lessons.find((l) => l.state === 'now') ?? state.lessons.find((l) => l.state === 'later') ?? null
   const rest = state.lessons.filter((l) => l.slot_id !== now?.slot_id)
+  const needed = state.lessons.filter((l) => l.required)
 
   return (
     <div className="flex flex-1 flex-col bg-paper">
@@ -76,21 +97,42 @@ export function MyDayScreen() {
           ))}
 
           {now !== null && (
-            <section aria-label={now.state === 'now' ? d.now : d.next} className={`bg-sheet p-3 ${now.state === 'now' ? 'border-[3px] border-teal' : 'border-2 border-ink'}`}>
+            <section aria-label={now.state === 'now' ? d.now : d.next} className={`p-3 ${now.kind === 'activity' ? STRIPE : 'bg-sheet'} ${now.state === 'now' ? 'border-[3px] border-teal' : 'border-2 border-ink'}`}>
               <div className="flex items-center justify-between gap-2">
-                <span className={`label-caps ${now.state === 'now' ? 'text-teal' : 'text-text-muted'}`}>{d.nowLabel(now.state === 'now' ? d.now : d.next, now.period, now.starts, now.ends)}</span>
-                {now.register !== null ? <Tag tone="done">{t.lessonState.taken}</Tag> : now.state === 'now' ? <Tag tone="attention">{d.notTaken}</Tag> : <Tag tone="plain">{t.lessonState.later}</Tag>}
+                <span className={`label-caps ${now.state === 'now' ? 'text-teal' : 'text-text-muted'}`}>
+                  {now.kind === 'activity' ? `${now.state === 'now' ? d.now : d.next} · ${now.subject} · ${now.starts}–${now.ends}` : d.nowLabel(now.state === 'now' ? d.now : d.next, now.period, now.starts, now.ends)}
+                </span>
+                {now.register !== null ? <Tag tone="done">{t.lessonState.taken}</Tag> : now.required ? <Tag tone="attention">{d.registerTag}</Tag> : <Tag tone="plain">{d.notNeeded}</Tag>}
               </div>
-              <div className="type-display mt-1.5 mb-0.5 text-[40px] leading-[0.86]">{now.class}</div>
+              {now.kind === 'activity' && (
+                <span className="mt-1.5 inline-block">
+                  <ActivityTag>{t.activityTag}</ActivityTag>
+                </span>
+              )}
+              <div className="type-display mt-1.5 mb-0.5 text-[40px] leading-[0.86]">{now.kind === 'activity' && now.whole_level ? now.subject : now.class}</div>
               <div className="mb-2.5 text-[15px] font-bold">
-                {now.subject}
+                {now.kind === 'activity' ? (now.whole_level ? now.class : now.subject) : now.subject}
                 {now.register !== null && ` · ${d.presentOf(now.register.present, now.register.total)}`}
               </div>
-              {!now.mine && <p className="mb-2.5 text-[13px] text-text-muted">{d.coverFor(now.cover_for, now.asked_by)}</p>}
-              <Button className="h-[52px]! w-full text-[17px]!" variant={now.register === null && now.state === 'now' ? 'primary' : 'secondary'} onClick={() => open(now)}>
-                {now.register === null ? d.take : d.open}
-              </Button>
+              {lessonSub(now) !== '' && now.register === null && <p className="mb-2.5 text-[13px] text-text-muted">{lessonSub(now)}</p>}
+              {now.register === null && now.required ? (
+                <Button className="h-[52px]! w-full text-[17px]!" variant={now.state === 'now' ? 'primary' : 'secondary'} onClick={() => open(now)}>
+                  {d.check}
+                </Button>
+              ) : now.register !== null ? (
+                <Button className="w-full" variant="secondary" onClick={() => open(now)}>
+                  {d.open}
+                </Button>
+              ) : (
+                <button type="button" onClick={() => open(now)} className="text-sm font-bold text-ink underline underline-offset-2">
+                  {d.takeAnyway}
+                </button>
+              )}
             </section>
+          )}
+
+          {state.lessons.length > 0 && (
+            <p className="text-[13px] text-text-muted">{d.registersToday(needed.length, copy.and(needed.map(lessonName)), needed.length < state.lessons.length)}</p>
           )}
 
           {state.day === state.today && <AwayControl state={state} onChanged={loaded.reload} />}
@@ -130,7 +172,7 @@ function dayRows(state: MyDayState, lessons: MyLesson[], now: MyLesson | null): 
           </div>
         ),
       })
-    } else if (!taken.has(b.starts) && b.starts !== now?.starts) {
+    } else if (b.kind === 'lesson' && !taken.has(b.starts) && b.starts !== now?.starts) {
       rows.push({
         key: `f:${b.starts}`,
         starts: b.starts,
@@ -147,10 +189,10 @@ function dayRows(state: MyDayState, lessons: MyLesson[], now: MyLesson | null): 
   return rows.sort((a, b) => a.starts.localeCompare(b.starts))
 }
 
-function Period({ number, starts }: { number: number | null; starts: string }) {
+function Period({ number, starts, activity = false }: { number: number | null; starts: string; activity?: boolean }) {
   return (
     <span className="w-11 flex-none">
-      <span className="type-display block text-[15px] leading-none">{number !== null ? t.periodShort(number) : ''}</span>
+      <span className="type-display block text-[15px] leading-none">{activity ? <ActivityTag>{t.activityMark}</ActivityTag> : number !== null ? t.periodShort(number) : ''}</span>
       <span className="ref block text-[11px] text-text-muted">{starts}</span>
     </span>
   )
@@ -158,23 +200,22 @@ function Period({ number, starts }: { number: number | null; starts: string }) {
 
 function LessonRow({ lesson: l, pad, onOpen }: { lesson: MyLesson; pad: string; onOpen: () => void }) {
   const tag = lessonTag(l)
-  const sub = !l.mine ? d.coverFor(l.cover_for, l.asked_by) : l.register !== null ? d.presentOf(l.register.present, l.register.total) : ''
+  const sub = lessonSub(l)
+  const fill = covering(l) ? 'bg-marigold-wash' : l.kind === 'activity' ? STRIPE : 'bg-sheet'
 
   return (
     <button
       type="button"
       onClick={onOpen}
-      aria-label={d.lessonLabel(l.period, l.class, l.subject, tag?.word ?? t.lessonState.later ?? '')}
-      className={`flex min-h-14 w-full items-center gap-2.5 border-b border-rule py-1.5 text-left hover:bg-field ${l.mine ? 'bg-sheet' : 'bg-marigold-wash'} ${pad}`}
+      aria-label={d.lessonLabel(l.period, l.class, l.subject, tag?.word ?? d.notNeeded)}
+      className={`flex min-h-14 w-full items-center gap-2.5 border-b border-rule py-1.5 text-left hover:bg-field ${fill} ${pad}`}
     >
-      <Period number={l.period} starts={l.starts} />
+      <Period number={l.period} starts={l.starts} activity={l.kind === 'activity'} />
       <span className="min-w-0 flex-1">
-        <span className="block text-[15px] font-extrabold">
-          {l.class} · {l.subject}
-        </span>
+        <span className="block text-[15px] font-extrabold">{lessonTitle(l)}</span>
         {sub !== '' && <span className="block text-xs text-text-muted">{sub}</span>}
       </span>
-      {tag !== null ? <Tag tone={tag.tone}>{tag.word}</Tag> : <span className="text-xs text-text-muted">{t.lessonState.later}</span>}
+      {tag !== null ? <Tag tone={tag.tone}>{tag.word}</Tag> : <span className="text-xs text-text-muted">{d.notNeeded}</span>}
     </button>
   )
 }

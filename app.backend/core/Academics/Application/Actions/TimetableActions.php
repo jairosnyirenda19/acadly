@@ -104,8 +104,12 @@ final class TimetableActions
         $this->timetables->forget();
     }
 
-    /** Sets what a class is taught in one period of one day of the week, or makes it a free period (no subject). */
-    public function setPeriod(User $by, string $classId, int $weekday, int $period, ?string $subjectId, ?string $userId): void
+    /**
+     * Sets what a class has in one lesson period of one day of the week: a
+     * subject, an activity (a name, such as games), or nothing (a free
+     * period). The teacher is who teaches the subject, or who is on duty.
+     */
+    public function setPeriod(User $by, string $classId, int $weekday, int $period, ?string $subjectId, ?string $userId, ?string $activity = null): void
     {
         $class = Str::isUuid($classId) ? $this->calendar->classInForce($classId) : null;
         $this->access->check($by, AcademicsPermission::Manage, $class !== null ? ScopeRef::of(ScopeType::ClassGroup, $class['id']) : ScopeRef::institution());
@@ -130,8 +134,19 @@ final class TimetableActions
             throw ValidationException::withMessages(['period' => ['The bell times of this day have no such period.']]);
         }
 
-        if ($subjectId === null && $userId !== null) {
-            throw ValidationException::withMessages(['subject_id' => ['Choose a subject, or make it a free period.']]);
+        $activity = $activity !== null ? trim($activity) : null;
+        $activity = $activity === '' ? null : $activity;
+
+        if ($subjectId !== null && $activity !== null) {
+            throw ValidationException::withMessages(['activity' => ['A period holds a subject or an activity, not both.']]);
+        }
+
+        if ($activity !== null && mb_strlen($activity) > 60) {
+            throw ValidationException::withMessages(['activity' => ['Name the activity in up to 60 characters.']]);
+        }
+
+        if ($subjectId === null && $activity === null && $userId !== null) {
+            throw ValidationException::withMessages(['subject_id' => ['Choose a subject or an activity, or make it a free period.']]);
         }
 
         if ($subjectId !== null) {
@@ -160,11 +175,12 @@ final class TimetableActions
             }
         }
 
-        DB::transaction(function () use ($by, $classId, $weekday, $period, $subjectId, $userId, $today, $at): void {
+        DB::transaction(function () use ($by, $classId, $weekday, $period, $subjectId, $activity, $userId, $today, $at): void {
             $current = DB::table('academic_timetable')->where('class_id', $classId)->where('weekday', $weekday)->where('period', $period)
-                ->whereNull('ends_on')->lockForUpdate()->first(['id', 'subject_id', 'user_id', 'starts_on']);
+                ->whereNull('ends_on')->lockForUpdate()->first(['id', 'subject_id', 'activity', 'user_id', 'starts_on']);
 
-            if ($current !== null && Row::text($current, 'subject_id') === $subjectId && Row::maybeText($current, 'user_id') === $userId) {
+            if ($current !== null && Row::maybeText($current, 'subject_id') === $subjectId && Row::maybeText($current, 'activity') === $activity
+                && Row::maybeText($current, 'user_id') === $userId) {
                 return;
             }
 
@@ -175,17 +191,18 @@ final class TimetableActions
                 DB::table('academic_timetable')->where('id', Row::text($current, 'id'))->update(['ends_on' => $end]);
             }
 
-            if ($subjectId !== null) {
+            if ($subjectId !== null || $activity !== null) {
                 DB::table('academic_timetable')->insert(['id' => Ids::next(), 'class_id' => $classId, 'weekday' => $weekday, 'period' => $period,
-                    'subject_id' => $subjectId, 'user_id' => $userId, 'starts_on' => $today, 'ends_on' => null, 'set_by' => $by->id, 'set_at' => $this->clock->now()]);
+                    'subject_id' => $subjectId, 'activity' => $activity, 'user_id' => $userId, 'starts_on' => $today, 'ends_on' => null,
+                    'set_by' => $by->id, 'set_at' => $this->clock->now()]);
             }
 
             $this->audit->record(AcademicsAudit::TimetableSet, actor: $this->audit->actorFor($by), at: $at,
-                meta: ['weekday' => $weekday, 'period' => $period, 'free' => $subjectId === null]);
+                meta: ['weekday' => $weekday, 'period' => $period, 'kind' => $subjectId !== null ? 'subject' : ($activity !== null ? 'activity' : 'free')]);
         });
     }
 
-    /** @return list<array{name: string, starts: string, ends: string, kind: 'lesson'|'break'}> */
+    /** @return list<array{name: string, starts: string, ends: string, kind: 'lesson'|'break'|'activity', register: bool}> */
     private function periods(int $plan, mixed $given): array
     {
         $field = "plans.{$plan}.periods";
@@ -203,7 +220,11 @@ final class TimetableActions
             $name = trim(is_string($p['name'] ?? null) ? $p['name'] : '');
             $starts = is_string($p['starts'] ?? null) ? substr($p['starts'], 0, 5) : '';
             $ends = is_string($p['ends'] ?? null) ? substr($p['ends'], 0, 5) : '';
-            $kind = ($p['kind'] ?? null) === 'break' ? 'break' : 'lesson';
+            $kind = match ($p['kind'] ?? null) {
+                'break' => 'break',
+                'activity' => 'activity',
+                default => 'lesson',
+            };
 
             if ($name === '' || mb_strlen($name) > 40) {
                 throw ValidationException::withMessages(["{$field}.{$j}" => ['Name each period and break. Up to 40 characters.']]);
@@ -219,13 +240,16 @@ final class TimetableActions
 
             $last = $ends;
             $lessons += $kind === 'lesson' ? 1 : 0;
-            $out[] = ['name' => $name, 'starts' => $starts, 'ends' => $ends, 'kind' => $kind];
+            $out[] = ['name' => $name, 'starts' => $starts, 'ends' => $ends, 'kind' => $kind, 'register' => is_bool($p['register'] ?? null) ? $p['register'] : null];
         }
 
-        if ($lessons === 0 || $lessons > self::MAX_PERIODS) {
-            throw ValidationException::withMessages([$field => ['A day has between 1 and '.self::MAX_PERIODS.' lesson periods.']]);
+        if ($lessons > self::MAX_PERIODS || count(array_filter($out, fn (array $p): bool => $p['kind'] !== 'break')) === 0) {
+            throw ValidationException::withMessages([$field => ['A day has at least one lesson or activity, and at most '.self::MAX_PERIODS.' lesson periods.']]);
         }
 
-        return $out;
+        // A period the school did not decide takes the default: a register in the first period after each break.
+        $defaults = Timetables::afterBreaks($out);
+
+        return array_map(fn (array $p, bool $d): array => [...$p, 'register' => $p['kind'] !== 'break' && ($p['register'] ?? $d)], $out, $defaults);
     }
 }

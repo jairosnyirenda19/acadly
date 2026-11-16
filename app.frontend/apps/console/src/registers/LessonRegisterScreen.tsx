@@ -64,16 +64,43 @@ function Before({ learner, earlier }: { learner: LessonLearner; earlier: number 
   )
 }
 
+/** Away from the register before this one: absent or excused. */
+const awayBefore = (status: string | null) => status === 'absent' || status === 'excused'
+
+/**
+ * Where a learner starts when the register is confirmed as before: as they were
+ * in the register the class was last seen in. Late then is present now; a
+ * learner not in that register starts present.
+ */
+function startOf(state: LessonState): Draft {
+  return Object.fromEntries(
+    state.learners.map((l) => [l.id, { status: (awayBefore(l.before) ? l.before : 'present') as MarkValue, note: '' }]),
+  )
+}
+
+/** Why a learner is listed when confirming: how they were before. */
+function reasonOf(l: LessonLearner, previous: string): string {
+  if (l.before === 'absent') return l.morning === 'absent' ? t.absentSinceMorning : t.absentAt(previous)
+  if (l.before === 'excused') return t.excusedAt(previous)
+  if (l.before === 'late') return l.morning === 'late' ? t.lateMorning : t.lateAt(previous)
+
+  return ''
+}
+
 function TakeLesson({ state, back, onDone }: { state: LessonState; back: { path: string; label: string }; onDone: (next: LessonState) => void }) {
   const key = draftKey(state.lesson.slot_id, state.day)
   const [draft, setDraft] = useState<Draft>(() => {
     const ids = new Set(state.learners.map((l) => l.id))
     const kept = Object.fromEntries(Object.entries(readDraft(key)).filter(([id, m]) => ids.has(id) && MARKS.includes(m.status)))
-    // Absent this morning starts as absent; what this device kept wins.
-    const start: Draft = Object.fromEntries(state.learners.filter((l) => l.morning === 'absent').map((l) => [l.id, { status: 'absent' as MarkValue, note: '' }]))
+    // Confirming as before starts every learner as they were; otherwise absent this morning starts as absent. What this device kept wins.
+    const start: Draft =
+      state.previous !== null
+        ? startOf(state)
+        : Object.fromEntries(state.learners.filter((l) => l.morning === 'absent').map((l) => [l.id, { status: 'absent' as MarkValue, note: '' }]))
 
     return { ...start, ...kept }
   })
+  const [showAll, setShowAll] = useState(false)
   const [working, setWorking] = useState(false)
   const [failed, setFailed] = useState<string | null>(null)
 
@@ -89,6 +116,18 @@ function TakeLesson({ state, back, onDone }: { state: LessonState; back: { path:
   const left = state.learners.filter((l) => draft[l.id] === undefined).length
   const missed = state.learners.filter((l) => here(l.morning) && draft[l.id]?.status === 'absent').length
   const earlier = state.earlier?.period ?? null
+  const confirming = state.previous !== null
+  const previous = state.previous?.name ?? t.morningRegister
+  const initial = confirming ? startOf(state) : {}
+  const changes = confirming ? state.learners.filter((l) => draft[l.id]?.status !== initial[l.id]?.status).length : 0
+  const statuses = Object.values(draft).map((m) => m.status)
+  const hereNow = statuses.filter((m) => m === 'present' || m === 'late').length
+  const awayNow = statuses.filter((m) => m === 'absent' || m === 'excused').length
+  const listed = confirming && !showAll ? state.learners.filter((l) => l.before === 'absent' || l.before === 'excused' || l.before === 'late' || draft[l.id]?.status !== initial[l.id]?.status) : state.learners
+  const undo = () => {
+    setDraft(startOf(state))
+    setShowAll(false)
+  }
 
   const focusRow = (i: number) => document.querySelector<HTMLElement>(`[data-register-row="${i}"]`)?.focus()
   const keyed = (e: React.KeyboardEvent, i: number, id: string) => {
@@ -134,12 +173,30 @@ function TakeLesson({ state, back, onDone }: { state: LessonState; back: { path:
         title={state.class.name}
         intro={t.lessonTakeIntro(longDay(state.day), state.lesson.teacher)}
         actions={
-          <Button variant="secondary" onClick={rest}>
-            {t.restPresent}
-          </Button>
+          confirming ? undefined : (
+            <Button variant="secondary" onClick={rest}>
+              {t.restPresent}
+            </Button>
+          )
         }
       />
-      <Band learners={state.learners.length} marks={Object.values(draft).map((m) => m.status)} missed={missed} />
+      {confirming && state.previous !== null ? (
+        <section className="mx-3 mb-3 border-[3px] border-teal bg-sheet p-3 md:mx-[clamp(16px,3vw,40px)] md:p-4">
+          <div className="label-caps text-teal">{changes === 0 ? t.asAt(previous, state.previous.by, clock(state.previous.at)) : t.changesFrom(changes, previous)}</div>
+          <div className="mt-1.5 mb-1 flex flex-wrap items-baseline gap-x-3.5">
+            <span className="type-display text-[64px] leading-[0.8]">{hereNow}</span>
+            <span className="text-base font-extrabold">{t.here}</span>
+            <span className="type-display text-[40px] leading-[0.8] text-red-pen">{awayNow}</span>
+            <span className="text-base font-extrabold">{t.away}</span>
+          </div>
+          {changes === 0 && <p className="mb-2.5 text-[13px] text-text-muted">{t.lookAround}</p>}
+          <Button className="mt-1 h-14! w-full text-lg! md:w-auto" busy={working} disabled={state.learners.length === 0} onClick={() => void submit()}>
+            {working ? t.confirming : t.confirm(hereNow, changes)}
+          </Button>
+        </section>
+      ) : (
+        <Band learners={state.learners.length} marks={statuses} missed={missed} />
+      )}
 
       <section className="flex-1 bg-sheet px-3 pt-3.5 pb-5 md:px-[clamp(16px,3vw,40px)]">
         {failed !== null && (
@@ -147,6 +204,7 @@ function TakeLesson({ state, back, onDone }: { state: LessonState; back: { path:
             <Notice tone="wrong" title={failed} />
           </div>
         )}
+        {!state.lesson.required && <p className="mb-3 text-[13px] text-text-muted">{t.notRequired}</p>}
         {state.cover && (
           <div className="mb-3">
             <Attention title={t.recordedCover}>{t.coverNote}</Attention>
@@ -159,10 +217,19 @@ function TakeLesson({ state, back, onDone }: { state: LessonState; back: { path:
               {t.marks[m]}
             </span>
           ))}
-          <span className="text-text-muted">{state.morning_taken ? t.startsAbsent : t.noMorning}</span>
+          {!confirming && <span className="text-text-muted">{state.morning_taken ? t.startsAbsent : t.noMorning}</span>}
           <span className="hidden text-text-muted md:inline">{t.keys}</span>
           <span className="text-text-muted md:hidden">{t.tapNote}</span>
         </div>
+        {confirming && (
+          <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+            <span className="label-caps text-text-muted">{showAll ? t.allLearners(state.learners.length) : t.awayBefore(previous)}</span>
+            {changes > 0 && (
+              <SmallButton onClick={undo}>{t.undo}</SmallButton>
+            )}
+          </div>
+        )}
+        {confirming && listed.length === 0 && <p className="border-b border-rule py-3 text-sm text-text-muted">{t.nobodyAway(previous)}</p>}
         {state.learners.length === 0 && <p className="py-4 text-sm text-text-muted">{t.noLearners}</p>}
         <div className={`label-caps hidden ${COLS} gap-3 border-b-2 border-ink pr-4 pb-2 text-text-muted md:grid`}>
           <span />
@@ -173,9 +240,11 @@ function TakeLesson({ state, back, onDone }: { state: LessonState; back: { path:
           <span>{t.colReason}</span>
         </div>
         <div className="md:ledger md:[--margin:48px]">
-          {state.learners.map((l, i) => {
+          {listed.map((l) => {
+            const i = state.learners.indexOf(l)
             const mark = draft[l.id]?.status ?? null
-            const wasHere = here(l.morning) && mark === 'absent'
+            const wasHere = confirming ? !awayBefore(l.before) && awayBefore(mark) : here(l.morning) && mark === 'absent'
+            const reason = confirming ? reasonOf(l, previous) : ''
 
             return (
               <div
@@ -191,8 +260,10 @@ function TakeLesson({ state, back, onDone }: { state: LessonState; back: { path:
                   <span className="ref hidden text-xs text-text-muted md:block">{l.admission_number ?? ''}</span>
                   {wasHere ? (
                     <span className="mt-0.5 inline-block">
-                      <Tag tone="attention">{t.wasHere}</Tag>
+                      <Tag tone="attention">{confirming ? t.wasHereAt(previous) : t.wasHere}</Tag>
                     </span>
+                  ) : reason !== '' ? (
+                    <span className="block text-xs text-text-muted">{reason}</span>
                   ) : (
                     <span className="block md:hidden">
                       <Before learner={l} earlier={earlier} />
@@ -245,10 +316,22 @@ function TakeLesson({ state, back, onDone }: { state: LessonState; back: { path:
             )
           })}
         </div>
+        {confirming && !showAll && (
+          <button type="button" onClick={() => setShowAll(true)} className="h-12 w-full border-b border-rule bg-sheet px-3 text-left text-[15px] font-extrabold text-ink hover:bg-field">
+            {t.showAll(state.learners.length)}
+          </button>
+        )}
         <p className="mt-2.5 text-[13px] text-text-muted">{t.draftKept}</p>
+        {confirming && (
+          <div className="mt-4">
+            <Button variant="secondary" onClick={() => navigate(back.path)}>
+              {back.label}
+            </Button>
+          </div>
+        )}
       </section>
 
-      <footer className="sticky bottom-0 flex flex-wrap items-center gap-2 border-t-2 border-ink bg-sheet px-3 py-2.5 md:gap-3 md:px-[clamp(16px,3vw,40px)] md:py-4">
+      {!confirming && <footer className="sticky bottom-0 flex flex-wrap items-center gap-2 border-t-2 border-ink bg-sheet px-3 py-2.5 md:gap-3 md:px-[clamp(16px,3vw,40px)] md:py-4">
         <span className="hidden md:inline-flex">
           <Button variant="secondary" onClick={() => navigate(back.path)}>
             {back.label}
@@ -272,7 +355,7 @@ function TakeLesson({ state, back, onDone }: { state: LessonState; back: { path:
             )}
           </Button>
         </span>
-      </footer>
+      </footer>}
     </>
   )
 }

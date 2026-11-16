@@ -31,7 +31,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * lesson's register, missed lessons, and who is free to cover.
  *
  * A lesson's state: `taken` or `cover` once its register is in; otherwise
- * `no_register` once the period has ended, `needs_cover` while its teacher
+ * `no_register` once the period has ended (`not_needed` when the period
+ * needs no register), `needs_cover` while its teacher
  * is away and nobody is asked, `now` during the period, and `later` before.
  *
  * @phpstan-import-type Lesson from Timetable
@@ -122,6 +123,14 @@ final class Lessons
 
             if ($lesson !== null && ! in_array($lesson['slot_id'], array_column($lessons, 'slot_id'), true)) {
                 $lessons[] = $lesson;
+            }
+        }
+
+        foreach ($morning as $m) {
+            foreach ($this->timetable->lessonsOn([$m['class_id']], $day) as $l) {
+                if ($l['whole_level']) {
+                    $lessons[] = $l;
+                }
             }
         }
 
@@ -257,11 +266,13 @@ final class Lessons
 
         // A lesson already taken keeps what it was, even if the timetable changed since.
         if ($register !== null) {
-            $subject = DB::table('academic_subjects')->where('id', Row::maybeText($register, 'subject_id') ?? '')->first(['name', 'short']);
+            $subject = DB::table('academic_subjects')->where('id', Row::maybeText($register, 'subject_id') ?? Lessons::NONE)->first(['name', 'short']);
+            $activity = Row::maybeText($register, 'activity');
             $lesson = ['slot_id' => $slotId, 'class_id' => Row::text($register, 'class_id'), 'day' => $day, 'period' => Row::int($register, 'period'),
                 'name' => Row::maybeText($register, 'period_name') ?? '', 'starts' => Row::maybeText($register, 'starts') ?? '', 'ends' => Row::maybeText($register, 'ends') ?? '',
-                'subject_id' => Row::maybeText($register, 'subject_id') ?? '', 'subject' => $subject !== null ? Row::text($subject, 'name') : '',
-                'subject_short' => $subject !== null ? Row::text($subject, 'short') : '', 'teacher_id' => Row::maybeText($register, 'teacher_id')];
+                'kind' => $activity !== null ? 'activity' : 'lesson', 'whole_level' => false,
+                'subject_id' => Row::maybeText($register, 'subject_id'), 'subject' => $activity ?? ($subject !== null ? Row::text($subject, 'name') : ''),
+                'subject_short' => $subject !== null ? Row::text($subject, 'short') : '', 'teacher_id' => Row::maybeText($register, 'teacher_id'), 'register' => true];
         }
 
         $class = $lesson !== null ? $this->calendar->classInForce($lesson['class_id']) : null;
@@ -274,7 +285,8 @@ final class Lessons
         $registerId = $register !== null ? Row::text($register, 'id') : null;
         $morningId = DB::table('attendance_registers')->where('class_id', $class['id'])->where('day', $day)->where('kind', SubmitRegister::KIND)->value('id');
         $earlier = DB::table('attendance_registers')->where('class_id', $class['id'])->where('day', $day)->where('kind', SubmitLessonRegister::KIND)
-            ->where('starts', '<', $lesson['starts'])->orderByDesc('starts')->first(['id', 'period']);
+            ->where('starts', '<', $lesson['starts'])->orderByDesc('starts')->first(['id', 'period', 'period_name', 'submitted_by', 'submitted_at']);
+        $morningRow = is_string($morningId) ? DB::table('attendance_registers')->where('id', $morningId)->first(['submitted_by', 'submitted_at']) : null;
         $ids = array_values(array_filter([$registerId, is_string($morningId) ? $morningId : null, $earlier !== null ? Row::text($earlier, 'id') : null]));
         $inForce = $this->marks->inForce($ids);
         $morning = is_string($morningId) ? ($inForce[$morningId] ?? []) : [];
@@ -282,13 +294,24 @@ final class Lessons
         $marks = $registerId !== null ? ($inForce[$registerId] ?? []) : [];
         $corrections = $registerId !== null ? $registers->correctionsOf($viewer, $registerId) : [];
         $mayTake = $this->reach->may($viewer, AttendancePermission::Capture, $class['id']);
-        $names = $this->names(array_values(array_filter([$lesson['teacher_id'], $register !== null ? Row::text($register, 'submitted_by') : null])));
+        $names = $this->names(array_values(array_filter([$lesson['teacher_id'], $register !== null ? Row::text($register, 'submitted_by') : null,
+            $earlier !== null ? Row::text($earlier, 'submitted_by') : null, $morningRow !== null ? Row::text($morningRow, 'submitted_by') : null])));
+        // The register the class was last seen in: the lesson before, or the morning register.
+        $last = $earlier ?? $morningRow;
+        $lastMarks = $earlier !== null ? $before : $morning;
         $schoolDay = $this->days->isSchoolDay($class['division_id'], $day);
 
         return [
             'class' => ['id' => $class['id'], 'name' => $class['name']],
             'lesson' => ['slot_id' => $slotId, 'period' => $lesson['period'], 'name' => $lesson['name'], 'starts' => $lesson['starts'], 'ends' => $lesson['ends'],
+                'kind' => $lesson['kind'], 'whole_level' => $lesson['whole_level'], 'required' => $lesson['register'],
                 'subject' => $lesson['subject'], 'teacher' => $lesson['teacher_id'] !== null ? ($names[$lesson['teacher_id']] ?? null) : null],
+            'previous' => $last === null ? null : [
+                'kind' => $earlier !== null ? 'lesson' : 'morning',
+                'name' => $earlier !== null ? (Row::maybeText($earlier, 'period_name') ?? '') : null,
+                'by' => $names[Row::text($last, 'submitted_by')] ?? '',
+                'at' => Row::text($last, 'submitted_at'),
+            ],
             'day' => $day,
             'today' => $this->clock->today(),
             'school_day' => $schoolDay,
@@ -301,6 +324,7 @@ final class Lessons
                 ...$l,
                 'morning' => $morning[$l['id']]['status'] ?? null,
                 'earlier' => $before[$l['id']]['status'] ?? null,
+                'before' => $lastMarks[$l['id']]['status'] ?? null,
                 'mark' => $marks[$l['id']] ?? null,
                 'correction' => $corrections[$l['id']] ?? null,
             ], $learners),
@@ -377,7 +401,7 @@ final class Lessons
                 'learner' => $learnerNames[$x['learner']] ?? '',
                 'class' => $classes[$classId] ?? '',
                 'morning' => $x['morning'],
-                'subject' => is_string($subjects[Row::maybeText($r, 'subject_id') ?? ''] ?? null) ? $subjects[Row::maybeText($r, 'subject_id') ?? ''] : '',
+                'subject' => is_string($subjects[Row::maybeText($r, 'subject_id') ?? ''] ?? null) ? $subjects[Row::maybeText($r, 'subject_id') ?? ''] : (Row::maybeText($r, 'activity') ?? ''),
                 'period' => Row::int($r, 'period'),
                 'starts' => Row::maybeText($r, 'starts') ?? '',
                 'taken_by' => $names[Row::text($r, 'submitted_by')] ?? '',
@@ -471,7 +495,7 @@ final class Lessons
 
             $away_ = $l['teacher_id'] !== null && ($away[$l['teacher_id']]['away'] ?? false);
             $state = match (true) {
-                $day < $today || ($day === $today && $now >= $l['ends']) => 'no_register',
+                $day < $today || ($day === $today && $now >= $l['ends']) => $l['register'] ? 'no_register' : 'not_needed',
                 $away_ && ! isset($asks[$l['slot_id']]) => 'needs_cover',
                 $day === $today && $now >= $l['starts'] => 'now',
                 default => 'later',
@@ -492,6 +516,7 @@ final class Lessons
         return [
             'slot_id' => $l['slot_id'], 'period' => $l['period'], 'name' => $l['name'], 'starts' => $l['starts'], 'ends' => $l['ends'],
             'class_id' => $l['class_id'], 'class' => $className, 'subject' => $l['subject'], 'subject_short' => $l['subject_short'],
+            'kind' => $l['kind'], 'whole_level' => $l['whole_level'], 'required' => $l['register'],
             'state' => $row['state'],
             'register' => $row['register'] !== null ? ['id' => $row['register']['id'], 'present' => $row['register']['present'], 'total' => $row['register']['total']] : null,
         ];

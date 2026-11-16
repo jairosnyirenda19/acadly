@@ -35,6 +35,6 @@ export const academicsApi = {
   timetable: (at: { division_id: string; campus_id: string; class_id?: string } | null) => read(api.GET('/v1/academics/timetable', { params: { query: at ?? {} } })),
   saveBells: (body: { division_id: string; campus_id: string; plans: BellPlan[] }) =>
     settle(api.PUT('/v1/academics/timetable/bells', { body: body as never }) as Done<TimetableState>),
-  setPeriod: (body: { class_id: string; weekday: number; period: number; subject_id: string | null; user_id: string | null }) =>
+  setPeriod: (body: { class_id: string; weekday: number; period: number; subject_id: string | null; activity: string | null; user_id: string | null }) =>
     settle(api.PUT('/v1/academics/timetable/period', { body: body as never }) as Done<TimetableState>),
 }

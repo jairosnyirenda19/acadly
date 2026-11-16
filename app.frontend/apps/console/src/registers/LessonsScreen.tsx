@@ -3,7 +3,7 @@ import { Button, Notice, slips, Waiting } from '@acadly/ui'
 import { useState } from 'react'
 import { copy } from '../copy'
 import { Total, TotalsBand } from '../setup/parts'
-import { SmallButton, Tag } from '../settings/parts'
+import { ActivityTag, SmallButton, STRIPE, Tag } from '../settings/parts'
 import { clock, lessonsApi, type AwayPerson, type LessonCell, type LessonsState, type LessonStateName } from './api'
 import { RegistersHead } from './parts'
 
@@ -16,6 +16,7 @@ const cellLook: Record<LessonStateName, string> = {
   cover: 'bg-sheet',
   now: 'bg-teal-wash outline-[3px] -outline-offset-[3px] outline-teal',
   no_register: 'bg-marigold-wash',
+  not_needed: 'bg-sheet',
   needs_cover: 'bg-sheet outline-2 -outline-offset-4 outline-dashed outline-marigold',
   later: 'bg-sheet',
 }
@@ -25,7 +26,9 @@ const legendLook: Record<keyof typeof t.legend, string> = {
   cover: 'bg-sheet',
   now: cellLook.now,
   no_register: cellLook.no_register,
+  not_needed: 'bg-sheet',
   needs_cover: cellLook.needs_cover,
+  activity: STRIPE,
   free: 'bg-paper',
 }
 
@@ -42,6 +45,7 @@ const cellWord: Partial<Record<LessonStateName, { word: string; strong: boolean 
   cover: { word: t.lessonState.cover ?? '', strong: true },
   now: { word: t.lessonState.now ?? '', strong: true },
   no_register: { word: t.lessonState.no_register ?? '', strong: true },
+  not_needed: { word: t.lessonState.not_needed ?? '', strong: false },
   needs_cover: { word: t.lessonState.needs_cover ?? '', strong: true },
 }
 
@@ -103,8 +107,8 @@ export function LessonsScreen() {
 
 /** One level at one campus: classes down, lesson periods across, breaks as thin columns. */
 function Place({ place, labelled, onOpen }: { place: LessonsState['places'][number]; labelled: boolean; onOpen: (slot: string) => void }) {
-  const cols = `116px ${place.bells.map((b) => (b.kind === 'break' ? '10px' : 'minmax(78px,1fr)')).join(' ')}`
-  const lessonsIn = place.bells.filter((b) => b.kind === 'lesson').length
+  const cols = `116px ${place.bells.map((b) => (b.kind === 'break' ? '10px' : b.kind === 'activity' ? 'minmax(110px,1.2fr)' : 'minmax(78px,1fr)')).join(' ')}`
+  const lessonsIn = place.bells.filter((b) => b.kind !== 'break').length
 
   if (lessonsIn === 0) {
     return (
@@ -127,7 +131,7 @@ function Place({ place, labelled, onOpen }: { place: LessonsState['places'][numb
                 <span key={b.starts} aria-hidden="true" className="bg-field" />
               ) : (
                 <span key={b.starts} className="px-1.5 pb-1.5">
-                  <span className="block">{b.number !== null ? t.periodShort(b.number) : b.name}</span>
+                  <span className="block truncate">{b.kind === 'activity' ? b.name : b.number !== null ? t.periodShort(b.number) : b.name}</span>
                   <span className="ref font-semibold tracking-normal">{b.starts}</span>
                 </span>
               ),
@@ -173,15 +177,16 @@ function Cell({ lesson: l, onOpen }: { lesson: LessonCell; onOpen: () => void })
       onClick={onOpen}
       title={[l.subject, who].filter((x) => x !== null).join(' · ')}
       aria-label={t.lessonCell(l.class, l.period, l.subject, t.lessonState[l.state] ?? l.state)}
-      className={`min-h-11 border-l border-rule px-2 py-1.5 text-left hover:bg-field ${cellLook[l.state]}`}
+      className={`min-h-11 min-w-0 border-l border-rule px-2 py-1.5 text-left hover:bg-field ${l.kind === 'activity' && cellLook[l.state] === 'bg-sheet' ? STRIPE : cellLook[l.state]}`}
     >
-      <span className="ref flex items-center gap-1.5 text-sm font-extrabold">
+      <span className={`flex items-center gap-1.5 text-sm font-extrabold ${l.kind === 'activity' ? '' : 'ref'}`}>
         {mark !== undefined && (
-          <span aria-hidden="true" className={`inline-flex size-[18px] items-center justify-center text-[11px] ${mark.look}`}>
+          <span aria-hidden="true" className={`ref inline-flex size-[18px] shrink-0 items-center justify-center text-[11px] ${mark.look}`}>
             {mark.glyph}
           </span>
         )}
-        {l.subject_short}
+        {l.kind === 'activity' && <ActivityTag>{t.activityMark}</ActivityTag>}
+        <span className="truncate">{l.kind === 'activity' ? l.subject : l.subject_short}</span>
       </span>
       {word !== undefined && <span className={`block text-[11px] ${word.strong ? 'font-extrabold' : 'font-semibold text-text-muted'}`}>{word.word}</span>}
       {l.asked !== null && l.register === null && <span className="block truncate text-[11px] text-text-muted">{t.asked(l.asked)}</span>}
@@ -218,7 +223,7 @@ function AwayCard({ person: a, day, onAsked }: { person: AwayPerson; day: string
             <Tag tone="done">{t.lessonState[l.state] ?? l.state}</Tag>
           ) : l.asked !== null ? (
             <Tag tone="plain">{t.asked(l.asked)}</Tag>
-          ) : l.can_arrange && l.state !== 'no_register' ? (
+          ) : l.can_arrange && l.state !== 'no_register' && l.state !== 'not_needed' ? (
             <SmallButton onClick={() => setAsking(asking === l.slot_id ? null : l.slot_id)}>{t.askSomeone}</SmallButton>
           ) : (
             <Tag tone={l.state === 'no_register' || l.state === 'needs_cover' ? 'attention' : 'plain'}>{t.lessonState[l.state] ?? l.state}</Tag>

@@ -101,7 +101,7 @@ it('sets bell times and a class timetable, and refuses a teacher in two classes 
         'subject_id' => $this->subjects['MAT']])->assertUnprocessable()->assertJsonValidationErrors(['period']);
 
     $week = $this->actingAs($this->people['admin'])->getJson('/api/v1/academics/timetable?division_id='.$this->school->id('secondary').'&campus_id='.$this->school->id('campus_b').'&class_id='.$this->class)->assertOk();
-    expect($week->json('grid'))->toBe([['weekday' => 2, 'period' => 3, 'subject_id' => $this->subjects['BIO'], 'user_id' => $this->people['tadala']->id]])
+    expect($week->json('grid'))->toBe([['weekday' => 2, 'period' => 3, 'subject_id' => $this->subjects['BIO'], 'activity' => null, 'user_id' => $this->people['tadala']->id]])
         ->and($week->json('free'))->toBe(19);
 
     // A change applies from today; the lesson keeps its name, a new row is in force.
@@ -139,8 +139,10 @@ it('takes a lesson register, records cover, and lists a learner who missed a les
         ->and(LogSmsProvider::$sent)->toHaveCount(1); // the morning absence only; the missed-lesson notice starts off
 
     $today = $this->actingAs($this->people['admin'])->getJson('/api/v1/registers/lessons?day='.LESSON_DAY)->assertOk();
-    expect(array_column($today->json('places.0.classes.0.lessons'), 'state'))->toBe(['no_register', 'cover', 'later'])
-        ->and($today->json('totals'))->toMatchArray(['lessons' => 3, 'cover' => 1, 'no_register' => 1]);
+    // Period 1 needs no register (only the first period after a break does), so it is not missing one.
+    expect(array_column($today->json('places.0.classes.0.lessons'), 'state'))->toBe(['not_needed', 'cover', 'later'])
+        ->and(array_column($today->json('places.0.classes.0.lessons'), 'required'))->toBe([false, true, false])
+        ->and($today->json('totals'))->toMatchArray(['lessons' => 3, 'cover' => 1, 'no_register' => 0]);
 
     // Switched on, the next missed lesson tells the main contact.
     DB::table('institution_topic_settings')->insert(['topic_key' => 'attendance.lesson_missed', 'enabled' => true, 'updated_at' => now()]);
@@ -191,4 +193,48 @@ it('takes lesson registers only where the level\'s profile says so', function ()
     $this->actingAs($this->people['mercy'])->postJson('/api/v1/registers/lesson/'.slotOf(3, $this->school->id('class_primary_a')), ['day' => LESSON_DAY, 'marks' => []])
         ->assertUnprocessable()->assertJsonValidationErrors(['slot_id' => 'This level takes a morning register only.']);
     $this->actingAs($this->people['admin'])->getJson('/api/v1/registers?day='.LESSON_DAY)->assertOk()->assertJsonPath('lessons', true);
+});
+
+it('opens a lesson register as the last register left the class, so nothing changed is one confirm', function (): void {
+    $this->actingAs($this->people['admin'])->putJson('/api/v1/academics/timetable/bells', lessonBells())->assertOk();
+    lessonSet($this->class, 1, $this->subjects['MAT'], $this->people['joseph']->id);
+    lessonSet($this->class, 3, $this->subjects['BIO'], $this->people['tadala']->id);
+    $this->actingAs($this->people['mercy'])->postJson("/api/v1/registers/class/{$this->class}", ['day' => LESSON_DAY, 'marks' => lessonMarks($this->learners, ['present', 'late', 'absent'])])->assertOk();
+
+    $this->actingAs($this->people['tadala'])->getJson('/api/v1/registers/lesson/'.slotOf(1).'?day='.LESSON_DAY)->assertOk()
+        ->assertJsonPath('previous.kind', 'morning')->assertJsonPath('previous.by', 'Mercy Banda')->assertJsonPath('lesson.required', false);
+    $this->actingAs($this->people['joseph'])->postJson('/api/v1/registers/lesson/'.slotOf(1), ['day' => LESSON_DAY, 'marks' => lessonMarks($this->learners, ['present', 'present', 'absent'])])->assertOk();
+
+    $lesson = $this->actingAs($this->people['tadala'])->getJson('/api/v1/registers/lesson/'.slotOf(3).'?day='.LESSON_DAY)->assertOk()
+        ->assertJsonPath('previous.kind', 'lesson')->assertJsonPath('previous.name', 'Period 1')->assertJsonPath('previous.by', 'Joseph Nyirenda')
+        ->assertJsonPath('lesson.required', true);
+    expect(array_column($lesson->json('learners'), 'before'))->toBe(['present', 'present', 'absent']);
+});
+
+it('keeps activities on the timetable: for the whole level in the bell times, and for one class in its week', function (): void {
+    $bells = lessonBells();
+    $bells['plans'][0]['periods'][] = ['name' => 'Sports and clubs', 'starts' => '13:30', 'ends' => '15:00', 'kind' => 'activity', 'register' => true];
+    $bells['plans'][0]['periods'][0]['register'] = true;
+    $saved = $this->actingAs($this->people['admin'])->putJson('/api/v1/academics/timetable/bells', $bells)->assertOk();
+    expect(array_column($saved->json('plans.0.periods'), 'register'))->toBe([true, false, false, true, false, true]);
+
+    $this->actingAs($this->people['admin'])->putJson('/api/v1/academics/timetable/period', ['class_id' => $this->class, 'weekday' => 2, 'period' => 4,
+        'subject_id' => $this->subjects['MAT'], 'activity' => 'Games'])->assertUnprocessable()->assertJsonValidationErrors(['activity']);
+    $week = $this->actingAs($this->people['admin'])->putJson('/api/v1/academics/timetable/period', ['class_id' => $this->class, 'weekday' => 2, 'period' => 4,
+        'activity' => 'Games', 'user_id' => $this->people['joseph']->id])->assertOk();
+    expect($week->json('grid.0'))->toMatchArray(['period' => 4, 'subject_id' => null, 'activity' => 'Games'])->and($week->json('counts'))->toBe([]);
+
+    $this->travelTo('2026-11-17 11:40:00'); // 13:40, during Sports and clubs
+    $today = $this->actingAs($this->people['admin'])->getJson('/api/v1/registers/lessons?day='.LESSON_DAY)->assertOk();
+    $f1 = collect($today->json('places.0.classes'))->firstWhere('id', $this->class)['lessons'];
+    expect(array_column($f1, 'subject'))->toBe(['Games', 'Sports and clubs'])
+        ->and(array_column($f1, 'kind'))->toBe(['activity', 'activity'])
+        ->and(array_column($f1, 'whole_level'))->toBe([false, true])
+        ->and(array_column($f1, 'state'))->toBe(['not_needed', 'now']);
+
+    // The whole level's activity can be taken like a lesson, and keeps its name.
+    $slot = $f1[1]['slot_id'];
+    $this->actingAs($this->people['mercy'])->postJson('/api/v1/registers/lesson/'.$slot, ['day' => LESSON_DAY, 'marks' => lessonMarks($this->learners, ['present', 'present', 'present'])])
+        ->assertOk()->assertJsonPath('lesson.subject', 'Sports and clubs')->assertJsonPath('lesson.kind', 'activity')->assertJsonPath('register.cover', true);
+    expect(DB::table('attendance_registers')->where('slot_id', $slot)->value('activity'))->toBe('Sports and clubs');
 });

@@ -6,7 +6,7 @@ import { minutesBetween } from '../registers/api'
 import { errorFor, type Saved } from '../setup/api'
 import { Input, Select } from '../setup/parts'
 import { academicsApi, type BellPeriod, type BellPlan, type TimetableState } from './academicsApi'
-import { PageHead, SettingsTabs, SmallButton, Tag } from './parts'
+import { ActivityTag, PageHead, SettingsTabs, SmallButton, STRIPE, Tag } from './parts'
 
 const t = copy.settings.timetable
 const s = copy.settings
@@ -115,8 +115,28 @@ export function TimetableScreen({ view }: { view: View }) {
 
 // ── Bell times ───────────────────────────────────────────────────────────────
 
+type Preset = keyof typeof t.presets
+
+/** Which periods need a register under a preset; a break never does. */
+function applyPreset(periods: BellPeriod[], preset: Preset): BellPeriod[] {
+  if (preset === 'chosen') return periods
+
+  return periods.map((p, i) => ({
+    ...p,
+    register: p.kind !== 'break' && (preset === 'every' || periods[i - 1]?.kind === 'break'),
+  }))
+}
+
+/** The preset the ticks already follow in every plan, or Chosen periods. */
+function presetOf(plans: BellPlan[]): Preset {
+  const same = (preset: Preset) => plans.every((p) => applyPreset(p.periods, preset).every((x, i) => x.register === p.periods[i]?.register))
+
+  return plans.length > 0 && same('breaks') ? 'breaks' : plans.length > 0 && same('every') ? 'every' : 'chosen'
+}
+
 function Bells({ state, at, onSaved }: { state: TimetableState; at: At; onSaved: (next: TimetableState) => void }) {
   const [plans, setPlans] = useState<BellPlan[]>(() => (state.plans.length > 0 ? state.plans : [{ name: t.defaultPlanName, weekdays: [1, 2, 3, 4, 5], periods: [] }]))
+  const [preset, setPreset] = useState<Preset>(() => (state.plans.length > 0 ? presetOf(state.plans) : 'breaks'))
   const [chosen, setChosen] = useState(0)
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [failed, setFailed] = useState<string | null>(null)
@@ -125,23 +145,35 @@ function Bells({ state, at, onSaved }: { state: TimetableState; at: At; onSaved:
 
   if (plan === undefined) return null
 
-  const change = (next: Partial<BellPlan>) => setPlans((ps) => ps.map((p, i) => (i === chosen ? { ...p, ...next } : p)))
-  const setRow = (j: number, next: Partial<BellPeriod>) => change({ periods: plan.periods.map((p, k) => (k === j ? { ...p, ...next } : p)) })
+  const change = (next: Partial<BellPlan>) =>
+    setPlans((ps) => ps.map((p, i) => (i === chosen ? { ...p, ...next, ...(next.periods !== undefined ? { periods: applyPreset(next.periods, preset) } : {}) } : p)))
+  const setRow = (j: number, next: Partial<BellPeriod>) => change({ periods: plan.periods.map((p, k) => (k === j ? { ...p, ...next, ...(next.kind === 'break' ? { register: false } : {}) } : p)) })
+  const tick = (j: number, register: boolean) => {
+    setPreset('chosen')
+    setPlans((ps) => ps.map((p, i) => (i === chosen ? { ...p, periods: p.periods.map((x, k) => (k === j ? { ...x, register } : x)) } : p)))
+  }
+  const choosePreset = (next: Preset) => {
+    setPreset(next)
+    setPlans((ps) => ps.map((p) => ({ ...p, periods: applyPreset(p.periods, next) })))
+  }
   const lessons = plan.periods.filter((p) => p.kind === 'lesson')
   const add = (kind: BellPeriod['kind']) => {
     const last = plan.periods[plan.periods.length - 1]
     const lastLesson = lessons[lessons.length - 1]
     const starts = last?.ends ?? '07:30'
-    const length = kind === 'break' ? 30 : lastLesson !== undefined ? minutesBetween(lastLesson.starts, lastLesson.ends) : 40
-    change({ periods: [...plan.periods, { name: kind === 'break' ? t.newBreak : t.newPeriod(lessons.length + 1), starts, ends: addMinutes(starts, length), kind }] })
+    const length = kind === 'break' ? 30 : kind === 'activity' ? 60 : lastLesson !== undefined ? minutesBetween(lastLesson.starts, lastLesson.ends) : 40
+    const name = kind === 'break' ? t.newBreak : kind === 'activity' ? t.newActivity : t.newPeriod(lessons.length + 1)
+    change({ periods: [...plan.periods, { name, starts, ends: addMinutes(starts, length), kind, register: false }] })
   }
   const taken = new Set(plans.filter((_, i) => i !== chosen).flatMap((p) => p.weekdays))
+  const needing = plan.periods.filter((p) => p.kind !== 'break' && p.register)
 
   const save = async () => {
     setWorking(true)
     setFailed(null)
     setErrors({})
-    const result: Saved<TimetableState> = await academicsApi.saveBells({ division_id: at.division_id, campus_id: at.campus_id, plans })
+    const body = plans.map((p) => ({ ...p, periods: p.periods.map((x) => ({ ...x, register: x.kind !== 'break' && x.register })) }))
+    const result: Saved<TimetableState> = await academicsApi.saveBells({ division_id: at.division_id, campus_id: at.campus_id, plans: body })
     setWorking(false)
 
     if (result.kind === 'saved') {
@@ -158,7 +190,7 @@ function Bells({ state, at, onSaved }: { state: TimetableState; at: At; onSaved:
 
   const planError = errorFor(errors, `plans.${chosen}.periods`) ?? errorFor(errors, 'plans') ?? errorFor(errors, 'campus_id')
   let number = 0
-  const COLS = 'grid-cols-[36px_minmax(140px,1.3fr)_112px_112px_70px_120px_40px]'
+  const COLS = 'grid-cols-[36px_minmax(140px,1.3fr)_112px_112px_70px_120px_140px_40px]'
 
   return (
     <div className="flex flex-1 flex-wrap items-stretch">
@@ -242,7 +274,7 @@ function Bells({ state, at, onSaved }: { state: TimetableState; at: At; onSaved:
         </div>
 
         <div className="overflow-x-auto">
-          <div className="min-w-[680px]">
+          <div className="min-w-[840px]">
             <div className={`label-caps grid ${COLS} gap-3 border-b-2 border-ink pr-3 pb-2 text-text-muted`}>
               <span />
               <span>{t.colName}</span>
@@ -250,32 +282,43 @@ function Bells({ state, at, onSaved }: { state: TimetableState; at: At; onSaved:
               <span>{t.colEnds}</span>
               <span>{t.colLength}</span>
               <span>{t.colKind}</span>
+              <span>{t.colRegister}</span>
               <span />
             </div>
             {plan.periods.length === 0 && <p className="py-3 text-sm text-text-muted">{t.noRows}</p>}
             {plan.periods.map((p, j) => {
-              const lesson = p.kind === 'lesson'
-              if (lesson) number += 1
+              if (p.kind === 'lesson') number += 1
               const error = errorFor(errors, `plans.${chosen}.periods.${j}`)
               const field = 'h-[38px] w-full border-0 border-b-2 bg-field px-2.5 text-ink outline-none focus:border-teal'
               const edge = error !== undefined ? 'border-red-pen' : 'border-ink'
               const label = p.name !== '' ? p.name : t.nameOf(j + 1)
+              const fill = error !== undefined ? 'bg-red-wash' : p.kind === 'activity' ? STRIPE : p.kind === 'break' ? 'bg-paper' : ''
 
               return (
-                <div key={j} className={`border-b border-rule py-2 pr-3 ${error !== undefined ? 'bg-red-wash' : lesson ? '' : 'bg-paper'}`}>
+                <div key={j} className={`border-b border-rule py-2 pr-3 ${fill}`}>
                   <div className={`grid ${COLS} items-center gap-3`}>
-                    <span className="type-display text-center text-xl text-text-muted">{lesson ? number : ''}</span>
+                    <span className="type-display text-center text-xl text-text-muted">
+                      {p.kind === 'lesson' ? number : p.kind === 'activity' ? <ActivityTag>{t.activityMark}</ActivityTag> : ''}
+                    </span>
                     <input type="text" value={p.name} maxLength={40} aria-label={t.nameOf(j + 1)} onChange={(e) => setRow(j, { name: e.target.value })} className={`${field} ${edge} text-[15px] font-bold`} />
                     <input type="time" value={p.starts} aria-label={t.startsOf(label)} onChange={(e) => setRow(j, { starts: e.target.value })} className={`${field} ${edge} ref text-sm`} />
                     <input type="time" value={p.ends} aria-label={t.endsOf(label)} onChange={(e) => setRow(j, { ends: e.target.value })} className={`${field} ${edge} ref text-sm`} />
                     <span className="ref text-sm">{t.minutes(minutesBetween(p.starts, p.ends))}</span>
-                    <select value={p.kind} aria-label={t.kindOf(label)} onChange={(e) => setRow(j, { kind: e.target.value as BellPeriod['kind'] })} className={`${field} ${edge} text-sm`}>
-                      {(['lesson', 'break'] as const).map((k) => (
+                    <select value={p.kind} aria-label={t.kindOf(label)} onChange={(e) => setRow(j, { kind: e.target.value as BellPeriod['kind'] })} className={`${field} ${edge} text-sm ${p.kind === 'activity' ? 'font-extrabold' : ''}`}>
+                      {(['lesson', 'break', 'activity'] as const).map((k) => (
                         <option key={k} value={k}>
                           {t.kinds[k]}
                         </option>
                       ))}
                     </select>
+                    {p.kind === 'break' ? (
+                      <span />
+                    ) : (
+                      <label className={`inline-flex h-9 cursor-pointer items-center gap-2 px-2 text-sm font-extrabold ${p.register ? 'bg-teal-wash' : 'font-semibold text-text-muted'}`}>
+                        <input type="checkbox" checked={p.register} aria-label={t.registerOf(label)} onChange={(e) => tick(j, e.target.checked)} className="size-5 accent-teal" />
+                        {p.register ? t.register : t.noRegister}
+                      </label>
+                    )}
                     <button
                       type="button"
                       aria-label={t.remove(label)}
@@ -295,6 +338,7 @@ function Bells({ state, at, onSaved }: { state: TimetableState; at: At; onSaved:
         <div className="mt-3 flex flex-wrap gap-2">
           <SmallButton onClick={() => add('lesson')}>{t.addPeriod}</SmallButton>
           <SmallButton onClick={() => add('break')}>{t.addBreak}</SmallButton>
+          <SmallButton onClick={() => add('activity')}>{t.addActivity}</SmallButton>
         </div>
         <footer className="mt-4.5 flex flex-wrap items-center gap-3 border-t-2 border-ink pt-4">
           <Button busy={working} onClick={() => void save()}>
@@ -304,6 +348,36 @@ function Bells({ state, at, onSaved }: { state: TimetableState; at: At; onSaved:
         </footer>
       </section>
       <aside className="min-w-0 flex-[1_1_300px] border-ink bg-paper px-3 pt-4 pb-6 max-[959px]:border-t-2 md:px-[clamp(16px,3vw,32px)] min-[960px]:border-l-2">
+        <h2 className="label-caps mb-2 text-ink">{t.whenTitle}</h2>
+        <div role="radiogroup" aria-label={t.whenTitle} className="grid gap-1.5">
+          {(Object.keys(t.presets) as Preset[]).map((k) => (
+            <label key={k} className={`flex cursor-pointer items-start gap-2.5 border-2 bg-sheet px-3 py-2.5 ${preset === k ? 'border-ink' : 'border-rule'}`}>
+              <input type="radio" name="when" checked={preset === k} onChange={() => choosePreset(k)} className="mt-0.5 size-[18px] accent-teal" />
+              <span>
+                <span className="block text-sm font-extrabold">{t.presets[k].title}</span>
+                <span className="block text-[13px] text-text-muted">{t.presets[k].text}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+        <div className="mt-3.5 border-2 border-ink bg-sheet p-3">
+          <div className="type-display text-[40px] leading-[0.9]">
+            {needing.length} <span className="text-xl">{t.registersCount(needing.length)}</span>
+          </div>
+          <p className="mt-1.5 text-[13px] text-text-muted">{t.registersLine(copy.and(needing.map((p) => p.name)))}</p>
+        </div>
+
+        <h2 className="label-caps mt-6 mb-1.5 text-ink">{t.kindsTitle}</h2>
+        <dl className="grid gap-2 text-[13px]">
+          {(['lesson', 'break', 'activity'] as const).map((k) => (
+            <div key={k} className="border-b border-rule pb-2">
+              <dt className="font-extrabold">{t.kinds[k]}</dt>
+              <dd className="text-text-muted">{t.kindsText[k]}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="mt-2 mb-6 text-[13px] text-text-muted">{t.oneClassNote}</p>
+
         <Glance periods={plan.periods} />
       </aside>
     </div>
@@ -312,7 +386,7 @@ function Bells({ state, at, onSaved }: { state: TimetableState; at: At; onSaved:
 
 const PX = 1.2
 
-/** The day drawn to scale: each period and break as a box on the hours. */
+/** The day drawn to scale: each period, break and activity as a box on the hours. */
 function Glance({ periods }: { periods: BellPeriod[] }) {
   const valid = periods.filter((p) => /^\d\d:\d\d$/.test(p.starts) && /^\d\d:\d\d$/.test(p.ends) && minutesBetween(p.starts, p.ends) > 0)
   const lessons = valid.filter((p) => p.kind === 'lesson')
@@ -328,6 +402,12 @@ function Glance({ periods }: { periods: BellPeriod[] }) {
       {first !== null && last !== null && <Timeline periods={valid} first={first} last={last} />}
     </>
   )
+}
+
+const timelineLook: Record<BellPeriod['kind'], string> = {
+  lesson: 'bg-sheet font-extrabold',
+  break: 'bg-paper font-semibold text-text-muted',
+  activity: `${STRIPE} font-extrabold`,
 }
 
 function Timeline({ periods, first, last }: { periods: BellPeriod[]; first: string; last: string }) {
@@ -346,9 +426,10 @@ function Timeline({ periods, first, last }: { periods: BellPeriod[]; first: stri
       {periods.map((p, i) => (
         <div
           key={i}
-          className={`absolute right-0 left-[52px] overflow-hidden border-2 border-ink px-2 py-0.5 text-xs ${p.kind === 'lesson' ? 'bg-sheet font-extrabold' : 'bg-paper font-semibold text-text-muted'}`}
+          className={`absolute right-0 left-[52px] flex items-start gap-1.5 overflow-hidden border-2 border-ink px-2 py-0.5 text-xs ${timelineLook[p.kind]}`}
           style={{ top: `${minutesBetween(origin, p.starts) * PX}px`, height: `${minutesBetween(p.starts, p.ends) * PX}px` }}
         >
+          {p.kind === 'activity' && <ActivityTag>{t.activityMark}</ActivityTag>}
           {p.name}
         </div>
       ))}
@@ -359,6 +440,7 @@ function Timeline({ periods, first, last }: { periods: BellPeriod[]; first: stri
 // ── Class timetables ─────────────────────────────────────────────────────────
 
 type Slot = { weekday: number; period: number }
+type Row = { kind: 'lesson'; n: number; starts: string; ends: string } | { kind: 'break'; name: string; starts: string } | { kind: 'activity'; name: string; starts: string; ends: string }
 
 function Classes({ state, at, onSaved }: { state: TimetableState; at: At; onSaved: (next: TimetableState) => void }) {
   const [chosen, setChosen] = useState<Slot | null>(null)
@@ -374,24 +456,35 @@ function Classes({ state, at, onSaved }: { state: TimetableState; at: At; onSave
   const klass = state.class
   const planOf = (weekday: number) => state.plans.find((p) => p.weekdays.includes(weekday)) ?? null
   const lessonOf = (weekday: number, period: number) => planOf(weekday)?.periods.filter((p) => p.kind === 'lesson')[period - 1] ?? null
+  const activitiesOf = (weekday: number) => planOf(weekday)?.periods.filter((p) => p.kind === 'activity') ?? []
   const most = Math.max(0, ...state.days.map((d) => d.lessons))
   const subjects = new Map(state.subjects.map((x) => [x.id, x]))
   const teachers = new Map(state.teachers.map((x) => [x.id, x.name]))
   const cols = `120px repeat(${state.days.length}, minmax(120px,1fr))`
   const others = state.plans.filter((p) => p !== main)
 
-  // The rows: the main plan's lessons and breaks, then any lesson rows only other days have.
-  const rows: ({ kind: 'lesson'; n: number; times: string } | { kind: 'break'; name: string; starts: string })[] = []
+  // The rows: the main plan's lessons, breaks and activities, then any lesson rows only other days have.
+  const rows: Row[] = []
   let n = 0
   for (const p of main.periods) {
-    if (p.kind === 'lesson') rows.push({ kind: 'lesson', n: ++n, times: `${p.starts}–${p.ends}` })
+    if (p.kind === 'lesson') rows.push({ kind: 'lesson', n: ++n, starts: p.starts, ends: p.ends })
+    else if (p.kind === 'activity') rows.push({ kind: 'activity', name: p.name, starts: p.starts, ends: p.ends })
     else rows.push({ kind: 'break', name: p.name, starts: p.starts })
   }
-  while (n < most) rows.push({ kind: 'lesson', n: ++n, times: '' })
+  while (n < most) rows.push({ kind: 'lesson', n: ++n, starts: '', ends: '' })
 
   const same = (a: Slot | null, w: number, p: number) => a !== null && a.weekday === w && a.period === p
   const entry = chosen !== null ? (state.grid.find((g) => g.weekday === chosen.weekday && g.period === chosen.period) ?? null) : null
   const counts = [...state.counts].sort((a, b) => b.periods - a.periods)
+
+  /** A whole-level activity from the bell times, fixed on the timetable. */
+  const fixed = (key: number, name: string, starts: string, ends: string) => (
+    <span key={key} className={`flex flex-col items-start gap-1 border-l border-rule p-2 ${STRIPE}`}>
+      <ActivityTag>{t.activityTag}</ActivityTag>
+      <span className="text-sm font-extrabold">{name}</span>
+      <span className="text-xs text-text-muted">{t.wholeLevel(`${starts}–${ends}`)}</span>
+    </span>
+  )
 
   return (
     <>
@@ -415,6 +508,10 @@ function Classes({ state, at, onSaved }: { state: TimetableState; at: At; onSave
       </div>
       <div className="flex flex-1 flex-wrap items-stretch">
         <section className="min-w-0 flex-[3_1_640px] bg-sheet px-3 pt-4 pb-6 md:px-[clamp(16px,3vw,40px)]">
+          <div className="mb-3 flex flex-wrap items-center gap-2 text-[13px] text-text-muted">
+            <ActivityTag>{t.activityTag}</ActivityTag>
+            {t.activityLegend}
+          </div>
           <div className="overflow-x-auto">
             <div style={{ minWidth: `${120 + state.days.length * 122}px` }}>
               <div className="label-caps grid border-b-2 border-ink text-text-muted" style={{ gridTemplateColumns: cols }}>
@@ -431,14 +528,38 @@ function Classes({ state, at, onSaved }: { state: TimetableState; at: At; onSave
                     <span className="ref px-2">{r.starts}</span>
                     <span className="label-caps px-2">{r.name}</span>
                   </div>
+                ) : r.kind === 'activity' ? (
+                  <div key={`a:${r.starts}`} className="grid border-b border-rule" style={{ gridTemplateColumns: cols }}>
+                    <span className="border-r-2 border-ink p-2">
+                      <ActivityTag>{t.activityTag}</ActivityTag>
+                      <span className="ref mt-1 block text-xs text-text-muted">
+                        {r.starts}–{r.ends}
+                      </span>
+                    </span>
+                    {state.days.map((d) =>
+                      activitiesOf(d.weekday).some((a) => a.starts === r.starts && a.name === r.name) ? fixed(d.weekday, r.name, r.starts, r.ends) : <span key={d.weekday} className="border-l border-rule" />,
+                    )}
+                  </div>
                 ) : (
                   <div key={`p:${r.n}`} className="grid border-b border-rule" style={{ gridTemplateColumns: cols }}>
                     <span className="border-r-2 border-ink p-2">
                       <span className="type-display block text-lg leading-none">{t.period(r.n)}</span>
-                      <span className="ref block text-xs text-text-muted">{r.times}</span>
+                      <span className="ref block text-xs text-text-muted">{r.starts !== '' ? `${r.starts}–${r.ends}` : ''}</span>
                     </span>
                     {state.days.map((d) => {
                       if (r.n > d.lessons) {
+                        // A day with fewer periods may hold a whole-level activity at this time.
+                        const starting = activitiesOf(d.weekday).find((a) => r.starts !== '' && a.starts >= r.starts && a.starts < r.ends)
+                        const running = activitiesOf(d.weekday).find((a) => r.starts !== '' && a.starts < r.starts && a.ends > r.starts)
+                        if (starting !== undefined) return fixed(d.weekday, starting.name, starting.starts, starting.ends)
+                        if (running !== undefined) {
+                          return (
+                            <span key={d.weekday} className={`border-l border-rule p-2 text-xs text-text-muted ${STRIPE}`}>
+                              {t.continued(running.name)}
+                            </span>
+                          )
+                        }
+
                         return (
                           <span key={d.weekday} className="border-l border-rule bg-[repeating-linear-gradient(135deg,var(--color-paper)_0_6px,var(--color-field)_6px_8px)] p-2 text-xs text-text-muted">
                             {t.noPeriod}
@@ -446,8 +567,9 @@ function Classes({ state, at, onSaved }: { state: TimetableState; at: At; onSave
                         )
                       }
                       const g = state.grid.find((x) => x.weekday === d.weekday && x.period === r.n)
-                      const subject = g !== undefined ? (subjects.get(g.subject_id)?.name ?? '') : null
-                      const teacher = g?.user_id != null ? (teachers.get(g.user_id) ?? null) : null
+                      const activity = g?.activity ?? null
+                      const subject = g !== undefined && g.subject_id !== null ? (subjects.get(g.subject_id)?.name ?? '') : null
+                      const person = g?.user_id != null ? (teachers.get(g.user_id) ?? null) : null
                       const on = same(chosen, d.weekday, r.n)
                       const clashed = same(clash, d.weekday, r.n)
 
@@ -456,17 +578,23 @@ function Classes({ state, at, onSaved }: { state: TimetableState; at: At; onSave
                           key={d.weekday}
                           type="button"
                           aria-pressed={on}
-                          aria-label={t.cellLabel(t.weekdays[d.weekday] ?? '', r.n, subject ?? t.freePeriod)}
+                          aria-label={t.cellLabel(t.weekdays[d.weekday] ?? '', r.n, activity !== null ? `${t.activityTag}: ${activity}` : (subject ?? t.freePeriod))}
                           onClick={() => {
                             setClash(null)
                             setChosen(on ? null : { weekday: d.weekday, period: r.n })
                           }}
-                          className={`block min-h-[58px] border-l border-rule p-2 text-left text-ink ${clashed ? 'bg-red-wash' : 'bg-sheet hover:bg-field'} ${on ? 'outline-[3px] -outline-offset-[3px] outline-teal' : ''}`}
+                          className={`block min-h-[58px] border-l border-rule p-2 text-left text-ink ${clashed ? 'bg-red-wash' : activity !== null ? STRIPE : 'bg-sheet hover:bg-field'} ${on ? 'outline-[3px] -outline-offset-[3px] outline-teal' : ''}`}
                         >
-                          {subject !== null ? (
+                          {activity !== null ? (
+                            <>
+                              <ActivityTag>{t.activityTag}</ActivityTag>
+                              <span className="mt-1 block text-sm font-extrabold">{activity}</span>
+                              {person !== null && <span className="block text-xs text-text-muted">{t.onDutyLine(person)}</span>}
+                            </>
+                          ) : subject !== null ? (
                             <>
                               <span className="block text-sm font-extrabold">{subject}</span>
-                              <span className="block text-xs text-text-muted">{teacher ?? t.noTeacher}</span>
+                              <span className="block text-xs text-text-muted">{person ?? t.noTeacher}</span>
                             </>
                           ) : (
                             <span className="block text-xs text-text-muted">{t.freePeriod}</span>
@@ -491,7 +619,7 @@ function Classes({ state, at, onSaved }: { state: TimetableState; at: At; onSave
         <aside className="min-w-0 flex-[1_1_320px] border-ink bg-paper px-3 pt-4 pb-6 max-[959px]:border-t-2 md:px-[clamp(16px,3vw,32px)] min-[960px]:border-l-2">
           {chosen !== null ? (
             <Editor
-              key={`${klass.id}:${chosen.weekday}:${chosen.period}:${entry?.subject_id ?? ''}:${entry?.user_id ?? ''}`}
+              key={`${klass.id}:${chosen.weekday}:${chosen.period}:${entry?.subject_id ?? ''}:${entry?.activity ?? ''}:${entry?.user_id ?? ''}`}
               state={state}
               klass={klass}
               slot={chosen}
@@ -522,11 +650,14 @@ function Classes({ state, at, onSaved }: { state: TimetableState; at: At; onSave
             <span>{t.freePeriods}</span>
             <span className="ref font-bold">{state.free}</span>
           </div>
+          <p className="mt-2 text-[13px] text-text-muted">{t.activitiesNote}</p>
         </aside>
       </div>
     </>
   )
 }
+
+type Holds = 'subject' | 'activity' | 'free'
 
 function Editor({
   state,
@@ -546,26 +677,36 @@ function Editor({
   onSaved: (next: TimetableState, free: boolean) => void
 }) {
   const teaching = state.teaching as Record<string, string>
+  const [holds, setHolds] = useState<Holds>(entry?.activity != null ? 'activity' : entry?.subject_id != null ? 'subject' : 'free')
   const [subject, setSubject] = useState(entry?.subject_id ?? '')
+  const [activity, setActivity] = useState(entry?.activity ?? '')
   const [teacher, setTeacher] = useState(entry?.user_id ?? '')
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [failed, setFailed] = useState<string | null>(null)
   const [working, setWorking] = useState(false)
-  const fromTeaching = subject !== '' && teaching[subject] === teacher && teacher !== ''
+  const fromTeaching = holds === 'subject' && subject !== '' && teaching[subject] === teacher && teacher !== ''
   const clash = errorFor(errors, 'user_id')
+  const blocked = (holds === 'subject' && subject === '') || (holds === 'activity' && activity.trim() === '')
 
-  const save = async (free: boolean) => {
+  const save = async () => {
     setWorking(true)
     setFailed(null)
     setErrors({})
-    const result = await academicsApi.setPeriod({ class_id: klass.id, weekday: slot.weekday, period: slot.period, subject_id: free ? null : subject, user_id: free || teacher === '' ? null : teacher })
+    const result = await academicsApi.setPeriod({
+      class_id: klass.id,
+      weekday: slot.weekday,
+      period: slot.period,
+      subject_id: holds === 'subject' ? subject : null,
+      activity: holds === 'activity' ? activity.trim() : null,
+      user_id: holds === 'free' || teacher === '' ? null : teacher,
+    })
     setWorking(false)
 
-    if (result.kind === 'saved') onSaved(result.data, free)
+    if (result.kind === 'saved') onSaved(result.data, holds === 'free')
     else if (result.kind === 'invalid') {
       setErrors(result.errors)
       onClash(errorFor(result.errors, 'user_id') !== undefined)
-      if (Object.keys(result.errors).every((k) => !['subject_id', 'user_id'].includes(k))) setFailed(Object.values(result.errors)[0]?.[0] ?? s.failed)
+      if (Object.keys(result.errors).every((k) => !['subject_id', 'activity', 'user_id'].includes(k))) setFailed(Object.values(result.errors)[0]?.[0] ?? s.failed)
     } else setFailed(result.kind === 'refused' ? s.refused : s.failed)
   }
 
@@ -573,38 +714,67 @@ function Editor({
     <div className="border-2 border-ink bg-sheet px-4 pt-3.5 pb-4">
       <div className="label-caps text-text-muted">{t.editing(t.weekdays[slot.weekday] ?? '', slot.period, times)}</div>
       <div className="type-display mt-1 mb-3 text-[26px] leading-none">{klass.name}</div>
-      <div className="grid gap-3">
-        <Select
-          label={t.subject}
-          value={subject}
-          onChange={(e) => {
-            setSubject(e.target.value)
-            const usual = teaching[e.target.value]
-            if (usual !== undefined) setTeacher(usual)
-          }}
-          error={errorFor(errors, 'subject_id')}
-        >
-          <option value="">{t.chooseSubject}</option>
-          {state.subjects.map((x) => (
-            <option key={x.id} value={x.id}>
-              {x.name}
-            </option>
+      <fieldset className="mb-3">
+        <legend className="label-caps mb-1.5 text-text-muted">{t.inPeriod}</legend>
+        <div className="flex flex-wrap gap-1.5">
+          {(Object.keys(t.choice) as Holds[]).map((k) => (
+            <label
+              key={k}
+              className={`inline-flex h-10 cursor-pointer items-center gap-2 border-2 px-3 text-sm font-extrabold ${holds === k ? 'border-ink bg-ink text-sheet' : 'border-rule-dashed bg-sheet text-ink hover:bg-field'}`}
+            >
+              <input type="radio" name="holds" checked={holds === k} onChange={() => setHolds(k)} className="size-4 accent-teal-bright" />
+              {t.choice[k]}
+            </label>
           ))}
-        </Select>
-        <Select
-          label={t.teacher}
-          value={teacher}
-          onChange={(e) => setTeacher(e.target.value)}
-          hint={fromTeaching ? t.fromTeaching(state.teachers.find((x) => x.id === teacher)?.name ?? '', state.subjects.find((x) => x.id === subject)?.name ?? '', klass.name) : undefined}
-        >
-          <option value="">{t.noTeacher}</option>
-          {state.teachers.map((x) => (
-            <option key={x.id} value={x.id}>
-              {x.name}
-            </option>
-          ))}
-        </Select>
-      </div>
+        </div>
+      </fieldset>
+      {holds === 'subject' && (
+        <div className="grid gap-3">
+          <Select
+            label={t.subject}
+            value={subject}
+            onChange={(e) => {
+              setSubject(e.target.value)
+              const usual = teaching[e.target.value]
+              if (usual !== undefined) setTeacher(usual)
+            }}
+            error={errorFor(errors, 'subject_id')}
+          >
+            <option value="">{t.chooseSubject}</option>
+            {state.subjects.map((x) => (
+              <option key={x.id} value={x.id}>
+                {x.name}
+              </option>
+            ))}
+          </Select>
+          <Select
+            label={t.teacher}
+            value={teacher}
+            onChange={(e) => setTeacher(e.target.value)}
+            hint={fromTeaching ? t.fromTeaching(state.teachers.find((x) => x.id === teacher)?.name ?? '', state.subjects.find((x) => x.id === subject)?.name ?? '', klass.name) : undefined}
+          >
+            <option value="">{t.noTeacher}</option>
+            {state.teachers.map((x) => (
+              <option key={x.id} value={x.id}>
+                {x.name}
+              </option>
+            ))}
+          </Select>
+        </div>
+      )}
+      {holds === 'activity' && (
+        <div className="grid gap-3">
+          <Input label={t.activityName} required hint={t.activityHint} value={activity} maxLength={60} onChange={(e) => setActivity(e.target.value)} error={errorFor(errors, 'activity')} />
+          <Select label={t.onDuty} hint={t.onDutyHint} value={teacher} onChange={(e) => setTeacher(e.target.value)}>
+            <option value="">{t.nobodyOnDuty}</option>
+            {state.teachers.map((x) => (
+              <option key={x.id} value={x.id}>
+                {x.name}
+              </option>
+            ))}
+          </Select>
+        </div>
+      )}
       {clash !== undefined && (
         <div role="alert" className="mt-3 border-2 border-red-pen bg-red-wash px-3 py-2.5 text-sm">
           <strong className="text-red-text">{t.clash}</strong> {clash}
@@ -612,14 +782,9 @@ function Editor({
       )}
       {failed !== null && <p className="mt-3 text-[13px] font-bold text-red-text">{failed}</p>}
       <div className="mt-3 flex flex-wrap gap-2">
-        <Button busy={working} disabled={subject === ''} onClick={() => void save(false)}>
+        <Button busy={working} disabled={blocked} onClick={() => void save()}>
           {working ? s.saving : t.savePeriod}
         </Button>
-        {entry !== null && (
-          <Button variant="secondary" busy={working} onClick={() => void save(true)}>
-            {t.makeFree}
-          </Button>
-        )}
       </div>
     </div>
   )

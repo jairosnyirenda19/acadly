@@ -94,3 +94,11 @@ export function SmallButton({ children, onClick, disabled, tone = 'ink' }: { chi
     </button>
   )
 }
+
+/** The fill of an activity: a fine stripe on the sheet, so it reads as not a lesson. */
+export const STRIPE = 'bg-[repeating-linear-gradient(135deg,var(--color-sheet)_0_10px,var(--color-paper)_10px_12px)]'
+
+/** The word that marks an activity: ink edge on the sheet. */
+export function ActivityTag({ children }: { children: ReactNode }) {
+  return <span className="label-caps inline-block border-2 border-ink bg-sheet px-[5px] py-px whitespace-nowrap text-ink">{children}</span>
+}

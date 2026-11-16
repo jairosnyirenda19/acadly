@@ -104,7 +104,7 @@ final class SubmitLessonRegister
             DB::table('attendance_registers')->insert(['id' => $id, 'class_id' => $class['id'], 'day' => $day, 'kind' => self::KIND,
                 'submitted_by' => $by->id, 'submitted_at' => $now, 'slot_id' => $lesson['slot_id'], 'subject_id' => $lesson['subject_id'],
                 'period' => $lesson['period'], 'period_name' => $lesson['name'], 'starts' => $lesson['starts'], 'ends' => $lesson['ends'],
-                'teacher_id' => $lesson['teacher_id'], 'cover' => $cover]);
+                'teacher_id' => $lesson['teacher_id'], 'cover' => $cover, 'activity' => $lesson['kind'] === 'activity' ? $lesson['subject'] : null]);
 
             $morningId = DB::table('attendance_registers')->where('class_id', $class['id'])->where('day', $day)->where('kind', SubmitRegister::KIND)->value('id');
             $morning = is_string($morningId) ? ($this->marks->inForce([$morningId])[$morningId] ?? []) : [];

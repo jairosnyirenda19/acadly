@@ -37,7 +37,7 @@ final class TimetableController
     /**
      * `?division_id=&campus_id=&class_id=` choose the tab and the class; the first of each otherwise.
      *
-     * @response array{tabs: list<array{division_id: string, campus_id: string, label: string}>, current: array{division_id: string, campus_id: string, label: string}|null, year: array{id: string, name: string}|null, plans: list<array{name: string, weekdays: list<int>, periods: list<array{name: string, starts: string, ends: string, kind: 'lesson'|'break'}>}>, classes: list<array{id: string, name: string}>, class: array{id: string, name: string}|null, days: list<array{weekday: int, lessons: int, plan: string}>, subjects: list<array{id: string, short: string, name: string}>, teachers: list<array{id: string, name: string}>, teaching: array<string, string>, grid: list<array{weekday: int, period: int, subject_id: string, user_id: string|null}>, counts: list<array{subject_id: string, periods: int}>, free: int}
+     * @response array{tabs: list<array{division_id: string, campus_id: string, label: string}>, current: array{division_id: string, campus_id: string, label: string}|null, year: array{id: string, name: string}|null, plans: list<array{name: string, weekdays: list<int>, periods: list<array{name: string, starts: string, ends: string, kind: 'lesson'|'break'|'activity', register: bool}>}>, classes: list<array{id: string, name: string}>, class: array{id: string, name: string}|null, days: list<array{weekday: int, lessons: int, plan: string}>, subjects: list<array{id: string, short: string, name: string}>, teachers: list<array{id: string, name: string}>, teaching: array<string, string>, grid: list<array{weekday: int, period: int, subject_id: string|null, activity: string|null, user_id: string|null}>, counts: list<array{subject_id: string, periods: int}>, free: int}
      */
     public function index(Request $request): JsonResponse
     {
@@ -129,13 +129,14 @@ final class TimetableController
         return $this->index($request);
     }
 
-    /** Sets one period of a class: `{class_id, weekday, period, subject_id?, user_id?}`. No subject makes it a free period. */
+    /** Sets one period of a class: `{class_id, weekday, period, subject_id?, activity?, user_id?}`. Neither a subject nor an activity makes it a free period. */
     public function period(Request $request, TimetableActions $actions): JsonResponse
     {
         $classId = $request->string('class_id')->toString();
         $actions->setPeriod(self::user($request), $classId, $request->integer('weekday'), $request->integer('period'),
             $request->filled('subject_id') ? $request->string('subject_id')->toString() : null,
-            $request->filled('user_id') ? $request->string('user_id')->toString() : null);
+            $request->filled('user_id') ? $request->string('user_id')->toString() : null,
+            $request->filled('activity') ? $request->string('activity')->toString() : null);
 
         $class = $this->calendar->classInForce($classId);
         $request->query->set('division_id', $class['division_id'] ?? null);
@@ -168,10 +169,11 @@ final class TimetableController
         $teaching = DB::table('academic_teaching')->where('class_id', $class['id'])->whereNotNull('subject_id')->whereNull('ended_at')->pluck('user_id', 'subject_id')->all();
         $grid = array_values(DB::table('academic_timetable')->where('class_id', $class['id'])->whereNull('ends_on')->orderBy('weekday')->orderBy('period')->get()
             ->map(fn (object $t): array => ['weekday' => Row::int($t, 'weekday'), 'period' => Row::int($t, 'period'),
-                'subject_id' => Row::text($t, 'subject_id'), 'user_id' => Row::maybeText($t, 'user_id')])->all());
+                'subject_id' => Row::maybeText($t, 'subject_id'), 'activity' => Row::maybeText($t, 'activity'), 'user_id' => Row::maybeText($t, 'user_id')])->all());
         $lessons = array_column($days, 'lessons', 'weekday');
         $grid = array_values(array_filter($grid, fn (array $g): bool => $g['period'] <= ($lessons[$g['weekday']] ?? 0)));
-        $counts = array_count_values(array_column($grid, 'subject_id'));
+        // Activities have no subject: they do not count towards a subject's periods a week.
+        $counts = array_count_values(array_filter(array_column($grid, 'subject_id'), is_string(...)));
 
         return [
             'subjects' => $subjects,

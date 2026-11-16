@@ -9,8 +9,12 @@ namespace Acadly\Core\Academics\Contracts;
  * on one day: `slot_id` and `day` together name it, and stay the same after
  * the timetable changes. Times are the school's own, `HH:MM`.
  *
- * @phpstan-type Bell array{number: int|null, name: string, starts: string, ends: string, kind: 'lesson'|'break'}
- * @phpstan-type Lesson array{slot_id: string, class_id: string, day: string, period: int, name: string, starts: string, ends: string, subject_id: string, subject: string, subject_short: string, teacher_id: string|null}
+ * A lesson is a subject taught, or an activity (games, clubs, assembly): an
+ * activity has a name in `subject` and no subject id. `register` says whether
+ * the period needs a lesson register.
+ *
+ * @phpstan-type Bell array{number: int|null, name: string, starts: string, ends: string, kind: 'lesson'|'break'|'activity', register: bool}
+ * @phpstan-type Lesson array{slot_id: string, class_id: string, day: string, period: int, name: string, starts: string, ends: string, kind: 'lesson'|'activity', whole_level: bool, subject_id: string|null, subject: string, subject_short: string, teacher_id: string|null, register: bool}
  */
 interface Timetable
 {

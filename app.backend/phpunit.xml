@@ -30,6 +30,7 @@
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="ACADLY_VIRUS_SCAN" value="off"/>
+        <env name="ACADLY_SMS_DRIVER" value="log"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>

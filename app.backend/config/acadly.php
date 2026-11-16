@@ -6,6 +6,8 @@ use Acadly\Core\Academics\AcademicsCore;
 use Acadly\Core\Enrolment\EnrolmentCore;
 use Acadly\Core\Institution\InstitutionCore;
 use Acadly\Core\Setup\SetupCore;
+use Acadly\Kernel\Notify\Sms\AfricasTalkingProvider;
+use Acadly\Kernel\Notify\Sms\MeTicketProvider;
 use Acadly\Modules\Attendance\AttendanceModule;
 
 return [
@@ -34,10 +36,18 @@ return [
     ],
 
     /*
-    | Where each SMS provider is reached. The school chooses the provider and
-    | enters its access key on the Messages page; the key is kept encrypted.
+    | Text messages. `driver` is `school` (send through the provider the
+    | school chose on the Messages page) or `log` (write each message to the
+    | log and send nothing). `providers` lists the companies a school may
+    | choose, by key; each class implements ChoosableSmsProvider. The access
+    | key is entered on the Messages page and kept encrypted.
     */
     'sms' => [
+        'driver' => env('ACADLY_SMS_DRIVER', 'school'),
+        'providers' => [
+            'meticket' => MeTicketProvider::class,
+            'africastalking' => AfricasTalkingProvider::class,
+        ],
         'meticket_url' => env('ACADLY_SMS_METICKET_URL', 'https://smpp.meticketmw.com'),
         'africastalking_url' => env('ACADLY_SMS_AFRICASTALKING_URL', 'https://api.africastalking.com'),
         'africastalking_sandbox_url' => env('ACADLY_SMS_AFRICASTALKING_SANDBOX_URL', 'https://api.sandbox.africastalking.com'),

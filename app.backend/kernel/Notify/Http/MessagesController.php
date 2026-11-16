@@ -29,7 +29,7 @@ final class MessagesController
     /**
      * How messages are sent, and this month's numbers.
      *
-     * @response array{sms: array{provider: string|null, providers: list<array{key: string, name: string}>, sender: string|null, username: string|null, key_hint: string|null, connected: bool, last_accepted_at: string|null, reports_address: string|null, balance: array{value: string, at: string}|null}, email: array{from_address: string, from_name: string, reply_to: string|null, connected: bool}, limits: array{quiet_from: string|null, quiet_to: string|null, sms_per_month: int|null}, month: array{sms: int, units: int, delivered_share: int|null, emails: int, emails_accepted: int, not_delivered: int}}
+     * @response array{sms: array{provider: string|null, providers: list<array{key: string, name: string, needs_username: bool}>, test_mode: bool, sender: string|null, username: string|null, key_hint: string|null, connected: bool, last_accepted_at: string|null, reports_address: string|null, balance: array{value: string, at: string}|null}, email: array{from_address: string, from_name: string, reply_to: string|null, connected: bool}, limits: array{quiet_from: string|null, quiet_to: string|null, sms_per_month: int|null}, month: array{sms: int, units: int, delivered_share: int|null, emails: int, emails_accepted: int, not_delivered: int}}
      */
     public function channels(Request $request): JsonResponse
     {

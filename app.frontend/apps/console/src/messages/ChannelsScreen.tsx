@@ -68,6 +68,7 @@ function useSave<T>() {
 
 function SmsForm({ state, onSaved }: { state: ChannelsState; onSaved: (next: ChannelsState) => void }) {
   const sms = state.sms
+  const providers = sms.providers
   const [provider, setProvider] = useState(sms.provider ?? '')
   const [sender, setSender] = useState(sms.sender ?? '')
   const [username, setUsername] = useState(sms.username ?? '')
@@ -75,6 +76,7 @@ function SmsForm({ state, onSaved }: { state: ChannelsState; onSaved: (next: Cha
   const [replacing, setReplacing] = useState(sms.key_hint === null)
   const save = useSave<ChannelsState>()
   const keyKept = sms.key_hint !== null && provider === sms.provider && !replacing
+  const chosen = providers.find((p) => p.key === provider)
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
@@ -92,6 +94,7 @@ function SmsForm({ state, onSaved }: { state: ChannelsState; onSaved: (next: Cha
         aside={
           <>
             <Tag tone={sms.connected ? 'done' : 'attention'}>{sms.connected ? t.connected : t.notConnected}</Tag>
+            {sms.test_mode && <Tag tone="attention">{t.testMode}</Tag>}
             <span className="text-[13px] text-text-muted">{sms.last_accepted_at !== null ? t.lastAccepted(clock(sms.last_accepted_at)) : t.noSmsYet}</span>
           </>
         }
@@ -99,9 +102,10 @@ function SmsForm({ state, onSaved }: { state: ChannelsState; onSaved: (next: Cha
         {t.sms}
       </Heading>
       <div className="grid gap-3.5">
+        {sms.test_mode && <p className="border-2 border-ink bg-marigold-wash px-3 py-2 text-sm">{t.testModeNote}</p>}
         <Select label={t.provider} required hint={t.providerHint} value={provider} onChange={(e) => setProvider(e.target.value)} error={errorFor(save.errors, 'provider')}>
           {provider === '' && <option value="">{t.chooseProvider}</option>}
-          {sms.providers.map((p) => (
+          {providers.map((p) => (
             <option key={p.key} value={p.key}>
               {p.name}
             </option>
@@ -109,8 +113,8 @@ function SmsForm({ state, onSaved }: { state: ChannelsState; onSaved: (next: Cha
         </Select>
         <div className="grid gap-3 sm:grid-cols-2">
           <Input label={t.sender} required hint={t.senderHint} value={sender} onChange={(e) => setSender(e.target.value)} error={errorFor(save.errors, 'sender')} maxLength={11} />
-          {provider === 'africastalking' && (
-            <Input label={t.username} required hint={t.usernameHint} value={username} onChange={(e) => setUsername(e.target.value)} error={errorFor(save.errors, 'username')} maxLength={80} />
+          {chosen?.needs_username === true && (
+            <Input label={t.username} required hint={t.usernameHint(chosen.name)} value={username} onChange={(e) => setUsername(e.target.value)} error={errorFor(save.errors, 'username')} maxLength={80} />
           )}
         </div>
         {keyKept ? (

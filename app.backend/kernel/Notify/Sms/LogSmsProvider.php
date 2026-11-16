@@ -2,39 +2,42 @@
 
 declare(strict_types=1);
 
-namespace Acadly\Kernel\Notify\Channels;
+namespace Acadly\Kernel\Notify\Sms;
 
-use Acadly\Kernel\Notify\Sms\SmsLength;
+use Acadly\Kernel\Notify\Channels\DeliveryReport;
+use Acadly\Kernel\Notify\Channels\ProviderReceipt;
+use Acadly\Kernel\Notify\Channels\SmsProvider;
 use Acadly\Kernel\Support\Ids;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Sends nothing. Keeps each message in memory and writes a log line with the
- * number masked, so the pipeline can be watched on a development machine.
+ * The `log` driver. Sends nothing. Keeps each message in memory and writes a
+ * log line with the number masked, so the whole path can be watched without
+ * a provider.
  * A report of `{"ref": "...", "stat": "DELIVRD"}` settles a message, so the
  * whole path can be tried without a provider.
  */
-final class DevelopmentSmsProvider implements SmsProvider
+final class LogSmsProvider implements SmsProvider
 {
     /** @var list<array{to: string, text: string}> */
     public static array $sent = [];
 
     public function key(): string
     {
-        return 'development';
+        return SmsProviders::LOG;
     }
 
     public function send(string $to, string $text): ProviderReceipt
     {
         self::$sent[] = ['to' => $to, 'text' => $text];
 
-        Log::info('A text message was accepted by the development provider.', [
+        Log::info('A text message was written to the log and not sent.', [
             'to' => substr($to, 0, 4).str_repeat('•', max(0, strlen($to) - 7)).substr($to, -3),
-            'length' => mb_strlen($text),
+            'text' => $text,
         ]);
 
-        return ProviderReceipt::sent('dev-'.Ids::next(), SmsLength::of($text)['units']);
+        return ProviderReceipt::sent('log-'.Ids::next(), SmsLength::of($text)['units']);
     }
 
     public function report(Request $request): ?DeliveryReport

@@ -7,9 +7,9 @@ namespace Acadly\Kernel\Notify\Channels;
 use Illuminate\Http\Request;
 
 /**
- * An SMS company (04 §8). The product is not tied to one: the school chooses
- * its provider on the Messages page. A development machine without a choice
- * uses `DevelopmentSmsProvider`.
+ * Sends text messages (04 §8). The product is not tied to one company: each
+ * company a school may choose implements `ChoosableSmsProvider` and is
+ * listed in `acadly.sms.providers`. The `log` driver sends nothing.
  */
 interface SmsProvider
 {

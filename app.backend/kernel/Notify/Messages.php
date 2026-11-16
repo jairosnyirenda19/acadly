@@ -7,6 +7,7 @@ namespace Acadly\Kernel\Notify;
 use Acadly\Kernel\Module\ModuleRegistry;
 use Acadly\Kernel\Notify\Channels\SmsProvider;
 use Acadly\Kernel\Notify\Sms\SmsLength;
+use Acadly\Kernel\Notify\Sms\SmsProviders;
 use Acadly\Kernel\School\SchoolProfile;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Phone;
@@ -63,7 +64,8 @@ final class Messages
         return [
             'sms' => [
                 'provider' => $route['provider'] ?? null,
-                'providers' => array_map(fn (string $key, string $name): array => ['key' => $key, 'name' => $name], array_keys(MessageSettings::PROVIDERS), array_values(MessageSettings::PROVIDERS)),
+                'providers' => array_map(fn (string $key): array => ['key' => $key, 'name' => SmsProviders::label($key) ?? $key, 'needs_username' => SmsProviders::needsUsername($key)], array_keys(SmsProviders::all())),
+                'test_mode' => SmsProviders::logOnly(),
                 'sender' => $route['sender'] ?? null,
                 'username' => $route['username'] ?? null,
                 'key_hint' => $route['hint'] ?? null,
@@ -289,8 +291,8 @@ final class Messages
         return match ($key) {
             null => null,
             'mail' => 'Mail server',
-            'development' => 'Kept on this computer',
-            default => MessageSettings::PROVIDERS[$key] ?? null,
+            'log', 'development' => 'Test mode, not sent',
+            default => SmsProviders::label($key),
         };
     }
 

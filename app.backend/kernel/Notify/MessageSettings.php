@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Acadly\Kernel\Notify;
 
-use Acadly\Kernel\Notify\Channels\DevelopmentSmsProvider;
 use Acadly\Kernel\Notify\Channels\NoSmsProvider;
 use Acadly\Kernel\Notify\Channels\SmsProvider;
-use Acadly\Kernel\Notify\Sms\AfricasTalkingProvider;
-use Acadly\Kernel\Notify\Sms\MeTicketProvider;
+use Acadly\Kernel\Notify\Sms\LogSmsProvider;
+use Acadly\Kernel\Notify\Sms\SmsAccount;
+use Acadly\Kernel\Notify\Sms\SmsProviders;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Row;
 use Carbon\CarbonImmutable;
@@ -24,9 +24,6 @@ use Illuminate\Support\Facades\DB;
  */
 final class MessageSettings
 {
-    /** The SMS providers a school may choose, by key. */
-    public const array PROVIDERS = ['meticket' => 'MeTicket', 'africastalking' => "Africa's Talking"];
-
     public const string LOCALE = 'en';
 
     public function __construct(private readonly Clock $clock) {}
@@ -55,26 +52,23 @@ final class MessageSettings
     }
 
     /**
-     * The provider that sends now. Without a choice, a development machine
-     * keeps messages in memory and any other machine fails them, visibly.
+     * The provider that sends now. The `log` driver sends nothing. Without
+     * a choice, or without its key, every message fails, visibly.
      */
     public function smsProvider(): SmsProvider
     {
-        $row = DB::table('notification_routes')->where('channel', Channel::Sms->value)->first();
-
-        if ($row === null) {
-            return app()->environment(['local', 'testing']) ? new DevelopmentSmsProvider : new NoSmsProvider;
+        if (SmsProviders::logOnly()) {
+            return new LogSmsProvider;
         }
 
-        $secret = $this->secret(Row::maybeText($row, 'secret'));
-        $sender = Row::maybeText($row, 'sender') ?? '';
+        $row = DB::table('notification_routes')->where('channel', Channel::Sms->value)->first();
+        $secret = $row !== null ? $this->secret(Row::maybeText($row, 'secret')) : null;
 
-        return match (Row::text($row, 'provider')) {
-            'meticket' => $secret !== null ? new MeTicketProvider($sender, $secret) : new NoSmsProvider,
-            'africastalking' => $secret !== null ? new AfricasTalkingProvider($sender, Row::maybeText($row, 'username') ?? '', $secret) : new NoSmsProvider,
-            'development' => new DevelopmentSmsProvider,
-            default => new NoSmsProvider,
-        };
+        if ($row === null || $secret === null) {
+            return new NoSmsProvider;
+        }
+
+        return SmsProviders::connect(Row::text($row, 'provider'), new SmsAccount(Row::maybeText($row, 'sender') ?? '', Row::maybeText($row, 'username') ?? '', $secret));
     }
 
     /** The provider whose reports may arrive at this address, or null for an address nobody was given. */

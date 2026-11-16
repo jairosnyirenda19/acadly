@@ -6,7 +6,11 @@ use Acadly\Kernel\Access\Role;
 use Acadly\Kernel\Access\RoleAssignment;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Identity\User;
-use Acadly\Kernel\Notify\Channels\DevelopmentSmsProvider;
+use Acadly\Kernel\Notify\Channels\NoSmsProvider;
+use Acadly\Kernel\Notify\MessageSettings;
+use Acadly\Kernel\Notify\Sms\AfricasTalkingProvider;
+use Acadly\Kernel\Notify\Sms\LogSmsProvider;
+use Acadly\Kernel\Notify\Sms\MeTicketProvider;
 use Acadly\Kernel\Notify\Sms\SmsLength;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Kernel\Support\Phone;
@@ -23,7 +27,7 @@ beforeEach(function (): void {
     DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'attendance', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()->subYear()]);
     app()->forgetScopedInstances();
     $this->travelTo('2026-11-13 06:30:00'); // 08:30 in Blantyre
-    DevelopmentSmsProvider::$sent = [];
+    LogSmsProvider::$sent = [];
     $this->school = TwoCampusSchool::make();
 
     foreach (['primary', 'secondary'] as $division) {
@@ -55,7 +59,7 @@ function msgMarks(array $learners, array $statuses): array
 
 function msgRoute(string $token = 'reports0123456789reports0123456789'): string
 {
-    DB::table('notification_routes')->insert(['channel' => 'sms', 'provider' => 'development', 'receipt_token' => $token, 'updated_at' => now()]);
+    DB::table('notification_routes')->insert(['channel' => 'sms', 'provider' => 'meticket', 'receipt_token' => $token, 'updated_at' => now()]);
 
     return $token;
 }
@@ -67,9 +71,9 @@ it('tells the main contact of each absent learner on the day, by the channel the
     $deliveries = DB::table('notification_deliveries')->where('topic_key', 'attendance.learner_absent')->orderBy('recipient_name')->get();
 
     expect($deliveries->pluck('channel', 'recipient_name')->all())->toBe(['Ruth Banda' => 'email', 'Ruth Chisale' => 'sms'])
-        ->and(DevelopmentSmsProvider::$sent)->toHaveCount(1)
-        ->and(DevelopmentSmsProvider::$sent[0]['to'])->toBe('+265991234567')
-        ->and(DevelopmentSmsProvider::$sent[0]['text'])->toContain('Thoko Chisale was marked absent from')
+        ->and(LogSmsProvider::$sent)->toHaveCount(1)
+        ->and(LogSmsProvider::$sent[0]['to'])->toBe('+265991234567')
+        ->and(LogSmsProvider::$sent[0]['text'])->toContain('Thoko Chisale was marked absent from')
         ->and($register['learners'][0]['absence']['told'][0])->toMatchArray(['to' => 'Ruth Banda', 'relationship' => 'Mother', 'channel' => 'email', 'state' => 'accepted'])
         ->and($register['learners'][1]['absence']['next'])->toBe('Peter Chisale')
         ->and($register['learners'][2]['absence'])->toBeNull();
@@ -97,7 +101,7 @@ it('settles a message from the provider report, tells the next contact, and reco
 
     expect(collect($after['told'])->pluck('state', 'to')->all())->toBe(['Ruth Chisale' => 'not_delivered', 'Peter Chisale' => 'sent'])
         ->and($after['next'])->toBeNull()
-        ->and(DevelopmentSmsProvider::$sent[1]['to'])->toBe('+265888410220');
+        ->and(LogSmsProvider::$sent[1]['to'])->toBe('+265888410220');
 
     $ref2 = DB::table('notification_deliveries')->where('topic_key', 'attendance.learner_absent_next')->value('provider_ref');
     $this->postJson("/api/v1/notify/reports/{$token}", ['ref' => $ref2, 'stat' => 'DELIVRD'])->assertNoContent();
@@ -140,8 +144,8 @@ it('sends the school\'s own words, refuses an unknown fact, and sends nothing wh
 
     $this->actingAs($this->admin)->postJson("/api/v1/registers/class/{$this->class}", ['day' => MSG_TODAY, 'marks' => msgMarks($this->learners, ['present', 'absent', 'present'])])->assertOk();
 
-    expect(array_column(DevelopmentSmsProvider::$sent, 'to'))->toBe(['+265991234567', '+265888410220'])
-        ->and(DevelopmentSmsProvider::$sent[0]['text'])->toBe('Sunrise: Thoko Chisale was not at school today (Fri 13 Nov).');
+    expect(array_column(LogSmsProvider::$sent, 'to'))->toBe(['+265991234567', '+265888410220'])
+        ->and(LogSmsProvider::$sent[0]['text'])->toBe('Sunrise: Thoko Chisale was not at school today (Fri 13 Nov).');
 
     $this->actingAs($this->admin)->deleteJson("/api/v1/messages/notices/{$key}/wording")->assertOk()->assertJsonPath('own', null);
 });
@@ -150,7 +154,7 @@ it('sends nothing while the school has the notice switched off', function (): vo
     $this->actingAs($this->admin)->putJson('/api/v1/messages/notices/attendance.learner_absent', ['enabled' => false])->assertOk()->assertJsonPath('enabled', false);
     $this->actingAs($this->admin)->postJson("/api/v1/registers/class/{$this->class}", ['day' => MSG_TODAY, 'marks' => msgMarks($this->learners, ['absent', 'absent', 'absent'])])->assertOk();
 
-    expect(DevelopmentSmsProvider::$sent)->toBe([])
+    expect(LogSmsProvider::$sent)->toBe([])
         ->and(DB::table('notification_deliveries')->where('topic_key', 'attendance.learner_absent')->pluck('reason')->unique()->all())->toBe(['switched_off']);
 });
 
@@ -161,15 +165,15 @@ it('holds SMS for quiet hours and sends them in the morning', function (): void 
     $this->actingAs($this->admin)->postJson("/api/v1/registers/class/{$this->class}", ['day' => MSG_TODAY, 'marks' => msgMarks($this->learners, ['present', 'absent', 'present'])])->assertOk();
     $row = DB::table('notification_deliveries')->where('topic_key', 'attendance.learner_absent')->first();
 
-    expect($row->status)->toBe('queued')->and($row->reason)->toBe('quiet_hours')->and(DevelopmentSmsProvider::$sent)->toBe([]);
+    expect($row->status)->toBe('queued')->and($row->reason)->toBe('quiet_hours')->and(LogSmsProvider::$sent)->toBe([]);
 
     $this->artisan('notify:sweep')->assertSuccessful();
-    expect(DevelopmentSmsProvider::$sent)->toBe([]);
+    expect(LogSmsProvider::$sent)->toBe([]);
 
     $this->travelTo('2026-11-14 04:30:00'); // 06:30 in Blantyre
     $this->artisan('notify:sweep')->assertSuccessful();
 
-    expect(DevelopmentSmsProvider::$sent)->toHaveCount(1)
+    expect(LogSmsProvider::$sent)->toHaveCount(1)
         ->and(DB::table('notification_deliveries')->where('id', $row->id)->value('status'))->toBe('sent');
 });
 
@@ -210,4 +214,22 @@ it('counts SMS units and reads phone numbers as people write them', function ():
         ->and(Phone::international('+44 20 7946 0958'))->toBe('+442079460958')
         ->and(Phone::international('12345'))->toBeNull()
         ->and(Phone::forPeople('+265991234567'))->toBe('0991 234 567');
+});
+
+it('sends through the provider listed in configuration, and only writes to the log under the log driver', function (): void {
+    $this->actingAs($this->admin)->putJson('/api/v1/messages/channels/sms', ['provider' => 'africastalking', 'sender' => 'SUNRISE', 'username' => '', 'key' => 'at-key-1234'])
+        ->assertUnprocessable()->assertJsonValidationErrors(['username']);
+    $this->actingAs($this->admin)->putJson('/api/v1/messages/channels/sms', ['provider' => 'africastalking', 'sender' => 'SUNRISE', 'username' => 'sunrise', 'key' => 'at-key-1234'])
+        ->assertOk()->assertJsonPath('sms.test_mode', true)
+        ->assertJsonPath('sms.providers.1', ['key' => 'africastalking', 'name' => "Africa's Talking", 'needs_username' => true]);
+
+    expect(app(MessageSettings::class)->smsProvider())->toBeInstanceOf(LogSmsProvider::class);
+
+    config(['acadly.sms.driver' => 'school']);
+    expect(app(MessageSettings::class)->smsProvider())->toBeInstanceOf(AfricasTalkingProvider::class);
+
+    config(['acadly.sms.providers' => ['meticket' => MeTicketProvider::class]]);
+    expect(app(MessageSettings::class)->smsProvider())->toBeInstanceOf(NoSmsProvider::class);
+    $this->actingAs($this->admin)->putJson('/api/v1/messages/channels/sms', ['provider' => 'africastalking', 'sender' => 'SUNRISE', 'username' => 'sunrise', 'key' => ''])
+        ->assertUnprocessable()->assertJsonValidationErrors(['provider']);
 });

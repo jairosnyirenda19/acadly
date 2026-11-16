@@ -4834,13 +4834,20 @@
                                                             },
                                                             "name": {
                                                                 "type": "string"
+                                                            },
+                                                            "needs_username": {
+                                                                "type": "boolean"
                                                             }
                                                         },
                                                         "required": [
                                                             "key",
-                                                            "name"
+                                                            "name",
+                                                            "needs_username"
                                                         ]
                                                     }
+                                                },
+                                                "test_mode": {
+                                                    "type": "boolean"
                                                 },
                                                 "sender": {
                                                     "type": [
@@ -4897,6 +4904,7 @@
                                             "required": [
                                                 "provider",
                                                 "providers",
+                                                "test_mode",
                                                 "sender",
                                                 "username",
                                                 "key_hint",
@@ -5080,6 +5088,9 @@
                                                     "type": "array",
                                                     "items": {}
                                                 },
+                                                "test_mode": {
+                                                    "type": "boolean"
+                                                },
                                                 "sender": {
                                                     "type": [
                                                         "string",
@@ -5130,6 +5141,7 @@
                                             "required": [
                                                 "provider",
                                                 "providers",
+                                                "test_mode",
                                                 "sender",
                                                 "username",
                                                 "key_hint",
@@ -5330,6 +5342,9 @@
                                                     "type": "array",
                                                     "items": {}
                                                 },
+                                                "test_mode": {
+                                                    "type": "boolean"
+                                                },
                                                 "sender": {
                                                     "type": [
                                                         "string",
@@ -5380,6 +5395,7 @@
                                             "required": [
                                                 "provider",
                                                 "providers",
+                                                "test_mode",
                                                 "sender",
                                                 "username",
                                                 "key_hint",
@@ -5583,6 +5599,9 @@
                                                     "type": "array",
                                                     "items": {}
                                                 },
+                                                "test_mode": {
+                                                    "type": "boolean"
+                                                },
                                                 "sender": {
                                                     "type": [
                                                         "string",
@@ -5633,6 +5652,7 @@
                                             "required": [
                                                 "provider",
                                                 "providers",
+                                                "test_mode",
                                                 "sender",
                                                 "username",
                                                 "key_hint",

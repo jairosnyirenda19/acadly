@@ -6,7 +6,6 @@ namespace Acadly\Kernel\Notify\Sms;
 
 use Acadly\Kernel\Notify\Channels\DeliveryReport;
 use Acadly\Kernel\Notify\Channels\ProviderReceipt;
-use Acadly\Kernel\Notify\Channels\SmsProvider;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -17,12 +16,27 @@ use Throwable;
  * has the same shape as Africa's Talking. A report arrives as `event: dlr`
  * with the carrier's state: DELIVRD, UNDELIV, FAILED, EXPIRED.
  */
-final class MeTicketProvider implements SmsProvider
+final class MeTicketProvider implements ChoosableSmsProvider
 {
     public function __construct(
         private readonly string $sender,
         private readonly string $key,
     ) {}
+
+    public static function label(): string
+    {
+        return 'MeTicket';
+    }
+
+    public static function needsUsername(): bool
+    {
+        return false;
+    }
+
+    public static function connect(SmsAccount $account): self
+    {
+        return new self($account->sender, $account->key);
+    }
 
     public function key(): string
     {

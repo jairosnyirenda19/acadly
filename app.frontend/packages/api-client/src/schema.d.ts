@@ -3113,7 +3113,9 @@ export interface operations {
                             providers: {
                                 key: string;
                                 name: string;
+                                needs_username: boolean;
                             }[];
+                            test_mode: boolean;
                             sender: string | null;
                             username: string | null;
                             key_hint: string | null;
@@ -3178,6 +3180,7 @@ export interface operations {
                         sms: {
                             provider: string | null;
                             providers: unknown[];
+                            test_mode: boolean;
                             sender: string | null;
                             username: string | null;
                             key_hint: string | null;
@@ -3245,6 +3248,7 @@ export interface operations {
                         sms: {
                             provider: string | null;
                             providers: unknown[];
+                            test_mode: boolean;
                             sender: string | null;
                             username: string | null;
                             key_hint: string | null;
@@ -3313,6 +3317,7 @@ export interface operations {
                         sms: {
                             provider: string | null;
                             providers: unknown[];
+                            test_mode: boolean;
                             sender: string | null;
                             username: string | null;
                             key_hint: string | null;

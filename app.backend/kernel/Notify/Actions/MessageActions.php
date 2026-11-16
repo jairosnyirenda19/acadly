@@ -16,6 +16,7 @@ use Acadly\Kernel\Notify\NoticeCatalogue;
 use Acadly\Kernel\Notify\NoticeDispatcher;
 use Acadly\Kernel\Notify\NotifyPermission;
 use Acadly\Kernel\Notify\OptOut;
+use Acadly\Kernel\Notify\Sms\SmsProviders;
 use Acadly\Kernel\Notify\Words;
 use Acadly\Kernel\School\SchoolProfile;
 use Acadly\Kernel\Support\Clock;
@@ -53,7 +54,7 @@ final class MessageActions
         $current = $this->settings->smsRoute();
         $errors = [];
 
-        if (! array_key_exists($provider, MessageSettings::PROVIDERS)) {
+        if (! SmsProviders::has($provider)) {
             $errors['provider'] = ['Choose a provider.'];
         }
 
@@ -61,8 +62,8 @@ final class MessageActions
             $errors['sender'] = ['Up to 11 letters and digits, as the provider approved it.'];
         }
 
-        if ($provider === 'africastalking' && $username === '') {
-            $errors['username'] = ["Enter the account name from Africa's Talking."];
+        if (SmsProviders::needsUsername($provider) && $username === '') {
+            $errors['username'] = ['Enter the account name from '.SmsProviders::label($provider).'.'];
         }
 
         if ($key === '' && ($current === null || $current['provider'] !== $provider || $current['hint'] === null)) {

@@ -6,7 +6,6 @@ namespace Acadly\Kernel\Notify\Sms;
 
 use Acadly\Kernel\Notify\Channels\DeliveryReport;
 use Acadly\Kernel\Notify\Channels\ProviderReceipt;
-use Acadly\Kernel\Notify\Channels\SmsProvider;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -17,13 +16,28 @@ use Throwable;
  * status code of 200 or more for the recipient is a refusal, even when the
  * request itself succeeded.
  */
-final class AfricasTalkingProvider implements SmsProvider
+final class AfricasTalkingProvider implements ChoosableSmsProvider
 {
     public function __construct(
         private readonly string $sender,
         private readonly string $username,
         private readonly string $key,
     ) {}
+
+    public static function label(): string
+    {
+        return "Africa's Talking";
+    }
+
+    public static function needsUsername(): bool
+    {
+        return true;
+    }
+
+    public static function connect(SmsAccount $account): self
+    {
+        return new self($account->sender, $account->username, $account->key);
+    }
 
     public function key(): string
     {

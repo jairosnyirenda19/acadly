@@ -28,7 +28,6 @@ use Acadly\Kernel\Notify\Actions\SetPreference;
 use Acadly\Kernel\Notify\Actions\Subscribe;
 use Acadly\Kernel\Notify\Actions\Unsubscribe;
 use Acadly\Kernel\Notify\Channel;
-use Acadly\Kernel\Notify\Channels\DevelopmentSmsProvider;
 use Acadly\Kernel\Notify\Channels\NoSmsProvider;
 use Acadly\Kernel\Notify\Channels\SmsProvider;
 use Acadly\Kernel\Notify\Jobs\ResolveNotice;
@@ -39,6 +38,7 @@ use Acadly\Kernel\Notify\NoticeDispatcher;
 use Acadly\Kernel\Notify\NoticeLinter;
 use Acadly\Kernel\Notify\Notifier;
 use Acadly\Kernel\Notify\OptOut;
+use Acadly\Kernel\Notify\Sms\LogSmsProvider;
 use Acadly\Kernel\Notify\SubjectRef;
 use Acadly\Kernel\Notify\Topic;
 use Acadly\Kernel\Notify\Words;
@@ -75,7 +75,7 @@ function useToyBuild(array $extra = []): void
 beforeEach(function (): void {
     useToyBuild();
     $this->artisan('acadly:sync')->assertSuccessful();
-    DevelopmentSmsProvider::$sent = [];
+    LogSmsProvider::$sent = [];
 });
 
 /** @param  list<ToyPermission>  $permissions */
@@ -302,7 +302,7 @@ describe('sending', function (): void {
             ->and($row?->body)->toContain('approved by '.$decider->name)
             ->and($row?->body)->toContain('Contact '.config('acadly.school_name'))
             ->and($row?->action_url)->toEndWith('/errands/'.$errand->id)
-            ->and(DevelopmentSmsProvider::$sent)->toBe([['to' => '+265991234567', 'text' => 'Collect the register books was approved. Open Acadly for details.']])
+            ->and(LogSmsProvider::$sent)->toBe([['to' => '+265991234567', 'text' => 'Collect the register books was approved. Open Acadly for details.']])
             ->and(DB::table('notification_usage')->where('channel', 'sms')->sum('units'))->toEqual(1)
             ->and(DB::table('in_app_notifications')->where('user_id', $desk->id)->count())->toBe(1);
     });
@@ -325,7 +325,7 @@ describe('sending', function (): void {
 
         expect(deliveriesTo($requester->id))->toEqual(['in_app' => 'delivered', 'email' => 'suppressed', 'sms' => 'suppressed'])
             ->and(DB::table('notification_deliveries')->where('recipient_user_id', $requester->id)->where('status', 'suppressed')->pluck('reason')->unique()->all())->toBe(['not_reachable'])
-            ->and(DevelopmentSmsProvider::$sent)->toBe([]);
+            ->and(LogSmsProvider::$sent)->toBe([]);
     });
 
     it('honours a person who switched a channel off, unless the notice cannot be silenced', function (): void {

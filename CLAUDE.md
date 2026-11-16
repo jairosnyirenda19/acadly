@@ -21,6 +21,8 @@ Education platform (ECD, primary, secondary, tertiary). **One deployment per sch
 11. **External I/O after commit**, on the queue, idempotent.
 12. **Frontend:** generated API client only. Check permissions, modules and bindings — never roles, levels or state literals. No string literals for user-facing text. Semantic tokens only.
 
+13. **The learner record holds everything about a learner.** A module that keeps anything about a learner adds its part: implement `LearnerRecordPart` (Enrolment Contracts), tag it, and give the record screen its tab. A test fails the build when a module that tells families about a learner has none.
+
 ## Design
 
 - `PRODUCT.md` says who the product is for and how it speaks. `DESIGN.md` is the visual law ("The Register Book"). Read both before any UI work.

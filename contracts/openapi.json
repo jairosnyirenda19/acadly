@@ -1308,6 +1308,576 @@
                 }
             }
         },
+        "/v1/grids/{grid}/views": {
+            "post": {
+                "operationId": "grids.views.store",
+                "summary": "Saves a view: `{name, state}`",
+                "tags": [
+                    "Grids"
+                ],
+                "parameters": [
+                    {
+                        "name": "grid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "state": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "views": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "object",
+                                                        "additionalProperties": {}
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "state"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "views"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/grids/{grid}/views/{id}": {
+            "put": {
+                "operationId": "grids.views.update",
+                "summary": "Renames a view or keeps the list as it is now in it: `{name, state}`",
+                "tags": [
+                    "Grids"
+                ],
+                "parameters": [
+                    {
+                        "name": "grid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "state": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "views": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "object",
+                                                        "additionalProperties": {}
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "state"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "views"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "grids.views.delete",
+                "tags": [
+                    "Grids"
+                ],
+                "parameters": [
+                    {
+                        "name": "grid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "views": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "object",
+                                                        "additionalProperties": {}
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "state"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "views"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/grids/{grid}/columns": {
+            "put": {
+                "operationId": "grids.columns",
+                "summary": "Keeps the columns a person chose: `{shown: [key, \u2026]}`, or `{reset: true}` for the list's own",
+                "tags": [
+                    "Grids"
+                ],
+                "parameters": [
+                    {
+                        "name": "grid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "shown": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "shown": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "shown"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/grids/{grid}/exports": {
+            "post": {
+                "operationId": "grids.exports.store",
+                "summary": "Asks for an export, built in the background: `{state, ids?}`. Without ids, every row that matches",
+                "tags": [
+                    "Grids"
+                ],
+                "parameters": [
+                    {
+                        "name": "grid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "state": {
+                                        "type": "string"
+                                    },
+                                    "ids": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "queued",
+                                                "building",
+                                                "ready",
+                                                "failed",
+                                                "expired"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "status"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/grids/{grid}/bulk": {
+            "post": {
+                "operationId": "grids.bulk",
+                "summary": "Takes a bulk action: `{action, ids?, all?, state, input?}`. With `all`, every row that matches the state",
+                "tags": [
+                    "Grids"
+                ],
+                "parameters": [
+                    {
+                        "name": "grid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "state": {
+                                        "type": "string"
+                                    },
+                                    "ids": {
+                                        "type": "string"
+                                    },
+                                    "input": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "done": {
+                                            "type": "integer"
+                                        },
+                                        "refused": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "reason": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "reason"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "done",
+                                        "refused"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/grids/exports/{id}": {
+            "get": {
+                "operationId": "grids.exports.show",
+                "summary": "One of the person's own exports",
+                "tags": [
+                    "Grids"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "list": {
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "queued",
+                                                "building",
+                                                "ready",
+                                                "failed",
+                                                "expired"
+                                            ]
+                                        },
+                                        "rows": {
+                                            "type": [
+                                                "integer",
+                                                "null"
+                                            ]
+                                        },
+                                        "requested_at": {
+                                            "type": "string"
+                                        },
+                                        "expires_at": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "list",
+                                        "status",
+                                        "rows",
+                                        "requested_at",
+                                        "expires_at"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/grids/exports/{id}/file": {
+            "get": {
+                "operationId": "grids.exports.file",
+                "summary": "Downloads a finished export",
+                "tags": [
+                    "Grids"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Transfer-Encoding": {
+                                "required": true,
+                                "schema": {
+                                    "type": "string",
+                                    "enum": [
+                                        "chunked"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/health": {
             "get": {
                 "operationId": "kernel.health",
@@ -3049,6 +3619,284 @@
                 }
             }
         },
+        "/v1/learners/grid": {
+            "get": {
+                "operationId": "learners.grid",
+                "summary": "The learners as a data grid: `?page=&per_page=&sort=&dir=&q=&filter[class]=a,b&filter[state]=few_contacts&filter[sex]=female&filter[admitted]=from..to`",
+                "tags": [
+                    "Learners"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "rows": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "acadly_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "admission_number": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "class_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus": {
+                                                        "type": "string"
+                                                    },
+                                                    "sex": {
+                                                        "type": "string"
+                                                    },
+                                                    "date_of_birth": {
+                                                        "type": "string"
+                                                    },
+                                                    "admitted_on": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "contacts": {
+                                                        "type": "integer"
+                                                    },
+                                                    "main_contact": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "has_photo": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "few_contacts": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "possible_duplicate": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "acadly_id",
+                                                    "name",
+                                                    "admission_number",
+                                                    "class_id",
+                                                    "class",
+                                                    "campus",
+                                                    "sex",
+                                                    "date_of_birth",
+                                                    "admitted_on",
+                                                    "contacts",
+                                                    "main_contact",
+                                                    "has_photo",
+                                                    "few_contacts",
+                                                    "possible_duplicate"
+                                                ]
+                                            }
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        },
+                                        "page": {
+                                            "type": "integer"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "pages": {
+                                            "type": "integer"
+                                        },
+                                        "sort": {
+                                            "type": "string"
+                                        },
+                                        "dir": {
+                                            "type": "string",
+                                            "enum": [
+                                                "asc",
+                                                "desc"
+                                            ]
+                                        },
+                                        "q": {
+                                            "type": "string"
+                                        },
+                                        "filters": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "columns": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "sortable": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "shown": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "always": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label",
+                                                    "sortable",
+                                                    "shown",
+                                                    "always"
+                                                ]
+                                            }
+                                        },
+                                        "filter_options": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "choice",
+                                                            "dates"
+                                                        ]
+                                                    },
+                                                    "options": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "value": {
+                                                                    "type": "string"
+                                                                },
+                                                                "label": {
+                                                                    "type": "string"
+                                                                },
+                                                                "count": {
+                                                                    "type": "integer"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "value",
+                                                                "label",
+                                                                "count"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label",
+                                                    "kind",
+                                                    "options"
+                                                ]
+                                            }
+                                        },
+                                        "views": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "object",
+                                                        "additionalProperties": {}
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "state"
+                                                ]
+                                            }
+                                        },
+                                        "bulk": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label"
+                                                ]
+                                            }
+                                        },
+                                        "can_export": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "rows",
+                                        "total",
+                                        "page",
+                                        "per_page",
+                                        "pages",
+                                        "sort",
+                                        "dir",
+                                        "q",
+                                        "filters",
+                                        "columns",
+                                        "filter_options",
+                                        "views",
+                                        "bulk",
+                                        "can_export"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/learners/{id}": {
             "get": {
                 "operationId": "learners.show",
@@ -3120,6 +3968,9 @@
                                             ]
                                         },
                                         "word": {
+                                            "type": "string"
+                                        },
+                                        "word_plural": {
                                             "type": "string"
                                         },
                                         "class": {
@@ -3331,6 +4182,78 @@
                                                     "label"
                                                 ]
                                             }
+                                        },
+                                        "parts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "band": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "label": {
+                                                                    "type": "string"
+                                                                },
+                                                                "value": {
+                                                                    "type": "string"
+                                                                },
+                                                                "note": {
+                                                                    "type": "string"
+                                                                },
+                                                                "tone": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "plain",
+                                                                        "attention"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "label",
+                                                                "value",
+                                                                "note",
+                                                                "tone"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "attention": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "title",
+                                                    "band",
+                                                    "attention"
+                                                ]
+                                            }
+                                        },
+                                        "told": {
+                                            "type": "object",
+                                            "properties": {
+                                                "all": {
+                                                    "type": "integer"
+                                                },
+                                                "delivered": {
+                                                    "type": "integer"
+                                                },
+                                                "not_delivered": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "all",
+                                                "delivered",
+                                                "not_delivered"
+                                            ]
                                         }
                                     },
                                     "required": [
@@ -3347,6 +4270,7 @@
                                         "status",
                                         "admitted_on",
                                         "word",
+                                        "word_plural",
                                         "class",
                                         "level",
                                         "division",
@@ -3358,7 +4282,9 @@
                                         "possible_duplicate",
                                         "move_to",
                                         "can_manage",
-                                        "relationships"
+                                        "relationships",
+                                        "parts",
+                                        "told"
                                     ]
                                 }
                             }
@@ -3441,6 +4367,9 @@
                                         "word": {
                                             "type": "string"
                                         },
+                                        "word_plural": {
+                                            "type": "string"
+                                        },
                                         "class": {
                                             "type": [
                                                 "object",
@@ -3508,6 +4437,51 @@
                                         "relationships": {
                                             "type": "array",
                                             "items": {}
+                                        },
+                                        "parts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "band": {
+                                                        "type": "string"
+                                                    },
+                                                    "attention": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "title",
+                                                    "band",
+                                                    "attention"
+                                                ]
+                                            }
+                                        },
+                                        "told": {
+                                            "type": "object",
+                                            "properties": {
+                                                "all": {
+                                                    "type": "integer"
+                                                },
+                                                "delivered": {
+                                                    "type": "integer"
+                                                },
+                                                "not_delivered": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "all",
+                                                "delivered",
+                                                "not_delivered"
+                                            ]
                                         }
                                     },
                                     "required": [
@@ -3524,6 +4498,7 @@
                                         "status",
                                         "admitted_on",
                                         "word",
+                                        "word_plural",
                                         "class",
                                         "level",
                                         "division",
@@ -3535,7 +4510,118 @@
                                         "possible_duplicate",
                                         "move_to",
                                         "can_manage",
-                                        "relationships"
+                                        "relationships",
+                                        "parts",
+                                        "told"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/learners/{id}/messages": {
+            "get": {
+                "operationId": "learners.messages",
+                "summary": "Every notice the school sent about the learner, to whom, and what happened to it",
+                "tags": [
+                    "Learners"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "messages": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "to": {
+                                                        "type": "string"
+                                                    },
+                                                    "address": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "notice": {
+                                                        "type": "string"
+                                                    },
+                                                    "about": {
+                                                        "type": "string"
+                                                    },
+                                                    "channel": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "delivered",
+                                                            "sent",
+                                                            "accepted",
+                                                            "not_delivered",
+                                                            "waiting",
+                                                            "not_reachable",
+                                                            "over_allowance",
+                                                            "not_sent"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "units": {
+                                                        "type": "integer"
+                                                    },
+                                                    "again": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "at",
+                                                    "to",
+                                                    "address",
+                                                    "notice",
+                                                    "about",
+                                                    "channel",
+                                                    "state",
+                                                    "reason",
+                                                    "units",
+                                                    "again"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "messages"
                                     ]
                                 }
                             }
@@ -3620,6 +4706,9 @@
                                         "word": {
                                             "type": "string"
                                         },
+                                        "word_plural": {
+                                            "type": "string"
+                                        },
                                         "class": {
                                             "type": [
                                                 "object",
@@ -3687,6 +4776,51 @@
                                         "relationships": {
                                             "type": "array",
                                             "items": {}
+                                        },
+                                        "parts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "band": {
+                                                        "type": "string"
+                                                    },
+                                                    "attention": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "title",
+                                                    "band",
+                                                    "attention"
+                                                ]
+                                            }
+                                        },
+                                        "told": {
+                                            "type": "object",
+                                            "properties": {
+                                                "all": {
+                                                    "type": "integer"
+                                                },
+                                                "delivered": {
+                                                    "type": "integer"
+                                                },
+                                                "not_delivered": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "all",
+                                                "delivered",
+                                                "not_delivered"
+                                            ]
                                         }
                                     },
                                     "required": [
@@ -3703,6 +4837,7 @@
                                         "status",
                                         "admitted_on",
                                         "word",
+                                        "word_plural",
                                         "class",
                                         "level",
                                         "division",
@@ -3714,7 +4849,9 @@
                                         "possible_duplicate",
                                         "move_to",
                                         "can_manage",
-                                        "relationships"
+                                        "relationships",
+                                        "parts",
+                                        "told"
                                     ]
                                 }
                             }
@@ -3814,6 +4951,9 @@
                                         "word": {
                                             "type": "string"
                                         },
+                                        "word_plural": {
+                                            "type": "string"
+                                        },
                                         "class": {
                                             "type": [
                                                 "object",
@@ -3881,6 +5021,51 @@
                                         "relationships": {
                                             "type": "array",
                                             "items": {}
+                                        },
+                                        "parts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "band": {
+                                                        "type": "string"
+                                                    },
+                                                    "attention": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "title",
+                                                    "band",
+                                                    "attention"
+                                                ]
+                                            }
+                                        },
+                                        "told": {
+                                            "type": "object",
+                                            "properties": {
+                                                "all": {
+                                                    "type": "integer"
+                                                },
+                                                "delivered": {
+                                                    "type": "integer"
+                                                },
+                                                "not_delivered": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "all",
+                                                "delivered",
+                                                "not_delivered"
+                                            ]
                                         }
                                     },
                                     "required": [
@@ -3897,6 +5082,7 @@
                                         "status",
                                         "admitted_on",
                                         "word",
+                                        "word_plural",
                                         "class",
                                         "level",
                                         "division",
@@ -3908,7 +5094,9 @@
                                         "possible_duplicate",
                                         "move_to",
                                         "can_manage",
-                                        "relationships"
+                                        "relationships",
+                                        "parts",
+                                        "told"
                                     ]
                                 }
                             }
@@ -4001,6 +5189,9 @@
                                         "word": {
                                             "type": "string"
                                         },
+                                        "word_plural": {
+                                            "type": "string"
+                                        },
                                         "class": {
                                             "type": [
                                                 "object",
@@ -4068,6 +5259,51 @@
                                         "relationships": {
                                             "type": "array",
                                             "items": {}
+                                        },
+                                        "parts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "band": {
+                                                        "type": "string"
+                                                    },
+                                                    "attention": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "title",
+                                                    "band",
+                                                    "attention"
+                                                ]
+                                            }
+                                        },
+                                        "told": {
+                                            "type": "object",
+                                            "properties": {
+                                                "all": {
+                                                    "type": "integer"
+                                                },
+                                                "delivered": {
+                                                    "type": "integer"
+                                                },
+                                                "not_delivered": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "all",
+                                                "delivered",
+                                                "not_delivered"
+                                            ]
                                         }
                                     },
                                     "required": [
@@ -4084,6 +5320,7 @@
                                         "status",
                                         "admitted_on",
                                         "word",
+                                        "word_plural",
                                         "class",
                                         "level",
                                         "division",
@@ -4095,7 +5332,9 @@
                                         "possible_duplicate",
                                         "move_to",
                                         "can_manage",
-                                        "relationships"
+                                        "relationships",
+                                        "parts",
+                                        "told"
                                     ]
                                 }
                             }
@@ -4188,6 +5427,9 @@
                                         "word": {
                                             "type": "string"
                                         },
+                                        "word_plural": {
+                                            "type": "string"
+                                        },
                                         "class": {
                                             "type": [
                                                 "object",
@@ -4255,6 +5497,51 @@
                                         "relationships": {
                                             "type": "array",
                                             "items": {}
+                                        },
+                                        "parts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "band": {
+                                                        "type": "string"
+                                                    },
+                                                    "attention": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "title",
+                                                    "band",
+                                                    "attention"
+                                                ]
+                                            }
+                                        },
+                                        "told": {
+                                            "type": "object",
+                                            "properties": {
+                                                "all": {
+                                                    "type": "integer"
+                                                },
+                                                "delivered": {
+                                                    "type": "integer"
+                                                },
+                                                "not_delivered": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "all",
+                                                "delivered",
+                                                "not_delivered"
+                                            ]
                                         }
                                     },
                                     "required": [
@@ -4271,6 +5558,7 @@
                                         "status",
                                         "admitted_on",
                                         "word",
+                                        "word_plural",
                                         "class",
                                         "level",
                                         "division",
@@ -4282,7 +5570,9 @@
                                         "possible_duplicate",
                                         "move_to",
                                         "can_manage",
-                                        "relationships"
+                                        "relationships",
+                                        "parts",
+                                        "told"
                                     ]
                                 }
                             }
@@ -4375,6 +5665,9 @@
                                         "word": {
                                             "type": "string"
                                         },
+                                        "word_plural": {
+                                            "type": "string"
+                                        },
                                         "class": {
                                             "type": [
                                                 "object",
@@ -4442,6 +5735,51 @@
                                         "relationships": {
                                             "type": "array",
                                             "items": {}
+                                        },
+                                        "parts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "band": {
+                                                        "type": "string"
+                                                    },
+                                                    "attention": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "title",
+                                                    "band",
+                                                    "attention"
+                                                ]
+                                            }
+                                        },
+                                        "told": {
+                                            "type": "object",
+                                            "properties": {
+                                                "all": {
+                                                    "type": "integer"
+                                                },
+                                                "delivered": {
+                                                    "type": "integer"
+                                                },
+                                                "not_delivered": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "all",
+                                                "delivered",
+                                                "not_delivered"
+                                            ]
                                         }
                                     },
                                     "required": [
@@ -4458,6 +5796,7 @@
                                         "status",
                                         "admitted_on",
                                         "word",
+                                        "word_plural",
                                         "class",
                                         "level",
                                         "division",
@@ -4469,7 +5808,9 @@
                                         "possible_duplicate",
                                         "move_to",
                                         "can_manage",
-                                        "relationships"
+                                        "relationships",
+                                        "parts",
+                                        "told"
                                     ]
                                 }
                             }
@@ -4554,6 +5895,9 @@
                                         "word": {
                                             "type": "string"
                                         },
+                                        "word_plural": {
+                                            "type": "string"
+                                        },
                                         "class": {
                                             "type": [
                                                 "object",
@@ -4621,6 +5965,51 @@
                                         "relationships": {
                                             "type": "array",
                                             "items": {}
+                                        },
+                                        "parts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "band": {
+                                                        "type": "string"
+                                                    },
+                                                    "attention": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "title",
+                                                    "band",
+                                                    "attention"
+                                                ]
+                                            }
+                                        },
+                                        "told": {
+                                            "type": "object",
+                                            "properties": {
+                                                "all": {
+                                                    "type": "integer"
+                                                },
+                                                "delivered": {
+                                                    "type": "integer"
+                                                },
+                                                "not_delivered": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "all",
+                                                "delivered",
+                                                "not_delivered"
+                                            ]
                                         }
                                     },
                                     "required": [
@@ -4637,6 +6026,7 @@
                                         "status",
                                         "admitted_on",
                                         "word",
+                                        "word_plural",
                                         "class",
                                         "level",
                                         "division",
@@ -4648,7 +6038,9 @@
                                         "possible_duplicate",
                                         "move_to",
                                         "can_manage",
-                                        "relationships"
+                                        "relationships",
+                                        "parts",
+                                        "told"
                                     ]
                                 }
                             }
@@ -5587,6 +6979,394 @@
                                         "notice_on",
                                         "missed",
                                         "totals"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/registers/learner/{id}": {
+            "get": {
+                "operationId": "registers.learner",
+                "summary": "Attendance's part of a learner's record: the term, every morning, lessons by subject, absences and corrections",
+                "tags": [
+                    "Lessons"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "term": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "starts_on": {
+                                                    "type": "string"
+                                                },
+                                                "ends_on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "starts_on",
+                                                "ends_on"
+                                            ]
+                                        },
+                                        "today": {
+                                            "type": "string"
+                                        },
+                                        "totals": {
+                                            "type": "object",
+                                            "properties": {
+                                                "marked": {
+                                                    "type": "integer"
+                                                },
+                                                "present": {
+                                                    "type": "integer"
+                                                },
+                                                "absent": {
+                                                    "type": "integer"
+                                                },
+                                                "late": {
+                                                    "type": "integer"
+                                                },
+                                                "missed": {
+                                                    "type": "integer"
+                                                },
+                                                "missed_today": {
+                                                    "type": "integer"
+                                                },
+                                                "share": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last_absent": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "marked",
+                                                "present",
+                                                "absent",
+                                                "late",
+                                                "missed",
+                                                "missed_today",
+                                                "share",
+                                                "last_absent"
+                                            ]
+                                        },
+                                        "weeks": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "week": {
+                                                        "type": "string"
+                                                    },
+                                                    "days": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "day": {
+                                                                    "type": "string"
+                                                                },
+                                                                "mark": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ],
+                                                                    "enum": [
+                                                                        "present",
+                                                                        "absent",
+                                                                        "late",
+                                                                        "excused",
+                                                                        null
+                                                                    ]
+                                                                },
+                                                                "school_day": {
+                                                                    "type": "boolean"
+                                                                },
+                                                                "future": {
+                                                                    "type": "boolean"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "day",
+                                                                "mark",
+                                                                "school_day",
+                                                                "future"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "week",
+                                                    "days"
+                                                ]
+                                            }
+                                        },
+                                        "lessons_today": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "period": {
+                                                        "type": "integer"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "starts": {
+                                                        "type": "string"
+                                                    },
+                                                    "subject": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "lesson",
+                                                            "activity"
+                                                        ]
+                                                    },
+                                                    "mark": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ],
+                                                        "enum": [
+                                                            "present",
+                                                            "absent",
+                                                            "late",
+                                                            "excused",
+                                                            null
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "period",
+                                                    "name",
+                                                    "starts",
+                                                    "subject",
+                                                    "kind",
+                                                    "mark"
+                                                ]
+                                            }
+                                        },
+                                        "subjects": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "subject": {
+                                                        "type": "string"
+                                                    },
+                                                    "present": {
+                                                        "type": "integer"
+                                                    },
+                                                    "total": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "subject",
+                                                    "present",
+                                                    "total"
+                                                ]
+                                            }
+                                        },
+                                        "absences": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "day": {
+                                                        "type": "string"
+                                                    },
+                                                    "what": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "absent",
+                                                            "missed"
+                                                        ]
+                                                    },
+                                                    "lesson": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "register_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "told": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "to": {
+                                                                    "type": "string"
+                                                                },
+                                                                "channel": {
+                                                                    "type": "string"
+                                                                },
+                                                                "state": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "delivered",
+                                                                        "sent",
+                                                                        "accepted",
+                                                                        "not_delivered",
+                                                                        "waiting",
+                                                                        "not_reachable"
+                                                                    ]
+                                                                },
+                                                                "at": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "to",
+                                                                "channel",
+                                                                "state",
+                                                                "at"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "follow_ups": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "kind": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "told_next",
+                                                                        "called"
+                                                                    ]
+                                                                },
+                                                                "by": {
+                                                                    "type": "string"
+                                                                },
+                                                                "at": {
+                                                                    "type": "string"
+                                                                },
+                                                                "note": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "kind",
+                                                                "by",
+                                                                "at",
+                                                                "note"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "day",
+                                                    "what",
+                                                    "lesson",
+                                                    "register_id",
+                                                    "reason",
+                                                    "told",
+                                                    "follow_ups"
+                                                ]
+                                            }
+                                        },
+                                        "corrections": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "day": {
+                                                        "type": "string"
+                                                    },
+                                                    "register": {
+                                                        "type": "string"
+                                                    },
+                                                    "from": {
+                                                        "type": "string"
+                                                    },
+                                                    "to": {
+                                                        "type": "string"
+                                                    },
+                                                    "reason": {
+                                                        "type": "string"
+                                                    },
+                                                    "asked_by": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "day",
+                                                    "register",
+                                                    "from",
+                                                    "to",
+                                                    "reason",
+                                                    "asked_by",
+                                                    "state",
+                                                    "at"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "term",
+                                        "today",
+                                        "totals",
+                                        "weeks",
+                                        "lessons_today",
+                                        "subjects",
+                                        "absences",
+                                        "corrections"
                                     ]
                                 }
                             }
@@ -8657,6 +10437,275 @@
                 }
             }
         },
+        "/v1/messages/sent/grid": {
+            "get": {
+                "operationId": "messages.sent.grid",
+                "summary": "Every message as a data grid: `?page=&per_page=&sort=&dir=&q=&filter[day]=from..to&filter[channel]=sms&filter[state]=not_delivered`",
+                "tags": [
+                    "Messages"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "rows": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "to": {
+                                                        "type": "string"
+                                                    },
+                                                    "address": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "notice": {
+                                                        "type": "string"
+                                                    },
+                                                    "about": {
+                                                        "type": "string"
+                                                    },
+                                                    "channel": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "delivered",
+                                                            "sent",
+                                                            "accepted",
+                                                            "not_delivered",
+                                                            "waiting",
+                                                            "not_reachable",
+                                                            "over_allowance",
+                                                            "not_sent"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "units": {
+                                                        "type": "integer"
+                                                    },
+                                                    "again": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "at",
+                                                    "to",
+                                                    "address",
+                                                    "notice",
+                                                    "about",
+                                                    "channel",
+                                                    "state",
+                                                    "reason",
+                                                    "units",
+                                                    "again"
+                                                ]
+                                            }
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        },
+                                        "page": {
+                                            "type": "integer"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "pages": {
+                                            "type": "integer"
+                                        },
+                                        "sort": {
+                                            "type": "string"
+                                        },
+                                        "dir": {
+                                            "type": "string",
+                                            "enum": [
+                                                "asc",
+                                                "desc"
+                                            ]
+                                        },
+                                        "q": {
+                                            "type": "string"
+                                        },
+                                        "filters": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "columns": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "sortable": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "shown": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "always": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label",
+                                                    "sortable",
+                                                    "shown",
+                                                    "always"
+                                                ]
+                                            }
+                                        },
+                                        "filter_options": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "choice",
+                                                            "dates"
+                                                        ]
+                                                    },
+                                                    "options": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "value": {
+                                                                    "type": "string"
+                                                                },
+                                                                "label": {
+                                                                    "type": "string"
+                                                                },
+                                                                "count": {
+                                                                    "type": "integer"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "value",
+                                                                "label",
+                                                                "count"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label",
+                                                    "kind",
+                                                    "options"
+                                                ]
+                                            }
+                                        },
+                                        "views": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "object",
+                                                        "additionalProperties": {}
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "state"
+                                                ]
+                                            }
+                                        },
+                                        "bulk": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label"
+                                                ]
+                                            }
+                                        },
+                                        "can_export": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "rows",
+                                        "total",
+                                        "page",
+                                        "per_page",
+                                        "pages",
+                                        "sort",
+                                        "dir",
+                                        "q",
+                                        "filters",
+                                        "columns",
+                                        "filter_options",
+                                        "views",
+                                        "bulk",
+                                        "can_export"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/messages/sent/{id}": {
             "get": {
                 "operationId": "messages.message",
@@ -9969,6 +12018,279 @@
                     },
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/people/grid": {
+            "get": {
+                "operationId": "people.grid",
+                "summary": "The people as a data grid: `?page=&per_page=&sort=&dir=&q=&filter[state]=&filter[role]=&filter[signed_in]=from..to`",
+                "tags": [
+                    "People"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "rows": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "active",
+                                                            "ready",
+                                                            "invited",
+                                                            "expired",
+                                                            "no_role",
+                                                            "disabled"
+                                                        ]
+                                                    },
+                                                    "roles": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "role": {
+                                                                    "type": "string"
+                                                                },
+                                                                "where": {
+                                                                    "type": "string"
+                                                                },
+                                                                "ends_at": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "role",
+                                                                "where",
+                                                                "ends_at"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "last_signed_in_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "invitation_sent_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "email",
+                                                    "state",
+                                                    "roles",
+                                                    "last_signed_in_at",
+                                                    "invitation_sent_at"
+                                                ]
+                                            }
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        },
+                                        "page": {
+                                            "type": "integer"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "pages": {
+                                            "type": "integer"
+                                        },
+                                        "sort": {
+                                            "type": "string"
+                                        },
+                                        "dir": {
+                                            "type": "string",
+                                            "enum": [
+                                                "asc",
+                                                "desc"
+                                            ]
+                                        },
+                                        "q": {
+                                            "type": "string"
+                                        },
+                                        "filters": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "columns": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "sortable": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "shown": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "always": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label",
+                                                    "sortable",
+                                                    "shown",
+                                                    "always"
+                                                ]
+                                            }
+                                        },
+                                        "filter_options": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "choice",
+                                                            "dates"
+                                                        ]
+                                                    },
+                                                    "options": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "value": {
+                                                                    "type": "string"
+                                                                },
+                                                                "label": {
+                                                                    "type": "string"
+                                                                },
+                                                                "count": {
+                                                                    "type": "integer"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "value",
+                                                                "label",
+                                                                "count"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label",
+                                                    "kind",
+                                                    "options"
+                                                ]
+                                            }
+                                        },
+                                        "views": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "object",
+                                                        "additionalProperties": {}
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "state"
+                                                ]
+                                            }
+                                        },
+                                        "bulk": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label"
+                                                ]
+                                            }
+                                        },
+                                        "can_export": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "rows",
+                                        "total",
+                                        "page",
+                                        "per_page",
+                                        "pages",
+                                        "sort",
+                                        "dir",
+                                        "q",
+                                        "filters",
+                                        "columns",
+                                        "filter_options",
+                                        "views",
+                                        "bulk",
+                                        "can_export"
+                                    ]
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"

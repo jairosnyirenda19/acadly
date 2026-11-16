@@ -203,6 +203,125 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/grids/{grid}/views": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Saves a view: `{name, state}` */
+        post: operations["grids.views.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/grids/{grid}/views/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Renames a view or keeps the list as it is now in it: `{name, state}` */
+        put: operations["grids.views.update"];
+        post?: never;
+        delete: operations["grids.views.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/grids/{grid}/columns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Keeps the columns a person chose: `{shown: [key, …]}`, or `{reset: true}` for the list's own */
+        put: operations["grids.columns"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/grids/{grid}/exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Asks for an export, built in the background: `{state, ids?}`. Without ids, every row that matches */
+        post: operations["grids.exports.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/grids/{grid}/bulk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Takes a bulk action: `{action, ids?, all?, state, input?}`. With `all`, every row that matches the state */
+        post: operations["grids.bulk"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/grids/exports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One of the person's own exports */
+        get: operations["grids.exports.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/grids/exports/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Downloads a finished export */
+        get: operations["grids.exports.file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/health": {
         parameters: {
             query?: never;
@@ -417,6 +536,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/learners/grid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The learners as a data grid: `?page=&per_page=&sort=&dir=&q=&filter[class]=a,b&filter[state]=few_contacts&filter[sex]=female&filter[admitted]=from..to` */
+        get: operations["learners.grid"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/learners/{id}": {
         parameters: {
             query?: never;
@@ -428,6 +564,23 @@ export interface paths {
         get: operations["learners.show"];
         /** Corrects the details: `{first_name, other_names, surname, sex, date_of_birth, admission_number, reason}` */
         put: operations["learners.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learners/{id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every notice the school sent about the learner, to whom, and what happened to it */
+        get: operations["learners.messages"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -598,6 +751,23 @@ export interface paths {
         };
         /** Learners here this morning and absent from a lesson: `?day=YYYY-MM-DD` */
         get: operations["registers.missed"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/registers/learner/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Attendance's part of a learner's record: the term, every morning, lessons by subject, absences and corrections */
+        get: operations["registers.learner"];
         put?: never;
         post?: never;
         delete?: never;
@@ -861,6 +1031,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/messages/sent/grid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every message as a data grid: `?page=&per_page=&sort=&dir=&q=&filter[day]=from..to&filter[channel]=sms&filter[state]=not_delivered` */
+        get: operations["messages.sent.grid"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/messages/sent/{id}": {
         parameters: {
             query?: never;
@@ -1022,6 +1209,23 @@ export interface paths {
         put?: never;
         /** Invites a person with a role at a place: `{name, email, role_id, scope_type, scope_id, send}` */
         post: operations["people.invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/people/grid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The people as a data grid: `?page=&per_page=&sort=&dir=&q=&filter[state]=&filter[role]=&filter[signed_in]=from..to` */
+        get: operations["people.grid"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2187,6 +2391,265 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "grids.views.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                grid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    state?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        views: {
+                            id: string;
+                            name: string;
+                            state: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "grids.views.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                grid: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    state?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        views: {
+                            id: string;
+                            name: string;
+                            state: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "grids.views.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                grid: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        views: {
+                            id: string;
+                            name: string;
+                            state: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "grids.columns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                grid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    shown?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        shown: string[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "grids.exports.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                grid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    state?: string;
+                    ids?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        /** @enum {string} */
+                        status: "queued" | "building" | "ready" | "failed" | "expired";
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "grids.bulk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                grid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    state?: string;
+                    ids?: string;
+                    input?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        done: number;
+                        refused: {
+                            id: string;
+                            name: string;
+                            reason: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "grids.exports.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        list: string;
+                        /** @enum {string} */
+                        status: "queued" | "building" | "ready" | "failed" | "expired";
+                        rows: number | null;
+                        requested_at: string;
+                        expires_at: string | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "grids.exports.file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Transfer-Encoding": "chunked";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "kernel.health": {
         parameters: {
             query?: never;
@@ -2758,6 +3221,85 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "learners.grid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        rows: {
+                            id: string;
+                            acadly_id: string;
+                            name: string;
+                            admission_number: string | null;
+                            class_id: string;
+                            class: string;
+                            campus: string;
+                            sex: string;
+                            date_of_birth: string;
+                            admitted_on: string | null;
+                            contacts: number;
+                            main_contact: string | null;
+                            has_photo: boolean;
+                            few_contacts: boolean;
+                            possible_duplicate: boolean;
+                        }[];
+                        total: number;
+                        page: number;
+                        per_page: number;
+                        pages: number;
+                        sort: string;
+                        /** @enum {string} */
+                        dir: "asc" | "desc";
+                        q: string;
+                        filters: {
+                            [key: string]: string[];
+                        };
+                        columns: {
+                            key: string;
+                            label: string;
+                            sortable: boolean;
+                            shown: boolean;
+                            always: boolean;
+                        }[];
+                        filter_options: {
+                            key: string;
+                            label: string;
+                            /** @enum {string} */
+                            kind: "choice" | "dates";
+                            options: {
+                                value: string;
+                                label: string;
+                                count: number;
+                            }[];
+                        }[];
+                        views: {
+                            id: string;
+                            name: string;
+                            state: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        bulk: {
+                            key: string;
+                            label: string;
+                        }[];
+                        can_export: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "learners.show": {
         parameters: {
             query?: never;
@@ -2788,6 +3330,7 @@ export interface operations {
                         status: string;
                         admitted_on: string | null;
                         word: string;
+                        word_plural: string;
                         class: {
                             id: string;
                             name: string;
@@ -2833,6 +3376,23 @@ export interface operations {
                             value: string;
                             label: string;
                         }[];
+                        parts: {
+                            key: string;
+                            title: string;
+                            band: {
+                                label: string;
+                                value: string;
+                                note: string;
+                                /** @enum {string} */
+                                tone: "plain" | "attention";
+                            }[];
+                            attention: number;
+                        }[];
+                        told: {
+                            all: number;
+                            delivered: number;
+                            not_delivered: number;
+                        };
                     };
                 };
             };
@@ -2869,6 +3429,7 @@ export interface operations {
                         status: string;
                         admitted_on: string | null;
                         word: string;
+                        word_plural: string;
                         class: {
                             id: string;
                             name: string;
@@ -2884,6 +3445,54 @@ export interface operations {
                         move_to: unknown[];
                         can_manage: boolean;
                         relationships: unknown[];
+                        parts: {
+                            key: string;
+                            title: string;
+                            band: string;
+                            attention: string;
+                        }[];
+                        told: {
+                            all: number;
+                            delivered: number;
+                            not_delivered: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "learners.messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        messages: {
+                            id: string;
+                            at: string;
+                            to: string;
+                            address: string | null;
+                            notice: string;
+                            about: string;
+                            channel: string;
+                            /** @enum {string} */
+                            state: "delivered" | "sent" | "accepted" | "not_delivered" | "waiting" | "not_reachable" | "over_allowance" | "not_sent";
+                            reason: string | null;
+                            units: number;
+                            again: boolean;
+                        }[];
                     };
                 };
             };
@@ -2920,6 +3529,7 @@ export interface operations {
                         status: string;
                         admitted_on: string | null;
                         word: string;
+                        word_plural: string;
                         class: {
                             id: string;
                             name: string;
@@ -2935,6 +3545,17 @@ export interface operations {
                         move_to: unknown[];
                         can_manage: boolean;
                         relationships: unknown[];
+                        parts: {
+                            key: string;
+                            title: string;
+                            band: string;
+                            attention: string;
+                        }[];
+                        told: {
+                            all: number;
+                            delivered: number;
+                            not_delivered: number;
+                        };
                     };
                 };
             };
@@ -2978,6 +3599,7 @@ export interface operations {
                         status: string;
                         admitted_on: string | null;
                         word: string;
+                        word_plural: string;
                         class: {
                             id: string;
                             name: string;
@@ -2993,6 +3615,17 @@ export interface operations {
                         move_to: unknown[];
                         can_manage: boolean;
                         relationships: unknown[];
+                        parts: {
+                            key: string;
+                            title: string;
+                            band: string;
+                            attention: string;
+                        }[];
+                        told: {
+                            all: number;
+                            delivered: number;
+                            not_delivered: number;
+                        };
                     };
                 };
             };
@@ -3030,6 +3663,7 @@ export interface operations {
                         status: string;
                         admitted_on: string | null;
                         word: string;
+                        word_plural: string;
                         class: {
                             id: string;
                             name: string;
@@ -3045,6 +3679,17 @@ export interface operations {
                         move_to: unknown[];
                         can_manage: boolean;
                         relationships: unknown[];
+                        parts: {
+                            key: string;
+                            title: string;
+                            band: string;
+                            attention: string;
+                        }[];
+                        told: {
+                            all: number;
+                            delivered: number;
+                            not_delivered: number;
+                        };
                     };
                 };
             };
@@ -3082,6 +3727,7 @@ export interface operations {
                         status: string;
                         admitted_on: string | null;
                         word: string;
+                        word_plural: string;
                         class: {
                             id: string;
                             name: string;
@@ -3097,6 +3743,17 @@ export interface operations {
                         move_to: unknown[];
                         can_manage: boolean;
                         relationships: unknown[];
+                        parts: {
+                            key: string;
+                            title: string;
+                            band: string;
+                            attention: string;
+                        }[];
+                        told: {
+                            all: number;
+                            delivered: number;
+                            not_delivered: number;
+                        };
                     };
                 };
             };
@@ -3134,6 +3791,7 @@ export interface operations {
                         status: string;
                         admitted_on: string | null;
                         word: string;
+                        word_plural: string;
                         class: {
                             id: string;
                             name: string;
@@ -3149,6 +3807,17 @@ export interface operations {
                         move_to: unknown[];
                         can_manage: boolean;
                         relationships: unknown[];
+                        parts: {
+                            key: string;
+                            title: string;
+                            band: string;
+                            attention: string;
+                        }[];
+                        told: {
+                            all: number;
+                            delivered: number;
+                            not_delivered: number;
+                        };
                     };
                 };
             };
@@ -3208,6 +3877,7 @@ export interface operations {
                         status: string;
                         admitted_on: string | null;
                         word: string;
+                        word_plural: string;
                         class: {
                             id: string;
                             name: string;
@@ -3223,6 +3893,17 @@ export interface operations {
                         move_to: unknown[];
                         can_manage: boolean;
                         relationships: unknown[];
+                        parts: {
+                            key: string;
+                            title: string;
+                            band: string;
+                            attention: string;
+                        }[];
+                        told: {
+                            all: number;
+                            delivered: number;
+                            not_delivered: number;
+                        };
                     };
                 };
             };
@@ -3477,6 +4158,102 @@ export interface operations {
                             followed_up: number;
                             told: number;
                         };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "registers.learner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        term: {
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                        } | null;
+                        today: string;
+                        totals: {
+                            marked: number;
+                            present: number;
+                            absent: number;
+                            late: number;
+                            missed: number;
+                            missed_today: number;
+                            share: number | null;
+                            last_absent: string | null;
+                        };
+                        weeks: {
+                            week: string;
+                            days: {
+                                day: string;
+                                /** @enum {string|null} */
+                                mark: "present" | "absent" | "late" | "excused" | null;
+                                school_day: boolean;
+                                future: boolean;
+                            }[];
+                        }[];
+                        lessons_today: {
+                            period: number;
+                            name: string;
+                            starts: string;
+                            subject: string;
+                            /** @enum {string} */
+                            kind: "lesson" | "activity";
+                            /** @enum {string|null} */
+                            mark: "present" | "absent" | "late" | "excused" | null;
+                        }[];
+                        subjects: {
+                            subject: string;
+                            present: number;
+                            total: number;
+                        }[];
+                        absences: {
+                            day: string;
+                            /** @enum {string} */
+                            what: "absent" | "missed";
+                            lesson: string | null;
+                            register_id: string;
+                            reason: string | null;
+                            told: {
+                                to: string;
+                                channel: string;
+                                /** @enum {string} */
+                                state: "delivered" | "sent" | "accepted" | "not_delivered" | "waiting" | "not_reachable";
+                                at: string;
+                            }[];
+                            follow_ups: {
+                                /** @enum {string} */
+                                kind: "told_next" | "called";
+                                by: string;
+                                at: string;
+                                note: string | null;
+                            }[];
+                        }[];
+                        corrections: {
+                            day: string;
+                            register: string;
+                            from: string;
+                            to: string;
+                            reason: string;
+                            asked_by: string;
+                            state: string;
+                            at: string;
+                        }[];
                     };
                 };
             };
@@ -4395,6 +5172,82 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
+    "messages.sent.grid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        rows: {
+                            id: string;
+                            at: string;
+                            to: string;
+                            address: string | null;
+                            notice: string;
+                            about: string;
+                            channel: string;
+                            /** @enum {string} */
+                            state: "delivered" | "sent" | "accepted" | "not_delivered" | "waiting" | "not_reachable" | "over_allowance" | "not_sent";
+                            reason: string | null;
+                            units: number;
+                            again: boolean;
+                        }[];
+                        total: number;
+                        page: number;
+                        per_page: number;
+                        pages: number;
+                        sort: string;
+                        /** @enum {string} */
+                        dir: "asc" | "desc";
+                        q: string;
+                        filters: {
+                            [key: string]: string[];
+                        };
+                        columns: {
+                            key: string;
+                            label: string;
+                            sortable: boolean;
+                            shown: boolean;
+                            always: boolean;
+                        }[];
+                        filter_options: {
+                            key: string;
+                            label: string;
+                            /** @enum {string} */
+                            kind: "choice" | "dates";
+                            options: {
+                                value: string;
+                                label: string;
+                                count: number;
+                            }[];
+                        }[];
+                        views: {
+                            id: string;
+                            name: string;
+                            state: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        bulk: {
+                            key: string;
+                            label: string;
+                        }[];
+                        can_export: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "messages.message": {
         parameters: {
             query?: never;
@@ -4825,6 +5678,82 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "people.grid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        rows: {
+                            id: string;
+                            name: string;
+                            email: string;
+                            /** @enum {string} */
+                            state: "active" | "ready" | "invited" | "expired" | "no_role" | "disabled";
+                            roles: {
+                                role: string;
+                                where: string;
+                                ends_at: string | null;
+                            }[];
+                            last_signed_in_at: string | null;
+                            invitation_sent_at: string | null;
+                        }[];
+                        total: number;
+                        page: number;
+                        per_page: number;
+                        pages: number;
+                        sort: string;
+                        /** @enum {string} */
+                        dir: "asc" | "desc";
+                        q: string;
+                        filters: {
+                            [key: string]: string[];
+                        };
+                        columns: {
+                            key: string;
+                            label: string;
+                            sortable: boolean;
+                            shown: boolean;
+                            always: boolean;
+                        }[];
+                        filter_options: {
+                            key: string;
+                            label: string;
+                            /** @enum {string} */
+                            kind: "choice" | "dates";
+                            options: {
+                                value: string;
+                                label: string;
+                                count: number;
+                            }[];
+                        }[];
+                        views: {
+                            id: string;
+                            name: string;
+                            state: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        bulk: {
+                            key: string;
+                            label: string;
+                        }[];
+                        can_export: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "people.import.template": {

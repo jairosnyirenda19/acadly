@@ -15,7 +15,7 @@ export function Glyph({ mark, size = 'size-9 text-[17px]' }: { mark: string | nu
   const look = mark !== null && mark in markLook ? markLook[mark as MarkValue] : markLook.none
 
   return (
-    <span aria-label={mark !== null ? (t.marks[mark] ?? mark) : t.notMarked} className={`ref inline-flex shrink-0 items-center justify-center font-extrabold ${size} ${look}`}>
+    <span role="img" aria-label={mark !== null ? (t.marks[mark] ?? mark) : t.notMarked} className={`ref inline-flex shrink-0 items-center justify-center font-extrabold ${size} ${look}`}>
       {mark !== null ? t.glyph[mark] : ''}
     </span>
   )

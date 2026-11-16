@@ -13,6 +13,7 @@ use Acadly\Kernel\Access\RoleAssignment;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Access\WorkPlaces;
+use Acadly\Kernel\Grid\Grids;
 use Acadly\Kernel\Identity\Actions\DisableAccount;
 use Acadly\Kernel\Identity\Actions\InviteAccount;
 use Acadly\Kernel\Identity\Actions\SendInvitation;
@@ -58,6 +59,16 @@ final class PeopleController
         $in = $this->workPlace($request, $viewer, $places);
 
         return response()->json([...$this->people->list($viewer, $in), 'giving' => $this->people->giving($viewer)]);
+    }
+
+    /**
+     * The people as a data grid: `?page=&per_page=&sort=&dir=&q=&filter[state]=&filter[role]=&filter[signed_in]=from..to`.
+     *
+     * @response array{rows: list<array{id: string, name: string, email: string, state: 'active'|'ready'|'invited'|'expired'|'no_role'|'disabled', roles: list<array{role: string, where: string, ends_at: string|null}>, last_signed_in_at: string|null, invitation_sent_at: string|null}>, total: int, page: int, per_page: int, pages: int, sort: string, dir: 'asc'|'desc', q: string, filters: array<string, list<string>>, columns: list<array{key: string, label: string, sortable: bool, shown: bool, always: bool}>, filter_options: list<array{key: string, label: string, kind: 'choice'|'dates', options: list<array{value: string, label: string, count: int}>}>, views: list<array{id: string, name: string, state: array<string, mixed>}>, bulk: list<array{key: string, label: string}>, can_export: bool}
+     */
+    public function grid(Request $request, Grids $grids): JsonResponse
+    {
+        return response()->json($grids->page(self::user($request), $grids->grid('people'), $request->query()));
     }
 
     /**

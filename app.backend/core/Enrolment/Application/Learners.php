@@ -7,6 +7,7 @@ namespace Acadly\Core\Enrolment\Application;
 use Acadly\Core\Academics\Contracts\AcademicCalendar;
 use Acadly\Core\Enrolment\Contracts\EnrolmentAudit;
 use Acadly\Core\Enrolment\Contracts\EnrolmentPermission;
+use Acadly\Core\Enrolment\Contracts\LearnerRecordPart;
 use Acadly\Core\Enrolment\Contracts\Relationship;
 use Acadly\Core\Enrolment\Domain\Learner;
 use Acadly\Core\Institution\Contracts\SchoolDirectory;
@@ -15,6 +16,8 @@ use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Identity\User;
+use Acadly\Kernel\Module\ModuleActivation;
+use Acadly\Kernel\Notify\Messages;
 use Acadly\Kernel\Support\Row;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
@@ -120,6 +123,7 @@ final class Learners
             'status' => $enrolment !== null ? Row::text($enrolment, 'status') : 'active',
             'admitted_on' => $enrolment !== null ? substr(Row::text($enrolment, 'admitted_on'), 0, 10) : null,
             'word' => $division?->profile->word(Term::Learner->value) ?? 'Learner',
+            'word_plural' => $division?->profile->word(Term::Learner->value, true) ?? 'Learners',
             'class' => $class === null ? null : ['id' => $class['id'], 'name' => $class['name']],
             'level' => $place !== null ? $division?->profile->levelLabel($place['level_code']) : null,
             'division' => $division?->name,
@@ -132,11 +136,12 @@ final class Learners
             'move_to' => array_map(fn (array $c): array => ['id' => $c['id'], 'name' => $c['name'], 'count' => is_numeric($siblingCounts[$c['id']] ?? null) ? (int) $siblingCounts[$c['id']] : 0], $siblings),
             'can_manage' => $at !== null && $this->access->allows($viewer, EnrolmentPermission::Manage, $at),
             'relationships' => array_map(fn (Relationship $r): array => ['value' => $r->value, 'label' => $r->label()], Relationship::cases()),
+            ...$this->parts($viewer, $learner->id, $at),
         ];
     }
 
     /** @return list<array{id: string, name: string, division_id: string, level: string, campus: string, can_admit: bool}> */
-    private function visibleClasses(User $viewer, string $yearId, ?ScopeRef $in): array
+    public function visibleClasses(User $viewer, string $yearId, ?ScopeRef $in): array
     {
         $out = [];
         $campuses = [];
@@ -293,5 +298,35 @@ final class Learners
         $name = DB::table('users')->where('id', $id)->value('name');
 
         return is_string($name) ? $name : null;
+    }
+
+    /**
+     * The parts other modules add to the record, while they are on, and what
+     * the family has been told about the learner.
+     *
+     * @return array{parts: list<array{key: string, title: string, band: list<array{label: string, value: string, note: string, tone: 'plain'|'attention'}>, attention: int}>, told: array{all: int, delivered: int, not_delivered: int}}
+     */
+    private function parts(User $viewer, string $learnerId, ?ScopeRef $at): array
+    {
+        $parts = [];
+        $activation = app(ModuleActivation::class);
+
+        foreach (app()->tagged(LearnerRecordPart::TAG) as $part) {
+            if ($part instanceof LearnerRecordPart && $activation->isActive($part->key(), $at)) {
+                $parts[] = ['key' => $part->key(), 'title' => $part->title(), 'band' => $part->band($viewer, $learnerId), 'attention' => $part->attention($viewer, $learnerId)];
+            }
+        }
+
+        $told = app(Messages::class)->carrying('learner', $learnerId);
+        $states = array_column($told, 'state');
+
+        return [
+            'parts' => $parts,
+            'told' => [
+                'all' => count(array_filter($states, fn (mixed $s): bool => in_array($s, ['delivered', 'sent', 'accepted', 'not_delivered'], true))),
+                'delivered' => count(array_filter($states, fn (mixed $s): bool => $s === 'delivered' || $s === 'accepted')),
+                'not_delivered' => count(array_filter($states, fn (mixed $s): bool => $s === 'not_delivered')),
+            ],
+        ];
     }
 }

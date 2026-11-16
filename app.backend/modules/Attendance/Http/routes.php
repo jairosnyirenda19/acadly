@@ -12,6 +12,7 @@ Route::middleware(['auth:sanctum', 'module:attendance'])->prefix('registers')->n
     Route::get('/my-day', [LessonsController::class, 'myDay'])->name('my-day');
     Route::get('/lessons', [LessonsController::class, 'today'])->name('lessons');
     Route::get('/missed', [LessonsController::class, 'missed'])->name('missed');
+    Route::get('/learner/{id}', [LessonsController::class, 'learner'])->whereUuid('id')->name('learner');
     Route::get('/lesson/{slot}', [LessonsController::class, 'show'])->whereUuid('slot')->name('lesson.show');
     Route::post('/lesson/{slot}', [LessonsController::class, 'submit'])->whereUuid('slot')->name('lesson.submit');
     Route::post('/away', [LessonsController::class, 'away'])->name('away');

@@ -1,54 +1,113 @@
 import { navigate, useLoad } from '@acadly/kernel'
-import { Button, Notice, Waiting } from '@acadly/ui'
-import { useMemo, useState } from 'react'
+import { Button, DataGrid, NO_SELECTION, Notice, slips, viewState, Waiting } from '@acadly/ui'
+import { useState, type MouseEvent } from 'react'
 import { copy } from '../copy'
+import { gridsApi, type BulkAnswer } from '../grid/api'
+import { BulkResult } from '../grid/BulkResult'
+import { startExport, useGridPage, useGridPrefs, useGridQuery, useGridSelection } from '../grid/useGrid'
 import { errorFor } from '../setup/api'
-import { Input, Total, TotalsBand, nn } from '../setup/parts'
-import { day, daysSince, missingAt, settingsApi, type PeopleState, type PersonRow } from './api'
-import { PageHead, SettingsTabs, SmallButton, Tag, stateTone } from './parts'
+import { Input, Total, TotalsBand } from '../setup/parts'
+import { day, daysSince, missingAt, settingsApi, type PeopleState, type PersonGridRow } from './api'
+import { PageHead, SettingsTabs, Tag, stateTone } from './parts'
 import { RolePlace, placeBody } from './RolePlace'
-import { useWorkIn } from '../shell/WorkIn'
 
 const t = copy.settings.people
 const s = copy.settings
+const GRID = 'people'
 
-type Filter = 'all' | 'active' | 'invited' | 'disabled'
+/** Follows a link inside the app; a click with a modifier key keeps the browser's own behaviour. */
+function follow(event: MouseEvent<HTMLAnchorElement>, path: string) {
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+  event.preventDefault()
+  navigate(path)
+}
 
-const inFilter = (person: PersonRow, filter: Filter) =>
-  filter === 'all' ||
-  (filter === 'active' && (person.state === 'active' || person.state === 'no_role')) ||
-  (filter === 'invited' && (person.state === 'invited' || person.state === 'ready' || person.state === 'expired')) ||
-  (filter === 'disabled' && person.state === 'disabled')
+function NameLink({ row }: { row: PersonGridRow }) {
+  return (
+    <a href={`/settings/people/${row.id}`} onClick={(e) => follow(e, `/settings/people/${row.id}`)} className="text-ink no-underline underline-offset-[3px] hover:underline">
+      {row.name}
+    </a>
+  )
+}
 
-const COLS = 'grid-cols-[48px_minmax(200px,1.4fr)_minmax(240px,2fr)_minmax(110px,0.7fr)_180px]'
+/** The state as its tag, and one line on what it means where that helps. */
+function State({ row }: { row: PersonGridRow }) {
+  const note =
+    row.state === 'invited' && row.invitation_sent_at !== null ? t.sentAgo(daysSince(row.invitation_sent_at)) : row.state === 'ready' ? t.notSent : row.state === 'no_role' ? t.noRoleNote : null
 
-export function PeopleScreen() {
-  const [search, setSearch] = useState('')
-  const [role, setRole] = useState('')
-  const [where, setWhere] = useState('')
-  const [filter, setFilter] = useState<Filter>('all')
-  const [inviting, setInviting] = useState(false)
+  return (
+    <>
+      <Tag tone={stateTone[row.state]}>{s.states[row.state]}</Tag>
+      {note !== null && <span className="mt-1 block text-[13px] whitespace-normal">{note}</span>}
+    </>
+  )
+}
 
-  const { place } = useWorkIn()
-  const [everyone, setEveryone] = useState(false)
-  const narrowed = place !== null && place.key !== 'institution:'
-  const inPlace = narrowed && !everyone ? place.key : null
-  const loaded = useLoad(`people:${inPlace ?? ''}`, () => settingsApi.people(inPlace))
-  const state = loaded.data
-  const load = loaded.reload
-
-  const people = useMemo(() => {
-    if (state === undefined) return []
-    const q = search.trim().toLowerCase()
-
-    return state.people.filter(
-      (p) =>
-        inFilter(p, filter) &&
-        (q === '' || p.name.toLowerCase().includes(q) || p.email.toLowerCase().includes(q)) &&
-        (role === '' || p.roles.some((r) => r.role === role)) &&
-        (where === '' || p.roles.some((r) => r.where === where)),
+/** A moment as date and time, or a dash that is read as "Never". */
+function When({ iso }: { iso: string | null }) {
+  if (iso === null) {
+    return (
+      <span className="text-text-muted">
+        <span aria-hidden="true">{copy.dash}</span>
+        <span className="sr-only">{t.never}</span>
+      </span>
     )
-  }, [state, search, role, where, filter])
+  }
+
+  return <span className="tabular-nums">{t.signedInAt(iso)}</span>
+}
+
+const render = {
+  name: (row: PersonGridRow) => (
+    <>
+      <span className="block text-[15px] font-extrabold">
+        <NameLink row={row} />
+      </span>
+      <span className="ref block text-xs whitespace-nowrap text-text-muted">{row.email}</span>
+    </>
+  ),
+  email: (row: PersonGridRow) => <span className="ref text-[13px]">{row.email}</span>,
+  roles: (row: PersonGridRow) =>
+    row.roles.length === 0 ? (
+      <span className="text-text-muted">{t.noRoleHeld}</span>
+    ) : (
+      <span className="flex max-w-[420px] min-w-[220px] flex-wrap gap-1 whitespace-normal">
+        {row.roles.map((r, i) => (
+          <span key={i} className="inline-flex min-h-7 items-center border-2 border-ink bg-sheet px-2 text-[13px] font-bold">
+            {t.roleWhere(r.role, r.where)}
+            {r.ends_at !== null && <span className="ml-1 font-medium text-text-muted">{t.until(day(r.ends_at))}</span>}
+          </span>
+        ))}
+      </span>
+    ),
+  state: (row: PersonGridRow) => <State row={row} />,
+  last_signed_in_at: (row: PersonGridRow) => <When iso={row.last_signed_in_at} />,
+  invitation_sent_at: (row: PersonGridRow) => <When iso={row.invitation_sent_at} />,
+}
+
+const card = (row: PersonGridRow) => ({
+  title: <NameLink row={row} />,
+  meta: row.email,
+  aside: <Tag tone={stateTone[row.state]}>{s.states[row.state]}</Tag>,
+})
+
+const rowTone = (row: PersonGridRow) => {
+  const tone = stateTone[row.state]
+
+  return tone === 'wrong' ? 'wrong' : tone === 'attention' ? 'attention' : null
+}
+
+/** Everyone with an account, on the data grid (the approved design). */
+export function PeopleScreen() {
+  const [inviting, setInviting] = useState(false)
+  // The totals and the invite form cover every part of the school the account can see, as the list does.
+  const loaded = useLoad('people:', () => settingsApi.people(null))
+  const state = loaded.data
+  const [query, setQuery] = useGridQuery('/settings/people')
+  const grid = useGridPage(GRID, query, settingsApi.peopleGrid)
+  const [selection, setSelection] = useGridSelection(query)
+  const prefs = useGridPrefs(GRID, grid.reload)
+  const [result, setResult] = useState<BulkAnswer | null>(null)
 
   if (state === undefined) {
     return (
@@ -59,21 +118,40 @@ export function PeopleScreen() {
     )
   }
 
-  const counts = {
-    all: state.people.length,
-    active: state.people.filter((p) => inFilter(p, 'active')).length,
-    invited: state.people.filter((p) => inFilter(p, 'invited')).length,
-    disabled: state.people.filter((p) => inFilter(p, 'disabled')).length,
-  }
+  const page = grid.page
+  const sort = { sort: page?.sort ?? query.sort, dir: page?.dir ?? query.dir }
   const attention = state.totals.expired + state.totals.no_role
-  const roleNames = [...new Set(state.people.flatMap((p) => p.roles.map((r) => r.role)))].sort()
-  const places = [...new Set(state.people.flatMap((p) => p.roles.map((r) => r.where)))].sort()
+
+  const labels = copy.grid.labels({
+    name: t.title,
+    word: t.word,
+    plural: t.plural,
+    searchPlaceholder: t.findPlaceholder,
+    columnsNote: t.gridColumnsNote,
+    emptyText: t.gridEmpty,
+    noMatchText: t.gridNoMatch(state.people.length),
+  })
+
+  // Resend invitations takes no input: it runs at once and its result shows above the rows.
+  const bulk = (action: string) => {
+    if (action !== 'resend') return
+    void gridsApi.bulk(GRID, { action, ...(selection.all ? { all: true as const } : { ids: selection.ids }), state: viewState(query, sort), input: {} }).then((r) => {
+      if (r.kind === 'saved') {
+        setResult(r.data)
+        setSelection(NO_SELECTION)
+        grid.reload()
+        loaded.reload()
+      } else {
+        slips.wrong({ word: t.notResent, title: r.kind === 'refused' ? s.refused : t.resendFailed })
+      }
+    })
+  }
 
   return (
     <>
       <SettingsTabs current="people" />
       <PageHead
-        kicker={inPlace !== null && place !== null ? `${s.kicker} · ${t.title} · ${place.label}` : `${s.kicker} · ${t.title}`}
+        kicker={`${s.kicker} · ${t.title}`}
         title={t.title}
         intro={t.intro}
         actions={
@@ -93,147 +171,58 @@ export function PeopleScreen() {
         <Total label={t.bandGivers} value={String(state.totals.whole_school_givers.length)} note={t.bandGiversNote(state.totals.whole_school_givers)} />
       </TotalsBand>
 
-      <section className="flex-1 bg-sheet px-[clamp(16px,3vw,40px)] pt-5 pb-8">
-        {narrowed && (
-          <div className="mb-4 flex flex-wrap items-center gap-3 border-l-4 border-ink bg-paper px-4 py-2.5">
-            <span className="flex-[1_1_260px] text-sm">{everyone ? t.showingEveryone : t.showingIn(place.label)}</span>
-            <div role="group" aria-label={t.scopeLabel} className="flex h-10 border-2 border-ink">
-              {[false, true].map((all, i) => (
-                <button
-                  key={String(all)}
-                  type="button"
-                  aria-pressed={everyone === all}
-                  onClick={() => setEveryone(all)}
-                  className={`px-3.5 text-sm ${i > 0 ? 'border-l-2 border-ink' : ''} ${everyone === all ? 'bg-ink font-extrabold text-sheet' : 'font-bold text-ink hover:bg-field'}`}
-                >
-                  {all ? t.scopeEveryone : t.scopeIn(place.label)}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        {inviting && <InviteForm giving={state.giving} onDone={(id) => navigate(`/settings/people/${id}`)} onCancel={() => setInviting(false)} />}
-
-        <div className="mb-4 flex flex-wrap items-end gap-x-4.5 gap-y-3">
-          <div className="min-w-[220px] flex-[2_1_260px]">
-            <Input label={t.find} type="search" placeholder={t.findPlaceholder} value={search} onChange={(e) => setSearch(e.target.value)} />
-          </div>
-          <FilterSelect label={copy.settings.give.role} value={role} onChange={setRole} any={t.anyRole} options={roleNames} />
-          <FilterSelect label={copy.settings.give.where} value={where} onChange={setWhere} any={t.anywhere} options={places} />
-          <div role="group" aria-label={t.stateLabel} className="flex h-11 border-2 border-ink">
-            {(['all', 'active', 'invited', 'disabled'] as const).map((key, i) => (
-              <button
-                key={key}
-                type="button"
-                aria-pressed={filter === key}
-                onClick={() => setFilter(key)}
-                className={`px-3.5 text-sm ${i > 0 ? 'border-l-2 border-ink' : ''} ${filter === key ? 'bg-ink font-extrabold text-sheet' : 'font-bold text-ink hover:bg-field'}`}
-              >
-                {t.filters[key]} {counts[key]}
-              </button>
-            ))}
-          </div>
+      {inviting && (
+        <div className="bg-sheet px-[clamp(16px,3vw,40px)] pt-5">
+          <InviteForm giving={state.giving} onDone={(id) => navigate(`/settings/people/${id}`)} onCancel={() => setInviting(false)} />
         </div>
+      )}
 
-        <div className="overflow-x-auto">
-          <div className="min-w-[820px]">
-            <div className={`label-caps grid ${COLS} gap-3 border-b-2 border-ink pr-4 pb-2 text-text-muted`}>
-              <span />
-              <span>{t.person}</span>
-              <span>{t.roles}</span>
-              <span>{t.lastSignedIn}</span>
-              <span className="text-right">{t.state}</span>
-            </div>
-            <div className="ledger [--margin:48px]">
-              {people.map((person, i) => (
-                <PersonLine key={person.id} n={i + 1} person={person} onResent={load} />
-              ))}
-              {people.length === 0 && <p className="py-4 pl-[60px] text-sm text-text-muted">{t.none}</p>}
-            </div>
-          </div>
-        </div>
-        <p className="mt-3.5 text-[13px] text-text-muted">{t.showing(people.length, state.people.length)}</p>
-      </section>
+      <DataGrid
+        labels={labels}
+        page={page}
+        phase={grid.phase}
+        query={query}
+        onQuery={(next, replace) => {
+          setResult(null)
+          setQuery(next, replace)
+        }}
+        onRetry={grid.reload}
+        render={render}
+        card={card}
+        rowName={(row) => row.name}
+        rowTone={rowTone}
+        selection={selection}
+        onSelection={setSelection}
+        onBulk={bulk}
+        notice={
+          result !== null && (
+            <BulkResult
+              label={t.resendLabel}
+              done={t.resent(result.done)}
+              notDoneCount={t.notResentCount(result.refused.length)}
+              notDone={t.notResent}
+              line={t.resultLine}
+              refused={result.refused}
+              close={t.closeResult}
+              onClose={() => setResult(null)}
+            />
+          )
+        }
+        onColumns={prefs.onColumns}
+        views={prefs.views}
+        onExport={(scope) => {
+          if (page !== undefined) startExport(GRID, scope, { page, query, selection, word: t.word, plural: t.plural })
+        }}
+        emptyActions={
+          <>
+            <Button onClick={() => setInviting(true)}>{t.invite}</Button>
+            <Button variant="secondary" onClick={() => navigate('/settings/people/import')}>
+              {t.import}
+            </Button>
+          </>
+        }
+      />
     </>
-  )
-}
-
-function FilterSelect({ label, value, onChange, any, options }: { label: string; value: string; onChange: (v: string) => void; any: string; options: string[] }) {
-  return (
-    <label className="block min-w-[170px] flex-[1_1_180px]">
-      <span className="label-caps mb-1.5 block text-text-muted">{label}</span>
-      <select value={value} onChange={(e) => onChange(e.target.value)} className="h-11 w-full border-0 border-b-2 border-ink bg-field px-3 text-[15px] text-ink outline-none focus:border-teal">
-        <option value="">{any}</option>
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ))}
-      </select>
-    </label>
-  )
-}
-
-function PersonLine({ n, person, onResent }: { n: number; person: PersonRow; onResent: () => void }) {
-  const tone = stateTone[person.state]
-  const [sending, setSending] = useState(false)
-  const note =
-    person.state === 'invited' && person.invitation_sent_at !== null
-      ? t.sentAgo(daysSince(person.invitation_sent_at))
-      : person.state === 'ready'
-        ? t.notSent
-        : person.state === 'no_role'
-          ? t.noRoleNote
-          : person.state === 'disabled' && person.disabled !== null
-            ? t.disabledNote(day(person.disabled.at), person.disabled.reason ?? '')
-            : null
-
-  return (
-    <div
-      role="link"
-      tabIndex={0}
-      onClick={() => navigate(`/settings/people/${person.id}`)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') navigate(`/settings/people/${person.id}`)
-      }}
-      className={`grid cursor-pointer ${COLS} items-center gap-3 border-b border-rule py-3 pr-4 hover:bg-paper ${tone === 'wrong' ? 'bg-red-wash' : tone === 'attention' ? 'bg-marigold-wash' : ''}`}
-    >
-      <div className={`type-display text-center text-xl ${tone === 'wrong' ? 'text-red-pen' : 'text-text-muted'}`}>{nn(n)}</div>
-      <div className="min-w-0">
-        <div className="text-base font-extrabold">{person.name}</div>
-        <div className="ref text-xs break-all text-text-muted">{person.email}</div>
-      </div>
-      <div className="flex flex-wrap gap-1">
-        {person.roles.length === 0 && <span className="text-sm text-text-muted">{t.noRoleHeld}</span>}
-        {person.roles.map((r, i) => (
-          <span key={i} className="inline-flex h-7 items-center border-2 border-ink bg-sheet px-2 text-[13px] font-bold whitespace-nowrap">
-            {r.role} · {r.where}
-            {r.ends_at !== null && <span className="ml-1 font-medium text-text-muted">{t.until(day(r.ends_at))}</span>}
-          </span>
-        ))}
-      </div>
-      <div className="text-sm text-text-muted">{person.last_signed_in_at !== null ? day(person.last_signed_in_at) : t.never}</div>
-      <div className="text-right">
-        <Tag tone={tone}>{s.states[person.state]}</Tag>
-        {note !== null && <div className="mt-1.5 text-[13px]">{note}</div>}
-        {person.state === 'expired' && (
-          <div className="mt-1.5" onClick={(e) => e.stopPropagation()}>
-            <SmallButton
-              disabled={sending}
-              onClick={() => {
-                setSending(true)
-                void settingsApi.resend(person.id).then(() => {
-                  setSending(false)
-                  onResent()
-                })
-              }}
-            >
-              {t.sendAgain}
-            </SmallButton>
-          </div>
-        )}
-      </div>
-    </div>
   )
 }
 

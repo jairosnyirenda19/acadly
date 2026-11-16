@@ -29,4 +29,11 @@ interface EnrolmentDirectory
      * @return list<array{id: string, name: string, relationship: string, phone: string, email: string|null, notices_by: string, main: bool}>
      */
     public function contactsOf(string $learnerId): array;
+
+    /**
+     * Where a learner is now: the class of the latest placement, open or not.
+     *
+     * @return array{class_id: string, division_id: string, campus_id: string, year_id: string, open: bool, since: string}|null
+     */
+    public function placeOf(string $learnerId): ?array;
 }

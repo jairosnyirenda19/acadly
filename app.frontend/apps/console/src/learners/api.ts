@@ -1,8 +1,13 @@
 import { api, type paths } from '@acadly/kernel'
+import { gridApiQuery, type GridQuery } from '@acadly/ui'
 import { read, settle } from '../setup/api'
 
 export type LearnersState = paths['/v1/learners']['get']['responses'][200]['content']['application/json']
 export type LearnerRow = LearnersState['learners'][number]
+export type LearnersGrid = paths['/v1/learners/grid']['get']['responses'][200]['content']['application/json']
+export type LearnerGridRow = LearnersGrid['rows'][number]
+export type LearnerAttendance = paths['/v1/registers/learner/{id}']['get']['responses'][200]['content']['application/json']
+export type LearnerMessages = paths['/v1/learners/{id}/messages']['get']['responses'][200]['content']['application/json']
 export type LearnerState = paths['/v1/learners/{id}']['get']['responses'][200]['content']['application/json']
 export type ContactInput = { name: string; relationship: string; phone: string; email: string; notices_by: 'sms' | 'email'; main: boolean }
 
@@ -10,6 +15,12 @@ type Done<T> = Promise<{ data?: T; error?: unknown; response: Response }>
 
 export const learnersApi = {
   list: (inPlace: string | null) => read(api.GET('/v1/learners', { params: { query: inPlace !== null ? { in: inPlace } : {} } })),
+  /** One page of the learners, for the data grid: the server pages, sorts, searches and filters. */
+  grid: (query: GridQuery) => read(api.GET('/v1/learners/grid', { params: { query: gridApiQuery(query) as never } })),
+  /** What Attendance knows about one learner this term: the record's attendance part. */
+  attendance: (id: string) => read(api.GET('/v1/registers/learner/{id}', { params: { path: { id } } })),
+  /** Every notice sent to the family about one learner. */
+  messages: (id: string) => read(api.GET('/v1/learners/{id}/messages', { params: { path: { id } } })),
   record: (id: string) => read(api.GET('/v1/learners/{id}', { params: { path: { id } } })),
 
   admit: (body: {

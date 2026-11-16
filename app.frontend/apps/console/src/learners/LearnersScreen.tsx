@@ -1,35 +1,85 @@
 import { navigate, useLoad } from '@acadly/kernel'
-import { Button, Notice, Waiting } from '@acadly/ui'
-import { useMemo, useState } from 'react'
+import { Button, DataGrid, NO_SELECTION, Notice, viewState, Waiting, type GridQuery, type GridSelection } from '@acadly/ui'
+import { useState, type MouseEvent } from 'react'
 import { copy } from '../copy'
-import { Input, Total, TotalsBand, nn } from '../setup/parts'
+import { gridsApi, type BulkAnswer } from '../grid/api'
+import { BulkResult } from '../grid/BulkResult'
+import { startExport, useGridPage, useGridPrefs, useGridQuery, useGridSelection } from '../grid/useGrid'
+import { useRememberList } from './back'
+import { Input, Select, Total, TotalsBand } from '../setup/parts'
 import { PageHead, Tag } from '../settings/parts'
 import { useWorkIn } from '../shell/WorkIn'
-import { initials, learnersApi, type LearnerRow } from './api'
+import { learnersApi, today, type LearnerGridRow } from './api'
 
 const t = copy.learners
+const s = copy.settings
+const GRID = 'learners'
 
-const COLS = 'grid-cols-[48px_44px_minmax(200px,1.3fr)_minmax(110px,0.6fr)_minmax(220px,1.4fr)_minmax(150px,auto)]'
+/** Follows a link inside the app; a click with a modifier key keeps the browser's own behaviour. */
+function follow(event: MouseEvent<HTMLAnchorElement>, path: string) {
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+  event.preventDefault()
+  navigate(path)
+}
 
-/** The list of learners by class (the approved design). */
+function StateTags({ row }: { row: LearnerGridRow }) {
+  if (!row.few_contacts && !row.possible_duplicate) return <Tag tone="done">{t.active}</Tag>
+
+  return (
+    <span className="inline-flex flex-wrap gap-1">
+      {row.few_contacts && <Tag tone="attention">{t.fewContactsTag}</Tag>}
+      {row.possible_duplicate && <Tag tone="attention">{t.possibleDuplicate}</Tag>}
+    </span>
+  )
+}
+
+function NameLink({ row }: { row: LearnerGridRow }) {
+  return (
+    <a href={`/learners/${row.id}`} onClick={(e) => follow(e, `/learners/${row.id}`)} className="text-ink no-underline underline-offset-[3px] hover:underline">
+      {row.name}
+    </a>
+  )
+}
+
+const render = {
+  learner: (row: LearnerGridRow) => (
+    <>
+      <span className="block text-[15px] font-extrabold">
+        <NameLink row={row} />
+      </span>
+      <span className="ref block text-xs text-text-muted">{row.acadly_id}</span>
+    </>
+  ),
+  admission_number: (row: LearnerGridRow) => <span className="ref text-[13px]">{row.admission_number ?? ''}</span>,
+  class: (row: LearnerGridRow) => row.class,
+  sex: (row: LearnerGridRow) => t.sexes[row.sex] ?? row.sex,
+  date_of_birth: (row: LearnerGridRow) => <span className="tabular-nums">{t.day(row.date_of_birth)}</span>,
+  admitted_on: (row: LearnerGridRow) => <span className="tabular-nums">{row.admitted_on !== null ? t.day(row.admitted_on) : ''}</span>,
+  contacts: (row: LearnerGridRow) => <span className="type-numeral text-xl">{row.contacts}</span>,
+  main_contact: (row: LearnerGridRow) => (row.main_contact !== null ? <span className="ref text-[13px]">{row.main_contact}</span> : <span className="text-text-muted">{t.notRecorded}</span>),
+  campus: (row: LearnerGridRow) => row.campus,
+  state: (row: LearnerGridRow) => <StateTags row={row} />,
+}
+
+const card = (row: LearnerGridRow) => ({
+  title: <NameLink row={row} />,
+  meta: [row.admission_number ?? row.acadly_id, row.class].join(' · '),
+  aside: <StateTags row={row} />,
+})
+
+/** The list of learners on the data grid (the approved design). */
 export function LearnersScreen() {
   const { place } = useWorkIn()
   const inPlace = place !== null && place.key !== 'institution:' ? place.key : null
   const loaded = useLoad(`learners:${inPlace ?? ''}`, () => learnersApi.list(inPlace))
   const state = loaded.data
-  const [klass, setKlass] = useState('')
-  const [search, setSearch] = useState('')
-
-  const shown = useMemo(() => {
-    if (state === undefined) return []
-    const q = search.trim().toLowerCase()
-
-    return state.learners.filter(
-      (l) =>
-        (klass === '' || l.class_id === klass) &&
-        (q === '' || l.name.toLowerCase().includes(q) || (l.admission_number ?? '').toLowerCase().includes(q) || l.acadly_id.toLowerCase().includes(q)),
-    )
-  }, [state, klass, search])
+  const [query, setQuery] = useGridQuery('/learners')
+  useRememberList()
+  const grid = useGridPage(GRID, query, learnersApi.grid)
+  const [selection, setSelection] = useGridSelection(query)
+  const prefs = useGridPrefs(GRID, grid.reload)
+  const [moving, setMoving] = useState(false)
+  const [result, setResult] = useState<{ answer: BulkAnswer; to: string } | null>(null)
 
   if (state === undefined) {
     return <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} band={[t.title, t.bandAdmitted, t.bandClasses, t.bandAttention]} rows={8} onRetry={loaded.reload} />
@@ -37,8 +87,34 @@ export function LearnersScreen() {
 
   const word = state.word.toLowerCase()
   const plural = state.word_plural
+  const lower = plural.toLowerCase()
   const attention = state.totals.few_contacts + state.totals.duplicates
-  const inClass = klass === '' ? state.learners.length : (state.classes.find((c) => c.id === klass)?.count ?? 0)
+  const page = grid.page
+  const sort = { sort: page?.sort ?? query.sort, dir: page?.dir ?? query.dir }
+  const classes = page?.filter_options.find((f) => f.key === 'class')?.options ?? []
+  const chosen = selection.all ? (page?.total ?? 0) : selection.ids.length
+
+  const labels = copy.grid.labels({
+    name: plural,
+    word,
+    plural: lower,
+    searchPlaceholder: t.findPlaceholder,
+    columnsNote: t.columnsNote(word),
+    emptyText: t.emptyText(lower),
+    noMatchText: t.noMatchText(state.totals.active, word, lower),
+  })
+
+  const exportList = (scope: 'match' | 'selected') => {
+    if (page !== undefined) startExport(GRID, scope, { page, query, selection, word, plural: lower })
+  }
+
+  const moved = (answer: BulkAnswer, to: string) => {
+    setMoving(false)
+    setResult({ answer, to })
+    setSelection(NO_SELECTION)
+    grid.reload()
+    loaded.reload()
+  }
 
   return (
     <>
@@ -76,90 +152,159 @@ export function LearnersScreen() {
             />
           </TotalsBand>
 
-          <section className="flex-1 bg-sheet px-[clamp(16px,3vw,40px)] pt-4 pb-8">
-            <div className="mb-3 flex flex-wrap items-end gap-3">
-              <div className="min-w-[220px] flex-[1_1_320px] md:max-w-[520px]">
-                <Input label={t.find(word)} type="search" placeholder={t.findPlaceholder} value={search} onChange={(e) => setSearch(e.target.value)} />
-              </div>
-              <span className="ml-auto text-[13px] text-text-muted">{t.showing(shown.length, inClass)}</span>
-            </div>
-
-            <nav aria-label={t.classLabel} className="flex gap-0.5 overflow-x-auto border-b-2 border-ink [scrollbar-width:none]">
-              {[{ id: '', name: t.allClasses, count: state.learners.length }, ...state.classes].map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  aria-pressed={klass === c.id}
-                  onClick={() => setKlass(c.id)}
-                  className={`flex shrink-0 items-baseline gap-2 border-b-4 px-3.5 pt-3 pb-2.5 text-[15px] whitespace-nowrap ${klass === c.id ? 'border-ink font-extrabold' : 'border-transparent font-medium hover:bg-paper'}`}
-                >
-                  {c.name}
-                  <span className="ref text-xs text-text-muted">{c.count}</span>
-                </button>
-              ))}
-            </nav>
-
-            <div className="overflow-x-auto">
-              <div className="min-w-[860px]">
-                <div className={`label-caps grid ${COLS} gap-3 border-b-2 border-ink py-2 pr-4 text-text-muted`}>
-                  <span />
-                  <span />
-                  <span>{t.colLearner(state.word)}</span>
-                  <span>{t.colClass}</span>
-                  <span>{t.colContact}</span>
-                  <span className="text-right">{t.colState}</span>
-                </div>
-                <div className="ledger [--margin:48px]">
-                  {shown.map((l, i) => (
-                    <LearnerLine key={l.id} n={i + 1} learner={l} />
-                  ))}
-                  {shown.length === 0 && <p className="py-4 pl-[60px] text-sm text-text-muted">{state.learners.length === 0 ? t.empty(plural.toLowerCase()) : t.none}</p>}
-                </div>
-              </div>
-            </div>
-          </section>
+          <DataGrid
+            labels={labels}
+            page={page}
+            phase={grid.phase}
+            query={query}
+            onQuery={(next, replace) => {
+              setResult(null)
+              setQuery(next, replace)
+            }}
+            onRetry={grid.reload}
+            render={render}
+            headers={{ learner: state.word }}
+            alignEnd={['contacts']}
+            card={card}
+            rowName={(row) => row.name}
+            rowTone={(row) => (row.few_contacts || row.possible_duplicate ? 'attention' : null)}
+            selection={selection}
+            onSelection={(next) => {
+              setSelection(next)
+              if (next.all === false && next.ids.length === 0) setMoving(false)
+            }}
+            onBulk={(action) => {
+              if (action === 'change_class') setMoving(true)
+            }}
+            bulkPanel={
+              moving && (
+                <ChangeClassForm
+                  classes={classes}
+                  count={chosen}
+                  word={word}
+                  plural={lower}
+                  query={query}
+                  sort={sort}
+                  selection={selection}
+                  onDone={moved}
+                  onCancel={() => setMoving(false)}
+                />
+              )
+            }
+            notice={
+              result !== null && (
+                <BulkResult
+                  label={t.resultLabel}
+                  done={t.movedTo(result.answer.done, result.to, word, lower)}
+                  notDoneCount={t.notMovedCount(result.answer.refused.length)}
+                  notDone={t.notMoved}
+                  line={t.notMovedLine}
+                  refused={result.answer.refused}
+                  close={t.closeResult}
+                  onClose={() => setResult(null)}
+                />
+              )
+            }
+            onColumns={prefs.onColumns}
+            views={prefs.views}
+            onExport={exportList}
+            emptyActions={
+              state.can_admit ? (
+                <>
+                  <Button onClick={() => navigate('/learners/admit')}>{t.admit(word)}</Button>
+                  <Button variant="secondary" onClick={() => navigate('/learners/import')}>
+                    {t.emptyImport}
+                  </Button>
+                </>
+              ) : undefined
+            }
+          />
         </>
       )}
     </>
   )
 }
 
-function LearnerLine({ n, learner }: { n: number; learner: LearnerRow }) {
-  const few = learner.contacts < 2
-  const attention = few || learner.possible_duplicate
-  const open = () => navigate(`/learners/${learner.id}`)
+/** Change class for the rows chosen: inline, under the bar of the selection. */
+function ChangeClassForm({
+  classes,
+  count,
+  word,
+  plural,
+  query,
+  sort,
+  selection,
+  onDone,
+  onCancel,
+}: {
+  classes: { value: string; label: string; count: number }[]
+  count: number
+  word: string
+  plural: string
+  query: GridQuery
+  sort: { sort: string; dir: 'asc' | 'desc' }
+  selection: GridSelection
+  onDone: (answer: BulkAnswer, to: string) => void
+  onCancel: () => void
+}) {
+  const [to, setTo] = useState('')
+  const [from, setFrom] = useState(today())
+  const [reason, setReason] = useState('')
+  const [failed, setFailed] = useState<string | null>(null)
+  const [working, setWorking] = useState(false)
 
   return (
-    <div
-      role="link"
-      tabIndex={0}
-      onClick={open}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') open()
+    <form
+      aria-label={t.bulkTitle}
+      onSubmit={(e) => {
+        e.preventDefault()
+        setWorking(true)
+        setFailed(null)
+        const target = classes.find((c) => c.value === to)?.label ?? ''
+
+        void gridsApi
+          .bulk(GRID, {
+            action: 'change_class',
+            ...(selection.all ? { all: true as const } : { ids: selection.ids }),
+            state: viewState(query, sort),
+            input: { class_id: to, from, reason },
+          })
+          .then((r) => {
+            setWorking(false)
+            if (r.kind === 'saved') onDone(r.data, target)
+            else if (r.kind === 'invalid') setFailed(Object.values(r.errors)[0]?.[0] ?? s.failed)
+            else setFailed(r.kind === 'refused' ? s.refused : s.failed)
+          })
       }}
-      className={`grid cursor-pointer ${COLS} items-center gap-3 border-b border-rule py-2.5 pr-4 hover:bg-paper ${attention ? 'bg-marigold-wash' : ''}`}
+      className="border-2 border-t-0 border-ink bg-sheet px-4 pt-3.5 pb-4"
     >
-      <div className="type-display text-center text-lg text-text-muted">{nn(n)}</div>
-      <span aria-hidden="true" className="type-display flex size-10 items-center justify-center border-2 border-ink bg-sheet text-xl">
-        {initials(learner.name)}
-      </span>
-      <div className="min-w-0">
-        <div className="text-base font-extrabold">{learner.name}</div>
-        <div className="ref text-xs text-text-muted">{learner.admission_number ?? learner.acadly_id}</div>
+      <div className="label-caps text-text-muted">{t.bulkTitle}</div>
+      <p className="mt-1 mb-3 max-w-[65ch] text-sm text-text-muted">{t.bulkNote(count, word, plural)}</p>
+      {failed !== null && (
+        <div className="mb-3">
+          <Notice tone="wrong" title={failed} />
+        </div>
+      )}
+      <div className="grid gap-3.5 md:grid-cols-[minmax(200px,1fr)_180px_minmax(220px,1.4fr)]">
+        <Select label={t.moveTo} required value={to} onChange={(e) => setTo(e.target.value)} hint={t.moveToHint}>
+          <option value="">{t.chooseClass}</option>
+          {classes.map((c) => (
+            <option key={c.value} value={c.value}>
+              {t.moveOption(c.label, c.count)}
+            </option>
+          ))}
+        </Select>
+        <Input label={t.moveDate} required type="date" max={today()} value={from} onChange={(e) => setFrom(e.target.value)} />
+        <Input label={t.reason} required value={reason} onChange={(e) => setReason(e.target.value)} maxLength={255} />
       </div>
-      <div className="text-sm font-bold">{learner.class}</div>
-      <div className="text-sm">
-        {learner.main_contact === null ? (
-          <span className="font-bold">{t.noMainContact}</span>
-        ) : (
-          `${learner.main_contact.name} · ${learner.main_contact.relationship} · ${learner.main_contact.phone}`
-        )}
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Button type="submit" busy={working}>
+          {working ? t.moving : t.bulkSubmit(count, word, plural)}
+        </Button>
+        <Button variant="secondary" onClick={onCancel}>
+          {s.cancel}
+        </Button>
       </div>
-      <div className="flex flex-wrap justify-end gap-1">
-        <Tag tone="done">{t.active}</Tag>
-        {few && <Tag tone="attention">{t.fewContacts(learner.contacts)}</Tag>}
-        {learner.possible_duplicate && <Tag tone="attention">{t.possibleDuplicate}</Tag>}
-      </div>
-    </div>
+    </form>
   )
 }

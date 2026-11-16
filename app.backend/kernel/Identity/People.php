@@ -226,6 +226,18 @@ final class People
         return ['at' => $event !== null ? self::time(Row::maybeText($event, 'occurred_at')) : null, 'reason' => $event !== null ? Row::maybeText($event, 'reason') : null];
     }
 
+    /** How a person's account stands: active, invited, ready, expired, no role or disabled. */
+    public function stateOf(User $person): string
+    {
+        return $this->state($person, $this->openScopes($person) !== []);
+    }
+
+    /** @return list<array{role: string, where: string, ends_at: string|null}> the roles a person holds now or later, and where */
+    public function rolesNow(User $person): array
+    {
+        return array_map(fn (array $r): array => ['role' => $r['role'], 'where' => $r['where'], 'ends_at' => $r['ends_at']], $this->rolesOf($person, open: true));
+    }
+
     /**
      * @return list<array{id: string, role: string, where: string, scope: ScopeRef, scope_type: string, scope_id: string|null, starts_at: string, ends_at: string|null, reason: string|null, given_by: string|null, ended_by: string|null, end_reason: string|null}>
      */

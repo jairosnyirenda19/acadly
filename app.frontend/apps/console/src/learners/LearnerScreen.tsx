@@ -1,24 +1,38 @@
-import { useLoad } from '@acadly/kernel'
+import { useLoad, useLocation } from '@acadly/kernel'
 import { Button, Notice, slips, Waiting } from '@acadly/ui'
 import { useEffect, useState, type ReactNode } from 'react'
 import { copy } from '../copy'
 import { errorFor, type Saved } from '../setup/api'
-import { Attention, Input, Select } from '../setup/parts'
+import { Attention, Input, Select, Total, TotalsBand } from '../setup/parts'
 import { day } from '../settings/api'
 import { SmallButton, Tag } from '../settings/parts'
 import { initials, learnersApi, today, type ContactInput, type LearnerState } from './api'
+import { BackToList } from './back'
 import { NoticesBy } from './NoticesBy'
 import { PhotoPicker } from './PhotoPicker'
+import { PART_VIEWS } from './record/registry'
+import { Activity, HistoryTab, MessagesTab, Placements, useFamilyMessages } from './record/tabs'
+import { Column, Columns, InLink, SectionTitle, follow, tabHref } from './record/ui'
 
 const t = copy.learners
+const r = copy.learners.record
 const s = copy.settings
 
 type Panel = 'none' | 'correct' | 'move' | 'contact' | 'photo'
 
-/** One learner's record (the approved design): details, the class history, contacts and activity. */
+/** A cell of the record's band: from a part of the record, or what the family was told. */
+interface BandCell {
+  label: string
+  value: string
+  note: string
+  tone: 'plain' | 'attention'
+}
+
+/** One learner's record (the approved learner dashboard): a head, the band, and the record's tabs. */
 export function LearnerScreen({ id }: { id: string }) {
   const loaded = useLoad(`learner:${id}`, () => learnersApi.record(id))
   const record = loaded.data
+  const { query } = useLocation()
   const [panel, setPanel] = useState<Panel>('none')
   const [photo, setPhoto] = useState<string | null>(null)
 
@@ -55,52 +69,85 @@ export function LearnerScreen({ id }: { id: string }) {
   }
   const toggle = (p: Panel) => setPanel(panel === p ? 'none' : p)
 
+  // Only the parts this console can draw get a tab; the rest wait for their view.
+  const parts = record.parts.filter((p) => PART_VIEWS[p.key] !== undefined)
+  const tabs = [
+    { key: 'overview', label: r.tabs.overview, short: r.tabs.overview, attention: 0 },
+    ...parts.map((p) => ({ key: p.key, label: p.title, short: p.title, attention: p.attention })),
+    { key: 'messages', label: r.tabs.messages, short: r.shortTabs.messages, attention: 0 },
+    { key: 'history', label: r.tabs.history, short: r.tabs.history, attention: 0 },
+  ]
+  const asked = query.get('tab') ?? 'overview'
+  const tab = tabs.some((x) => x.key === asked) ? asked : 'overview'
+
+  const cells: BandCell[] = [
+    ...record.parts.flatMap((p) => p.band),
+    ...(record.told.all > 0
+      ? [{ label: r.toldLabel, value: String(record.told.all), note: r.toldNote(record.told.all, record.told.delivered, record.told.not_delivered), tone: record.told.not_delivered > 0 ? ('attention' as const) : ('plain' as const) }]
+      : []),
+  ]
+  const attentionTags = record.parts.filter((p) => p.attention > 0).map((p) => ({ key: p.key, word: r.partAttention[p.key] ?? r.partAttentionOther }))
+  const current = parts.find((p) => p.key === tab)
+  const PartTab = current !== undefined ? PART_VIEWS[current.key]?.Tab : undefined
+
   return (
     <>
-      <div className="flex flex-wrap items-end gap-5 px-[clamp(16px,3vw,40px)] pt-6 pb-5">
-        <div className="flex shrink-0 flex-col items-center gap-1.5">
-          {photo !== null ? (
-            <img src={photo} alt={t.photoAlt(record.name)} className="h-[124px] w-24 border-2 border-ink object-cover" />
-          ) : (
-            <span aria-hidden="true" className="type-display flex h-[124px] w-24 items-center justify-center border-2 border-ink bg-ink text-[44px] text-sheet">
-              {initials(record.name)}
-            </span>
-          )}
-          {record.can_manage && (
-            <button type="button" onClick={() => toggle('photo')} className="text-[13px] font-bold text-teal underline">
-              {record.has_photo ? t.changePhoto : t.choosePhoto}
-            </button>
-          )}
-        </div>
-        <div className="min-w-0 flex-[1_1_420px]">
-          <div className="mb-1.5 flex flex-wrap gap-1.5">
-            <Tag tone={record.status === 'active' ? 'done' : 'plain'}>{t.states[record.status] ?? record.status}</Tag>
-            {record.class !== null && (
-              <Tag tone="plain">
-                {record.word} · {record.class.name}
-              </Tag>
+      <nav aria-label={t.backLabel} className="px-4 pt-2 md:px-[clamp(16px,3vw,40px)]">
+        <BackToList label={t.importing.backTo(record.word_plural)} />
+      </nav>
+
+      {/* The head: photo, state, name, identifiers and what can be done */}
+      <div className="flex flex-wrap items-end gap-x-5 gap-y-3 px-4 pt-1 pb-4.5 md:px-[clamp(16px,3vw,40px)]">
+        <div className="flex min-w-0 flex-[1_1_420px] items-end gap-3.5 md:gap-5">
+          <div className="flex shrink-0 flex-col items-center gap-1">
+            {photo !== null ? (
+              <img src={photo} alt={t.photoAlt(record.name)} className="h-[84px] w-16 border-2 border-ink object-cover md:h-[124px] md:w-24" />
+            ) : (
+              <span aria-hidden="true" className="type-display flex h-[84px] w-16 items-center justify-center border-2 border-ink bg-ink text-[30px] text-sheet md:h-[124px] md:w-24 md:text-[44px]">
+                {initials(record.name)}
+              </span>
             )}
-            {record.possible_duplicate && <Tag tone="attention">{t.possibleDuplicate}</Tag>}
+            {record.can_manage && (
+              <button type="button" onClick={() => toggle('photo')} className="min-h-11 text-[13px] font-bold text-ink underline underline-offset-[3px]">
+                {record.has_photo ? t.changePhoto : t.choosePhoto}
+              </button>
+            )}
           </div>
-          <h1 className="type-display mb-2 text-[clamp(48px,6vw,80px)] break-words">{record.name}</h1>
-          <div className="text-sm">
-            <span className="label-caps text-text-muted">{t.admissionNumberLabel}</span> <span className="ref font-bold">{record.admission_number ?? t.notGiven}</span>{' '}
-            <span className="text-text-muted">·</span> <span className="label-caps text-text-muted">{t.acadlyId}</span> <span className="ref font-bold">{record.acadly_id}</span>{' '}
-            <span className="text-text-muted">· {t.idsNote}</span>
+          <div className="min-w-0 flex-1">
+            <div className="mb-1.5 flex flex-wrap gap-1.5">
+              <Tag tone={record.status === 'active' ? 'done' : 'plain'}>{t.states[record.status] ?? record.status}</Tag>
+              {record.class !== null && (
+                <Tag tone="plain">
+                  {record.word} · {record.class.name}
+                </Tag>
+              )}
+              {attentionTags.map((a) => (
+                <Tag key={a.key} tone="attention">
+                  {a.word}
+                </Tag>
+              ))}
+              {record.possible_duplicate && <Tag tone="attention">{t.possibleDuplicate}</Tag>}
+            </div>
+            <h1 className="type-display mb-1.5 text-[clamp(40px,6vw,88px)] break-words">{record.name}</h1>
+            <div className="text-[13px] text-text-muted">
+              <span className="label-caps hidden md:inline">{t.admissionNumberLabel}</span> <span className="ref font-bold text-ink">{record.admission_number ?? t.notGiven}</span>{' '}
+              <span aria-hidden="true">·</span> <span className="label-caps hidden md:inline">{t.acadlyId}</span> <span className="ref font-bold text-ink">{record.acadly_id}</span>
+              <span className="hidden md:inline"> · {t.idsNote}</span>
+            </div>
           </div>
         </div>
         {record.can_manage && (
           <div className="flex flex-wrap gap-2.5">
+            {record.move_to.length > 0 && record.class !== null && <Button onClick={() => toggle('move')}>{t.changeClass}</Button>}
             <Button variant="secondary" onClick={() => toggle('correct')}>
               {t.correct}
             </Button>
-            {record.move_to.length > 0 && <Button onClick={() => toggle('move')}>{t.changeClass}</Button>}
           </div>
         )}
       </div>
 
       {record.possible_duplicate && (
-        <div className="px-[clamp(16px,3vw,40px)] pb-4">
+        <div className="px-4 pb-4 md:px-[clamp(16px,3vw,40px)]">
           <Attention title={t.possibleDuplicate}>{t.duplicateNote}</Attention>
         </div>
       )}
@@ -114,71 +161,64 @@ export function LearnerScreen({ id }: { id: string }) {
           <CorrectForm record={record} onDone={(next) => done(next, t.corrected)} onCancel={() => setPanel('none')} />
         </Box>
       )}
+      {panel === 'move' && record.class !== null && (
+        <Box>
+          <MoveForm record={record} onDone={(next) => done(next, t.moved)} onCancel={() => setPanel('none')} />
+        </Box>
+      )}
 
-      <div className="flex flex-1 flex-wrap border-y-2 border-ink bg-sheet">
-        <Column>
-          <h2 className="type-display mb-1.5 text-[26px] leading-none">{t.details}</h2>
-          <Fact label={t.dateOfBirth} value={`${day(record.date_of_birth)}${ageOn(record.date_of_birth)}`} />
-          <Fact label={t.sex} value={t.sexes[record.sex] ?? record.sex} />
-          <Fact label={t.admittedLabel} value={day(record.admitted_on)} />
-          <Fact label={t.level} value={[record.level, record.division].filter(Boolean).join(' · ')} />
-          <Fact label={t.campus} value={record.campus ?? ''} />
-          <Fact label={t.classTeacher} value={record.class_teacher ?? t.notGiven} />
-          <p className="mt-3 text-[13px] text-text-muted">{t.correctionNote}</p>
-        </Column>
-
-        <Column edge wide>
-          <h2 className="type-display mb-4 text-[26px] leading-none">{t.atSchool}</h2>
-          <ol className="relative">
-            <span aria-hidden="true" className="absolute top-2.5 bottom-6 left-[7px] w-0.5 bg-ink" />
-            {record.placements.map((p, i) => (
-              <li key={i} className="relative pb-4.5 pl-[30px]">
-                <span aria-hidden="true" className={`absolute top-0.5 left-0 size-4 border-2 border-ink ${p.now ? 'bg-teal' : 'bg-sheet'}`} />
-                <div className="flex flex-wrap items-baseline gap-2">
-                  <span className="type-display text-[22px] leading-none">{p.class}</span>
-                  <Tag tone={p.now ? 'done' : 'plain'}>{p.now ? t.now : t.ended}</Tag>
-                </div>
-                <div className="mt-1 text-sm font-bold">
-                  {[p.campus, p.year, p.ends_on === null ? t.since(day(p.starts_on)) : t.between(day(p.starts_on), day(p.ends_on))].filter(Boolean).join(' · ')}
-                </div>
-                <div className="text-[13px] text-text-muted">
-                  {t.entry[p.entry_reason] ?? ''} {p.reason !== null ? t.reasonWas(p.reason) : ''}
-                </div>
-              </li>
-            ))}
-          </ol>
-          <p className="text-[13px] text-text-muted">{t.timelineNote}</p>
-        </Column>
-
-        <Column edge tinted>
-          {panel === 'move' && record.class !== null && (
-            <MoveForm record={record} onDone={(next) => done(next, t.moved)} onCancel={() => setPanel('none')} />
-          )}
-          <div className="flex items-baseline gap-2.5">
-            <h2 className="type-display flex-1 text-[26px] leading-none">{t.contactsTitle}</h2>
-            {record.can_manage && <SmallButton onClick={() => toggle('contact')}>{t.addContactShort}</SmallButton>}
+      {/* The band: each part's cells, then what the family was told. On a phone, the first three. */}
+      {cells.length > 0 && (
+        <>
+          <div className="hidden md:block">
+            <TotalsBand>
+              {cells.map((c, i) => (
+                <Total key={`${c.label}-${i}`} tone={i === 0 ? 'ink' : c.tone === 'attention' ? 'attention' : 'plain'} label={c.label} value={c.value} note={c.note} />
+              ))}
+            </TotalsBand>
           </div>
-          {panel === 'contact' && (
-            <ContactForm record={record} onDone={(next) => done(next, t.contactSaved)} onCancel={() => setPanel('none')} />
-          )}
-          {record.contacts.map((c) => (
-            <ContactLine key={c.id} record={record} contact={c} onChanged={(next, title) => done(next, title)} />
-          ))}
-          <p className="mt-2.5 text-[13px] text-text-muted">{t.keepTwo}</p>
-
-          <h2 className="type-display mt-6 mb-1 text-[26px] leading-none">{t.activity}</h2>
-          <ul>
-            {record.activity.length === 0 && <li className="py-2 text-[13px] text-text-muted">{t.noActivity}</li>}
-            {record.activity.map((a, i) => (
-              <li key={i} className="border-b border-rule py-2 text-[13px]">
-                <span className="ref text-xs text-text-muted">{day(a.at)}</span>
-                <br />
-                <strong>{a.what}</strong> {t.activityLine(a.who)}
-                {a.reason !== null && <span className="block text-text-muted">{t.reasonWas(a.reason)}</span>}
-              </li>
+          <div className="grid grid-cols-3 border-y-2 border-ink md:hidden">
+            {cells.slice(0, 3).map((c, i) => (
+              <section key={`${c.label}-${i}`} className={`min-w-0 px-3 pt-2.5 pb-3 ${i === 0 ? 'bg-ink text-sheet' : 'border-l-2 border-ink'} ${i > 0 && c.tone === 'attention' ? 'bg-marigold' : ''}`}>
+                <h2 className={`label-caps break-words hyphens-auto ${i === 0 ? 'text-on-ink-muted' : c.tone === 'attention' ? '' : 'text-text-muted'}`}>{c.label}</h2>
+                <div className={`type-numeral text-[40px] ${i === 0 ? 'text-teal-bright' : ''}`}>{c.value}</div>
+              </section>
             ))}
-          </ul>
-        </Column>
+          </div>
+        </>
+      )}
+
+      {/* The record's tabs, kept in the address */}
+      <nav aria-label={r.tabsLabel} className="flex gap-1 overflow-x-auto border-b-2 border-ink bg-sheet px-2 [scrollbar-width:none] md:px-[clamp(16px,3vw,40px)]">
+        {tabs.map((x) => {
+          const href = tabHref(record.id, x.key)
+
+          return (
+            <a
+              key={x.key}
+              href={href}
+              aria-current={x.key === tab ? 'page' : undefined}
+              onClick={(e) => follow(e, href)}
+              className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 border-b-4 px-3.5 pt-2.5 pb-2 text-[15px] whitespace-nowrap text-ink no-underline md:px-4 ${x.key === tab ? 'border-ink font-extrabold' : 'border-transparent font-medium hover:bg-paper'}`}
+            >
+              <span className="md:hidden">{x.short}</span>
+              <span className="hidden md:inline">{x.label}</span>
+              {x.attention > 0 && (
+                <span className="bg-marigold px-1.5 py-px text-xs font-extrabold text-ink">
+                  <span aria-hidden="true">{x.attention}</span>
+                  <span className="sr-only">{r.needAttention(x.attention)}</span>
+                </span>
+              )}
+            </a>
+          )
+        })}
+      </nav>
+
+      <div className="flex-1 bg-sheet">
+        {tab === 'overview' && <Overview record={record} panel={panel} toggle={toggle} done={done} close={() => setPanel('none')} ageOn={ageOn} />}
+        {PartTab !== undefined && <PartTab learner={record} />}
+        {tab === 'messages' && <MessagesTab learner={record} />}
+        {tab === 'history' && <HistoryTab learner={record} />}
       </div>
     </>
   )
@@ -192,18 +232,78 @@ export function LearnerScreen({ id }: { id: string }) {
   }
 }
 
-function Box({ children }: { children: ReactNode }) {
-  return <div className="mx-[clamp(16px,3vw,40px)] mb-5 border-2 border-ink bg-sheet p-4.5">{children}</div>
+/** The overview: details, each part's block, contacts; then the class history and recent activity. */
+function Overview({
+  record,
+  panel,
+  toggle,
+  done,
+  close,
+  ageOn,
+}: {
+  record: LearnerState
+  panel: Panel
+  toggle: (p: Panel) => void
+  done: (next: LearnerState, title: string) => void
+  close: () => void
+  ageOn: (born: string) => string
+}) {
+  const family = useFamilyMessages(record.id)
+  const lastTold = (name: string): string | undefined => {
+    if (family.data === undefined) return undefined
+    const last = family.data.messages.find((msg) => msg.to === name)
+
+    return last === undefined ? r.neverTold : r.lastTold(day(last.at), (copy.messages.state[last.state] ?? last.state).toLowerCase())
+  }
+
+  return (
+    <>
+      <Columns top>
+        <Column label={t.details}>
+          <SectionTitle>{t.details}</SectionTitle>
+          <Fact label={t.dateOfBirth} value={`${day(record.date_of_birth)}${ageOn(record.date_of_birth)}`} />
+          <Fact label={t.sex} value={t.sexes[record.sex] ?? record.sex} />
+          <Fact label={t.admittedLabel} value={day(record.admitted_on)} />
+          <Fact label={t.level} value={[record.level, record.division].filter(Boolean).join(' · ')} />
+          <Fact label={t.campus} value={record.campus ?? ''} />
+          <Fact label={t.classTeacher} value={record.class_teacher ?? t.notGiven} />
+          <p className="mt-3 text-[13px] text-text-muted">{t.correctionNote}</p>
+        </Column>
+
+        {record.parts.map((p) => {
+          const Summary = PART_VIEWS[p.key]?.Summary
+
+          return Summary !== undefined ? <Summary key={p.key} learner={record} /> : null
+        })}
+
+        <Column edge tinted grow="flex-[1.2_1_320px]" label={t.contactsTitle}>
+          <SectionTitle aside={record.can_manage && <SmallButton onClick={() => toggle('contact')}>{t.addContactShort}</SmallButton>}>{t.contactsTitle}</SectionTitle>
+          {panel === 'contact' && <ContactForm record={record} onDone={(next) => done(next, t.contactSaved)} onCancel={close} />}
+          {record.contacts.map((c) => (
+            <ContactLine key={c.id} record={record} contact={c} told={lastTold(c.name)} onChanged={(next, title) => done(next, title)} />
+          ))}
+          <p className="mt-2.5 text-[13px] text-text-muted">{t.keepTwo}</p>
+          <InLink href={tabHref(record.id, 'messages')}>{r.seeMessages}</InLink>
+        </Column>
+      </Columns>
+
+      <Columns top>
+        <Column grow="flex-[1.3_1_340px]" label={t.atSchool}>
+          <SectionTitle>{t.atSchool}</SectionTitle>
+          <Placements learner={record} />
+        </Column>
+        <Column edge label={r.recentActivity}>
+          <SectionTitle>{r.recentActivity}</SectionTitle>
+          <Activity learner={record} limit={3} />
+          {record.activity.length > 3 && <InLink href={tabHref(record.id, 'history')}>{r.seeHistory}</InLink>}
+        </Column>
+      </Columns>
+    </>
+  )
 }
 
-function Column({ children, edge = false, wide = false, tinted = false }: { children: ReactNode; edge?: boolean; wide?: boolean; tinted?: boolean }) {
-  return (
-    <section
-      className={`min-w-0 px-[clamp(16px,2.4vw,32px)] pt-5 pb-6 ${wide ? 'flex-[1.3_1_340px]' : tinted ? 'flex-[1.2_1_320px] bg-paper' : 'flex-[1_1_260px]'} ${edge ? 'border-ink max-[700px]:border-t-2 min-[701px]:border-l-2' : ''}`}
-    >
-      {children}
-    </section>
-  )
+function Box({ children }: { children: ReactNode }) {
+  return <div className="mx-4 mb-5 border-2 border-ink bg-sheet p-4.5 md:mx-[clamp(16px,3vw,40px)]">{children}</div>
 }
 
 function Fact({ label, value }: { label: string; value: string }) {
@@ -397,7 +497,18 @@ function ContactForm({ record, onDone, onCancel }: { record: LearnerState; onDon
   )
 }
 
-function ContactLine({ record, contact, onChanged }: { record: LearnerState; contact: LearnerState['contacts'][number]; onChanged: (next: LearnerState, title: string) => void }) {
+function ContactLine({
+  record,
+  contact,
+  told,
+  onChanged,
+}: {
+  record: LearnerState
+  contact: LearnerState['contacts'][number]
+  /** When the contact was last told, from the messages to the family. */
+  told?: string | undefined
+  onChanged: (next: LearnerState, title: string) => void
+}) {
   const [removing, setRemoving] = useState(false)
   const [reason, setReason] = useState('')
   const save = useSave()
@@ -413,9 +524,15 @@ function ContactLine({ record, contact, onChanged }: { record: LearnerState; con
         </span>
       </div>
       <div className="ref mt-0.5 text-[13px] break-all">{[contact.phone, contact.email].filter(Boolean).join(' · ')}</div>
+      {contact.main && (
+        <a href={`tel:${contact.phone.replace(/\s+/g, '')}`} className="mt-2 inline-flex h-11 items-center bg-teal px-4 text-[15px] font-extrabold text-sheet no-underline hover:bg-ink md:hidden">
+          {t.record.call(contact.phone)}
+        </a>
+      )}
       <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
         <Tag tone="plain">{t.contactOnly}</Tag>
         <Tag tone="plain">{t.noticesTag(contact.notices_by)}</Tag>
+        {told !== undefined && <span className="text-[13px] text-text-muted">{told}</span>}
         {record.can_manage && (contact.notices_by === 'email' || contact.email !== null) && (
           <SmallButton
             disabled={save.working}

@@ -8,12 +8,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->prefix('learners')->name('learners.')->group(function (): void {
     Route::get('/', [LearnersController::class, 'index'])->name('index');
+    Route::get('/grid', [LearnersController::class, 'grid'])->name('grid');
     Route::post('/', [LearnersController::class, 'store'])->name('store');
     Route::get('/import/template', [LearnerImportController::class, 'template'])->name('import.template');
     Route::post('/import/check', [LearnerImportController::class, 'check'])->name('import.check');
     Route::post('/import', [LearnerImportController::class, 'import'])->name('import');
     Route::get('/{id}', [LearnersController::class, 'show'])->whereUuid('id')->name('show');
     Route::put('/{id}', [LearnersController::class, 'update'])->whereUuid('id')->name('update');
+    Route::get('/{id}/messages', [LearnersController::class, 'messages'])->whereUuid('id')->name('messages');
     Route::post('/{id}/class', [LearnersController::class, 'move'])->whereUuid('id')->name('move');
     Route::post('/{id}/contacts', [LearnersController::class, 'addContact'])->whereUuid('id')->name('contacts.store');
     Route::post('/{id}/contacts/{contact}/notices', [LearnersController::class, 'contactNotices'])->whereUuid(['id', 'contact'])->name('contacts.notices');

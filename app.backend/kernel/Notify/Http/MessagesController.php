@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acadly\Kernel\Notify\Http;
 
 use Acadly\Kernel\Access\Access;
+use Acadly\Kernel\Grid\Grids;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Notify\Actions\MessageActions;
 use Acadly\Kernel\Notify\Actions\RecordDeliveryReport;
@@ -117,6 +118,16 @@ final class MessagesController
         $this->actions->resetWording(self::user($request), $key);
 
         return $this->notice($request, $key);
+    }
+
+    /**
+     * Every message as a data grid: `?page=&per_page=&sort=&dir=&q=&filter[day]=from..to&filter[channel]=sms&filter[state]=not_delivered`.
+     *
+     * @response array{rows: list<array{id: string, at: string, to: string, address: string|null, notice: string, about: string, channel: string, state: 'delivered'|'sent'|'accepted'|'not_delivered'|'waiting'|'not_reachable'|'over_allowance'|'not_sent', reason: string|null, units: int, again: bool}>, total: int, page: int, per_page: int, pages: int, sort: string, dir: 'asc'|'desc', q: string, filters: array<string, list<string>>, columns: list<array{key: string, label: string, sortable: bool, shown: bool, always: bool}>, filter_options: list<array{key: string, label: string, kind: 'choice'|'dates', options: list<array{value: string, label: string, count: int}>}>, views: list<array{id: string, name: string, state: array<string, mixed>}>, bulk: list<array{key: string, label: string}>, can_export: bool}
+     */
+    public function grid(Request $request, Grids $grids): JsonResponse
+    {
+        return response()->json($grids->page(self::user($request), $grids->grid('messages'), $request->query()));
     }
 
     /**

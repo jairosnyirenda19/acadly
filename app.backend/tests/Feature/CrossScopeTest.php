@@ -47,13 +47,21 @@ const RECORD_ROUTES = [
     'learners.import.template' => 'LearnerImportTest: the template lists only the classes the viewer may admit into',
     'learners.import.check' => 'LearnerImportTest: a row for a class outside the viewer\'s reach is not imported',
     'learners.import' => 'LearnerImportTest: a row for a class outside the viewer\'s reach is not imported',
+    'grids.views.store' => 'GridTest: keeps a person\'s columns and named views (a person\'s own, over rows within reach)',
+    'grids.views.update' => 'GridTest: keeps a person\'s columns and named views',
+    'grids.views.delete' => 'GridTest: keeps a person\'s columns and named views',
+    'grids.columns' => 'GridTest: keeps a person\'s columns and named views',
+    'grids.exports.store' => 'GridTest: builds an export in the background (only rows within reach)',
+    'grids.exports.show' => 'GridTest: builds an export in the background (another person: not found)',
+    'grids.exports.file' => 'GridTest: builds an export in the background (another person: not found)',
+    'grids.bulk' => 'GridTest: changes the class of every learner that matches (rows outside reach are dropped)',
 ];
 
 /**
  * Lists that answer every viewer with only what is inside the viewer's reach.
  * For these the test checks that nothing of campus B is in the answer.
  */
-const LIST_ROUTES = ['people.index', 'academics.teaching.index', 'academics.timetable.index', 'learners.index', 'registers.index',
+const LIST_ROUTES = ['people.index', 'academics.teaching.index', 'academics.timetable.index', 'learners.index', 'learners.grid', 'people.grid', 'registers.index',
     'registers.lessons', 'registers.missed', 'registers.levels'];
 
 uses(DatabaseTransactions::class);

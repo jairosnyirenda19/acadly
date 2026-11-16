@@ -19,6 +19,7 @@ import { AuthLayout, Heading } from './sign-in/AuthLayout'
 import { ForgotPasswordScreen } from './sign-in/ForgotPasswordScreen'
 import { ResetPasswordScreen } from './sign-in/ResetPasswordScreen'
 import { AdmitScreen } from './learners/AdmitScreen'
+import { ExportScreen } from './exports/ExportScreen'
 import { LearnerImportScreen } from './learners/LearnerImportScreen'
 import { LearnerScreen } from './learners/LearnerScreen'
 import { LearnersScreen } from './learners/LearnersScreen'
@@ -60,6 +61,7 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const registers = seesRegisters(context)
   const register = /^\/registers\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const lesson = /^\/registers\/lesson\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const exported = /^\/exports\/([0-9a-f-]{36})$/.exec(path)?.[1]
 
   useEffect(() => {
     if (path === '/settings' && home !== null) navigate(home, true)
@@ -88,6 +90,8 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/settings/messages' && can(context, 'notify.manage')) page = <ChannelsScreen />
   else if (path === '/settings/messages/wording' && can(context, 'notify.manage')) page = <WordingScreen />
   else if (path === '/settings/messages/sent' && can(context, 'notify.manage')) page = <SentScreen />
+  // Anyone signed in may open an export; the server shows each person only their own.
+  else if (exported !== undefined) page = <ExportScreen key={exported} id={exported} />
 
   if (page !== undefined) {
     return (

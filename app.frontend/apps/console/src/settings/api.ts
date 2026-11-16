@@ -1,4 +1,5 @@
 import { api, type paths } from '@acadly/kernel'
+import { gridApiQuery, type GridQuery } from '@acadly/ui'
 import { read, settle } from '../setup/api'
 
 export type PeopleState = paths['/v1/people']['get']['responses'][200]['content']['application/json']
@@ -8,10 +9,14 @@ export type Giving = PeopleState['giving']
 export type Place = Giving['places'][number]
 export type PersonRow = PeopleState['people'][number]
 export type PersonStateName = PersonRow['state']
+export type PeopleGrid = paths['/v1/people/grid']['get']['responses'][200]['content']['application/json']
+export type PersonGridRow = PeopleGrid['rows'][number]
 
 type Done<T> = Promise<{ data?: T; error?: unknown; response: Response }>
 
 export const settingsApi = {
+  /** One page of the people, for the data grid. */
+  peopleGrid: (query: GridQuery) => read(api.GET('/v1/people/grid', { params: { query: gridApiQuery(query) as never } })),
   people: (inPlace: string | null) => read(api.GET('/v1/people', { params: { query: inPlace !== null ? { in: inPlace } : {} } })),
   person: (id: string) => read(api.GET('/v1/people/{id}', { params: { path: { id } } })),
   roles: () => read(api.GET('/v1/roles')),

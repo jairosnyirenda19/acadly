@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Acadly\Kernel\Access\Http\RolesController;
 use Acadly\Kernel\Documents\Http\DocumentsController;
+use Acadly\Kernel\Grid\GridsController;
 use Acadly\Kernel\Http\HealthController;
 use Acadly\Kernel\Http\ReadinessController;
 use Acadly\Kernel\Http\SchoolController;
@@ -53,8 +54,20 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::put('/notices/{key}', [MessagesController::class, 'saveNotice'])->where('key', '[a-z][a-z0-9_.]*')->name('notice.save');
         Route::delete('/notices/{key}/wording', [MessagesController::class, 'resetNotice'])->where('key', '[a-z][a-z0-9_.]*')->name('notice.reset');
         Route::get('/sent', [MessagesController::class, 'sent'])->name('sent');
+        Route::get('/sent/grid', [MessagesController::class, 'grid'])->name('sent.grid');
         Route::get('/sent/{id}', [MessagesController::class, 'message'])->whereUuid('id')->name('message');
         Route::post('/sent/{id}/again', [MessagesController::class, 'again'])->whereUuid('id')->name('again');
+    });
+
+    Route::prefix('grids')->name('grids.')->group(function (): void {
+        Route::post('/{grid}/views', [GridsController::class, 'storeView'])->where('grid', '[a-z][a-z0-9_]*')->name('views.store');
+        Route::put('/{grid}/views/{id}', [GridsController::class, 'updateView'])->where('grid', '[a-z][a-z0-9_]*')->whereUuid('id')->name('views.update');
+        Route::delete('/{grid}/views/{id}', [GridsController::class, 'deleteView'])->where('grid', '[a-z][a-z0-9_]*')->whereUuid('id')->name('views.delete');
+        Route::put('/{grid}/columns', [GridsController::class, 'columns'])->where('grid', '[a-z][a-z0-9_]*')->name('columns');
+        Route::post('/{grid}/exports', [GridsController::class, 'export'])->where('grid', '[a-z][a-z0-9_]*')->middleware('throttle:10,1')->name('exports.store');
+        Route::post('/{grid}/bulk', [GridsController::class, 'bulk'])->where('grid', '[a-z][a-z0-9_]*')->name('bulk');
+        Route::get('/exports/{id}', [GridsController::class, 'showExport'])->whereUuid('id')->name('exports.show');
+        Route::get('/exports/{id}/file', [GridsController::class, 'file'])->whereUuid('id')->name('exports.file');
     });
 
     Route::get('/modules', [ModulesController::class, 'index'])->name('modules.index');
@@ -62,6 +75,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
     Route::prefix('people')->name('people.')->group(function (): void {
         Route::get('/', [PeopleController::class, 'index'])->name('index');
+        Route::get('/grid', [PeopleController::class, 'grid'])->name('grid');
         Route::post('/', [PeopleController::class, 'invite'])->name('invite');
         Route::get('/import/template', [PeopleController::class, 'template'])->name('import.template');
         Route::post('/import/check', [PeopleController::class, 'checkImport'])->name('import.check');

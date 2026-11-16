@@ -61,7 +61,7 @@ function NoticeList({ list, chosen }: { list: NoticesState; chosen: string | nul
                 className={`grid grid-cols-[1fr_auto] gap-x-2.5 gap-y-1 border-b border-l-4 border-b-rule px-4 py-3 text-ink no-underline ${n.key === chosen ? 'border-l-teal bg-sheet' : 'border-l-transparent hover:bg-sheet'}`}
               >
                 <span className="text-[15px] font-extrabold">{n.name}</span>
-                <span className="flex gap-1">
+                <span className="flex items-start gap-1 self-start">
                   {n.own_words && <Tag tone="plain">{t.ownWords}</Tag>}
                   <Tag tone={n.enabled ? 'done' : 'plain'}>{n.enabled ? t.on : t.off}</Tag>
                 </span>

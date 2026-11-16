@@ -22,7 +22,7 @@ const toldTone: Record<string, 'done' | 'attention' | 'wrong' | 'plain'> = {
   not_reachable: 'attention',
 }
 
-const COLS = 'md:grid-cols-[minmax(160px,1.2fr)_minmax(100px,0.8fr)_64px_minmax(200px,1.6fr)_minmax(130px,0.9fr)_minmax(150px,1fr)]'
+const COLS = 'md:grid-cols-[minmax(150px,1.2fr)_minmax(90px,0.7fr)_56px_minmax(190px,1.6fr)_minmax(120px,0.9fr)_minmax(140px,1fr)]'
 const WORDING = '/settings/messages/wording?notice=attendance.lesson_missed'
 
 /** Learners here this morning and absent from a lesson later (the approved design), to follow up the same day. */
@@ -51,21 +51,26 @@ export function MissedScreen() {
 
       <div className="flex flex-1 flex-wrap items-stretch">
         <section className="min-w-0 flex-[3_1_640px] bg-sheet px-3 pt-4 pb-6 md:px-[clamp(16px,3vw,40px)]">
-          <div className={`label-caps hidden gap-3 border-b-2 border-ink px-4 pb-2 text-text-muted md:grid ${COLS}`}>
-            <span>{t.colLearner}</span>
-            <span>{t.colClass}</span>
-            <span>{t.colMorning}</span>
-            <span>{t.colMissed}</span>
-            <span>{t.colContacts}</span>
-            <span />
+          {/* The ledger keeps its columns; when the page is narrower it scrolls sideways inside its own box. */}
+          <div className="overflow-x-auto">
+            <div className="md:min-w-[840px]">
+              <div className={`label-caps hidden gap-3 border-b-2 border-ink px-4 pb-2 text-text-muted md:grid ${COLS}`}>
+                <span>{t.colLearner}</span>
+                <span>{t.colClass}</span>
+                <span>{t.colMorning}</span>
+                <span>{t.colMissed}</span>
+                <span>{t.colContacts}</span>
+                <span />
+              </div>
+              {state.missed.length === 0 && <p className="px-4 py-4 text-sm text-text-muted">{t.noMissed}</p>}
+              {state.missed.map((m) => (
+                <Row key={`${m.register_id}:${m.learner_id}`} missed={m} noticeOn={state.notice_on} onDone={loaded.reload} />
+              ))}
+            </div>
           </div>
-          {state.missed.length === 0 && <p className="px-4 py-4 text-sm text-text-muted">{t.noMissed}</p>}
-          {state.missed.map((m) => (
-            <Row key={`${m.register_id}:${m.learner_id}`} missed={m} noticeOn={state.notice_on} onDone={loaded.reload} />
-          ))}
           <p className="mt-3 text-[13px] text-text-muted">{t.missedRule}</p>
         </section>
-        <section className="min-w-0 flex-[2_1_340px] border-ink bg-paper px-3 pt-4 pb-6 max-[999px]:border-t-2 md:px-[clamp(16px,3vw,32px)] min-[1000px]:border-l-2">
+        <section className="min-w-0 flex-[1_1_300px] border-ink bg-paper px-3 pt-4 pb-6 max-[999px]:border-t-2 md:px-[clamp(16px,3vw,32px)] min-[1000px]:border-l-2">
           <div className="border-2 border-ink bg-sheet px-4 pt-3.5 pb-4">
             <div className="mb-2 flex flex-wrap items-center gap-2">
               <span className="label-caps text-text-muted">{t.noticeTitle}</span>

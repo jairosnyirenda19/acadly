@@ -53,6 +53,8 @@ enum KernelAudit: string implements AuditAction
     case UploadRefused = 'documents.upload_refused';
     case Sealed = 'audit.sealed';
     case ChainBroken = 'audit.chain_broken';
+    case ExportRequested = 'documents.export_requested';
+    case ExportDownloaded = 'documents.export_downloaded';
 
     public function key(): string
     {
@@ -108,6 +110,8 @@ enum KernelAudit: string implements AuditAction
             self::UploadRefused => 'Attempted to upload a file that was refused.',
             self::Sealed => 'Sealed the audit trail.',
             self::ChainBroken => 'Found that the audit trail does not verify.',
+            self::ExportRequested => 'Asked for an export of a list.',
+            self::ExportDownloaded => 'Downloaded an export of a list.',
         };
     }
 

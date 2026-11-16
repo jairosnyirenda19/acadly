@@ -12,6 +12,7 @@ use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Modules\Attendance\Application\Actions\CoverActions;
 use Acadly\Modules\Attendance\Application\Actions\SubmitLessonRegister;
+use Acadly\Modules\Attendance\Application\LearnerAttendance;
 use Acadly\Modules\Attendance\Application\Lessons;
 use Acadly\Modules\Attendance\Application\Reach;
 use Acadly\Modules\Attendance\Application\Registers;
@@ -79,6 +80,16 @@ final class LessonsController
     public function show(Request $request, string $slot): JsonResponse
     {
         return response()->json($this->lessons->lesson(self::user($request), $slot, $this->day($request), $this->registers));
+    }
+
+    /**
+     * Attendance's part of a learner's record: the term, every morning, lessons by subject, absences and corrections.
+     *
+     * @response array{term: array{name: string, starts_on: string, ends_on: string}|null, today: string, totals: array{marked: int, present: int, absent: int, late: int, missed: int, missed_today: int, share: int|null, last_absent: string|null}, weeks: list<array{week: string, days: list<array{day: string, mark: 'present'|'absent'|'late'|'excused'|null, school_day: bool, future: bool}>}>, lessons_today: list<array{period: int, name: string, starts: string, subject: string, kind: 'lesson'|'activity', mark: 'present'|'absent'|'late'|'excused'|null}>, subjects: list<array{subject: string, present: int, total: int}>, absences: list<array{day: string, what: 'absent'|'missed', lesson: string|null, register_id: string, reason: string|null, told: list<array{to: string, channel: string, state: 'delivered'|'sent'|'accepted'|'not_delivered'|'waiting'|'not_reachable', at: string}>, follow_ups: list<array{kind: 'told_next'|'called', by: string, at: string, note: string|null}>}>, corrections: list<array{day: string, register: string, from: string, to: string, reason: string, asked_by: string, state: string, at: string}>}
+     */
+    public function learner(Request $request, string $id, LearnerAttendance $attendance): JsonResponse
+    {
+        return response()->json($attendance->record(self::user($request), $id));
     }
 
     /** Submits a lesson register: `{day, marks: [{learner_id, status, note}]}`. */

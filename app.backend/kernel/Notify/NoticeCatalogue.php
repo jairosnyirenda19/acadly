@@ -6,6 +6,7 @@ namespace Acadly\Kernel\Notify;
 
 use Acadly\Kernel\Blueprint\Canonical;
 use Acadly\Kernel\Documents\Topics\StorageFilling;
+use Acadly\Kernel\Grid\ExportReady;
 use Acadly\Kernel\Module\ModuleRegistry;
 use Acadly\Kernel\Notify\Topics\DeliveriesWaiting;
 use LogicException;
@@ -22,7 +23,7 @@ use LogicException;
 final class NoticeCatalogue
 {
     /** @var array<class-string<Topic>, string> the kernel's own topics, with the area that owns each */
-    public const array KERNEL_TOPICS = [DeliveriesWaiting::class => 'notify', StorageFilling::class => 'documents'];
+    public const array KERNEL_TOPICS = [DeliveriesWaiting::class => 'notify', StorageFilling::class => 'documents', ExportReady::class => 'notify'];
 
     /** @var array<string, class-string<Topic>> */
     private array $topics = [];

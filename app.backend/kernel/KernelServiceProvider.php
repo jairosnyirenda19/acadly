@@ -39,6 +39,10 @@ use Acadly\Kernel\Documents\Scanning\VirusScanner;
 use Acadly\Kernel\Documents\Storage\StorageMeter;
 use Acadly\Kernel\Events\EventCatalogue;
 use Acadly\Kernel\Events\Outbox;
+use Acadly\Kernel\Grid\GridDefinition;
+use Acadly\Kernel\Grid\Grids;
+use Acadly\Kernel\Grid\PurgeExportsCommand;
+use Acadly\Kernel\Identity\PeopleGrid;
 use Acadly\Kernel\Module\Http\RequireModule;
 use Acadly\Kernel\Module\Licence\Licences;
 use Acadly\Kernel\Module\ModuleActivation;
@@ -52,6 +56,7 @@ use Acadly\Kernel\Notify\Channels\SmsChannel;
 use Acadly\Kernel\Notify\Channels\SmsProvider;
 use Acadly\Kernel\Notify\Console\NotifySweepCommand;
 use Acadly\Kernel\Notify\MessageSettings;
+use Acadly\Kernel\Notify\MessagesGrid;
 use Acadly\Kernel\Notify\NoticeCatalogue;
 use Acadly\Kernel\Notify\NoticeDispatcher;
 use Acadly\Kernel\Notify\Notifier;
@@ -160,6 +165,9 @@ final class KernelServiceProvider extends ServiceProvider
         $this->app->scoped(DocumentAccess::class);
         $this->app->scoped(DocumentReader::class);
         $this->app->scoped(StorageMeter::class);
+        $this->app->tag([PeopleGrid::class, MessagesGrid::class], Grids::TAG);
+        $this->app->scoped(Grids::class, fn (Application $app): Grids => new Grids(array_values(array_filter(iterator_to_array($app->tagged(Grids::TAG), false),
+            fn (mixed $g): bool => $g instanceof GridDefinition))));
     }
 
     public function boot(): void
@@ -173,6 +181,7 @@ final class KernelServiceProvider extends ServiceProvider
             __DIR__.'/Blueprint/Database/migrations',
             __DIR__.'/Notify/Database/migrations',
             __DIR__.'/Documents/Database/migrations',
+            __DIR__.'/Grid/Database/migrations',
         ]);
 
         $this->app->make('router')->aliasMiddleware('module', RequireModule::class);
@@ -195,7 +204,7 @@ final class KernelServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([SyncCommand::class, CreateAdministratorCommand::class, AuditVerifyCommand::class, AuditSealCommand::class, PublishEventsCommand::class, InstallLicenceCommand::class,
                 BlueprintCompileCommand::class, BlueprintLintCommand::class, BlueprintReleaseCommand::class, BlueprintDiagramCommand::class,
-                NotifySweepCommand::class, DocumentsPurgeCommand::class, DocumentsStorageCommand::class]);
+                NotifySweepCommand::class, DocumentsPurgeCommand::class, DocumentsStorageCommand::class, PurgeExportsCommand::class]);
         }
 
         // Every night: verify the audit trail, then seal its head.
@@ -211,6 +220,7 @@ final class KernelServiceProvider extends ServiceProvider
             // Empty the document trash past its period; measure storage against the licence.
             $schedule->command('documents:purge')->dailyAt('02:00')->withoutOverlapping()->onOneServer();
             $schedule->command('documents:storage')->hourly()->withoutOverlapping()->onOneServer();
+            $schedule->command('grids:purge-exports')->dailyAt('02:30')->withoutOverlapping()->onOneServer();
         });
     }
 }

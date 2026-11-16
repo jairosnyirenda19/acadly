@@ -190,7 +190,7 @@ final class Messages
         $rows = [];
 
         foreach ($query->get() as $row) {
-            $item = $this->row($row);
+            $item = $this->item($row);
 
             if ($state === null || $item['state'] === $state) {
                 $rows[] = $item;
@@ -209,7 +209,7 @@ final class Messages
             return null;
         }
 
-        $item = $this->row($row);
+        $item = $this->item($row);
         $again = DB::table('notification_deliveries')->where('resent_from', $id)->first(['id', 'status', 'reason', 'queued_at']);
         $channel = Row::text($row, 'channel');
         $steps = [['at' => Row::text($row, 'queued_at'), 'what' => 'written']];
@@ -240,8 +240,28 @@ final class Messages
         ];
     }
 
-    /** @return array<string, mixed> */
-    private function row(stdClass $row): array
+    /**
+     * Every delivery of the notices whose request carries this value, newest
+     * first: the messages about one record, for that record's own screen.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function carrying(string $field, string $value): array
+    {
+        $rows = DB::table('notification_deliveries as d')->join('notification_requests as r', 'r.id', '=', 'd.request_id')
+            ->where('d.channel', '!=', 'none')->whereRaw('r.payload->>? = ?', [$field, $value])
+            ->orderByDesc('d.queued_at')->limit(500)->get(['d.*']);
+        $out = [];
+
+        foreach ($rows as $row) {
+            $out[] = $this->item($row);
+        }
+
+        return $out;
+    }
+
+    /** @return array<string, mixed> one delivery as the Sent messages page shows it */
+    public function item(stdClass $row): array
     {
         $key = Row::text($row, 'topic_key');
         $channel = Row::text($row, 'channel');

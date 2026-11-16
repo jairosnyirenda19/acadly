@@ -54,4 +54,12 @@ final class Directory implements EnrolmentDirectory
         return array_map(fn (array $c): array => ['id' => $c['id'], 'name' => $c['name'], 'relationship' => $c['relationship_label'], 'phone' => $c['phone'],
             'email' => $c['email'], 'notices_by' => $c['notices_by'], 'main' => $c['main']], app(Contacts::class)->of($learnerId));
     }
+
+    public function placeOf(string $learnerId): ?array
+    {
+        $place = app(LearnerPlaces::class)->current($learnerId);
+
+        return $place === null ? null : ['class_id' => $place['class_id'], 'division_id' => $place['division_id'], 'campus_id' => $place['campus_id'],
+            'year_id' => $place['year_id'], 'open' => $place['open'], 'since' => $place['starts_on']];
+    }
 }

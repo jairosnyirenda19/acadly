@@ -1,9 +1,12 @@
 import { api, type paths } from '@acadly/kernel'
+import { gridApiQuery, type GridQuery } from '@acadly/ui'
 import { read, settle } from '../setup/api'
 
 export type ChannelsState = paths['/v1/messages/channels']['get']['responses'][200]['content']['application/json']
 export type NoticesState = paths['/v1/messages/notices']['get']['responses'][200]['content']['application/json']
 export type NoticeState = paths['/v1/messages/notices/{key}']['get']['responses'][200]['content']['application/json']
+export type SentGrid = paths['/v1/messages/sent/grid']['get']['responses'][200]['content']['application/json']
+export type SentRow = SentGrid['rows'][number]
 export type SentState = paths['/v1/messages/sent']['get']['responses'][200]['content']['application/json']
 export type MessageState = paths['/v1/messages/sent/{id}']['get']['responses'][200]['content']['application/json']
 
@@ -30,6 +33,8 @@ export const messagesApi = {
         params: { query: { ...(day !== null ? { day } : {}), ...(channel !== '' ? { channel } : {}), ...(state !== '' ? { state } : {}), ...(q !== '' ? { q } : {}) } as never },
       }),
     ),
+  /** One page of the sent messages, for the data grid. */
+  sentGrid: (query: GridQuery) => read(api.GET('/v1/messages/sent/grid', { params: { query: gridApiQuery(query) as never } })),
   message: (id: string) => read(api.GET('/v1/messages/sent/{id}', { params: { path: { id } } })),
   again: (id: string) => settle(api.POST('/v1/messages/sent/{id}/again', { params: { path: { id } } }) as Done<MessageState>),
 }
@@ -71,4 +76,16 @@ export function clock(iso: string): string {
 /** The time with seconds: 07:43:05. */
 export function clockSeconds(iso: string): string {
   return new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+}
+
+/** The tone of each message state: a word on a colour, never colour alone. */
+export const messageTone: Record<string, 'done' | 'attention' | 'wrong' | 'plain'> = {
+  delivered: 'done',
+  sent: 'plain',
+  accepted: 'plain',
+  waiting: 'plain',
+  not_delivered: 'wrong',
+  not_reachable: 'attention',
+  over_allowance: 'attention',
+  not_sent: 'plain',
 }

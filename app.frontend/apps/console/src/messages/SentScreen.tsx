@@ -1,65 +1,133 @@
 import { navigate, useLoad, useLocation } from '@acadly/kernel'
-import { Button, slips, Waiting } from '@acadly/ui'
-import { useState } from 'react'
+import { Button, DataGrid, NO_SELECTION, slips, viewState, Waiting, type GridQuery } from '@acadly/ui'
+import { useState, type MouseEvent } from 'react'
 import { copy } from '../copy'
+import { gridsApi, type BulkAnswer } from '../grid/api'
+import { BulkResult } from '../grid/BulkResult'
+import { gridAddress, startExport, useGridPage, useGridPrefs, useGridQuery, useGridSelection } from '../grid/useGrid'
 import { longDay } from '../registers/api'
 import { Total, TotalsBand } from '../setup/parts'
-import { SettingsTabs, Tag } from '../settings/parts'
-import { clock, clockSeconds, messagesApi, type MessageState, type SentState } from './api'
+import { Tag } from '../settings/parts'
+import { clockSeconds, messageTone, messagesApi, type MessageState, type SentRow } from './api'
 import { Facts, Heading, MessagesHead } from './parts'
 
 const t = copy.messages
 const s = copy.settings
+const GRID = 'messages'
+const PATH = '/settings/messages/sent'
 
-const tone: Record<string, 'done' | 'attention' | 'wrong' | 'plain'> = {
-  delivered: 'done',
-  sent: 'plain',
-  accepted: 'plain',
-  waiting: 'plain',
-  not_delivered: 'wrong',
-  not_reachable: 'attention',
-  over_allowance: 'attention',
-  not_sent: 'plain',
+const tone = messageTone
+
+const channelWord = (channel: string) => t.state[channel] ?? (channel === 'sms' ? t.sms : channel === 'email' ? t.email : channel)
+
+/** A value that is not there: a dash, read as nothing. */
+function Dash() {
+  return <span aria-hidden="true">{copy.dash}</span>
 }
 
-const COLS = 'md:grid-cols-[64px_minmax(200px,1.4fr)_minmax(150px,1fr)_64px_minmax(190px,1.3fr)_48px]'
+/** The name opens the message beside the list, keeping the list as it is. */
+function ToLink({ row, query, open }: { row: SentRow; query: GridQuery; open: boolean }) {
+  const path = gridAddress(PATH, query, { message: row.id })
 
-/** Every message of one day and what happened to it (the approved design). */
+  return (
+    <a
+      href={path}
+      aria-current={open || undefined}
+      onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+        event.preventDefault()
+        navigate(path)
+      }}
+      className="text-ink no-underline underline-offset-[3px] hover:underline"
+    >
+      {row.to}
+    </a>
+  )
+}
+
+function StateCell({ row }: { row: SentRow }) {
+  return (
+    <span className="grid justify-items-start gap-0.5 whitespace-normal">
+      <span className="flex flex-wrap gap-1">
+        <Tag tone={tone[row.state] ?? 'plain'}>{t.state[row.state] ?? row.state}</Tag>
+        {row.again && <Tag tone="plain">{t.again}</Tag>}
+      </span>
+      {row.reason !== null && <span className="max-w-[260px] text-xs text-text-muted">{row.reason}</span>}
+    </span>
+  )
+}
+
+/** Every message sent, on the data grid; the one chosen opens beside it (the approved design). */
 export function SentScreen() {
-  const { query } = useLocation()
-  const day = query.get('day')
-  const channel = query.get('channel') ?? ''
-  const state = query.get('state') ?? ''
-  const q = query.get('q') ?? ''
-  const chosen = query.get('message')
-  const loaded = useLoad(`messages:sent:${day ?? ''}:${channel}:${state}:${q}`, () => messagesApi.sent(day, channel, state, q))
-  const data = loaded.data
+  const { query: params } = useLocation()
+  const chosen = params.get('message')
+  // The band counts today, as before; the list below covers every day.
+  const today = useLoad('messages:sent:', () => messagesApi.sent(null, '', '', ''))
+  const data = today.data
+  const [query, setQuery] = useGridQuery(PATH, ['message'])
+  const grid = useGridPage(GRID, query, messagesApi.sentGrid)
+  const [selection, setSelection] = useGridSelection(query)
+  const prefs = useGridPrefs(GRID, grid.reload)
+  const [result, setResult] = useState<BulkAnswer | null>(null)
 
   if (data === undefined) {
-    return (
-      <>
-        <SettingsTabs current="messages" />
-        <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} band={[t.bandSentToday, t.bandDeliveredToday, t.bandWaiting, t.bandAttentionToday]} rows={8} onRetry={loaded.reload} />
-      </>
-    )
+    return <Waiting phase={today.phase} what={t.title} labels={copy.loading} band={[t.bandSentToday, t.bandDeliveredToday, t.bandWaiting, t.bandAttentionToday]} rows={8} onRetry={today.reload} />
   }
 
-  const go = (patch: Record<string, string | null>) => {
-    const next = new URLSearchParams(query)
+  const page = grid.page
+  const sort = { sort: page?.sort ?? query.sort, dir: page?.dir ?? query.dir }
 
-    for (const [k, v] of Object.entries(patch)) {
-      if (v === null || v === '') next.delete(k)
-      else next.set(k, v)
-    }
+  const labels = copy.grid.labels({
+    name: t.tabs.sent,
+    word: t.word,
+    plural: t.plural,
+    searchPlaceholder: t.search,
+    columnsNote: t.gridColumnsNote,
+    emptyText: t.gridEmpty,
+    noMatchText: t.gridNoMatch,
+  })
 
-    if (next.get('day') === data.today) next.delete('day')
-    const text = next.toString()
-    navigate(`/settings/messages/sent${text !== '' ? `?${text}` : ''}`)
+  const render = {
+    at: (row: SentRow) => <span className="ref text-[13px]">{t.when(row.at)}</span>,
+    to: (row: SentRow) => (
+      <>
+        <span className="block font-extrabold">
+          <ToLink row={row} query={query} open={row.id === chosen} />
+        </span>
+        <span className="ref block text-[13px] break-all text-text-muted">{row.address ?? <Dash />}</span>
+      </>
+    ),
+    address: (row: SentRow) => <span className="ref text-[13px]">{row.address ?? <Dash />}</span>,
+    notice: (row: SentRow) => row.notice,
+    channel: (row: SentRow) => <span className="text-[13px] font-bold">{channelWord(row.channel)}</span>,
+    state: (row: SentRow) => <StateCell row={row} />,
+    units: (row: SentRow) => <span className="ref text-[13px]">{row.channel === 'sms' && row.units > 0 ? row.units : <Dash />}</span>,
+  }
+
+  const card = (row: SentRow) => ({
+    title: <ToLink row={row} query={query} open={row.id === chosen} />,
+    meta: [t.when(row.at), row.notice].join(' · '),
+    aside: <Tag tone={tone[row.state] ?? 'plain'}>{t.state[row.state] ?? row.state}</Tag>,
+  })
+
+  // Send again takes no input: it runs at once and its result shows above the rows.
+  const bulk = (action: string) => {
+    if (action !== 'again') return
+    void gridsApi.bulk(GRID, { action, ...(selection.all ? { all: true as const } : { ids: selection.ids }), state: viewState(query, sort), input: {} }).then((r) => {
+      if (r.kind === 'saved') {
+        setResult(r.data)
+        setSelection(NO_SELECTION)
+        grid.reload()
+        today.reload()
+      } else {
+        slips.wrong({ word: t.notAgain, title: r.kind === 'refused' ? s.refused : t.againFailed })
+      }
+    })
   }
 
   return (
     <>
-      <MessagesHead current="sent" intro={t.sentIntro} />
+      <MessagesHead current="sent" intro={t.gridIntro} />
       <TotalsBand>
         <Total tone="ink" label={t.bandSentToday} value={String(data.totals.sent)} note={t.bandSentNote(longDay(data.day))} />
         <Total label={t.bandDeliveredToday} value={String(data.totals.delivered)} note={t.bandDeliveredNote} />
@@ -67,96 +135,53 @@ export function SentScreen() {
         <Total tone={data.totals.attention > 0 ? 'attention' : 'plain'} label={t.bandAttentionToday} value={String(data.totals.attention)} note={t.bandAttentionTodayNote(data.totals.attention)} />
       </TotalsBand>
       <div className="flex flex-1 flex-wrap items-stretch">
-        <section className="min-w-0 flex-[3_1_640px] bg-sheet px-3 pt-3.5 pb-6 md:px-[clamp(16px,3vw,40px)]">
-          <Filters data={data} channel={channel} state={state} q={q} onChange={go} />
-          <div className={`label-caps hidden gap-3 border-b-2 border-ink pr-4 pb-2 pl-5 text-text-muted md:grid ${COLS}`}>
-            <span>{t.colTime}</span>
-            <span>{t.colTo}</span>
-            <span>{t.colNotice}</span>
-            <span>{t.colChannel}</span>
-            <span>{t.colState}</span>
-            <span className="text-right">{t.colUnits}</span>
-          </div>
-          {data.messages.length === 0 && <p className="px-4 py-4 text-sm text-text-muted">{t.none}</p>}
-          {data.messages.map((m) => (
-            <button
-              key={m.id}
-              type="button"
-              onClick={() => go({ message: m.id })}
-              aria-pressed={m.id === chosen}
-              className={`grid w-full gap-1 border-b border-l-4 border-b-rule py-2.5 pr-4 pl-4 text-left md:items-center md:gap-3 ${COLS} ${m.id === chosen ? 'border-l-teal bg-paper' : 'border-l-transparent hover:bg-paper'}`}
-            >
-              <span className="ref text-[13px]">{clock(m.at)}</span>
-              <span className="min-w-0">
-                <span className="block font-extrabold">{m.to}</span>
-                <span className="ref block text-[13px] break-all text-text-muted">{m.address ?? '—'}</span>
-              </span>
-              <span className="text-sm">{m.notice}</span>
-              <span className="text-[13px] font-bold">{t.state[m.channel] ?? (m.channel === 'sms' ? t.sms : m.channel === 'email' ? t.email : m.channel)}</span>
-              <span className="grid justify-items-start gap-0.5">
-                <span className="flex flex-wrap gap-1">
-                  <Tag tone={tone[m.state] ?? 'plain'}>{t.state[m.state] ?? m.state}</Tag>
-                  {m.again && <Tag tone="plain">{t.again}</Tag>}
-                </span>
-                {m.reason !== null && <span className="text-xs text-text-muted">{m.reason}</span>}
-              </span>
-              <span className="ref text-[13px] md:text-right">{m.channel === 'sms' && m.units > 0 ? m.units : '—'}</span>
-            </button>
-          ))}
-        </section>
+        <div className="flex min-w-0 flex-[3_1_640px]">
+          <DataGrid
+            labels={labels}
+            page={page}
+            phase={grid.phase}
+            query={query}
+            onQuery={(next, replace) => {
+              setResult(null)
+              setQuery(next, replace)
+            }}
+            onRetry={grid.reload}
+            render={render}
+            alignEnd={['units']}
+            card={card}
+            rowName={(row) => row.to}
+            rowTone={(row) => (tone[row.state] === 'wrong' ? 'wrong' : null)}
+            current={chosen}
+            onOpen={(row) => navigate(gridAddress(PATH, query, { message: row.id }))}
+            selection={selection}
+            onSelection={setSelection}
+            onBulk={bulk}
+            notice={
+              result !== null && (
+                <BulkResult
+                  label={t.againLabel}
+                  done={t.againDone(result.done)}
+                  notDoneCount={t.notAgainCount(result.refused.length)}
+                  notDone={t.notAgain}
+                  line={t.resultLine}
+                  refused={result.refused}
+                  close={t.closeResult}
+                  onClose={() => setResult(null)}
+                />
+              )
+            }
+            onColumns={prefs.onColumns}
+            views={prefs.views}
+            onExport={(scope) => {
+              if (page !== undefined) startExport(GRID, scope, { page, query, selection, word: t.word, plural: t.plural })
+            }}
+          />
+        </div>
         <aside className="min-w-0 flex-[1_1_340px] border-ink bg-paper px-3 pt-4.5 pb-6 max-[1023px]:border-t-2 md:px-7 min-[1024px]:border-l-2">
-          {chosen === null ? <p className="text-sm text-text-muted">{t.pick}</p> : <Detail key={chosen} id={chosen} onChanged={loaded.reload} />}
+          {chosen === null ? <p className="text-sm text-text-muted">{t.pick}</p> : <Detail key={chosen} id={chosen} onChanged={grid.reload} />}
         </aside>
       </div>
     </>
-  )
-}
-
-function Filters({ data, channel, state, q, onChange }: { data: SentState; channel: string; state: string; q: string; onChange: (patch: Record<string, string | null>) => void }) {
-  const [text, setText] = useState(q)
-  const field = 'h-11 border-0 border-b-2 border-ink bg-field px-3 text-[15px] text-ink outline-none focus:border-teal'
-
-  return (
-    <form
-      className="mb-3 flex flex-wrap items-end gap-2.5"
-      onSubmit={(e) => {
-        e.preventDefault()
-        onChange({ q: text, message: null })
-      }}
-    >
-      <label className="block">
-        <span className="label-caps mb-1.5 block text-text-muted">{t.day}</span>
-        <input type="date" value={data.day} max={data.today} onChange={(e) => e.target.value !== '' && onChange({ day: e.target.value, message: null })} className={`${field} w-[170px]`} />
-      </label>
-      <label className="block">
-        <span className="label-caps mb-1.5 block text-text-muted">{t.colChannel}</span>
-        <select value={channel} onChange={(e) => onChange({ channel: e.target.value, message: null })} className={`${field} w-[160px]`}>
-          <option value="">{t.everyChannel}</option>
-          <option value="sms">{t.sms}</option>
-          <option value="email">{t.email}</option>
-        </select>
-      </label>
-      <label className="block">
-        <span className="label-caps mb-1.5 block text-text-muted">{t.colState}</span>
-        <select value={state} onChange={(e) => onChange({ state: e.target.value, message: null })} className={`${field} w-[190px]`}>
-          <option value="">{t.everyState}</option>
-          {Object.entries(t.state).map(([k, v]) => (
-            <option key={k} value={k}>
-              {v}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="block min-w-[220px] flex-1">
-        <span className="label-caps mb-1.5 block text-text-muted">{t.searchLabel}</span>
-        <input type="search" value={text} placeholder={t.search} onChange={(e) => setText(e.target.value)} className={`${field} w-full`} />
-      </label>
-      {data.day !== data.today && (
-        <Button variant="secondary" onClick={() => onChange({ day: data.today, message: null })}>
-          {t.today}
-        </Button>
-      )}
-    </form>
   )
 }
 
@@ -191,9 +216,9 @@ function DetailView({ m, working, failed, onAgain }: { m: MessageState; working:
       <Heading aside={<Tag tone={tone[m.state] ?? 'plain'}>{t.state[m.state] ?? m.state}</Tag>}>{m.to}</Heading>
       <Facts
         rows={[
-          [t.colTo, <span className="ref font-normal">{m.address ?? '—'}</span>],
+          [t.colTo, <span className="ref font-normal">{m.address ?? copy.dash}</span>],
           [t.colNotice, m.notice],
-          [t.providerLabel, [m.provider ?? '—', m.channel === 'sms' && m.units > 0 ? t.unitsLabel(m.units) : null].filter((x) => x !== null).join(' · ')],
+          [t.providerLabel, [m.provider ?? copy.dash, m.channel === 'sms' && m.units > 0 ? t.unitsLabel(m.units) : null].filter((x) => x !== null).join(' · ')],
         ]}
       />
       <div className="my-3.5 border-2 border-ink bg-sheet p-3 text-sm leading-normal whitespace-pre-line">

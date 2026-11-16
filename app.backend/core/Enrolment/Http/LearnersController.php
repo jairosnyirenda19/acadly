@@ -16,7 +16,9 @@ use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Access\WorkPlaces;
 use Acadly\Kernel\Documents\DocumentReader;
+use Acadly\Kernel\Grid\Grids;
 use Acadly\Kernel\Identity\User;
+use Acadly\Kernel\Notify\Messages;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -50,6 +52,18 @@ final class LearnersController
     }
 
     /**
+     * The learners as a data grid: `?page=&per_page=&sort=&dir=&q=&filter[class]=a,b&filter[state]=few_contacts&filter[sex]=female&filter[admitted]=from..to`.
+     *
+     * @response array{rows: list<array{id: string, acadly_id: string, name: string, admission_number: string|null, class_id: string, class: string, campus: string, sex: string, date_of_birth: string, admitted_on: string|null, contacts: int, main_contact: string|null, has_photo: bool, few_contacts: bool, possible_duplicate: bool}>, total: int, page: int, per_page: int, pages: int, sort: string, dir: 'asc'|'desc', q: string, filters: array<string, list<string>>, columns: list<array{key: string, label: string, sortable: bool, shown: bool, always: bool}>, filter_options: list<array{key: string, label: string, kind: 'choice'|'dates', options: list<array{value: string, label: string, count: int}>}>, views: list<array{id: string, name: string, state: array<string, mixed>}>, bulk: list<array{key: string, label: string}>, can_export: bool}
+     */
+    public function grid(Request $request, Grids $grids): JsonResponse
+    {
+        $viewer = self::user($request);
+
+        return response()->json($grids->page($viewer, $grids->grid('learners'), $request->query()));
+    }
+
+    /**
      * Admits a learner: `{first_name, other_names, surname, sex, date_of_birth, class_id, admitted_on, admission_number, different, contacts: [{name, relationship, phone, email, main}]}`.
      *
      * @response array{id: string}
@@ -74,7 +88,7 @@ final class LearnersController
     /**
      * One learner's record.
      *
-     * @response array{id: string, acadly_id: string, admission_number: string|null, first_name: string, other_names: string|null, surname: string, name: string, sex: string, date_of_birth: string, has_photo: bool, status: string, admitted_on: string|null, word: string, class: array{id: string, name: string}|null, level: string|null, division: string|null, campus: string|null, class_teacher: string|null, placements: list<array{class: string, campus: string, year: string, starts_on: string, ends_on: string|null, entry_reason: string, reason: string|null, now: bool}>, contacts: list<array{id: string, name: string, relationship: string, relationship_label: string, phone: string, email: string|null, notices_by: string, main: bool}>, activity: list<array{at: string, what: string, who: string, reason: string|null}>, possible_duplicate: bool, move_to: list<array{id: string, name: string, count: int}>, can_manage: bool, relationships: list<array{value: string, label: string}>}
+     * @response array{id: string, acadly_id: string, admission_number: string|null, first_name: string, other_names: string|null, surname: string, name: string, sex: string, date_of_birth: string, has_photo: bool, status: string, admitted_on: string|null, word: string, word_plural: string, class: array{id: string, name: string}|null, level: string|null, division: string|null, campus: string|null, class_teacher: string|null, placements: list<array{class: string, campus: string, year: string, starts_on: string, ends_on: string|null, entry_reason: string, reason: string|null, now: bool}>, contacts: list<array{id: string, name: string, relationship: string, relationship_label: string, phone: string, email: string|null, notices_by: string, main: bool}>, activity: list<array{at: string, what: string, who: string, reason: string|null}>, possible_duplicate: bool, move_to: list<array{id: string, name: string, count: int}>, can_manage: bool, relationships: list<array{value: string, label: string}>, parts: list<array{key: string, title: string, band: list<array{label: string, value: string, note: string, tone: 'plain'|'attention'}>, attention: int}>, told: array{all: int, delivered: int, not_delivered: int}}
      */
     public function show(Request $request, string $id): JsonResponse
     {
@@ -82,6 +96,18 @@ final class LearnersController
         ['learner' => $learner] = $this->reach->learner($viewer, $id, EnrolmentPermission::View);
 
         return response()->json($this->learners->record($viewer, $learner));
+    }
+
+    /**
+     * Every notice the school sent about the learner, to whom, and what happened to it.
+     *
+     * @response array{messages: list<array{id: string, at: string, to: string, address: string|null, notice: string, about: string, channel: string, state: 'delivered'|'sent'|'accepted'|'not_delivered'|'waiting'|'not_reachable'|'over_allowance'|'not_sent', reason: string|null, units: int, again: bool}>}
+     */
+    public function messages(Request $request, string $id, Messages $messages): JsonResponse
+    {
+        $this->reach->learner(self::user($request), $id, EnrolmentPermission::View);
+
+        return response()->json(['messages' => $messages->carrying('learner', $id)]);
     }
 
     /** Corrects the details: `{first_name, other_names, surname, sex, date_of_birth, admission_number, reason}`. */

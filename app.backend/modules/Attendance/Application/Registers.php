@@ -6,6 +6,7 @@ namespace Acadly\Modules\Attendance\Application;
 
 use Acadly\Core\Academics\Contracts\AcademicCalendar;
 use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
+use Acadly\Core\Institution\Contracts\SchoolDirectory;
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
@@ -26,6 +27,7 @@ final class Registers
         private readonly Access $access,
         private readonly AcademicCalendar $calendar,
         private readonly EnrolmentDirectory $learners,
+        private readonly SchoolDirectory $school,
         private readonly SchoolDays $days,
         private readonly Marks $marks,
         private readonly Reach $reach,
@@ -35,7 +37,7 @@ final class Registers
     /**
      * Every register the viewer may see on a day.
      *
-     * @return array{day: string, today: string, year: string|null, classes: list<array{id: string, name: string, teacher: string|null, school_day: bool, due: bool, register: array{id: string, submitted_at: string, submitted_by: string}|null, learners: int, counts: array{present: int, absent: int, late: int, excused: int}, corrections: int}>, totals: array{classes: int, due: int, taken: int, not_taken: int, present: int, absent: int, late: int, excused: int, corrections: int}}
+     * @return array{day: string, today: string, year: string|null, classes: list<array{id: string, name: string, division: string, campus: string, teacher: string|null, school_day: bool, due: bool, register: array{id: string, submitted_at: string, submitted_by: string}|null, learners: int, counts: array{present: int, absent: int, late: int, excused: int}, corrections: int}>, totals: array{classes: int, due: int, taken: int, not_taken: int, present: int, absent: int, late: int, excused: int, corrections: int}}
      */
     public function day(User $viewer, string $day, ?ScopeRef $in): array
     {
@@ -61,6 +63,17 @@ final class Registers
             ->where('state', State::Requested->value)->groupBy('class_id')->selectRaw('class_id, count(*) as n')->pluck('n', 'class_id')->all();
         $names = $this->userNames([...array_values(array_filter(array_map(fn (array $c): ?string => $this->calendar->classTeacherId($c['id']), $classes))),
             ...array_values(array_map(fn (object $r): string => Row::text($r, 'submitted_by'), $registers->all()))]);
+        $divisions = [];
+        $campuses = [];
+
+        foreach ($this->school->divisionViews() as $division) {
+            $divisions[$division->id] = $division->name;
+        }
+
+        foreach ($this->school->campusViews() as $campus) {
+            $campuses[$campus->id] = $campus->name;
+        }
+
         $rows = [];
         $totals = ['classes' => count($classes), 'due' => 0, 'taken' => 0, 'not_taken' => 0, 'present' => 0, 'absent' => 0, 'late' => 0, 'excused' => 0, 'corrections' => 0];
 
@@ -79,6 +92,8 @@ final class Registers
             $rows[] = [
                 'id' => $class['id'],
                 'name' => $class['name'],
+                'division' => $divisions[$class['division_id']] ?? '',
+                'campus' => $campuses[$class['campus_id']] ?? '',
                 'teacher' => $teacher !== null ? ($names[$teacher] ?? null) : null,
                 'school_day' => $schoolDay,
                 'due' => $due,

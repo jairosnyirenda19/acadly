@@ -6995,6 +6995,12 @@
                                                     "name": {
                                                         "type": "string"
                                                     },
+                                                    "division": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus": {
+                                                        "type": "string"
+                                                    },
                                                     "teacher": {
                                                         "type": [
                                                             "string",
@@ -7062,6 +7068,8 @@
                                                 "required": [
                                                     "id",
                                                     "name",
+                                                    "division",
+                                                    "campus",
                                                     "teacher",
                                                     "school_day",
                                                     "due",

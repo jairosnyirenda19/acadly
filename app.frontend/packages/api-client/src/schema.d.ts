@@ -3557,6 +3557,8 @@ export interface operations {
                         classes: {
                             id: string;
                             name: string;
+                            division: string;
+                            campus: string;
                             teacher: string | null;
                             school_day: boolean;
                             due: boolean;

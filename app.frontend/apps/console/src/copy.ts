@@ -911,6 +911,7 @@ export const copy = {
     taken: 'Taken',
     notTaken: 'Not taken',
     notSchoolDay: 'Not a school day',
+    groupTaken: (taken: number, due: number) => (due === 0 ? 'No register due' : `${taken} of ${due} taken`),
     correctionsToApprove: (n: number) => (n === 1 ? 'Correction to approve' : `${n} corrections to approve`),
     open: (name: string) => `Open the register of ${name}`,
     none: 'No class here.',

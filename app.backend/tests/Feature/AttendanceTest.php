@@ -97,6 +97,7 @@ it('takes the register once a school day, with every learner marked', function (
         ->and(DB::table('attendance_marks')->count())->toBe(6)
         ->and($row['counts'])->toBe(['present' => 2, 'absent' => 1, 'late' => 0, 'excused' => 0])
         ->and($row['teacher'])->toBeNull()
+        ->and($row['division'])->not->toBe('')->and($row['campus'])->not->toBe('')
         ->and($day['totals']['taken'])->toBe(1)
         ->and($day['totals']['due'])->toBe(1)
         ->and($day['totals']['not_taken'])->toBe(0)

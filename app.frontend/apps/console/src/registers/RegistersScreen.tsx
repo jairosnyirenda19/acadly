@@ -1,10 +1,11 @@
 import { navigate, useLoad, useLocation } from '@acadly/kernel'
 import { Waiting } from '@acadly/ui'
+import { Fragment } from 'react'
 import { copy } from '../copy'
 import { Total, TotalsBand } from '../setup/parts'
 import { PageHead, Tag } from '../settings/parts'
 import { useWorkIn } from '../shell/WorkIn'
-import { clock, longDay, registersApi } from './api'
+import { clock, type DayState, longDay, registersApi } from './api'
 
 const t = copy.registers
 
@@ -26,6 +27,8 @@ export function RegistersScreen() {
   const totals = state.totals
   const marked = totals.present + totals.absent + totals.late + totals.excused
   const attention = totals.not_taken + totals.corrections
+  // Viewers who see more than one division or campus read the classes under each place.
+  const grouped = new Set(state.classes.map((c) => `${c.division} · ${c.campus}`)).size > 1
   const go = (next: string) => navigate(next === state.today ? '/registers' : `/registers?day=${next}`)
 
   return (
@@ -74,13 +77,17 @@ export function RegistersScreen() {
               <span className="text-right">{t.colExcused}</span>
             </div>
             {state.classes.length === 0 && <p className="px-4 py-4 text-sm text-text-muted">{t.none}</p>}
-            {state.classes.map((c) => {
+            {state.classes.map((c, i) => {
+              const group = `${c.division} · ${c.campus}`
+              const before = i > 0 ? state.classes[i - 1] : undefined
+              const head = grouped && (before === undefined || `${before.division} · ${before.campus}` !== group)
               const missing = c.due && c.register === null && state.day <= state.today
               const open = () => navigate(`/registers/${c.id}${state.day !== state.today ? `?day=${state.day}` : ''}`)
 
               return (
+                <Fragment key={c.id}>
+                {head && <GroupHead name={group} rows={state.classes.filter((x) => x.division === c.division && x.campus === c.campus)} />}
                 <div
-                  key={c.id}
                   role="link"
                   tabIndex={0}
                   aria-label={t.open(c.name)}
@@ -113,6 +120,7 @@ export function RegistersScreen() {
                     </span>
                   ))}
                 </div>
+                </Fragment>
               )
             })}
           </div>
@@ -120,5 +128,18 @@ export function RegistersScreen() {
         <p className="mt-3 text-[13px] text-text-muted">{t.rule}</p>
       </section>
     </>
+  )
+}
+
+/** The place a run of classes belongs to, with how many of its due registers are taken. */
+function GroupHead({ name, rows }: { name: string; rows: DayState['classes'] }) {
+  const due = rows.filter((r) => r.due).length
+  const taken = rows.filter((r) => r.register !== null).length
+
+  return (
+    <div className="flex items-baseline justify-between gap-3 border-b border-rule bg-field px-4 pt-4 pb-2">
+      <span className="label-caps text-ink">{name}</span>
+      <span className="text-[13px] text-text-muted">{t.groupTaken(taken, due)}</span>
+    </div>
   )
 }

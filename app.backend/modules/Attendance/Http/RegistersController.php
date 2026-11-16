@@ -32,7 +32,7 @@ final class RegistersController
     /**
      * Every register the viewer may see on a day: `?day=YYYY-MM-DD&in=type:id`.
      *
-     * @response array{day: string, today: string, year: string|null, classes: list<array{id: string, name: string, teacher: string|null, school_day: bool, due: bool, register: array{id: string, submitted_at: string, submitted_by: string}|null, learners: int, counts: array{present: int, absent: int, late: int, excused: int}, corrections: int}>, totals: array{classes: int, due: int, taken: int, not_taken: int, present: int, absent: int, late: int, excused: int, corrections: int}}
+     * @response array{day: string, today: string, year: string|null, classes: list<array{id: string, name: string, division: string, campus: string, teacher: string|null, school_day: bool, due: bool, register: array{id: string, submitted_at: string, submitted_by: string}|null, learners: int, counts: array{present: int, absent: int, late: int, excused: int}, corrections: int}>, totals: array{classes: int, due: int, taken: int, not_taken: int, present: int, absent: int, late: int, excused: int, corrections: int}}
      */
     public function index(Request $request, WorkPlaces $places): JsonResponse
     {

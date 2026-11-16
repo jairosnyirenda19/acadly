@@ -180,6 +180,11 @@ it('refuses a subscription to an event that is not in the build', function (): v
 
         }
 
+        public function summary(): string
+        {
+            return 'A test module.';
+        }
+
         public function tier(): Tier
         {
             return Tier::Optional;

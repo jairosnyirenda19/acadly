@@ -45,6 +45,7 @@ final class LearnerImport
         'Contact 1 name', 'Contact 1 relationship', 'Contact 1 phone', 'Contact 1 email',
         'Contact 2 name', 'Contact 2 relationship', 'Contact 2 phone', 'Contact 2 email',
         'Contact 3 name', 'Contact 3 relationship', 'Contact 3 phone', 'Contact 3 email',
+        'Contact 1 notices by', 'Contact 2 notices by', 'Contact 3 notices by',
     ];
 
     /** Words people write for a relationship, beyond the names on the list. */
@@ -125,15 +126,19 @@ final class LearnerImport
             $options->addValidation($column, 2, $column, $last, new ListValidationRule(new CellReference(2, 2, 2, count($relationships) + 1, sheetName: 'Lists')));
         }
 
+        foreach ([20, 21, 22] as $column) {
+            $options->addValidation($column, 2, $column, $last, new ListValidationRule(new CellReference(3, 2, 3, 3, sheetName: 'Lists')));
+        }
+
         $writer = new Writer($options);
         $writer->openToFile($path);
         $writer->getCurrentSheet()->setName('Learners');
         $writer->addRow(Row::fromValues(self::COLUMNS));
         $writer->addNewSheetAndMakeItCurrent()->setName('Lists');
-        $writer->addRow(Row::fromValues(['Sex', 'Classes you can admit into', 'Relationships']));
+        $writer->addRow(Row::fromValues(['Sex', 'Classes you can admit into', 'Relationships', 'Notices by']));
 
         for ($i = 0; $i < max(2, count($classes), count($relationships)); $i++) {
-            $writer->addRow(Row::fromValues([['Female', 'Male'][$i] ?? '', $classes[$i] ?? '', $relationships[$i] ?? '']));
+            $writer->addRow(Row::fromValues([['Female', 'Male'][$i] ?? '', $classes[$i] ?? '', $relationships[$i] ?? '', ['SMS', 'Email'][$i] ?? '']));
         }
 
         $writer->setCurrentSheet($writer->getSheets()[0]);
@@ -142,7 +147,7 @@ final class LearnerImport
 
     /**
      * @param  array<int, list<string>>  $rows
-     * @return list<array{view: array{row: int, name: string, born: string, sex: string, class: string, contacts: list<string>, number: string|null, state: 'ready'|'double'|'wrong', note: string}, input: array{first_name: string, other_names: string|null, surname: string, sex: string, date_of_birth: string, class_id: string, admitted_on: string, admission_number: string|null}|null, people: list<array{name: string, relationship: string, phone: string, email: string|null, main: bool}>, class_id: string|null}>
+     * @return list<array{view: array{row: int, name: string, born: string, sex: string, class: string, contacts: list<string>, number: string|null, state: 'ready'|'double'|'wrong', note: string}, input: array{first_name: string, other_names: string|null, surname: string, sex: string, date_of_birth: string, class_id: string, admitted_on: string, admission_number: string|null}|null, people: list<array{name: string, relationship: string, phone: string, email: string|null, notices_by?: string, main: bool}>, class_id: string|null}>
      */
     private function checkRows(User $viewer, array $rows): array
     {
@@ -244,7 +249,8 @@ final class LearnerImport
                     continue;
                 }
 
-                $people[] = ['name' => $cName, 'relationship' => self::relationship($cRelation), 'phone' => $cPhone, 'email' => $cEmail !== '' ? $cEmail : null, 'main' => $i === 0];
+                $people[] = ['name' => $cName, 'relationship' => self::relationship($cRelation), 'phone' => $cPhone, 'email' => $cEmail !== '' ? $cEmail : null,
+                    'notices_by' => mb_strtolower(trim($cells[20 + $i] ?? '')), 'main' => $i === 0];
             }
 
             try {

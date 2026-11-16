@@ -14,10 +14,12 @@ use Acadly\Kernel\Identity\Http\SignInController;
 use Acadly\Kernel\Identity\Http\SignOutController;
 use Acadly\Kernel\Module\Http\ContextController;
 use Acadly\Kernel\Module\Http\ModulesController;
+use Acadly\Kernel\Notify\Http\MessagesController;
 use Acadly\Kernel\Notify\Http\NotificationsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', HealthController::class)->name('kernel.health');
+Route::post('/notify/reports/{token}', [MessagesController::class, 'report'])->where('token', '[A-Za-z0-9]{16,64}')->middleware('throttle:240,1')->name('notify.reports');
 Route::get('/ready', ReadinessController::class)->name('kernel.ready');
 Route::get('/school', SchoolController::class)->name('kernel.school');
 
@@ -40,6 +42,21 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/documents/{id}/versions', [DocumentsController::class, 'addVersion'])->whereUuid('id')->name('documents.versions.store');
     Route::delete('/documents/{id}', [DocumentsController::class, 'trash'])->whereUuid('id')->name('documents.trash');
     Route::post('/documents/trash/{batch}/restore', [DocumentsController::class, 'restore'])->whereUuid('batch')->name('documents.restore');
+    Route::prefix('messages')->name('messages.')->group(function (): void {
+        Route::get('/channels', [MessagesController::class, 'channels'])->name('channels');
+        Route::put('/channels/sms', [MessagesController::class, 'saveSms'])->name('channels.sms');
+        Route::put('/channels/email', [MessagesController::class, 'saveEmail'])->name('channels.email');
+        Route::put('/limits', [MessagesController::class, 'saveLimits'])->name('limits');
+        Route::post('/test', [MessagesController::class, 'test'])->middleware('throttle:10,1')->name('test');
+        Route::get('/notices', [MessagesController::class, 'notices'])->name('notices');
+        Route::get('/notices/{key}', [MessagesController::class, 'notice'])->where('key', '[a-z][a-z0-9_.]*')->name('notice');
+        Route::put('/notices/{key}', [MessagesController::class, 'saveNotice'])->where('key', '[a-z][a-z0-9_.]*')->name('notice.save');
+        Route::delete('/notices/{key}/wording', [MessagesController::class, 'resetNotice'])->where('key', '[a-z][a-z0-9_.]*')->name('notice.reset');
+        Route::get('/sent', [MessagesController::class, 'sent'])->name('sent');
+        Route::get('/sent/{id}', [MessagesController::class, 'message'])->whereUuid('id')->name('message');
+        Route::post('/sent/{id}/again', [MessagesController::class, 'again'])->whereUuid('id')->name('again');
+    });
+
     Route::get('/modules', [ModulesController::class, 'index'])->name('modules.index');
     Route::put('/modules/{key}', [ModulesController::class, 'update'])->where('key', '[a-z][a-z0-9_]*')->name('modules.update');
 

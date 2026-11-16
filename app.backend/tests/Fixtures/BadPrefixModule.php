@@ -20,6 +20,11 @@ final class BadPrefixModule implements Module
         return 'Library';
     }
 
+    public function summary(): string
+    {
+        return 'A test module.';
+    }
+
     public function tier(): Tier
     {
         return Tier::Optional;

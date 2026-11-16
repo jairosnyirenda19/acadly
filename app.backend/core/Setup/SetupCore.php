@@ -26,6 +26,11 @@ final class SetupCore implements Module
         return 'School setup';
     }
 
+    public function summary(): string
+    {
+        return 'The first setting up of the school, step by step.';
+    }
+
     public function tier(): Tier
     {
         return Tier::Core;

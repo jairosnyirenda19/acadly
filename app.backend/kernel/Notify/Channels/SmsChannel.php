@@ -6,11 +6,12 @@ namespace Acadly\Kernel\Notify\Channels;
 
 use Acadly\Kernel\Notify\Channel;
 use Acadly\Kernel\Notify\Recipient;
+use Illuminate\Contracts\Container\Container;
 
-/** SMS: the short words, through the deployment's provider. */
+/** SMS: the short words, through the provider the school chose. The provider is read at each send. */
 final class SmsChannel implements ChannelAdapter
 {
-    public function __construct(private readonly SmsProvider $provider) {}
+    public function __construct(private readonly Container $container) {}
 
     public function channel(): Channel
     {
@@ -19,10 +20,12 @@ final class SmsChannel implements ChannelAdapter
 
     public function send(RenderedNotice $notice, Recipient $to): ProviderReceipt
     {
+        $provider = $this->container->make(SmsProvider::class);
+
         if ($to->phone === null) {
-            return ProviderReceipt::failed('no_address');
+            return ProviderReceipt::failed('no_address')->from($provider->key());
         }
 
-        return $this->provider->send($to->phone, $notice->short ?? $notice->subject);
+        return $provider->send($to->phone, $notice->short ?? $notice->subject)->from($provider->key());
     }
 }

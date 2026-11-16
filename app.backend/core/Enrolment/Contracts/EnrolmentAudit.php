@@ -14,6 +14,7 @@ enum EnrolmentAudit: string implements AuditAction
     case ContactAdded = 'enrolment.contact_added';
     case ContactRemoved = 'enrolment.contact_removed';
     case MainContactSet = 'enrolment.main_contact_set';
+    case ContactChannelSet = 'enrolment.contact_channel_set';
     case PhotoReplaced = 'enrolment.photo_replaced';
     case LearnersImported = 'enrolment.learners_imported';
 
@@ -31,6 +32,7 @@ enum EnrolmentAudit: string implements AuditAction
             self::ContactAdded => 'Added a contact to a learner.',
             self::ContactRemoved => 'Removed a contact from a learner.',
             self::MainContactSet => 'Made a contact the main contact of a learner.',
+            self::ContactChannelSet => 'Changed how a contact of a learner receives notices.',
             self::PhotoReplaced => 'Set the photo of a learner.',
             self::LearnersImported => 'Admitted learners from a spreadsheet.',
         };

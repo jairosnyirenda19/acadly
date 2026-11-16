@@ -190,6 +190,7 @@ export function LearnerImportScreen() {
               <li>{t.ruleClass}</li>
               <li>{t.ruleRelationship}</li>
               <li>{t.ruleDates}</li>
+              <li>{t.ruleNotices}</li>
             </ul>
           </section>
 

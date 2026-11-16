@@ -27,7 +27,7 @@ use Tests\Fixtures\TwoCampusSchool;
 /** Routes open to anyone: they reveal nothing about a place. */
 const OPEN_ROUTES = [
     'sanctum.csrf-cookie', 'auth.sign-in', 'auth.forgot-password', 'auth.reset-password',
-    'kernel.health', 'kernel.ready', 'kernel.school', 'institution.logo.public',
+    'kernel.health', 'kernel.ready', 'kernel.school', 'institution.logo.public', 'notify.reports',
 ];
 
 /** Routes about the account itself, not about a place. */
@@ -112,7 +112,7 @@ it('refuses every place-bound route to an account that holds everything, but onl
         'people.' => ['id' => $atB->id, 'assignment' => $heldAtB->id],
         'roles.' => ['id' => $clerk->id],
         'learners.' => ['id' => $learner, 'contact' => $contact],
-        'registers.' => ['id' => $school->id('class_secondary_b'), 'register' => $school->id('class_secondary_b')],
+        'registers.' => ['id' => $school->id('class_secondary_b'), 'register' => $school->id('class_secondary_b'), 'learner' => $learner],
     ];
     $b = [
         'id' => $school->id('campus_b'),

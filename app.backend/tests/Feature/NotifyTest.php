@@ -173,6 +173,11 @@ describe('the catalogue', function (): void {
                 return 'Broken';
             }
 
+            public function summary(): string
+            {
+                return 'A test module.';
+            }
+
             public function tier(): Tier
             {
                 return Tier::Core;
@@ -312,13 +317,15 @@ describe('sending', function (): void {
         expect(DB::table('notification_deliveries')->where('subject_id', $errand->id)->pluck('status')->all())->toBe(['unaddressed']);
     });
 
-    it('leaves out addresses that cannot be reached', function (): void {
+    it('sends nothing to an address that cannot be reached, and lists it as not reachable', function (): void {
         $requester = staff('someone@example.com');
         $errand = requestedErrand($requester, '0991234567');
 
         app(Notifier::class)->send(new ErrandApproved($errand->id));
 
-        expect(deliveriesTo($requester->id))->toEqual(['in_app' => 'delivered']);
+        expect(deliveriesTo($requester->id))->toEqual(['in_app' => 'delivered', 'email' => 'suppressed', 'sms' => 'suppressed'])
+            ->and(DB::table('notification_deliveries')->where('recipient_user_id', $requester->id)->where('status', 'suppressed')->pluck('reason')->unique()->all())->toBe(['not_reachable'])
+            ->and(DevelopmentSmsProvider::$sent)->toBe([]);
     });
 
     it('honours a person who switched a channel off, unless the notice cannot be silenced', function (): void {

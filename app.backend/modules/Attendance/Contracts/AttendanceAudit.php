@@ -9,6 +9,7 @@ use Acadly\Kernel\Audit\AuditAction;
 enum AttendanceAudit: string implements AuditAction
 {
     case RegisterSubmitted = 'attendance.register_submitted';
+    case AbsenceFollowedUp = 'attendance.absence_followed_up';
 
     public function key(): string
     {
@@ -17,7 +18,10 @@ enum AttendanceAudit: string implements AuditAction
 
     public function sentence(): string
     {
-        return 'Submitted the register of a class.';
+        return match ($this) {
+            self::RegisterSubmitted => 'Submitted the register of a class.',
+            self::AbsenceFollowedUp => 'Told the next contact of an absence, or recorded a call to the family.',
+        };
     }
 
     public function requiresReason(): bool

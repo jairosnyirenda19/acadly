@@ -46,7 +46,7 @@ final class AdmitLearner
 
     /**
      * @param  array{first_name: string, other_names: string|null, surname: string, sex: string, date_of_birth: string, class_id: string, admitted_on: string, admission_number: string|null, different: bool}  $input
-     * @param  list<array{name: string, relationship: string, phone: string, email: string|null, main: bool}>  $contacts
+     * @param  list<array{name: string, relationship: string, phone: string, email: string|null, notices_by?: string, main: bool}>  $contacts
      */
     public function handle(User $by, array $input, array $contacts): Learner
     {

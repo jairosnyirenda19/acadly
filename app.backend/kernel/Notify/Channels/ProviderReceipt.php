@@ -14,7 +14,14 @@ final readonly class ProviderReceipt
         public ?string $providerRef,
         public ?string $reason,
         public int $units,
+        public ?string $provider = null,
     ) {}
+
+    /** The same answer, naming the provider that gave it. */
+    public function from(string $provider): self
+    {
+        return new self($this->status, $this->providerRef, $this->reason, $this->units, $provider);
+    }
 
     public static function sent(?string $providerRef = null, int $units = 1): self
     {

@@ -7,6 +7,7 @@ import { Attention, Input, Select } from '../setup/parts'
 import { day } from '../settings/api'
 import { SmallButton, Tag } from '../settings/parts'
 import { initials, learnersApi, today, type ContactInput, type LearnerState } from './api'
+import { NoticesBy } from './NoticesBy'
 import { PhotoPicker } from './PhotoPicker'
 
 const t = copy.learners
@@ -352,7 +353,7 @@ function MoveForm({ record, onDone, onCancel }: { record: LearnerState; onDone: 
 }
 
 function ContactForm({ record, onDone, onCancel }: { record: LearnerState; onDone: (next: LearnerState) => void; onCancel: () => void }) {
-  const [contact, setContact] = useState<ContactInput>({ name: '', relationship: '', phone: '', email: '', main: false })
+  const [contact, setContact] = useState<ContactInput>({ name: '', relationship: '', phone: '', email: '', notices_by: 'sms', main: false })
   const save = useSave()
   const e = save.errors
   const set = (patch: Partial<ContactInput>) => setContact((c) => ({ ...c, ...patch }))
@@ -378,7 +379,8 @@ function ContactForm({ record, onDone, onCancel }: { record: LearnerState; onDon
         </Select>
         <Input label={t.phone} required type="tel" value={contact.phone} onChange={(ev) => set({ phone: ev.target.value })} error={errorFor(e, 'contacts.0.phone')} maxLength={30} />
       </div>
-      <Input label={t.email} type="email" value={contact.email} onChange={(ev) => set({ email: ev.target.value })} error={errorFor(e, 'contacts.0.email')} />
+      <Input label={t.email} type="email" value={contact.email} onChange={(ev) => set({ email: ev.target.value, ...(ev.target.value.trim() === '' ? { notices_by: 'sms' as const } : {}) })} error={errorFor(e, 'contacts.0.email')} />
+      <NoticesBy value={contact.notices_by} hasEmail={contact.email.trim() !== ''} onChange={(next) => set({ notices_by: next })} error={errorFor(e, 'contacts.0.notices_by')} />
       <label className="flex items-center gap-2.5 text-sm font-bold">
         <input type="checkbox" checked={contact.main} onChange={(ev) => set({ main: ev.target.checked })} className="size-[18px] accent-teal" />
         {t.mainContact}
@@ -413,6 +415,15 @@ function ContactLine({ record, contact, onChanged }: { record: LearnerState; con
       <div className="ref mt-0.5 text-[13px] break-all">{[contact.phone, contact.email].filter(Boolean).join(' · ')}</div>
       <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
         <Tag tone="plain">{t.contactOnly}</Tag>
+        <Tag tone="plain">{t.noticesTag(contact.notices_by)}</Tag>
+        {record.can_manage && (contact.notices_by === 'email' || contact.email !== null) && (
+          <SmallButton
+            disabled={save.working}
+            onClick={() => void save.run(learnersApi.noticesBy(record.id, contact.id, contact.notices_by === 'email' ? 'sms' : 'email'), (next) => onChanged(next, t.noticesSaved))}
+          >
+            {contact.notices_by === 'email' ? t.useSms : t.useEmail}
+          </SmallButton>
+        )}
         {record.can_manage && !contact.main && (
           <SmallButton disabled={save.working} onClick={() => void save.run(learnersApi.mainContact(record.id, contact.id), (next) => onChanged(next, t.contactSaved))}>
             {t.makeMain}

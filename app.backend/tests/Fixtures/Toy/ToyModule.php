@@ -25,6 +25,11 @@ final class ToyModule implements Module
         return 'Errands';
     }
 
+    public function summary(): string
+    {
+        return 'A test module.';
+    }
+
     public function tier(): Tier
     {
         return Tier::Core;

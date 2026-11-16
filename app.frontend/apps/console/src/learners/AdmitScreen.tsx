@@ -7,12 +7,13 @@ import { Input, Select } from '../setup/parts'
 import { PageHead, SmallButton, Tag } from '../settings/parts'
 import { useWorkIn } from '../shell/WorkIn'
 import { ageOn, learnersApi, today, type ContactInput, type LearnersState } from './api'
+import { NoticesBy } from './NoticesBy'
 import { PhotoPicker } from './PhotoPicker'
 
 const t = copy.learners
 const s = copy.settings
 
-const blank = (main: boolean): ContactInput => ({ name: '', relationship: '', phone: '', email: '', main })
+const blank = (main: boolean): ContactInput => ({ name: '', relationship: '', phone: '', email: '', notices_by: 'sms', main })
 
 /** Admitting a learner (the approved design): the learner, the class, and at least two contacts. */
 export function AdmitScreen() {
@@ -220,7 +221,15 @@ function AdmitForm({ state, onAdmitted }: { state: LearnersState; onAdmitted: ()
                 </Select>
                 <Input label={t.phone} required type="tel" value={c.phone} onChange={(e) => change(i, { phone: e.target.value })} error={errorFor(errors, `contacts.${i}.phone`)} maxLength={30} autoComplete="off" />
               </div>
-              <Input label={t.email} type="email" value={c.email} onChange={(e) => change(i, { email: e.target.value })} error={errorFor(errors, `contacts.${i}.email`)} autoComplete="off" />
+              <Input
+                label={t.email}
+                type="email"
+                value={c.email}
+                onChange={(e) => change(i, { email: e.target.value, ...(e.target.value.trim() === '' ? { notices_by: 'sms' as const } : {}) })}
+                error={errorFor(errors, `contacts.${i}.email`)}
+                autoComplete="off"
+              />
+              <NoticesBy value={c.notices_by} hasEmail={c.email.trim() !== ''} onChange={(next) => change(i, { notices_by: next })} error={errorFor(errors, `contacts.${i}.notices_by`)} />
               <label className="flex items-center gap-2.5 text-sm font-bold">
                 <input type="radio" name="main-contact" checked={c.main} onChange={() => change(i, { main: true })} className="size-[18px] accent-teal" />
                 {t.mainContact}

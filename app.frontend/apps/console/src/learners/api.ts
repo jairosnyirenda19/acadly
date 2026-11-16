@@ -4,7 +4,7 @@ import { read, settle } from '../setup/api'
 export type LearnersState = paths['/v1/learners']['get']['responses'][200]['content']['application/json']
 export type LearnerRow = LearnersState['learners'][number]
 export type LearnerState = paths['/v1/learners/{id}']['get']['responses'][200]['content']['application/json']
-export type ContactInput = { name: string; relationship: string; phone: string; email: string; main: boolean }
+export type ContactInput = { name: string; relationship: string; phone: string; email: string; notices_by: 'sms' | 'email'; main: boolean }
 
 type Done<T> = Promise<{ data?: T; error?: unknown; response: Response }>
 
@@ -33,6 +33,8 @@ export const learnersApi = {
 
   addContact: (id: string, body: ContactInput) => settle(api.POST('/v1/learners/{id}/contacts', { params: { path: { id } }, body: body as never }) as Done<LearnerState>),
 
+  noticesBy: (id: string, contact: string, channel: 'sms' | 'email') =>
+    settle(api.POST('/v1/learners/{id}/contacts/{contact}/notices', { params: { path: { id, contact } }, body: { notices_by: channel } as never }) as Done<LearnerState>),
   mainContact: (id: string, contact: string) =>
     settle(api.POST('/v1/learners/{id}/contacts/{contact}/main', { params: { path: { id, contact } } }) as Done<LearnerState>),
 

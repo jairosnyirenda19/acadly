@@ -38,6 +38,11 @@ final class InstitutionDirectory implements SchoolDirectory, SchoolProfile
         return School::current()->name;
     }
 
+    public function phone(): ?string
+    {
+        return School::current()->phone;
+    }
+
     public function shortName(): string
     {
         $school = School::current();

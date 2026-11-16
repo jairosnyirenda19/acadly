@@ -33,6 +33,12 @@ enum KernelAudit: string implements AuditAction
     case Subscribed = 'notify.subscribed';
     case Unsubscribed = 'notify.unsubscribed';
     case PreferenceChanged = 'notify.preference_changed';
+    case ChannelSaved = 'notify.channel_saved';
+    case LimitsSaved = 'notify.limits_saved';
+    case NoticeSaved = 'notify.notice_saved';
+    case WordingReset = 'notify.wording_reset';
+    case TestSent = 'notify.test_sent';
+    case SentAgain = 'notify.sent_again';
     case DocumentStored = 'documents.stored';
     case VersionAdded = 'documents.version_added';
     case VersionRestored = 'documents.version_restored';
@@ -82,6 +88,12 @@ enum KernelAudit: string implements AuditAction
             self::Subscribed => 'Subscribed to a notice.',
             self::Unsubscribed => 'Ended a subscription to a notice.',
             self::PreferenceChanged => 'Changed how a notice is received.',
+            self::ChannelSaved => 'Changed how messages are sent.',
+            self::LimitsSaved => 'Changed the quiet hours or the SMS allowance.',
+            self::NoticeSaved => 'Changed a notice: its words, whether it is sent, or who is told.',
+            self::WordingReset => 'Returned a notice to the product wording.',
+            self::TestSent => 'Sent a test message.',
+            self::SentAgain => 'Sent a message again after it was not delivered.',
             self::DocumentStored => 'Added a document.',
             self::VersionAdded => 'Added a new version of a document.',
             self::VersionRestored => 'Restored an earlier version of a document.',

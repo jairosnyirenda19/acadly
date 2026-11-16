@@ -5,7 +5,7 @@ import { copy } from '../copy'
 import { errorFor, type Saved } from '../setup/api'
 import { Input, nn, Select, Total, TotalsBand } from '../setup/parts'
 import { PageHead, SmallButton, Tag } from '../settings/parts'
-import { clock, longDay, markLook, MARKS, registersApi, shortDay, type MarkValue, type RegisterLearner, type RegisterState } from './api'
+import { clock, longDay, markLook, MARKS, registersApi, shortDay, unreached, type Absence, type MarkValue, type RegisterLearner, type RegisterState } from './api'
 
 const t = copy.registers
 const s = copy.settings
@@ -296,6 +296,7 @@ function SubmittedRegister({ state, onChange }: { state: RegisterState; onChange
   const [asking, setAsking] = useState<string | null>(null)
   const marks = state.learners.map((l) => l.mark?.status).filter((m): m is string => m !== undefined)
   const toDecide = state.learners.filter((l) => l.correction?.can_decide === true)
+  const toReach = state.learners.filter((l) => l.absence !== null && l.absence.can_follow_up && unreached(l.absence))
   const count = (m: string) => marks.filter((x) => x === m).length
   const intro =
     state.register !== null
@@ -353,6 +354,7 @@ function SubmittedRegister({ state, onChange }: { state: RegisterState; onChange
                       )}
                     </span>
                   </div>
+                  {l.absence !== null && <Told absence={l.absence} />}
                   {asking === l.id && state.register !== null && l.mark !== null && (
                     <AskForm
                       registerId={state.register.id}
@@ -375,9 +377,10 @@ function SubmittedRegister({ state, onChange }: { state: RegisterState; onChange
             </Button>
           </div>
         </section>
-        {toDecide.length > 0 && (
+        {(toDecide.length > 0 || toReach.length > 0) && (
           <section className="min-w-0 flex-[2_1_360px] border-ink bg-paper px-3 pt-4 pb-6 max-[959px]:border-t-2 md:px-[clamp(16px,3vw,32px)] min-[960px]:border-l-2">
             <div className="grid gap-4">
+              {toReach.length > 0 && state.register !== null && <ReachCard registerId={state.register.id} learners={toReach} onDone={onChange} />}
               {toDecide.map((l) => (
                 <DecideCard key={l.id} learner={l} className={state.class.name} day={state.day} onDone={onChange} />
               ))}
@@ -478,6 +481,116 @@ function DecideCard({ learner, className, day, onDone }: { learner: RegisterLear
         </button>
       </div>
       <p className="mt-3 text-[13px] text-text-muted">{t.approveNote}</p>
+    </div>
+  )
+}
+
+const toldTone: Record<string, 'done' | 'attention' | 'wrong' | 'plain'> = {
+  delivered: 'done',
+  sent: 'plain',
+  accepted: 'plain',
+  waiting: 'plain',
+  not_delivered: 'wrong',
+  not_reachable: 'attention',
+}
+
+/** Who was told of an absence, by which channel, and how it stands; then what staff did. */
+function Told({ absence }: { absence: Absence }) {
+  return (
+    <div className="mt-2 mb-1 grid gap-1 text-[13px] md:ml-[60px]">
+      <span className="label-caps text-text-muted">{t.told}</span>
+      {absence.told.length === 0 && <span className="text-text-muted">{t.nobodyTold}</span>}
+      {absence.told.map((d, i) => (
+        <span key={i} className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          <span className="min-w-[180px]">
+            {d.to}
+            {d.relationship !== '' && <span className="text-text-muted"> · {d.relationship}</span>}
+          </span>
+          <span className="w-12 font-bold">{t.channel[d.channel] ?? d.channel}</span>
+          <Tag tone={toldTone[d.state] ?? 'plain'}>{t.toldState[d.state] ?? d.state}</Tag>
+          <span className="ref text-xs text-text-muted">{clock(d.at)}</span>
+        </span>
+      ))}
+      {absence.follow_ups.map((f, i) => (
+        <span key={`f${i}`} className="text-text-muted">
+          {(t.followUp[f.kind] ?? ((by: string) => by))(f.by)}, {clock(f.at)}
+          {f.note !== null && <> · {f.note}</>}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+/** Families the school has not reached yet: tell the next contact, or record a call. */
+function ReachCard({ registerId, learners, onDone }: { registerId: string; learners: RegisterLearner[]; onDone: (next: RegisterState) => void }) {
+  const [calling, setCalling] = useState<string | null>(null)
+  const [note, setNote] = useState('')
+  const save = useSave()
+
+  return (
+    <div className="border-2 border-ink bg-marigold-wash px-4 pt-3.5 pb-4">
+      <div className="mb-2.5 flex flex-wrap items-center gap-2">
+        <span className="type-display text-[22px] leading-none">{t.notTold(learners.length)}</span>
+        <Tag tone="attention">{copy.registers.bandAttention}</Tag>
+      </div>
+      <div className="grid gap-4">
+        {learners.map((l) => {
+          const a = l.absence as Absence
+          const missed = a.told.find((d) => d.state === 'not_delivered' || d.state === 'not_reachable')
+
+          return (
+            <div key={l.id} className="grid gap-2">
+              <p className="text-sm leading-normal">{a.next === null ? `${l.name}. ${t.nobodyLeft}` : t.notToldLine(l.name, missed?.to ?? a.told[0]?.to ?? '')}</p>
+              {calling === l.id ? (
+                <form
+                  className="grid gap-2"
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    void save.run(registersApi.called(registerId, l.id, note), (next) => {
+                      setCalling(null)
+                      setNote('')
+                      onDone(next)
+                      slips.done({ word: copy.slips.saved, title: t.callRecorded })
+                    })
+                  }}
+                >
+                  <Input label={t.calledNote} hint={t.calledNoteHint} value={note} onChange={(e) => setNote(e.target.value)} error={errorFor(save.errors, 'note')} maxLength={255} />
+                  <div className="flex flex-wrap gap-2">
+                    <Button type="submit" busy={save.working}>
+                      {save.working ? s.saving : t.saveCall}
+                    </Button>
+                    <Button variant="secondary" onClick={() => setCalling(null)}>
+                      {s.cancel}
+                    </Button>
+                  </div>
+                </form>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {a.next !== null && (
+                    <Button
+                      busy={save.working}
+                      onClick={() =>
+                        void save.run(registersApi.tellNext(registerId, l.id), (next) => {
+                          onDone(next)
+                          slips.done({ word: copy.slips.sent, title: t.toldNext })
+                        })
+                      }
+                    >
+                      {t.tellNext(a.next)}
+                    </Button>
+                  )}
+                  <Button variant="secondary" className="bg-sheet" onClick={() => setCalling(l.id)}>
+                    {t.called}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+      {save.failed !== null && <p className="mt-2 text-[13px] font-bold text-red-text">{save.failed}</p>}
+      {errorFor(save.errors, 'learner_id') !== undefined && <p className="mt-2 text-[13px] font-bold text-red-text">{errorFor(save.errors, 'learner_id')}</p>}
+      <p className="mt-3 text-[13px] text-text-muted">{t.followUpsKept}</p>
     </div>
   )
 }

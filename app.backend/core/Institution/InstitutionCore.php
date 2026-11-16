@@ -28,6 +28,11 @@ final class InstitutionCore implements Module
         return 'Institution';
     }
 
+    public function summary(): string
+    {
+        return 'Divisions, campuses and the school details.';
+    }
+
     public function tier(): Tier
     {
         return Tier::Core;

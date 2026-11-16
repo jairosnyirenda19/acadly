@@ -1,5 +1,6 @@
 import {
   can,
+  CONTEXT_CHANGED,
   ContextProvider,
   getAccount,
   getContext,
@@ -28,6 +29,10 @@ import { PeopleScreen } from './settings/PeopleScreen'
 import { PersonScreen } from './settings/PersonScreen'
 import { RolesScreen } from './settings/RolesScreen'
 import { SubjectsScreen } from './settings/SubjectsScreen'
+import { ModulesScreen } from './settings/ModulesScreen'
+import { ChannelsScreen } from './messages/ChannelsScreen'
+import { SentScreen } from './messages/SentScreen'
+import { WordingScreen } from './messages/WordingScreen'
 import { TeachingScreen } from './settings/TeachingScreen'
 import { SetupWizard } from './setup/SetupWizard'
 import { ConsoleShell, holdsAnywhere, settingsHome } from './shell/ConsoleShell'
@@ -67,6 +72,10 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/settings/roles' && edits) page = <RolesScreen />
   else if (path === '/settings/subjects' && teaches) page = <SubjectsScreen />
   else if (path === '/settings/teaching' && teaches) page = <TeachingScreen />
+  else if (path === '/settings/modules' && can(context, 'modules.manage')) page = <ModulesScreen />
+  else if (path === '/settings/messages' && can(context, 'notify.manage')) page = <ChannelsScreen />
+  else if (path === '/settings/messages/wording' && can(context, 'notify.manage')) page = <WordingScreen />
+  else if (path === '/settings/messages/sent' && can(context, 'notify.manage')) page = <SentScreen />
 
   if (page !== undefined) {
     return (
@@ -113,12 +122,16 @@ export function App() {
     if (account === null || account === undefined) return
 
     let current = true
-    void getContext().then((value) => {
-      if (current) setContext(value)
-    })
+    const load = () =>
+      void getContext().then((value) => {
+        if (current) setContext(value)
+      })
+    load()
+    window.addEventListener(CONTEXT_CHANGED, load)
 
     return () => {
       current = false
+      window.removeEventListener(CONTEXT_CHANGED, load)
     }
   }, [account])
 

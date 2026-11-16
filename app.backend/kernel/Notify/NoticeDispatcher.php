@@ -11,6 +11,7 @@ use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Module\Licence\Licences;
 use Acadly\Kernel\Module\ModuleActivation;
 use Acadly\Kernel\Notify\Channels\ChannelAdapters;
+use Acadly\Kernel\Notify\Channels\DeliveryReport;
 use Acadly\Kernel\Notify\Channels\RenderedNotice;
 use Acadly\Kernel\Notify\Jobs\DeliverNotice;
 use Acadly\Kernel\School\SchoolProfile;
@@ -51,6 +52,7 @@ final class NoticeDispatcher
         private readonly Licences $licences,
         private readonly ChannelAdapters $channels,
         private readonly Container $container,
+        private readonly MessageSettings $settings,
         private readonly Clock $clock,
     ) {}
 
@@ -85,6 +87,17 @@ final class NoticeDispatcher
         }
 
         $channel = Channel::from(self::text($row, 'channel'));
+        $key = self::text($row, 'topic_key');
+        $urgent = $this->catalogue->has($key) && $this->catalogue->notice($key)->isUrgent();
+        $until = $channel === Channel::Sms && ! $urgent && self::maybe($row, 'audience') !== 'test' ? $this->settings->quietUntil($this->clock->now()) : null;
+
+        if ($until !== null) {
+            // Quiet hours: the message waits, still queued; the sweep sends it when they end.
+            DB::table('notification_deliveries')->where('id', $row->id)->where('status', DeliveryStatus::Queued->value)->update(['reason' => 'quiet_hours']);
+
+            return;
+        }
+
         $receipt = $this->channels->for($channel)->send(
             new RenderedNotice(self::text($row, 'id'), self::text($row, 'topic_key'), self::text($row, 'subject'),
                 self::text($row, 'body'), self::maybe($row, 'short'), self::maybe($row, 'action_url')),
@@ -96,8 +109,11 @@ final class NoticeDispatcher
                 'status' => $receipt->status->value,
                 'reason' => $receipt->reason,
                 'provider_ref' => $receipt->providerRef,
+                'provider' => $receipt->provider,
+                'units' => $receipt->units,
                 'attempts' => DB::raw('attempts + 1'),
                 'settled_at' => $this->clock->now(),
+                'delivered_at' => $receipt->status === DeliveryStatus::Delivered ? $this->clock->now() : null,
             ]);
 
             if ($channel->isPaid() && $receipt->status !== DeliveryStatus::Failed) {
@@ -159,22 +175,27 @@ final class NoticeDispatcher
             return;
         }
 
+        if ($notice->optOutRule() !== OptOut::Never && ! $this->settings->topicEnabled($key)) {
+            $this->marker($base, DeliveryStatus::Suppressed, 'switched_off');
+
+            return;
+        }
+
         $actorId = self::maybe($request, 'actor_user_id');
         $actor = $actorId !== null ? User::query()->find($actorId) : null;
         $tokens = [
             ...$topic->tokens(),
             'institution' => app(SchoolProfile::class)->name(),
             'actor' => $actor instanceof User ? $actor->name : null,
+            'school_phone' => app(SchoolProfile::class)->phone(),
         ];
-
-        $words = [
-            'subject' => Words::fill($notice->subjectText(), $tokens),
-            'body' => implode("\n\n", array_map(fn (string $line): string => Words::fill($line, $tokens), $notice->lines())),
-            'short' => $notice->shortText() !== null ? Words::fill($notice->shortText(), $tokens) : null,
-            'action_url' => $notice->actionPath() !== null
-                ? rtrim(config()->string('acadly.frontend_url'), '/').Words::fill($notice->actionPath(), $tokens)
-                : null,
+        $own = $this->settings->wording($key);
+        $templates = [
+            'subject' => $own['subject'] ?? $notice->subjectText(),
+            'lines' => $own['lines'] ?? $notice->lines(),
+            'short' => $own['short'] ?? $notice->shortText(),
         ];
+        $words = fn (Recipient $to): array => self::render($notice, $templates, [...$tokens, 'contact' => $to->name]);
 
         $written = 0;
         $smsLeft = $this->smsAllowance($notice);
@@ -186,6 +207,11 @@ final class NoticeDispatcher
 
             foreach ($channels as $channel) {
                 if (! $this->reachable($recipient, $channel)) {
+                    // A family member the school cannot reach is a visible fact, not a silence.
+                    if ($audience === 'party') {
+                        $written += $this->writeDelivery([...$base, ...$words($recipient)], $recipient, $audience, $channel, DeliveryStatus::Suppressed, 'not_reachable');
+                    }
+
                     continue;
                 }
 
@@ -201,12 +227,12 @@ final class NoticeDispatcher
                     }
                 }
 
-                $written += $this->writeDelivery([...$base, ...$words], $recipient, $audience, $channel, $status, $reason);
+                $written += $this->writeDelivery([...$base, ...$words($recipient)], $recipient, $audience, $channel, $status, $reason);
             }
         }
 
         if ($written === 0) {
-            $this->marker([...$base, ...$words], DeliveryStatus::Unaddressed, null);
+            $this->marker([...$base, ...$words(new Recipient(''))], DeliveryStatus::Unaddressed, null);
         }
     }
 
@@ -310,6 +336,11 @@ final class NoticeDispatcher
     {
         $channels = $notice->defaultChannels();
 
+        // A contact without an account chose one channel when recorded.
+        if ($recipient->prefers !== null && in_array($recipient->prefers, $notice->allowedChannels(), true)) {
+            return [$recipient->prefers];
+        }
+
         if ($recipient->userId === null || $notice->optOutRule() === OptOut::Never) {
             return $channels;
         }
@@ -348,7 +379,9 @@ final class NoticeDispatcher
     /** Text messages left this month under the licence, or null when there is no limit. Urgent notices are never capped. */
     private function smsAllowance(Notice $notice): ?int
     {
-        $limit = $this->licences->current()->limits['sms_per_month'] ?? null;
+        $licence = $this->licences->current()->limits['sms_per_month'] ?? null;
+        $own = $this->settings->limits()['sms_per_month'];
+        $limit = $licence === null ? $own : ($own === null ? $licence : min($licence, $own));
 
         if ($limit === null || $notice->isUrgent()) {
             return null;
@@ -393,6 +426,111 @@ final class NoticeDispatcher
         }
 
         return $inserted;
+    }
+
+    /**
+     * A provider reported on a message: delivered to the phone, or not. A
+     * delivered message stays delivered, whatever arrives after.
+     */
+    public function report(DeliveryReport $report): bool
+    {
+        $done = DB::table('notification_deliveries')
+            ->where('channel', Channel::Sms->value)
+            ->where('provider_ref', $report->providerRef)
+            ->where('status', DeliveryStatus::Sent->value)
+            ->update($report->delivered
+                ? ['status' => DeliveryStatus::Delivered->value, 'delivered_at' => $this->clock->now(), 'reason' => null]
+                : ['status' => DeliveryStatus::Failed->value, 'reason' => mb_substr((string) $report->reason, 0, 120)]);
+
+        return $done > 0;
+    }
+
+    /**
+     * A message written on the Messages page to try a channel: one delivery,
+     * listed with the others, sent at once whatever the hour.
+     */
+    public function test(Channel $channel, string $address, string $words, User $by): string
+    {
+        $id = Ids::next();
+        $recipient = $channel === Channel::Sms ? new Recipient($by->name, null, null, $address) : new Recipient($by->name, null, $address);
+
+        DB::table('notification_deliveries')->insert([
+            'id' => $id,
+            'request_id' => $id,
+            'topic_key' => 'notify.test',
+            'audience' => 'test',
+            'recipient_key' => $recipient->key(),
+            'recipient_name' => $by->name,
+            'recipient_email' => $recipient->email,
+            'recipient_phone' => $recipient->phone,
+            'channel' => $channel->value,
+            'subject' => $words,
+            'body' => $words,
+            'short' => $words,
+            'subject_type' => 'none',
+            'scope_type' => 'institution',
+            'status' => DeliveryStatus::Queued->value,
+            'dedupe_key' => 'notify.test:'.$id,
+            'requested_by' => $by->id,
+            'queued_at' => $this->clock->now(),
+        ]);
+
+        DB::afterCommit(fn () => DeliverNotice::dispatch($id));
+
+        return $id;
+    }
+
+    /** A message that was not delivered, sent once more as a new delivery. The first stays as it was. */
+    public function again(string $deliveryId, User $by): ?string
+    {
+        $row = DB::table('notification_deliveries')->where('id', $deliveryId)->lockForUpdate()->first();
+
+        if ($row === null) {
+            return null;
+        }
+
+        $id = Ids::next();
+        $copy = [];
+
+        foreach (['request_id', 'topic_key', 'audience', 'recipient_key', 'recipient_user_id', 'recipient_name', 'recipient_email', 'recipient_phone',
+            'channel', 'subject', 'body', 'short', 'action_url', 'subject_type', 'subject_id', 'scope_type', 'scope_id'] as $column) {
+            $copy[$column] = $row->{$column} ?? null;
+        }
+
+        $inserted = DB::table('notification_deliveries')->insertOrIgnore([
+            ...$copy,
+            'id' => $id,
+            'status' => DeliveryStatus::Queued->value,
+            'dedupe_key' => mb_substr(self::text($row, 'dedupe_key'), 0, 240).':again',
+            'resent_from' => $deliveryId,
+            'requested_by' => $by->id,
+            'queued_at' => $this->clock->now(),
+        ]);
+
+        if ($inserted === 0) {
+            return null;
+        }
+
+        DB::afterCommit(fn () => DeliverNotice::dispatch($id));
+
+        return $id;
+    }
+
+    /**
+     * @param  array{subject: string, lines: list<string>, short: string|null}  $templates
+     * @param  array<string, string|null>  $tokens
+     * @return array{subject: string, body: string, short: string|null, action_url: string|null}
+     */
+    private static function render(Notice $notice, array $templates, array $tokens): array
+    {
+        return [
+            'subject' => Words::fill($templates['subject'], $tokens),
+            'body' => implode("\n\n", array_map(fn (string $line): string => Words::fill($line, $tokens), $templates['lines'])),
+            'short' => $templates['short'] !== null ? Words::fill($templates['short'], $tokens) : null,
+            'action_url' => $notice->actionPath() !== null
+                ? rtrim(config()->string('acadly.frontend_url'), '/').Words::fill($notice->actionPath(), $tokens)
+                : null,
+        ];
     }
 
     /** @param  array<string, mixed>  $row */

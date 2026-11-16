@@ -14,7 +14,7 @@ use Acadly\Kernel\Access\Permission;
 final class Notice
 {
     /** Tokens every notice may use without declaring them. */
-    public const array ALWAYS = ['institution', 'actor'];
+    public const array ALWAYS = ['institution', 'actor', 'contact', 'school_phone'];
 
     /** The longest `short()` wording, before tokens are filled: one SMS. */
     public const int SHORT_BUDGET = 160;
@@ -32,6 +32,9 @@ final class Notice
     private array $lines = [];
 
     private ?string $short = null;
+
+    /** @var array<string, string> */
+    private array $examples = [];
 
     private ?string $actionLabel = null;
 
@@ -110,6 +113,24 @@ final class Notice
         $this->short = $short;
 
         return $this;
+    }
+
+    /**
+     * Example facts, for the preview on the Messages page. Shown only there.
+     *
+     * @param  array<string, string>  $examples
+     */
+    public function examples(array $examples): self
+    {
+        $this->examples = $examples;
+
+        return $this;
+    }
+
+    /** @return array<string, string> */
+    public function exampleFacts(): array
+    {
+        return $this->examples;
     }
 
     /** A link to the screen where the person acts. The path may use tokens. */

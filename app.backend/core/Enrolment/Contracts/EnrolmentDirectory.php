@@ -21,4 +21,12 @@ interface EnrolmentDirectory
      * @return array<string, string> id => name
      */
     public function names(array $ids): array;
+
+    /**
+     * The contacts of a learner in force now, the main contact first, with
+     * the channel each chose for notices.
+     *
+     * @return list<array{id: string, name: string, relationship: string, phone: string, email: string|null, notices_by: string, main: bool}>
+     */
+    public function contactsOf(string $learnerId): array;
 }

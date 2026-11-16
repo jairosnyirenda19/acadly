@@ -18,6 +18,9 @@ interface SchoolProfile
     /** The short name that starts a text message. */
     public function shortName(): string;
 
+    /** The school's own phone number, as the school wrote it, for the words of a notice. */
+    public function phone(): ?string;
+
     public function hasLogo(): bool;
 
     /** Setup is finished and the school's work is available. */

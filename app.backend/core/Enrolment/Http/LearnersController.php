@@ -74,7 +74,7 @@ final class LearnersController
     /**
      * One learner's record.
      *
-     * @response array{id: string, acadly_id: string, admission_number: string|null, first_name: string, other_names: string|null, surname: string, name: string, sex: string, date_of_birth: string, has_photo: bool, status: string, admitted_on: string|null, word: string, class: array{id: string, name: string}|null, level: string|null, division: string|null, campus: string|null, class_teacher: string|null, placements: list<array{class: string, campus: string, year: string, starts_on: string, ends_on: string|null, entry_reason: string, reason: string|null, now: bool}>, contacts: list<array{id: string, name: string, relationship: string, relationship_label: string, phone: string, email: string|null, main: bool}>, activity: list<array{at: string, what: string, who: string, reason: string|null}>, possible_duplicate: bool, move_to: list<array{id: string, name: string, count: int}>, can_manage: bool, relationships: list<array{value: string, label: string}>}
+     * @response array{id: string, acadly_id: string, admission_number: string|null, first_name: string, other_names: string|null, surname: string, name: string, sex: string, date_of_birth: string, has_photo: bool, status: string, admitted_on: string|null, word: string, class: array{id: string, name: string}|null, level: string|null, division: string|null, campus: string|null, class_teacher: string|null, placements: list<array{class: string, campus: string, year: string, starts_on: string, ends_on: string|null, entry_reason: string, reason: string|null, now: bool}>, contacts: list<array{id: string, name: string, relationship: string, relationship_label: string, phone: string, email: string|null, notices_by: string, main: bool}>, activity: list<array{at: string, what: string, who: string, reason: string|null}>, possible_duplicate: bool, move_to: list<array{id: string, name: string, count: int}>, can_manage: bool, relationships: list<array{value: string, label: string}>}
      */
     public function show(Request $request, string $id): JsonResponse
     {
@@ -111,7 +111,15 @@ final class LearnersController
     public function addContact(Request $request, string $id, ContactActions $contacts): JsonResponse
     {
         $contacts->add(self::user($request), $id, ['name' => self::text($request, 'name'), 'relationship' => self::text($request, 'relationship'),
-            'phone' => self::text($request, 'phone'), 'email' => self::text($request, 'email'), 'main' => $request->boolean('main')]);
+            'phone' => self::text($request, 'phone'), 'email' => self::text($request, 'email'), 'notices_by' => self::text($request, 'notices_by'), 'main' => $request->boolean('main')]);
+
+        return $this->show($request, $id);
+    }
+
+    /** Changes how a contact receives notices: `{notices_by: sms|email}`. */
+    public function contactNotices(Request $request, string $id, string $contact, ContactActions $contacts): JsonResponse
+    {
+        $contacts->noticesBy(self::user($request), $id, $contact, self::text($request, 'notices_by'));
 
         return $this->show($request, $id);
     }
@@ -193,7 +201,7 @@ final class LearnersController
         return $place;
     }
 
-    /** @return list<array{name: string, relationship: string, phone: string, email: string|null, main: bool}> */
+    /** @return list<array{name: string, relationship: string, phone: string, email: string|null, notices_by?: string, main: bool}> */
     private static function contacts(mixed $value): array
     {
         if (! is_array($value) || ! array_is_list($value) || count($value) > 20) {
@@ -209,6 +217,7 @@ final class LearnersController
                 'relationship' => is_string($c['relationship'] ?? null) ? $c['relationship'] : '',
                 'phone' => is_string($c['phone'] ?? null) ? $c['phone'] : '',
                 'email' => is_string($c['email'] ?? null) ? $c['email'] : null,
+                'notices_by' => is_string($c['notices_by'] ?? null) ? $c['notices_by'] : 'sms',
                 'main' => ($c['main'] ?? false) === true,
             ];
         }

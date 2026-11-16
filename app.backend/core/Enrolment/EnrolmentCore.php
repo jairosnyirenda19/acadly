@@ -29,6 +29,11 @@ final class EnrolmentCore implements Module
         return 'Learners';
     }
 
+    public function summary(): string
+    {
+        return 'Admissions, the learner record, contacts and imports.';
+    }
+
     public function tier(): Tier
     {
         return Tier::Core;

@@ -6,17 +6,22 @@ namespace Acadly\Modules\Attendance\Application;
 
 use Acadly\Core\Academics\Contracts\AcademicCalendar;
 use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
+use Acadly\Core\Enrolment\Contracts\LearnerContacts;
 use Acadly\Core\Institution\Contracts\SchoolDirectory;
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Identity\User;
+use Acadly\Kernel\Notify\Deliveries;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Row;
 use Acadly\Modules\Attendance\Application\Actions\SubmitRegister;
 use Acadly\Modules\Attendance\Contracts\AttendancePermission;
+use Acadly\Modules\Attendance\Contracts\Mark;
 use Acadly\Modules\Attendance\Domain\Correction;
 use Acadly\Modules\Attendance\Journeys\Correction\State;
+use Acadly\Modules\Attendance\Notifications\AbsenceTopic;
+use Acadly\Modules\Attendance\Notifications\NextContact;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 
@@ -31,6 +36,7 @@ final class Registers
         private readonly SchoolDays $days,
         private readonly Marks $marks,
         private readonly Reach $reach,
+        private readonly Deliveries $deliveries,
         private readonly Clock $clock,
     ) {}
 
@@ -143,6 +149,8 @@ final class Registers
         $names = $this->userNames(array_values(array_filter([$teacher, $register !== null ? Row::text($register, 'submitted_by') : null])));
         $schoolDay = $this->days->isSchoolDay($class['division_id'], $day);
         $mayTake = $this->reach->may($viewer, AttendancePermission::Capture, $classId);
+        $absences = $registerId === null ? [] : $this->absences($registerId);
+        $mayFollow = $mayTake || $this->reach->may($viewer, AttendancePermission::Correct, $classId);
 
         return [
             'class' => ['id' => $class['id'], 'name' => $class['name']],
@@ -158,10 +166,64 @@ final class Registers
                 'history' => array_map(fn (string $d): ?string => $history[$l['id']][$d] ?? null, $before),
                 'mark' => $marks[$l['id']] ?? null,
                 'correction' => $corrections[$l['id']] ?? null,
+                'absence' => isset($absences[$l['id']]) ? [...$absences[$l['id']], 'can_follow_up' => $mayFollow] : null,
             ], $learners),
             'can_take' => $mayTake && $register === null && $schoolDay && $day <= $this->today(),
             'can_request' => $mayTake && $register !== null,
         ];
+    }
+
+    /**
+     * For each learner first marked absent: who was told and how it stands,
+     * the next contact not yet told, and what staff did after.
+     *
+     * @return array<string, array{told: list<array{to: string, relationship: string, channel: string, state: string, at: string}>, next: string|null, follow_ups: list<array{kind: string, by: string, at: string, note: string|null}>}>
+     */
+    private function absences(string $registerId): array
+    {
+        $first = [];
+
+        foreach (DB::table('attendance_marks')->where('register_id', $registerId)->orderBy('received_at')->get(['id', 'learner_id', 'status']) as $m) {
+            $first[Row::text($m, 'learner_id')] ??= ['id' => Row::text($m, 'id'), 'status' => Row::text($m, 'status')];
+        }
+
+        $first = array_filter($first, fn (array $m): bool => $m['status'] === Mark::Absent->value);
+
+        if ($first === []) {
+            return [];
+        }
+
+        $about = $this->deliveries->about(AbsenceTopic::SUBJECT, array_column($first, 'id'));
+        $steps = DB::table('attendance_follow_ups')->where('register_id', $registerId)->orderBy('done_at')->get();
+        $names = $this->userNames(array_values(array_map(fn (object $s): string => Row::text($s, 'done_by'), $steps->all())));
+        $out = [];
+
+        foreach ($first as $learner => $mark) {
+            $contacts = $this->learners->contactsOf($learner);
+            $told = $about[$mark['id']] ?? [];
+            $reached = NextContact::told($told);
+            $next = null;
+
+            foreach ($contacts as $c) {
+                $r = LearnerContacts::recipient($c);
+
+                if (! in_array($r->phone, $reached, true) && ! in_array($r->email, $reached, true)) {
+                    $next = $c['name'];
+
+                    break;
+                }
+            }
+
+            $relation = fn (string $name): string => array_values(array_filter($contacts, fn (array $c): bool => $c['name'] === $name))[0]['relationship'] ?? '';
+            $out[$learner] = [
+                'told' => array_map(fn (array $d): array => ['to' => $d['to'], 'relationship' => $relation($d['to']), 'channel' => $d['channel'], 'state' => $d['state'], 'at' => $d['at']], $told),
+                'next' => $next,
+                'follow_ups' => array_values(array_map(fn (object $s): array => ['kind' => Row::text($s, 'kind'), 'by' => $names[Row::text($s, 'done_by')] ?? '',
+                    'at' => Row::text($s, 'done_at'), 'note' => Row::maybeText($s, 'note')], array_filter($steps->all(), fn (object $s): bool => Row::text($s, 'learner_id') === $learner))),
+            ];
+        }
+
+        return $out;
     }
 
     /**

@@ -46,13 +46,12 @@ use Acadly\Kernel\Module\ModuleOffering;
 use Acadly\Kernel\Module\ModuleRegistry;
 use Acadly\Kernel\Module\OfferEverything;
 use Acadly\Kernel\Notify\Channels\ChannelAdapters;
-use Acadly\Kernel\Notify\Channels\DevelopmentSmsProvider;
 use Acadly\Kernel\Notify\Channels\EmailChannel;
 use Acadly\Kernel\Notify\Channels\InAppChannel;
-use Acadly\Kernel\Notify\Channels\NoSmsProvider;
 use Acadly\Kernel\Notify\Channels\SmsChannel;
 use Acadly\Kernel\Notify\Channels\SmsProvider;
 use Acadly\Kernel\Notify\Console\NotifySweepCommand;
+use Acadly\Kernel\Notify\MessageSettings;
 use Acadly\Kernel\Notify\NoticeCatalogue;
 use Acadly\Kernel\Notify\NoticeDispatcher;
 use Acadly\Kernel\Notify\Notifier;
@@ -132,10 +131,7 @@ final class KernelServiceProvider extends ServiceProvider
             fn (Application $app): NoticeCatalogue => new NoticeCatalogue($app->make(ModuleRegistry::class)),
         );
         $this->app->singleton(Notifier::class);
-        $this->app->bindIf(
-            SmsProvider::class,
-            fn (Application $app): SmsProvider => $app->environment(['local', 'testing']) ? new DevelopmentSmsProvider : new NoSmsProvider,
-        );
+        $this->app->bind(SmsProvider::class, fn (Application $app): SmsProvider => $app->make(MessageSettings::class)->smsProvider());
         $this->app->bind(
             ChannelAdapters::class,
             fn (Application $app): ChannelAdapters => new ChannelAdapters([

@@ -48,4 +48,10 @@ final class Directory implements EnrolmentDirectory
     {
         return trim(implode(' ', array_filter([Row::text($r, 'first_name'), Row::maybeText($r, 'other_names'), Row::text($r, 'surname')])));
     }
+
+    public function contactsOf(string $learnerId): array
+    {
+        return array_map(fn (array $c): array => ['id' => $c['id'], 'name' => $c['name'], 'relationship' => $c['relationship_label'], 'phone' => $c['phone'],
+            'email' => $c['email'], 'notices_by' => $c['notices_by'], 'main' => $c['main']], app(Contacts::class)->of($learnerId));
+    }
 }

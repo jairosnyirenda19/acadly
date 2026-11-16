@@ -7,6 +7,11 @@ namespace Acadly\Kernel\School;
 /** The school as configuration names it, before any school record exists. */
 final class ConfiguredSchool implements SchoolProfile
 {
+    public function phone(): ?string
+    {
+        return null;
+    }
+
     public function name(): string
     {
         return config()->string('acadly.school_name');

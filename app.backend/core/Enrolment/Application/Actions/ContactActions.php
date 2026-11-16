@@ -25,7 +25,7 @@ final class ContactActions
         private readonly Clock $clock,
     ) {}
 
-    /** @param  array{name: string, relationship: string, phone: string, email: string|null, main: bool}  $contact */
+    /** @param  array{name: string, relationship: string, phone: string, email: string|null, notices_by?: string, main: bool}  $contact */
     public function add(User $by, string $learnerId, array $contact): void
     {
         ['learner' => $learner, 'at' => $at] = $this->reach->learner($by, $learnerId, EnrolmentPermission::Manage);
@@ -36,6 +36,28 @@ final class ContactActions
             $this->contacts->add($by, $learner->id, [[...$checked[0], 'main' => $contact['main']]]);
             $this->audit->record(EnrolmentAudit::ContactAdded, subject: $learner, actor: $this->audit->actorFor($by), at: $at,
                 personal: ['name' => $checked[0]['name'], 'phone' => $checked[0]['phone']], meta: ['relationship' => $checked[0]['relationship']]);
+        });
+    }
+
+    /** The channel a contact chose for notices: SMS, or email when the contact has an address. */
+    public function noticesBy(User $by, string $learnerId, string $contactId, string $channel): void
+    {
+        ['learner' => $learner, 'at' => $at] = $this->reach->learner($by, $learnerId, EnrolmentPermission::Manage);
+        $contact = $this->contactInForce($learner->id, $contactId);
+        $channel = mb_strtolower(trim($channel));
+
+        if (! in_array($channel, Contacts::CHANNELS, true)) {
+            throw ValidationException::withMessages(['notices_by' => ['Choose SMS or email.']]);
+        }
+
+        if ($channel === 'email' && Row::maybeText($contact, 'email') === null) {
+            throw ValidationException::withMessages(['notices_by' => ['Add an email address to send notices by email.']]);
+        }
+
+        DB::transaction(function () use ($by, $learner, $at, $contactId, $channel): void {
+            DB::table('learner_contacts')->where('id', $contactId)->update(['notices_by' => $channel]);
+            $this->audit->record(EnrolmentAudit::ContactChannelSet, subject: $learner, actor: $this->audit->actorFor($by), at: $at,
+                meta: ['contact' => $contactId, 'notices_by' => $channel]);
         });
     }
 

@@ -8,6 +8,7 @@ use Acadly\Core\Enrolment\Contracts\Relationship;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
+use Acadly\Kernel\Support\Phone;
 use Acadly\Kernel\Support\Row;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -21,11 +22,14 @@ final class Contacts
 {
     public const int MINIMUM = 2;
 
+    /** How a contact may choose to receive notices. */
+    public const array CHANNELS = ['sms', 'email'];
+
     public function __construct(private readonly Clock $clock) {}
 
     /**
-     * @param  list<array{name: string, relationship: string, phone: string, email: string|null, main: bool}>  $contacts
-     * @return list<array{name: string, relationship: string, phone: string, email: string|null, main: bool}>
+     * @param  list<array{name: string, relationship: string, phone: string, email: string|null, notices_by?: string, main: bool}>  $contacts
+     * @return list<array{name: string, relationship: string, phone: string, email: string|null, notices_by: string, main: bool}>
      */
     public function check(array $contacts, int $minimum = self::MINIMUM): array
     {
@@ -45,15 +49,24 @@ final class Contacts
                 $errors["contacts.{$i}.relationship"] = ['Choose a relationship.'];
             }
 
-            if (preg_match('/^\+?[0-9 ()\-]{7,30}$/', $phone) !== 1 || strlen((string) preg_replace('/\D/', '', $phone)) < 7) {
-                $errors["contacts.{$i}.phone"] = ['Enter a phone number of at least 7 digits.'];
+            if (preg_match('/^\+?[0-9 ()\-]{7,30}$/', $phone) !== 1 || Phone::international($phone) === null) {
+                $errors["contacts.{$i}.phone"] = ['Enter the phone number as 0991 234 567, or with the country code, such as +265 991 234 567.'];
+            }
+
+            $by = mb_strtolower(trim($c['notices_by'] ?? 'sms'));
+            $by = $by === '' ? 'sms' : $by;
+
+            if (! in_array($by, self::CHANNELS, true)) {
+                $errors["contacts.{$i}.notices_by"] = ['Choose SMS or email.'];
+            } elseif ($by === 'email' && $email === '') {
+                $errors["contacts.{$i}.notices_by"] = ['Add an email address to send notices by email.'];
             }
 
             if ($email !== '' && (filter_var($email, FILTER_VALIDATE_EMAIL) === false || mb_strlen($email) > 190)) {
                 $errors["contacts.{$i}.email"] = ['Enter a valid email address, or leave it empty.'];
             }
 
-            $out[] = ['name' => $name, 'relationship' => $c['relationship'], 'phone' => $phone, 'email' => $email !== '' ? mb_strtolower($email) : null, 'main' => $c['main']];
+            $out[] = ['name' => $name, 'relationship' => $c['relationship'], 'phone' => $phone, 'email' => $email !== '' ? mb_strtolower($email) : null, 'notices_by' => $by, 'main' => $c['main']];
         }
 
         if (count($contacts) < $minimum) {
@@ -73,7 +86,7 @@ final class Contacts
         return $out;
     }
 
-    /** @param  list<array{name: string, relationship: string, phone: string, email: string|null, main: bool}>  $contacts */
+    /** @param  list<array{name: string, relationship: string, phone: string, email: string|null, notices_by: string, main: bool}>  $contacts */
     public function add(User $by, string $learnerId, array $contacts): void
     {
         $now = $this->clock->now();
@@ -86,11 +99,11 @@ final class Contacts
 
         foreach ($contacts as $c) {
             DB::table('learner_contacts')->insert(['id' => Ids::next(), 'learner_id' => $learnerId, 'name' => $c['name'], 'relationship' => $c['relationship'],
-                'phone' => $c['phone'], 'email' => $c['email'], 'is_main' => $c['main'], 'position' => ++$position, 'added_by' => $by->id, 'added_at' => $now]);
+                'phone' => $c['phone'], 'email' => $c['email'], 'notices_by' => $c['notices_by'], 'is_main' => $c['main'], 'position' => ++$position, 'added_by' => $by->id, 'added_at' => $now]);
         }
     }
 
-    /** @return list<array{id: string, name: string, relationship: string, relationship_label: string, phone: string, email: string|null, main: bool}> */
+    /** @return list<array{id: string, name: string, relationship: string, relationship_label: string, phone: string, email: string|null, notices_by: string, main: bool}> */
     public function of(string $learnerId): array
     {
         return array_values(DB::table('learner_contacts')->where('learner_id', $learnerId)->whereNull('removed_at')
@@ -98,7 +111,7 @@ final class Contacts
             ->map(fn (object $c): array => [
                 'id' => Row::text($c, 'id'), 'name' => Row::text($c, 'name'), 'relationship' => Row::text($c, 'relationship'),
                 'relationship_label' => Relationship::tryFrom(Row::text($c, 'relationship'))?->label() ?? '',
-                'phone' => Row::text($c, 'phone'), 'email' => Row::maybeText($c, 'email'), 'main' => (bool) ($c->is_main ?? false),
+                'phone' => Row::text($c, 'phone'), 'email' => Row::maybeText($c, 'email'), 'notices_by' => Row::text($c, 'notices_by'), 'main' => (bool) ($c->is_main ?? false),
             ])->all());
     }
 }

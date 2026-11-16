@@ -1,6 +1,6 @@
 import { navigate, signOut, useSchool } from '@acadly/kernel'
 import { Button } from '@acadly/ui'
-import { useId, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes, type InputHTMLAttributes } from 'react'
+import { useId, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes, type InputHTMLAttributes, type Ref } from 'react'
 import { copy } from '../copy'
 
 const t = copy.setup
@@ -204,13 +204,14 @@ export function Input({ label, hint, error, required, wide, ...rest }: Common & 
   )
 }
 
-export function TextArea({ label, hint, error, required, wide, ...rest }: Common & TextareaHTMLAttributes<HTMLTextAreaElement>) {
+export function TextArea({ label, hint, error, required, wide, ref, ...rest }: Common & TextareaHTMLAttributes<HTMLTextAreaElement> & { ref?: Ref<HTMLTextAreaElement> | undefined }) {
   const id = useId()
 
   return (
     <div className={wide === true ? 'col-span-full' : ''}>
       <LabelLine id={id} label={label} required={required} />
       <textarea
+        ref={ref}
         id={id}
         rows={3}
         aria-invalid={error !== undefined}

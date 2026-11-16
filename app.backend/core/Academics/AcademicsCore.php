@@ -27,6 +27,11 @@ final class AcademicsCore implements Module
         return 'Academics';
     }
 
+    public function summary(): string
+    {
+        return 'Years, terms, levels, classes, subjects and who teaches them.';
+    }
+
     public function tier(): Tier
     {
         return Tier::Core;

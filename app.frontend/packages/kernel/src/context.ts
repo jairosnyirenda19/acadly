@@ -27,6 +27,14 @@ export async function getContext(): Promise<AppContext | null> {
 }
 
 /** Whether a module is on for the school. Kernel areas are always on. */
+/** The event that asks the console to read its context again, after a change that alters what it shows. */
+export const CONTEXT_CHANGED = 'acadly:context-changed'
+
+/** Tells the console that the menus and permissions may have changed: a module was switched, a role changed. */
+export function contextChanged(): void {
+  window.dispatchEvent(new Event(CONTEXT_CHANGED))
+}
+
 export function moduleOn(context: AppContext, key: string): boolean {
   return KERNEL_AREAS.has(key) || context.modules.includes(key)
 }

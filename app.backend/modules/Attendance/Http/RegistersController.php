@@ -10,6 +10,7 @@ use Acadly\Kernel\Access\WorkPlaces;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Row;
+use Acadly\Modules\Attendance\Application\Actions\AbsenceFollowUp;
 use Acadly\Modules\Attendance\Application\Actions\CorrectionActions;
 use Acadly\Modules\Attendance\Application\Actions\SubmitRegister;
 use Acadly\Modules\Attendance\Application\Registers;
@@ -44,7 +45,7 @@ final class RegistersController
     /**
      * One class's register on a day: `?day=YYYY-MM-DD`.
      *
-     * @response array{class: array{id: string, name: string}, day: string, today: string, school_day: bool, teacher: string|null, register: array{id: string, submitted_at: string, submitted_by: string}|null, days_before: list<string>, learners: list<array{id: string, name: string, admission_number: string|null, history: list<string|null>, mark: array{status: string, note: string|null, corrected: bool}|null, correction: array{id: string, from: string, to: string, reason: string, state: string, requested_by: string, requested_at: string, can_decide: bool}|null}>, can_take: bool, can_request: bool}
+     * @response array{class: array{id: string, name: string}, day: string, today: string, school_day: bool, teacher: string|null, register: array{id: string, submitted_at: string, submitted_by: string}|null, days_before: list<string>, learners: list<array{id: string, name: string, admission_number: string|null, history: list<string|null>, mark: array{status: string, note: string|null, corrected: bool}|null, correction: array{id: string, from: string, to: string, reason: string, state: string, requested_by: string, requested_at: string, can_decide: bool}|null, absence: array{told: list<array{to: string, relationship: string, channel: string, state: 'delivered'|'sent'|'accepted'|'not_delivered'|'waiting'|'not_reachable', at: string}>, next: string|null, follow_ups: list<array{kind: 'told_next'|'called', by: string, at: string, note: string|null}>, can_follow_up: bool}|null}>, can_take: bool, can_request: bool}
      */
     public function show(Request $request, string $id): JsonResponse
     {
@@ -99,6 +100,23 @@ final class RegistersController
         }
 
         return $day;
+    }
+
+    /** Tells the next contact of an absent learner, when the first could not be reached. */
+    public function tellNext(Request $request, string $register, string $learner, AbsenceFollowUp $followUp): JsonResponse
+    {
+        $followUp->tellNext(self::user($request), $register, $learner);
+
+        return $this->registerOf(self::user($request), $register);
+    }
+
+    /** Records that the family of an absent learner was called: `{note}`. */
+    public function called(Request $request, string $register, string $learner, AbsenceFollowUp $followUp): JsonResponse
+    {
+        $note = $request->input('note');
+        $followUp->called(self::user($request), $register, $learner, is_string($note) ? $note : null);
+
+        return $this->registerOf(self::user($request), $register);
     }
 
     /** @return list<array{learner_id: string, status: string, note: string|null}> */

@@ -11,6 +11,7 @@ use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Identity\User;
+use Acadly\Kernel\Notify\Notifier;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Kernel\Support\Row;
@@ -19,6 +20,7 @@ use Acadly\Modules\Attendance\Application\SchoolDays;
 use Acadly\Modules\Attendance\Contracts\AttendanceAudit;
 use Acadly\Modules\Attendance\Contracts\AttendancePermission;
 use Acadly\Modules\Attendance\Contracts\Mark;
+use Acadly\Modules\Attendance\Notifications\LearnerAbsent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -40,6 +42,7 @@ final class SubmitRegister
         private readonly SchoolDays $days,
         private readonly Marks $marks,
         private readonly Audit $audit,
+        private readonly Notifier $notifier,
         private readonly Clock $clock,
     ) {}
 
@@ -117,9 +120,15 @@ final class SubmitRegister
                 'submitted_by' => $by->id, 'submitted_at' => $now]);
 
             foreach ($given as $learner => $mark) {
-                DB::table('attendance_marks')->insert(['id' => Ids::next(), 'register_id' => $id, 'learner_id' => $learner,
+                $markId = Ids::next();
+                DB::table('attendance_marks')->insert(['id' => $markId, 'register_id' => $id, 'learner_id' => $learner,
                     'status' => $mark['status'], 'note' => $mark['note'], 'method' => 'manual', 'captured_by' => $by->id,
                     'captured_at' => $now, 'received_at' => $now]);
+
+                // The family hears of an absence on the day itself; a register for an earlier day tells nobody.
+                if ($mark['status'] === Mark::Absent->value && $day === $this->clock->today()) {
+                    $this->notifier->send(new LearnerAbsent($markId, $learner, $classId, $day), $by);
+                }
             }
 
             $counts = array_count_values(array_column($given, 'status'));

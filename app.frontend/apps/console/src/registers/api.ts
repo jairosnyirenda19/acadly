@@ -5,6 +5,14 @@ export type DayState = paths['/v1/registers']['get']['responses'][200]['content'
 export type RegisterState = paths['/v1/registers/class/{id}']['get']['responses'][200]['content']['application/json']
 export type RegisterLearner = RegisterState['learners'][number]
 export type MarkValue = 'present' | 'absent' | 'late' | 'excused'
+export type Absence = NonNullable<RegisterLearner['absence']>
+
+/** A family is reached when a message was delivered or accepted, is on its way, or staff called. */
+export function unreached(absence: Absence): boolean {
+  if (absence.follow_ups.some((f) => f.kind === 'called')) return false
+
+  return !absence.told.some((d) => ['delivered', 'sent', 'accepted', 'waiting'].includes(d.state))
+}
 
 export const MARKS: MarkValue[] = ['present', 'absent', 'late', 'excused']
 
@@ -20,6 +28,12 @@ export const registersApi = {
 
   requestCorrection: (registerId: string, body: { learner_id: string; to: MarkValue; reason: string }) =>
     settle(api.POST('/v1/registers/{register}/corrections', { params: { path: { register: registerId } }, body: body as never }) as Done<RegisterState>),
+
+  tellNext: (registerId: string, learnerId: string) =>
+    settle(api.POST('/v1/registers/{register}/absences/{learner}/next', { params: { path: { register: registerId, learner: learnerId } } }) as Done<RegisterState>),
+
+  called: (registerId: string, learnerId: string, note: string) =>
+    settle(api.POST('/v1/registers/{register}/absences/{learner}/called', { params: { path: { register: registerId, learner: learnerId } }, body: { note } as never }) as Done<RegisterState>),
 
   decide: (correctionId: string, approve: boolean, note: string) =>
     settle(api.POST('/v1/registers/corrections/{id}/decide', { params: { path: { id: correctionId } }, body: { approve, note } as never }) as Done<RegisterState>),

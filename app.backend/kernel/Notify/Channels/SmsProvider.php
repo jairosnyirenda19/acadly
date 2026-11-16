@@ -4,12 +4,24 @@ declare(strict_types=1);
 
 namespace Acadly\Kernel\Notify\Channels;
 
+use Illuminate\Http\Request;
+
 /**
- * An SMS company (04 §8). The product is not tied to one: a deployment binds
- * the provider it uses. A development machine uses `DevelopmentSmsProvider`.
+ * An SMS company (04 §8). The product is not tied to one: the school chooses
+ * its provider on the Messages page. A development machine without a choice
+ * uses `DevelopmentSmsProvider`.
  */
 interface SmsProvider
 {
+    /** The provider's key, kept on each delivery: 'meticket'. */
+    public function key(): string;
+
     /** @param  string  $to  an international number, such as +265991234567 */
     public function send(string $to, string $text): ProviderReceipt;
+
+    /** A delivery report the provider posted, or null when the request is not one. */
+    public function report(Request $request): ?DeliveryReport;
+
+    /** The account balance as the provider states it, such as "MWK 412600.00", or null when it cannot be read. */
+    public function balance(): ?string;
 }

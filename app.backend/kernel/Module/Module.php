@@ -26,6 +26,9 @@ interface Module
     /** The name people see, such as 'Registers'. */
     public function name(): string;
 
+    /** One sentence on what the module does, for the Modules page. */
+    public function summary(): string;
+
     public function tier(): Tier;
 
     /**

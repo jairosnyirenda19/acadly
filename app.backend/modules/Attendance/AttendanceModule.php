@@ -11,6 +11,8 @@ use Acadly\Kernel\Module\Module;
 use Acadly\Kernel\Module\Tier;
 use Acadly\Modules\Attendance\Contracts\AttendanceAudit;
 use Acadly\Modules\Attendance\Contracts\AttendancePermission;
+use Acadly\Modules\Attendance\Notifications\LearnerAbsent;
+use Acadly\Modules\Attendance\Notifications\LearnerAbsentNextContact;
 
 /**
  * Registers, the marks in them, and corrections (the approved Attendance
@@ -27,6 +29,11 @@ final class AttendanceModule implements Module
     public function name(): string
     {
         return 'Attendance';
+    }
+
+    public function summary(): string
+    {
+        return 'Morning registers, corrections and absence notices to contacts.';
     }
 
     public function tier(): Tier
@@ -66,7 +73,7 @@ final class AttendanceModule implements Module
 
     public function topics(): array
     {
-        return [];
+        return [LearnerAbsent::class, LearnerAbsentNextContact::class];
     }
 
     public function documentKinds(): array

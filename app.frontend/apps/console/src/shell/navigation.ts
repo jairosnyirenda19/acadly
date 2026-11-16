@@ -54,6 +54,8 @@ export const GROUPS: NavGroup[] = [
       { key: 'roles', label: t.nav.roles, path: '/settings/roles', icon: 'roles', show: (c) => can(c, 'access.roles.manage'), lights: under('/settings/roles') },
       { key: 'subjects', label: t.nav.subjects, path: '/settings/subjects', icon: 'subjects', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/subjects') },
       { key: 'teaching', label: t.nav.teaching, path: '/settings/teaching', icon: 'teaching', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/teaching') },
+      { key: 'messages', label: t.nav.messages, path: '/settings/messages', icon: 'messages', show: (c) => can(c, 'notify.manage'), lights: under('/settings/messages') },
+      { key: 'modules', label: t.nav.modules, path: '/settings/modules', icon: 'modules', show: (c) => can(c, 'modules.manage'), lights: under('/settings/modules') },
     ],
   },
 ]

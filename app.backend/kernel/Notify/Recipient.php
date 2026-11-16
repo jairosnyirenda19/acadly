@@ -17,6 +17,7 @@ final readonly class Recipient
         public ?string $userId = null,
         public ?string $email = null,
         public ?string $phone = null,
+        public ?Channel $prefers = null,
     ) {}
 
     public static function user(User $user): self

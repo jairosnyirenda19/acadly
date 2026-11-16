@@ -21,6 +21,11 @@ final class ListenerModule implements Module
         return 'Listener';
     }
 
+    public function summary(): string
+    {
+        return 'A test module.';
+    }
+
     public function tier(): Tier
     {
         return Tier::Optional;

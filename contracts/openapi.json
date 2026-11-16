@@ -3238,6 +3238,9 @@
                                                             "null"
                                                         ]
                                                     },
+                                                    "notices_by": {
+                                                        "type": "string"
+                                                    },
                                                     "main": {
                                                         "type": "boolean"
                                                     }
@@ -3249,6 +3252,7 @@
                                                     "relationship_label",
                                                     "phone",
                                                     "email",
+                                                    "notices_by",
                                                     "main"
                                                 ]
                                             }
@@ -3754,6 +3758,193 @@
                         }
                     }
                 },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "acadly_id": {
+                                            "type": "string"
+                                        },
+                                        "admission_number": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "first_name": {
+                                            "type": "string"
+                                        },
+                                        "other_names": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "surname": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "sex": {
+                                            "type": "string"
+                                        },
+                                        "date_of_birth": {
+                                            "type": "string"
+                                        },
+                                        "has_photo": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "admitted_on": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "word": {
+                                            "type": "string"
+                                        },
+                                        "class": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "level": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "division": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "campus": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "class_teacher": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "placements": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "contacts": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "activity": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "possible_duplicate": {
+                                            "type": "boolean"
+                                        },
+                                        "move_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "can_manage": {
+                                            "type": "boolean"
+                                        },
+                                        "relationships": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "acadly_id",
+                                        "admission_number",
+                                        "first_name",
+                                        "other_names",
+                                        "surname",
+                                        "name",
+                                        "sex",
+                                        "date_of_birth",
+                                        "has_photo",
+                                        "status",
+                                        "admitted_on",
+                                        "word",
+                                        "class",
+                                        "level",
+                                        "division",
+                                        "campus",
+                                        "class_teacher",
+                                        "placements",
+                                        "contacts",
+                                        "activity",
+                                        "possible_duplicate",
+                                        "move_to",
+                                        "can_manage",
+                                        "relationships"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/learners/{id}/contacts/{contact}/notices": {
+            "post": {
+                "operationId": "learners.contacts.notices",
+                "summary": "Changes how a contact receives notices: `{notices_by: sms|email}`",
+                "tags": [
+                    "Learners"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "contact",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "",
@@ -4585,6 +4776,2381 @@
                 }
             }
         },
+        "/v1/notify/reports/{token}": {
+            "post": {
+                "operationId": "notify.reports",
+                "summary": "A provider's report on a message. Always answered the same way, so the address reveals nothing",
+                "tags": [
+                    "Messages"
+                ],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    }
+                }
+            }
+        },
+        "/v1/messages/channels": {
+            "get": {
+                "operationId": "messages.channels",
+                "summary": "How messages are sent, and this month's numbers",
+                "tags": [
+                    "Messages"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sms": {
+                                            "type": "object",
+                                            "properties": {
+                                                "provider": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "providers": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "key": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "key",
+                                                            "name"
+                                                        ]
+                                                    }
+                                                },
+                                                "sender": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "username": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "key_hint": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "connected": {
+                                                    "type": "boolean"
+                                                },
+                                                "last_accepted_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "reports_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "balance": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "value": {
+                                                            "type": "string"
+                                                        },
+                                                        "at": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "value",
+                                                        "at"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "provider",
+                                                "providers",
+                                                "sender",
+                                                "username",
+                                                "key_hint",
+                                                "connected",
+                                                "last_accepted_at",
+                                                "reports_address",
+                                                "balance"
+                                            ]
+                                        },
+                                        "email": {
+                                            "type": "object",
+                                            "properties": {
+                                                "from_address": {
+                                                    "type": "string"
+                                                },
+                                                "from_name": {
+                                                    "type": "string"
+                                                },
+                                                "reply_to": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "connected": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "from_address",
+                                                "from_name",
+                                                "reply_to",
+                                                "connected"
+                                            ]
+                                        },
+                                        "limits": {
+                                            "type": "object",
+                                            "properties": {
+                                                "quiet_from": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "quiet_to": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "sms_per_month": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "quiet_from",
+                                                "quiet_to",
+                                                "sms_per_month"
+                                            ]
+                                        },
+                                        "month": {
+                                            "type": "object",
+                                            "properties": {
+                                                "sms": {
+                                                    "type": "integer"
+                                                },
+                                                "units": {
+                                                    "type": "integer"
+                                                },
+                                                "delivered_share": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "emails": {
+                                                    "type": "integer"
+                                                },
+                                                "emails_accepted": {
+                                                    "type": "integer"
+                                                },
+                                                "not_delivered": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "sms",
+                                                "units",
+                                                "delivered_share",
+                                                "emails",
+                                                "emails_accepted",
+                                                "not_delivered"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "sms",
+                                        "email",
+                                        "limits",
+                                        "month"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/messages/channels/sms": {
+            "put": {
+                "operationId": "messages.channels.sms",
+                "tags": [
+                    "Messages"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "provider": {
+                                        "type": "string"
+                                    },
+                                    "sender": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 20
+                                    },
+                                    "username": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 80
+                                    },
+                                    "key": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 500
+                                    }
+                                },
+                                "required": [
+                                    "provider"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sms": {
+                                            "type": "object",
+                                            "properties": {
+                                                "provider": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "providers": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "sender": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "username": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "key_hint": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "connected": {
+                                                    "type": "boolean"
+                                                },
+                                                "last_accepted_at": {},
+                                                "reports_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "balance": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "value": {
+                                                            "type": "string"
+                                                        },
+                                                        "at": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "value",
+                                                        "at"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "provider",
+                                                "providers",
+                                                "sender",
+                                                "username",
+                                                "key_hint",
+                                                "connected",
+                                                "last_accepted_at",
+                                                "reports_address",
+                                                "balance"
+                                            ]
+                                        },
+                                        "email": {
+                                            "type": "object",
+                                            "properties": {
+                                                "from_address": {
+                                                    "type": "string"
+                                                },
+                                                "from_name": {
+                                                    "type": "string"
+                                                },
+                                                "reply_to": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "connected": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "from_address",
+                                                "from_name",
+                                                "reply_to",
+                                                "connected"
+                                            ]
+                                        },
+                                        "limits": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "quiet_from": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "quiet_to": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "sms_per_month": {
+                                                            "type": [
+                                                                "integer",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "quiet_from",
+                                                        "quiet_to",
+                                                        "sms_per_month"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "quiet_from": {
+                                                            "type": "null"
+                                                        },
+                                                        "quiet_to": {
+                                                            "type": "null"
+                                                        },
+                                                        "sms_per_month": {
+                                                            "type": "null"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "quiet_from",
+                                                        "quiet_to",
+                                                        "sms_per_month"
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        "month": {
+                                            "type": "object",
+                                            "properties": {
+                                                "sms": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "units": {
+                                                    "type": "integer"
+                                                },
+                                                "delivered_share": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "emails": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "emails_accepted": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "not_delivered": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "sms",
+                                                "units",
+                                                "delivered_share",
+                                                "emails",
+                                                "emails_accepted",
+                                                "not_delivered"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "sms",
+                                        "email",
+                                        "limits",
+                                        "month"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/messages/channels/email": {
+            "put": {
+                "operationId": "messages.channels.email",
+                "tags": [
+                    "Messages"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "from_name": {
+                                        "type": "string",
+                                        "maxLength": 200
+                                    },
+                                    "reply_to": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 190
+                                    }
+                                },
+                                "required": [
+                                    "from_name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sms": {
+                                            "type": "object",
+                                            "properties": {
+                                                "provider": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "providers": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "sender": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "username": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "key_hint": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "connected": {
+                                                    "type": "boolean"
+                                                },
+                                                "last_accepted_at": {},
+                                                "reports_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "balance": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "value": {
+                                                            "type": "string"
+                                                        },
+                                                        "at": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "value",
+                                                        "at"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "provider",
+                                                "providers",
+                                                "sender",
+                                                "username",
+                                                "key_hint",
+                                                "connected",
+                                                "last_accepted_at",
+                                                "reports_address",
+                                                "balance"
+                                            ]
+                                        },
+                                        "email": {
+                                            "type": "object",
+                                            "properties": {
+                                                "from_address": {
+                                                    "type": "string"
+                                                },
+                                                "from_name": {
+                                                    "type": "string"
+                                                },
+                                                "reply_to": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "connected": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "from_address",
+                                                "from_name",
+                                                "reply_to",
+                                                "connected"
+                                            ]
+                                        },
+                                        "limits": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "quiet_from": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "quiet_to": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "sms_per_month": {
+                                                            "type": [
+                                                                "integer",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "quiet_from",
+                                                        "quiet_to",
+                                                        "sms_per_month"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "quiet_from": {
+                                                            "type": "null"
+                                                        },
+                                                        "quiet_to": {
+                                                            "type": "null"
+                                                        },
+                                                        "sms_per_month": {
+                                                            "type": "null"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "quiet_from",
+                                                        "quiet_to",
+                                                        "sms_per_month"
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        "month": {
+                                            "type": "object",
+                                            "properties": {
+                                                "sms": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "units": {
+                                                    "type": "integer"
+                                                },
+                                                "delivered_share": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "emails": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "emails_accepted": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "not_delivered": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "sms",
+                                                "units",
+                                                "delivered_share",
+                                                "emails",
+                                                "emails_accepted",
+                                                "not_delivered"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "sms",
+                                        "email",
+                                        "limits",
+                                        "month"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/messages/limits": {
+            "put": {
+                "operationId": "messages.limits",
+                "tags": [
+                    "Messages"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "quiet_from": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "quiet_to": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "sms_per_month": {
+                                        "type": [
+                                            "integer",
+                                            "null"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sms": {
+                                            "type": "object",
+                                            "properties": {
+                                                "provider": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "providers": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "sender": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "username": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "key_hint": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "connected": {
+                                                    "type": "boolean"
+                                                },
+                                                "last_accepted_at": {},
+                                                "reports_address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "balance": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "value": {
+                                                            "type": "string"
+                                                        },
+                                                        "at": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "value",
+                                                        "at"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "provider",
+                                                "providers",
+                                                "sender",
+                                                "username",
+                                                "key_hint",
+                                                "connected",
+                                                "last_accepted_at",
+                                                "reports_address",
+                                                "balance"
+                                            ]
+                                        },
+                                        "email": {
+                                            "type": "object",
+                                            "properties": {
+                                                "from_address": {
+                                                    "type": "string"
+                                                },
+                                                "from_name": {
+                                                    "type": "string"
+                                                },
+                                                "reply_to": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "connected": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "from_address",
+                                                "from_name",
+                                                "reply_to",
+                                                "connected"
+                                            ]
+                                        },
+                                        "limits": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "quiet_from": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "quiet_to": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "sms_per_month": {
+                                                            "type": [
+                                                                "integer",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "quiet_from",
+                                                        "quiet_to",
+                                                        "sms_per_month"
+                                                    ]
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "quiet_from": {
+                                                            "type": "null"
+                                                        },
+                                                        "quiet_to": {
+                                                            "type": "null"
+                                                        },
+                                                        "sms_per_month": {
+                                                            "type": "null"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "quiet_from",
+                                                        "quiet_to",
+                                                        "sms_per_month"
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        "month": {
+                                            "type": "object",
+                                            "properties": {
+                                                "sms": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "units": {
+                                                    "type": "integer"
+                                                },
+                                                "delivered_share": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "emails": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "emails_accepted": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "not_delivered": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "sms",
+                                                "units",
+                                                "delivered_share",
+                                                "emails",
+                                                "emails_accepted",
+                                                "not_delivered"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "sms",
+                                        "email",
+                                        "limits",
+                                        "month"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/messages/test": {
+            "post": {
+                "operationId": "messages.test",
+                "tags": [
+                    "Messages"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "channel": {
+                                        "type": "string",
+                                        "enum": [
+                                            "sms",
+                                            "email"
+                                        ]
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "maxLength": 190
+                                    }
+                                },
+                                "required": [
+                                    "channel",
+                                    "address"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/messages/notices": {
+            "get": {
+                "operationId": "messages.notices",
+                "summary": "Every notice, and whether the school changed it",
+                "tags": [
+                    "Messages"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "notices": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "group": {
+                                                        "type": "string"
+                                                    },
+                                                    "audience": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "contacts",
+                                                            "staff"
+                                                        ]
+                                                    },
+                                                    "channels": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "enabled": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "own_words": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "name",
+                                                    "group",
+                                                    "audience",
+                                                    "channels",
+                                                    "enabled",
+                                                    "own_words"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "notices"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/messages/notices/{key}": {
+            "get": {
+                "operationId": "messages.notice",
+                "summary": "One notice: the declared words, the school's own, and what it may use",
+                "tags": [
+                    "Messages"
+                ],
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "audience": {
+                                            "type": "string",
+                                            "enum": [
+                                                "contacts",
+                                                "staff"
+                                            ]
+                                        },
+                                        "channels": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "enabled": {
+                                            "type": "boolean"
+                                        },
+                                        "can_switch_off": {
+                                            "type": "boolean"
+                                        },
+                                        "contacts": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ],
+                                            "enum": [
+                                                "main",
+                                                "every",
+                                                null
+                                            ]
+                                        },
+                                        "facts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "examples": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ]
+                                            }
+                                        },
+                                        "declared": {
+                                            "type": "object",
+                                            "properties": {
+                                                "subject": {
+                                                    "type": "string"
+                                                },
+                                                "lines": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "short": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "subject",
+                                                "lines",
+                                                "short"
+                                            ]
+                                        },
+                                        "own": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "subject": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "lines": {
+                                                    "type": [
+                                                        "array",
+                                                        "null"
+                                                    ],
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "short": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "subject",
+                                                "lines",
+                                                "short"
+                                            ]
+                                        },
+                                        "budget": {
+                                            "type": "integer"
+                                        },
+                                        "short_length": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "characters": {
+                                                    "type": "integer"
+                                                },
+                                                "units": {
+                                                    "type": "integer"
+                                                },
+                                                "unicode": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "characters",
+                                                "units",
+                                                "unicode"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "key",
+                                        "name",
+                                        "audience",
+                                        "channels",
+                                        "enabled",
+                                        "can_switch_off",
+                                        "contacts",
+                                        "facts",
+                                        "examples",
+                                        "declared",
+                                        "own",
+                                        "budget",
+                                        "short_length"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "messages.notice.save",
+                "tags": [
+                    "Messages"
+                ],
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "subject": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 300
+                                    },
+                                    "lines": {
+                                        "type": [
+                                            "array",
+                                            "null"
+                                        ],
+                                        "items": {
+                                            "type": "string",
+                                            "maxLength": 600
+                                        },
+                                        "maxItems": 12
+                                    },
+                                    "short": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 400
+                                    },
+                                    "enabled": {
+                                        "type": "boolean"
+                                    },
+                                    "contacts": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "enum": [
+                                            "main",
+                                            "every",
+                                            null
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "enabled"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "key": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "audience": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "contacts",
+                                                        "staff"
+                                                    ]
+                                                },
+                                                "channels": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "enabled": {
+                                                    "type": "boolean"
+                                                },
+                                                "can_switch_off": {
+                                                    "type": "boolean"
+                                                },
+                                                "contacts": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "enum": [
+                                                        "every",
+                                                        "main",
+                                                        null
+                                                    ]
+                                                },
+                                                "facts": {
+                                                    "type": "array",
+                                                    "prefixItems": [
+                                                        {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        {
+                                                            "type": "array",
+                                                            "items": {}
+                                                        }
+                                                    ],
+                                                    "minItems": 2,
+                                                    "maxItems": 2
+                                                },
+                                                "examples": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "institution": {
+                                                            "type": "string"
+                                                        },
+                                                        "school_phone": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "contact": {
+                                                            "type": "string",
+                                                            "const": "Alice Banda"
+                                                        },
+                                                        "actor": {
+                                                            "type": "string",
+                                                            "const": "Grace Phiri"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "institution",
+                                                        "school_phone",
+                                                        "contact",
+                                                        "actor"
+                                                    ],
+                                                    "additionalProperties": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "declared": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "subject": {
+                                                            "type": "string"
+                                                        },
+                                                        "lines": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "short": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "subject",
+                                                        "lines",
+                                                        "short"
+                                                    ]
+                                                },
+                                                "own": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "subject": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "lines": {
+                                                            "type": [
+                                                                "array",
+                                                                "null"
+                                                            ],
+                                                            "items": {}
+                                                        },
+                                                        "short": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "subject",
+                                                        "lines",
+                                                        "short"
+                                                    ]
+                                                },
+                                                "budget": {
+                                                    "type": "integer",
+                                                    "const": 160
+                                                },
+                                                "short_length": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "characters": {
+                                                            "type": "integer"
+                                                        },
+                                                        "units": {
+                                                            "type": "integer"
+                                                        },
+                                                        "unicode": {
+                                                            "type": "boolean"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "characters",
+                                                        "units",
+                                                        "unicode"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "key",
+                                                "name",
+                                                "audience",
+                                                "channels",
+                                                "enabled",
+                                                "can_switch_off",
+                                                "contacts",
+                                                "facts",
+                                                "examples",
+                                                "declared",
+                                                "own",
+                                                "budget",
+                                                "short_length"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/messages/notices/{key}/wording": {
+            "delete": {
+                "operationId": "messages.notice.reset",
+                "tags": [
+                    "Messages"
+                ],
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "key": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "audience": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "contacts",
+                                                        "staff"
+                                                    ]
+                                                },
+                                                "channels": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "enabled": {
+                                                    "type": "boolean"
+                                                },
+                                                "can_switch_off": {
+                                                    "type": "boolean"
+                                                },
+                                                "contacts": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "enum": [
+                                                        "every",
+                                                        "main",
+                                                        null
+                                                    ]
+                                                },
+                                                "facts": {
+                                                    "type": "array",
+                                                    "prefixItems": [
+                                                        {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        {
+                                                            "type": "array",
+                                                            "items": {}
+                                                        }
+                                                    ],
+                                                    "minItems": 2,
+                                                    "maxItems": 2
+                                                },
+                                                "examples": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "institution": {
+                                                            "type": "string"
+                                                        },
+                                                        "school_phone": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "contact": {
+                                                            "type": "string",
+                                                            "const": "Alice Banda"
+                                                        },
+                                                        "actor": {
+                                                            "type": "string",
+                                                            "const": "Grace Phiri"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "institution",
+                                                        "school_phone",
+                                                        "contact",
+                                                        "actor"
+                                                    ],
+                                                    "additionalProperties": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "declared": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "subject": {
+                                                            "type": "string"
+                                                        },
+                                                        "lines": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "short": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "subject",
+                                                        "lines",
+                                                        "short"
+                                                    ]
+                                                },
+                                                "own": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "subject": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "lines": {
+                                                            "type": [
+                                                                "array",
+                                                                "null"
+                                                            ],
+                                                            "items": {}
+                                                        },
+                                                        "short": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "subject",
+                                                        "lines",
+                                                        "short"
+                                                    ]
+                                                },
+                                                "budget": {
+                                                    "type": "integer",
+                                                    "const": 160
+                                                },
+                                                "short_length": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "characters": {
+                                                            "type": "integer"
+                                                        },
+                                                        "units": {
+                                                            "type": "integer"
+                                                        },
+                                                        "unicode": {
+                                                            "type": "boolean"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "characters",
+                                                        "units",
+                                                        "unicode"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "key",
+                                                "name",
+                                                "audience",
+                                                "channels",
+                                                "enabled",
+                                                "can_switch_off",
+                                                "contacts",
+                                                "facts",
+                                                "examples",
+                                                "declared",
+                                                "own",
+                                                "budget",
+                                                "short_length"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/messages/sent": {
+            "get": {
+                "operationId": "messages.sent",
+                "summary": "Every message of one day, newest first",
+                "tags": [
+                    "Messages"
+                ],
+                "parameters": [
+                    {
+                        "name": "day",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "channel",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "state",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 120
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "day": {
+                                            "type": "string"
+                                        },
+                                        "today": {
+                                            "type": "string"
+                                        },
+                                        "totals": {
+                                            "type": "object",
+                                            "properties": {
+                                                "sent": {
+                                                    "type": "integer"
+                                                },
+                                                "delivered": {
+                                                    "type": "integer"
+                                                },
+                                                "waiting": {
+                                                    "type": "integer"
+                                                },
+                                                "attention": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "sent",
+                                                "delivered",
+                                                "waiting",
+                                                "attention"
+                                            ]
+                                        },
+                                        "messages": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "to": {
+                                                        "type": "string"
+                                                    },
+                                                    "address": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "notice": {
+                                                        "type": "string"
+                                                    },
+                                                    "about": {
+                                                        "type": "string"
+                                                    },
+                                                    "channel": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "delivered",
+                                                            "sent",
+                                                            "accepted",
+                                                            "not_delivered",
+                                                            "waiting",
+                                                            "not_reachable",
+                                                            "over_allowance",
+                                                            "not_sent"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "units": {
+                                                        "type": "integer"
+                                                    },
+                                                    "again": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "at",
+                                                    "to",
+                                                    "address",
+                                                    "notice",
+                                                    "about",
+                                                    "channel",
+                                                    "state",
+                                                    "reason",
+                                                    "units",
+                                                    "again"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "day",
+                                        "today",
+                                        "totals",
+                                        "messages"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/messages/sent/{id}": {
+            "get": {
+                "operationId": "messages.message",
+                "summary": "One message, its words and what happened to it",
+                "tags": [
+                    "Messages"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "at": {
+                                            "type": "string"
+                                        },
+                                        "to": {
+                                            "type": "string"
+                                        },
+                                        "address": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "notice": {
+                                            "type": "string"
+                                        },
+                                        "about": {
+                                            "type": "string"
+                                        },
+                                        "channel": {
+                                            "type": "string"
+                                        },
+                                        "state": {
+                                            "type": "string"
+                                        },
+                                        "reason": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "units": {
+                                            "type": "integer"
+                                        },
+                                        "again": {
+                                            "type": "boolean"
+                                        },
+                                        "text": {
+                                            "type": "string"
+                                        },
+                                        "email_subject": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "provider": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "steps": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "what": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "written",
+                                                            "accepted",
+                                                            "refused",
+                                                            "delivered",
+                                                            "not_delivered",
+                                                            "not_reachable",
+                                                            "over_allowance"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "at",
+                                                    "what"
+                                                ]
+                                            }
+                                        },
+                                        "sent_again": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "state"
+                                            ]
+                                        },
+                                        "can_send_again": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "at",
+                                        "to",
+                                        "address",
+                                        "notice",
+                                        "about",
+                                        "channel",
+                                        "state",
+                                        "reason",
+                                        "units",
+                                        "again",
+                                        "text",
+                                        "email_subject",
+                                        "provider",
+                                        "steps",
+                                        "sent_again",
+                                        "can_send_again"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/messages/sent/{id}/again": {
+            "post": {
+                "operationId": "messages.again",
+                "tags": [
+                    "Messages"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "at": {
+                                                    "type": "string"
+                                                },
+                                                "to": {
+                                                    "type": "string"
+                                                },
+                                                "address": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "notice": {
+                                                    "type": "string"
+                                                },
+                                                "about": {
+                                                    "type": "string"
+                                                },
+                                                "channel": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "delivered",
+                                                        "accepted",
+                                                        "sent",
+                                                        "not_delivered",
+                                                        "waiting",
+                                                        "not_reachable",
+                                                        "over_allowance",
+                                                        "not_sent"
+                                                    ]
+                                                },
+                                                "reason": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        },
+                                                        {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "No phone number that can be used.",
+                                                                "No email address.",
+                                                                "The message was not sent.",
+                                                                "No report from the phone yet."
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                "units": {
+                                                    "type": "integer"
+                                                },
+                                                "again": {
+                                                    "type": "boolean"
+                                                },
+                                                "text": {
+                                                    "type": "string"
+                                                },
+                                                "email_subject": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "provider": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "steps": {
+                                                    "type": "array",
+                                                    "prefixItems": [
+                                                        {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "at": {
+                                                                    "type": "string"
+                                                                },
+                                                                "what": {
+                                                                    "type": "string",
+                                                                    "const": "not_delivered"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "at",
+                                                                "what"
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "minItems": 1,
+                                                    "maxItems": 1
+                                                },
+                                                "sent_again": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "state": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "delivered",
+                                                                "accepted",
+                                                                "sent",
+                                                                "not_delivered",
+                                                                "waiting",
+                                                                "not_reachable",
+                                                                "over_allowance",
+                                                                "not_sent"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "state"
+                                                    ]
+                                                },
+                                                "can_send_again": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "at",
+                                                "to",
+                                                "address",
+                                                "notice",
+                                                "about",
+                                                "channel",
+                                                "state",
+                                                "reason",
+                                                "units",
+                                                "again",
+                                                "text",
+                                                "email_subject",
+                                                "provider",
+                                                "steps",
+                                                "sent_again",
+                                                "can_send_again"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/modules": {
             "get": {
                 "operationId": "modules.index",
@@ -4643,6 +7209,15 @@
                                                     "name": {
                                                         "type": "string"
                                                     },
+                                                    "summary": {
+                                                        "type": "string"
+                                                    },
+                                                    "needs": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
                                                     "tier": {
                                                         "type": "string",
                                                         "enum": [
@@ -4662,21 +7237,91 @@
                                                     },
                                                     "switched_on": {
                                                         "type": "boolean"
+                                                    },
+                                                    "last_switch": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "at": {
+                                                                "type": "string"
+                                                            },
+                                                            "by": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "enabled": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "reason": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "at",
+                                                            "by",
+                                                            "enabled",
+                                                            "reason"
+                                                        ]
                                                     }
                                                 },
                                                 "required": [
                                                     "key",
                                                     "name",
+                                                    "summary",
+                                                    "needs",
                                                     "tier",
                                                     "state",
-                                                    "switched_on"
+                                                    "switched_on",
+                                                    "last_switch"
+                                                ]
+                                            }
+                                        },
+                                        "history": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "enabled": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "by": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "name",
+                                                    "enabled",
+                                                    "at",
+                                                    "by",
+                                                    "reason"
                                                 ]
                                             }
                                         }
                                     },
                                     "required": [
                                         "licence",
-                                        "modules"
+                                        "modules",
+                                        "history"
                                     ]
                                 }
                             }
@@ -7316,6 +9961,100 @@
                                                             "requested_at",
                                                             "can_decide"
                                                         ]
+                                                    },
+                                                    "absence": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "told": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "to": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "relationship": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "channel": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "state": {
+                                                                            "type": "string",
+                                                                            "enum": [
+                                                                                "delivered",
+                                                                                "sent",
+                                                                                "accepted",
+                                                                                "not_delivered",
+                                                                                "waiting",
+                                                                                "not_reachable"
+                                                                            ]
+                                                                        },
+                                                                        "at": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "to",
+                                                                        "relationship",
+                                                                        "channel",
+                                                                        "state",
+                                                                        "at"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "next": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "follow_ups": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "kind": {
+                                                                            "type": "string",
+                                                                            "enum": [
+                                                                                "told_next",
+                                                                                "called"
+                                                                            ]
+                                                                        },
+                                                                        "by": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "at": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "note": {
+                                                                            "type": [
+                                                                                "string",
+                                                                                "null"
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "kind",
+                                                                        "by",
+                                                                        "at",
+                                                                        "note"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "can_follow_up": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "told",
+                                                            "next",
+                                                            "follow_ups",
+                                                            "can_follow_up"
+                                                        ]
                                                     }
                                                 },
                                                 "required": [
@@ -7324,7 +10063,8 @@
                                                     "admission_number",
                                                     "history",
                                                     "mark",
-                                                    "correction"
+                                                    "correction",
+                                                    "absence"
                                                 ]
                                             }
                                         },
@@ -7505,6 +10245,274 @@
                         }
                     }
                 ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "class": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "day": {
+                                            "type": "string"
+                                        },
+                                        "today": {
+                                            "type": "string"
+                                        },
+                                        "school_day": {
+                                            "type": "boolean"
+                                        },
+                                        "teacher": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "register": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "submitted_at": {
+                                                    "type": "string"
+                                                },
+                                                "submitted_by": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "submitted_at",
+                                                "submitted_by"
+                                            ]
+                                        },
+                                        "days_before": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "learners": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "can_take": {
+                                            "type": "boolean"
+                                        },
+                                        "can_request": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "class",
+                                        "day",
+                                        "today",
+                                        "school_day",
+                                        "teacher",
+                                        "register",
+                                        "days_before",
+                                        "learners",
+                                        "can_take",
+                                        "can_request"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/registers/{register}/absences/{learner}/next": {
+            "post": {
+                "operationId": "registers.absences.next",
+                "summary": "Tells the next contact of an absent learner, when the first could not be reached",
+                "tags": [
+                    "Registers"
+                ],
+                "parameters": [
+                    {
+                        "name": "register",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "learner",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "class": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "day": {
+                                            "type": "string"
+                                        },
+                                        "today": {
+                                            "type": "string"
+                                        },
+                                        "school_day": {
+                                            "type": "boolean"
+                                        },
+                                        "teacher": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "register": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "submitted_at": {
+                                                    "type": "string"
+                                                },
+                                                "submitted_by": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "submitted_at",
+                                                "submitted_by"
+                                            ]
+                                        },
+                                        "days_before": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "learners": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "can_take": {
+                                            "type": "boolean"
+                                        },
+                                        "can_request": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "class",
+                                        "day",
+                                        "today",
+                                        "school_day",
+                                        "teacher",
+                                        "register",
+                                        "days_before",
+                                        "learners",
+                                        "can_take",
+                                        "can_request"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/registers/{register}/absences/{learner}/called": {
+            "post": {
+                "operationId": "registers.absences.called",
+                "summary": "Records that the family of an absent learner was called: `{note}`",
+                "tags": [
+                    "Registers"
+                ],
+                "parameters": [
+                    {
+                        "name": "register",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "learner",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "note": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "",
@@ -9862,6 +12870,25 @@
             },
             "AuthorizationException": {
                 "description": "Authorization error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": [
+                                "message"
+                            ]
+                        }
+                    }
+                }
+            },
+            "ModelNotFoundException": {
+                "description": "Not found",
                 "content": {
                     "application/json": {
                         "schema": {

@@ -25,6 +25,26 @@ return [
     'timezone' => env('ACADLY_TIMEZONE', 'Africa/Blantyre'),
 
     /*
+    | How phone numbers are read: a national number takes this country code.
+    */
+    'phone' => [
+        'country_code' => env('ACADLY_PHONE_COUNTRY_CODE', '265'),
+        'trunk_prefix' => env('ACADLY_PHONE_TRUNK_PREFIX', '0'),
+        'subscriber_length' => (int) env('ACADLY_PHONE_SUBSCRIBER_LENGTH', 9),
+    ],
+
+    /*
+    | Where each SMS provider is reached. The school chooses the provider and
+    | enters its access key on the Messages page; the key is kept encrypted.
+    */
+    'sms' => [
+        'meticket_url' => env('ACADLY_SMS_METICKET_URL', 'https://smpp.meticketmw.com'),
+        'africastalking_url' => env('ACADLY_SMS_AFRICASTALKING_URL', 'https://api.africastalking.com'),
+        'africastalking_sandbox_url' => env('ACADLY_SMS_AFRICASTALKING_SANDBOX_URL', 'https://api.sandbox.africastalking.com'),
+        'timeout' => (int) env('ACADLY_SMS_TIMEOUT', 15),
+    ],
+
+    /*
     | The public key that verifies the licence IQ-X issues (Ed25519, base64).
     | With no key on a development machine, every module is licensed.
     */

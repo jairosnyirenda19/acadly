@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Acadly\Kernel\Notify\Console;
 
 use Acadly\Kernel\Notify\DeliveryStatus;
+use Acadly\Kernel\Notify\Jobs\DeliverNotice;
 use Acadly\Kernel\Notify\Jobs\ResolveNotice;
+use Acadly\Kernel\Notify\MessageSettings;
 use Acadly\Kernel\Notify\Notifier;
 use Acadly\Kernel\Notify\Topics\DeliveriesWaiting;
 use Acadly\Kernel\Support\Clock;
 use Illuminate\Console\Command;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -24,7 +27,7 @@ final class NotifySweepCommand extends Command
 
     protected $description = 'Resolve notices left behind and report deliveries that are waiting';
 
-    public function handle(Notifier $notifier, Clock $clock): int
+    public function handle(Notifier $notifier, MessageSettings $settings, Clock $clock): int
     {
         $now = $clock->now();
 
@@ -42,8 +45,18 @@ final class NotifySweepCommand extends Command
             }
         }
 
+        // Messages held for quiet hours go once the hours are over.
+        if ($settings->quietUntil($now) === null) {
+            foreach (DB::table('notification_deliveries')->where('status', DeliveryStatus::Queued->value)->where('reason', 'quiet_hours')->limit(500)->pluck('id') as $id) {
+                if (is_string($id)) {
+                    DeliverNotice::dispatch($id);
+                }
+            }
+        }
+
         $waiting = DB::table('notification_deliveries')
             ->where('status', DeliveryStatus::Queued->value)
+            ->where(fn (Builder $q): Builder => $q->whereNull('reason')->orWhere('reason', '!=', 'quiet_hours'))
             ->where('queued_at', '<', $now->subHour())
             ->count();
 

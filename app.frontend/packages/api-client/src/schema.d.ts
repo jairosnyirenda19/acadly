@@ -469,6 +469,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/learners/{id}/contacts/{contact}/notices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Changes how a contact receives notices: `{notices_by: sms|email}` */
+        post: operations["learners.contacts.notices"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/learners/{id}/contacts/{contact}/main": {
         parameters: {
             query?: never;
@@ -536,6 +553,204 @@ export interface paths {
         get: operations["me"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/notify/reports/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A provider's report on a message. Always answered the same way, so the address reveals nothing */
+        post: operations["notify.reports"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/messages/channels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** How messages are sent, and this month's numbers */
+        get: operations["messages.channels"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/messages/channels/sms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["messages.channels.sms"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/messages/channels/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["messages.channels.email"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/messages/limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["messages.limits"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/messages/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["messages.test"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/messages/notices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every notice, and whether the school changed it */
+        get: operations["messages.notices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/messages/notices/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One notice: the declared words, the school's own, and what it may use */
+        get: operations["messages.notice"];
+        put: operations["messages.notice.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/messages/notices/{key}/wording": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["messages.notice.reset"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/messages/sent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every message of one day, newest first */
+        get: operations["messages.sent"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/messages/sent/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One message, its words and what happened to it */
+        get: operations["messages.message"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/messages/sent/{id}/again": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["messages.again"];
         delete?: never;
         options?: never;
         head?: never;
@@ -903,6 +1118,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/registers/{register}/absences/{learner}/next": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Tells the next contact of an absent learner, when the first could not be reached */
+        post: operations["registers.absences.next"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/registers/{register}/absences/{learner}/called": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Records that the family of an absent learner was called: `{note}` */
+        post: operations["registers.absences.called"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/registers/corrections/{id}/decide": {
         parameters: {
             query?: never;
@@ -1237,6 +1486,18 @@ export interface components {
         };
         /** @description Authorization error */
         AuthorizationException: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    /** @description Error overview. */
+                    message: string;
+                };
+            };
+        };
+        /** @description Not found */
+        ModelNotFoundException: {
             headers: {
                 [name: string]: unknown;
             };
@@ -2364,6 +2625,7 @@ export interface operations {
                             relationship_label: string;
                             phone: string;
                             email: string | null;
+                            notices_by: string;
                             main: boolean;
                         }[];
                         activity: {
@@ -2508,6 +2770,58 @@ export interface operations {
                 };
             };
         };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        acadly_id: string;
+                        admission_number: string | null;
+                        first_name: string;
+                        other_names: string | null;
+                        surname: string;
+                        name: string;
+                        sex: string;
+                        date_of_birth: string;
+                        has_photo: boolean;
+                        status: string;
+                        admitted_on: string | null;
+                        word: string;
+                        class: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        level: string | null;
+                        division: string | null;
+                        campus: string | null;
+                        class_teacher: string | null;
+                        placements: unknown[];
+                        contacts: unknown[];
+                        activity: unknown[];
+                        possible_duplicate: boolean;
+                        move_to: unknown[];
+                        can_manage: boolean;
+                        relationships: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "learners.contacts.notices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                contact: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             200: {
                 headers: {
@@ -2759,6 +3073,695 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "notify.reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "messages.channels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        sms: {
+                            provider: string | null;
+                            providers: {
+                                key: string;
+                                name: string;
+                            }[];
+                            sender: string | null;
+                            username: string | null;
+                            key_hint: string | null;
+                            connected: boolean;
+                            last_accepted_at: string | null;
+                            reports_address: string | null;
+                            balance: {
+                                value: string;
+                                at: string;
+                            } | null;
+                        };
+                        email: {
+                            from_address: string;
+                            from_name: string;
+                            reply_to: string | null;
+                            connected: boolean;
+                        };
+                        limits: {
+                            quiet_from: string | null;
+                            quiet_to: string | null;
+                            sms_per_month: number | null;
+                        };
+                        month: {
+                            sms: number;
+                            units: number;
+                            delivered_share: number | null;
+                            emails: number;
+                            emails_accepted: number;
+                            not_delivered: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "messages.channels.sms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    provider: string;
+                    sender?: string | null;
+                    username?: string | null;
+                    key?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        sms: {
+                            provider: string | null;
+                            providers: unknown[];
+                            sender: string | null;
+                            username: string | null;
+                            key_hint: string | null;
+                            connected: boolean;
+                            last_accepted_at: unknown;
+                            reports_address: string | null;
+                            balance: {
+                                value: string;
+                                at: string;
+                            } | null;
+                        };
+                        email: {
+                            from_address: string;
+                            from_name: string;
+                            reply_to: string | null;
+                            connected: boolean;
+                        };
+                        limits: {
+                            quiet_from: string | null;
+                            quiet_to: string | null;
+                            sms_per_month: number | null;
+                        } | {
+                            quiet_from: null;
+                            quiet_to: null;
+                            sms_per_month: null;
+                        };
+                        month: {
+                            sms: number;
+                            units: number;
+                            delivered_share: number | null;
+                            emails: number;
+                            emails_accepted: number;
+                            not_delivered: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "messages.channels.email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    from_name: string;
+                    reply_to?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        sms: {
+                            provider: string | null;
+                            providers: unknown[];
+                            sender: string | null;
+                            username: string | null;
+                            key_hint: string | null;
+                            connected: boolean;
+                            last_accepted_at: unknown;
+                            reports_address: string | null;
+                            balance: {
+                                value: string;
+                                at: string;
+                            } | null;
+                        };
+                        email: {
+                            from_address: string;
+                            from_name: string;
+                            reply_to: string | null;
+                            connected: boolean;
+                        };
+                        limits: {
+                            quiet_from: string | null;
+                            quiet_to: string | null;
+                            sms_per_month: number | null;
+                        } | {
+                            quiet_from: null;
+                            quiet_to: null;
+                            sms_per_month: null;
+                        };
+                        month: {
+                            sms: number;
+                            units: number;
+                            delivered_share: number | null;
+                            emails: number;
+                            emails_accepted: number;
+                            not_delivered: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "messages.limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    quiet_from?: string | null;
+                    quiet_to?: string | null;
+                    sms_per_month?: number | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        sms: {
+                            provider: string | null;
+                            providers: unknown[];
+                            sender: string | null;
+                            username: string | null;
+                            key_hint: string | null;
+                            connected: boolean;
+                            last_accepted_at: unknown;
+                            reports_address: string | null;
+                            balance: {
+                                value: string;
+                                at: string;
+                            } | null;
+                        };
+                        email: {
+                            from_address: string;
+                            from_name: string;
+                            reply_to: string | null;
+                            connected: boolean;
+                        };
+                        limits: {
+                            quiet_from: string | null;
+                            quiet_to: string | null;
+                            sms_per_month: number | null;
+                        } | {
+                            quiet_from: null;
+                            quiet_to: null;
+                            sms_per_month: null;
+                        };
+                        month: {
+                            sms: number;
+                            units: number;
+                            delivered_share: number | null;
+                            emails: number;
+                            emails_accepted: number;
+                            not_delivered: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "messages.test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    channel: "sms" | "email";
+                    address: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "messages.notices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        notices: {
+                            key: string;
+                            name: string;
+                            group: string;
+                            /** @enum {string} */
+                            audience: "contacts" | "staff";
+                            channels: string[];
+                            enabled: boolean;
+                            own_words: boolean;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "messages.notice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        key: string;
+                        name: string;
+                        /** @enum {string} */
+                        audience: "contacts" | "staff";
+                        channels: string[];
+                        enabled: boolean;
+                        can_switch_off: boolean;
+                        /** @enum {string|null} */
+                        contacts: "main" | "every" | null;
+                        facts: string[];
+                        examples: {
+                            [key: string]: string | null;
+                        };
+                        declared: {
+                            subject: string;
+                            lines: string[];
+                            short: string | null;
+                        };
+                        own: {
+                            subject: string | null;
+                            lines: string[] | null;
+                            short: string | null;
+                        } | null;
+                        budget: number;
+                        short_length: {
+                            characters: number;
+                            units: number;
+                            unicode: boolean;
+                        } | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "messages.notice.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    subject?: string | null;
+                    lines?: string[] | null;
+                    short?: string | null;
+                    enabled: boolean;
+                    /** @enum {string|null} */
+                    contacts?: "main" | "every" | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        key: string;
+                        name: string;
+                        /** @enum {string} */
+                        audience: "contacts" | "staff";
+                        channels: unknown[];
+                        enabled: boolean;
+                        can_switch_off: boolean;
+                        /** @enum {string|null} */
+                        contacts: "every" | "main" | null;
+                        facts: [
+                            string[],
+                            unknown[]
+                        ];
+                        examples: {
+                            institution: string;
+                            school_phone: string | null;
+                            /** @constant */
+                            contact: "Alice Banda";
+                            /** @constant */
+                            actor: "Grace Phiri";
+                        } & {
+                            [key: string]: string;
+                        };
+                        declared: {
+                            subject: string;
+                            lines: string[];
+                            short: string | null;
+                        };
+                        own: {
+                            subject: string | null;
+                            lines: unknown[] | null;
+                            short: string | null;
+                        } | null;
+                        /** @constant */
+                        budget: 160;
+                        short_length: {
+                            characters: number;
+                            units: number;
+                            unicode: boolean;
+                        } | null;
+                    } | Record<string, never>;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "messages.notice.reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        key: string;
+                        name: string;
+                        /** @enum {string} */
+                        audience: "contacts" | "staff";
+                        channels: unknown[];
+                        enabled: boolean;
+                        can_switch_off: boolean;
+                        /** @enum {string|null} */
+                        contacts: "every" | "main" | null;
+                        facts: [
+                            string[],
+                            unknown[]
+                        ];
+                        examples: {
+                            institution: string;
+                            school_phone: string | null;
+                            /** @constant */
+                            contact: "Alice Banda";
+                            /** @constant */
+                            actor: "Grace Phiri";
+                        } & {
+                            [key: string]: string;
+                        };
+                        declared: {
+                            subject: string;
+                            lines: string[];
+                            short: string | null;
+                        };
+                        own: {
+                            subject: string | null;
+                            lines: unknown[] | null;
+                            short: string | null;
+                        } | null;
+                        /** @constant */
+                        budget: 160;
+                        short_length: {
+                            characters: number;
+                            units: number;
+                            unicode: boolean;
+                        } | null;
+                    } | Record<string, never>;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "messages.sent": {
+        parameters: {
+            query?: {
+                day?: string | null;
+                channel?: string | null;
+                state?: string | null;
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        day: string;
+                        today: string;
+                        totals: {
+                            sent: number;
+                            delivered: number;
+                            waiting: number;
+                            attention: number;
+                        };
+                        messages: {
+                            id: string;
+                            at: string;
+                            to: string;
+                            address: string | null;
+                            notice: string;
+                            about: string;
+                            channel: string;
+                            /** @enum {string} */
+                            state: "delivered" | "sent" | "accepted" | "not_delivered" | "waiting" | "not_reachable" | "over_allowance" | "not_sent";
+                            reason: string | null;
+                            units: number;
+                            again: boolean;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "messages.message": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        at: string;
+                        to: string;
+                        address: string | null;
+                        notice: string;
+                        about: string;
+                        channel: string;
+                        state: string;
+                        reason: string | null;
+                        units: number;
+                        again: boolean;
+                        text: string;
+                        email_subject: string | null;
+                        provider: string | null;
+                        steps: {
+                            at: string;
+                            /** @enum {string} */
+                            what: "written" | "accepted" | "refused" | "delivered" | "not_delivered" | "not_reachable" | "over_allowance";
+                        }[];
+                        sent_again: {
+                            id: string;
+                            state: string;
+                        } | null;
+                        can_send_again: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "messages.again": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        at: string;
+                        to: string;
+                        address: string | null;
+                        notice: string;
+                        about: string;
+                        channel: string;
+                        /** @enum {string} */
+                        state: "delivered" | "accepted" | "sent" | "not_delivered" | "waiting" | "not_reachable" | "over_allowance" | "not_sent";
+                        reason: string | null | ("No phone number that can be used." | "No email address." | "The message was not sent." | "No report from the phone yet.");
+                        units: number;
+                        again: boolean;
+                        text: string;
+                        email_subject: string | null;
+                        provider: string | null;
+                        steps: [
+                            {
+                                at: string;
+                                /** @constant */
+                                what: "not_delivered";
+                            }
+                        ];
+                        sent_again: {
+                            id: string;
+                            /** @enum {string} */
+                            state: "delivered" | "accepted" | "sent" | "not_delivered" | "waiting" | "not_reachable" | "over_allowance" | "not_sent";
+                        } | null;
+                        can_send_again: boolean;
+                    } | Record<string, never>;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "modules.index": {
         parameters: {
             query?: never;
@@ -2783,11 +3786,27 @@ export interface operations {
                         modules: {
                             key: string;
                             name: string;
+                            summary: string;
+                            needs: string[];
                             /** @enum {string} */
                             tier: "core" | "optional";
                             /** @enum {string} */
                             state: "active" | "not_installed" | "not_offered" | "not_licensed" | "switched_off";
                             switched_on: boolean;
+                            last_switch: {
+                                at: string;
+                                by: string | null;
+                                enabled: boolean;
+                                reason: string;
+                            } | null;
+                        }[];
+                        history: {
+                            key: string;
+                            name: string;
+                            enabled: boolean;
+                            at: string;
+                            by: string | null;
+                            reason: string;
                         }[];
                     };
                 };
@@ -3644,6 +4663,25 @@ export interface operations {
                                 requested_at: string;
                                 can_decide: boolean;
                             } | null;
+                            absence: {
+                                told: {
+                                    to: string;
+                                    relationship: string;
+                                    channel: string;
+                                    /** @enum {string} */
+                                    state: "delivered" | "sent" | "accepted" | "not_delivered" | "waiting" | "not_reachable";
+                                    at: string;
+                                }[];
+                                next: string | null;
+                                follow_ups: {
+                                    /** @enum {string} */
+                                    kind: "told_next" | "called";
+                                    by: string;
+                                    at: string;
+                                    note: string | null;
+                                }[];
+                                can_follow_up: boolean;
+                            } | null;
                         }[];
                         can_take: boolean;
                         can_request: boolean;
@@ -3709,6 +4747,94 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        day: string;
+                        today: string;
+                        school_day: boolean;
+                        teacher: string | null;
+                        register: {
+                            id: string | null;
+                            submitted_at: string;
+                            submitted_by: string;
+                        } | null;
+                        days_before: string[];
+                        learners: unknown[];
+                        can_take: boolean;
+                        can_request: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "registers.absences.next": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                register: string;
+                learner: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        day: string;
+                        today: string;
+                        school_day: boolean;
+                        teacher: string | null;
+                        register: {
+                            id: string | null;
+                            submitted_at: string;
+                            submitted_by: string;
+                        } | null;
+                        days_before: string[];
+                        learners: unknown[];
+                        can_take: boolean;
+                        can_request: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "registers.absences.called": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                register: string;
+                learner: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    note?: string;
+                };
+            };
+        };
         responses: {
             200: {
                 headers: {

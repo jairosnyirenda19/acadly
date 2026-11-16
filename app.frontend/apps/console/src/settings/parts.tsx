@@ -6,7 +6,7 @@ import type { PersonStateName } from './api'
 
 const t = copy.settings
 
-export type SettingsTab = 'people' | 'roles' | 'subjects' | 'teaching'
+export type SettingsTab = 'people' | 'roles' | 'subjects' | 'teaching' | 'messages' | 'modules'
 
 /** The settings tabs that are built and that the account may use. */
 export function SettingsTabs({ current }: { current: SettingsTab }) {
@@ -16,6 +16,8 @@ export function SettingsTabs({ current }: { current: SettingsTab }) {
     { key: 'roles' as const, path: '/settings/roles', show: can(context, 'access.roles.manage') },
     { key: 'subjects' as const, path: '/settings/subjects', show: holdsAnywhere(context, 'academics.manage') },
     { key: 'teaching' as const, path: '/settings/teaching', show: holdsAnywhere(context, 'academics.manage') },
+    { key: 'messages' as const, path: '/settings/messages', show: can(context, 'notify.manage') },
+    { key: 'modules' as const, path: '/settings/modules', show: can(context, 'modules.manage') },
   ]
 
   return (

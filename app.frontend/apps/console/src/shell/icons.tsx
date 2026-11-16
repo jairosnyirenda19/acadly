@@ -10,6 +10,8 @@ const PATHS = {
   roles: 'M4 4h16v16H4z M8 12l3 3 5-6',
   subjects: 'M4 5h7v14H4z M13 5h7v14h-7z M6.5 9h2 M15.5 9h2',
   teaching: 'M3 4h18v12H3z M8 20h8 M12 16v4 M7 9h6',
+  messages: 'M4 5h16v11H9l-5 4z M8 9h8 M8 12h5',
+  modules: 'M4 4h7v7H4z M13 4h7v7h-7z M4 13h7v7H4z M16.5 13v7 M13 16.5h7',
   menu: 'M3 6h18 M3 12h18 M3 18h18',
   close: 'M5 5l14 14 M19 5L5 19',
   fold: 'M11 17l-5-5 5-5 M18 17l-5-5 5-5',

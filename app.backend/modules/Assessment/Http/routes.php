@@ -25,6 +25,9 @@ Route::middleware(['auth:sanctum', 'module:assessment'])->prefix('assessment')->
     Route::post('/assessments/{id}/lock', [AssessmentController::class, 'lock'])->whereUuid('id')->name('assessments.lock');
     Route::post('/assessments/{id}/return', [AssessmentController::class, 'return'])->whereUuid('id')->name('assessments.return');
     Route::post('/assessments/{id}/correct', [AssessmentController::class, 'correct'])->whereUuid('id')->name('assessments.correct');
+    Route::post('/assessments/{id}/papers', [AssessmentController::class, 'addPaper'])->whereUuid('id')->middleware('throttle:60,1')->name('assessments.papers.store');
+    Route::post('/papers/{id}/move', [AssessmentController::class, 'movePaper'])->whereUuid('id')->name('papers.move');
+    Route::delete('/papers/{id}', [AssessmentController::class, 'removePaper'])->whereUuid('id')->name('papers.remove');
 
     Route::get('/results', [ResultsController::class, 'index'])->name('results');
     Route::get('/results/working', [ResultsController::class, 'working'])->name('results.working');

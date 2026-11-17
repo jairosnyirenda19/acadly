@@ -43,6 +43,7 @@ final class Sheets
         private readonly JourneyEngine $engine,
         private readonly Clock $clock,
         private readonly ApprovalRequests $approvals,
+        private readonly Papers $papers,
     ) {}
 
     /** The assessment, when the viewer may see its class; otherwise "not found". */
@@ -100,6 +101,7 @@ final class Sheets
 
         $rows = [];
         $values = [];
+        $papers = $this->papers->of([$a->id])[$a->id] ?? [];
 
         foreach ($learners as $learner) {
             $mark = $marks[$learner['id']] ?? null;
@@ -115,6 +117,7 @@ final class Sheets
                 'value' => $mark['value'] ?? null, 'reason' => $mark['reason'] ?? null, 'percent' => $percent, 'grade' => $graded['grade'] ?? null,
                 'entered_by' => $mark !== null ? ($names[$mark['entered_by']] ?? '') : null, 'entered_at' => $mark['entered_at'] ?? null,
                 'corrected' => $mark['corrected'] ?? false, 'note' => $mark['note'] ?? null,
+                'paper' => $papers[$learner['id']] ?? [],
             ];
         }
 
@@ -165,6 +168,8 @@ final class Sheets
             'lock_note' => $lock !== null && ! $lock->permitted && $mayLock ? 'You cannot lock marks you submitted.'
                 : ($asked !== null && ! $asked['asks'] && $mayLock ? "Waiting for: {$asked['step']}." : null),
             'can_correct' => $state === State::Locked && $mayLock,
+            // Papers are optional, and kept by the teacher whose assessment it is, whatever its state.
+            'can_add_papers' => $owns && $this->reach->may($viewer, AssessmentPermission::Enter, $a->class_id),
         ];
     }
 

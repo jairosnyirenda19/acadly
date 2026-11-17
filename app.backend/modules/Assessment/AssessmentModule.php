@@ -10,6 +10,7 @@ use Acadly\Core\Institution\InstitutionCore;
 use Acadly\Kernel\Module\Module;
 use Acadly\Kernel\Module\Tier;
 use Acadly\Modules\Assessment\Contracts\AssessmentAudit;
+use Acadly\Modules\Assessment\Contracts\AssessmentDocument;
 use Acadly\Modules\Assessment\Contracts\AssessmentPermission;
 use Acadly\Modules\Assessment\Notifications\MarksReturned;
 use Acadly\Modules\Assessment\Notifications\MarksSubmitted;
@@ -78,6 +79,6 @@ final class AssessmentModule implements Module
 
     public function documentKinds(): array
     {
-        return [];
+        return AssessmentDocument::cases();
     }
 }

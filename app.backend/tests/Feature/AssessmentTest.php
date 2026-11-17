@@ -10,7 +10,9 @@ use Acadly\Kernel\Support\Ids;
 use Acadly\Modules\Assessment\Application\TermGrades;
 use Acadly\Modules\Assessment\Contracts\AssessmentPermission;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Tests\Fixtures\TwoCampusSchool;
 
 uses(DatabaseTransactions::class);
@@ -216,6 +218,43 @@ it('saves only the marks that changed, and refuses to submit while a learner has
         ->assertJsonPath('ladder.2', ['key' => 'submitted', 'label' => 'Submitted', 'done' => false, 'current' => true, 'by' => 'Tadala Mvula', 'at' => DB::table('journey_step_completions')->where('subject_id', $id)->value('occurred_at')]);
     $this->actingAs($this->people['tadala'])->putJson("{$url}/marks", ['marks' => assessmentMarks([18, null, null])])->assertUnprocessable()->assertJsonValidationErrors(['marks']);
     expect(DB::table('notification_requests')->where('topic_key', 'assessment.submitted')->where('subject_id', $id)->count())->toBe(1);
+});
+
+it('keeps optional marked papers, a page at a time, by the teacher, and shows them on the record once locked', function (): void {
+    Storage::fake('documents');
+    $page = fn (): UploadedFile => UploadedFile::fake()->createWithContent('page.png', (string) base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='));
+    $pdf = UploadedFile::fake()->createWithContent('scan.pdf', "%PDF-1.4\n% marked\n%%EOF\n");
+    $id = assessmentSet($this->people['tadala'], 'end_of_term', 'End-of-term exam', 100);
+    $url = "/api/v1/assessment/assessments/{$id}/papers";
+
+    $this->actingAs($this->people['tadala'])->post($url, ['learner_id' => $this->learners[0], 'file' => $page()], ['Accept' => 'application/json'])->assertOk();
+    $sheet = $this->actingAs($this->people['tadala'])->post($url, ['learner_id' => $this->learners[0], 'file' => $pdf], ['Accept' => 'application/json'])->assertOk();
+    expect($sheet->json('can_add_papers'))->toBeTrue()
+        ->and(array_column($sheet->json('learners.0.paper'), 'type'))->toBe(['image/png', 'application/pdf'])
+        ->and($sheet->json('learners.1.paper'))->toBe([]);
+
+    // Only the teacher of the assessment adds papers; a text file is refused.
+    $this->actingAs($this->people['mercy'])->post($url, ['learner_id' => $this->learners[1], 'file' => $page()], ['Accept' => 'application/json'])->assertForbidden();
+    $this->actingAs($this->people['tadala'])->post($url, ['learner_id' => $this->learners[1], 'file' => UploadedFile::fake()->createWithContent('notes.txt', 'hello')], ['Accept' => 'application/json'])
+        ->assertUnprocessable();
+
+    // Move the PDF first, then remove the photo: the PDF is page 1 and the photo stays recorded.
+    [$first, $second] = $sheet->json('learners.0.paper');
+    $this->actingAs($this->people['tadala'])->postJson("/api/v1/assessment/papers/{$second['id']}/move", ['earlier' => true])->assertOk()
+        ->assertJsonPath('learners.0.paper.0.id', $second['id']);
+    $this->actingAs($this->people['tadala'])->deleteJson("/api/v1/assessment/papers/{$first['id']}")->assertOk()
+        ->assertJsonPath('learners.0.paper', [['id' => $second['id'], 'document_id' => $second['document_id'], 'position' => 1, 'type' => 'application/pdf']]);
+    expect(DB::table('assessment_papers')->whereNotNull('removed_at')->count())->toBe(1);
+
+    // The office, who locks, may open the paper; someone else may not.
+    $this->actingAs($this->people['mercy'])->get("/api/v1/documents/{$second['document_id']}/content")->assertOk();
+    $this->actingAs($this->people['stranger'])->get("/api/v1/documents/{$second['document_id']}/content", ['Accept' => 'application/json'])->assertNotFound();
+
+    // The learner's record shows the paper with the mark, once the marks are locked.
+    expect(collect($this->actingAs($this->people['admin'])->getJson("/api/v1/assessment/learner/{$this->learners[0]}")->json('assessments'))->firstWhere('id', $id)['paper'])->toBe([]);
+    assessmentLocked($this->people['tadala'], $id, [62, 48, 70]);
+    $shown = collect($this->actingAs($this->people['admin'])->getJson("/api/v1/assessment/learner/{$this->learners[0]}")->json('assessments'))->firstWhere('id', $id);
+    expect($shown['subject_id'])->toBe($this->subjects['BIO'])->and(array_column($shown['paper'], 'document_id'))->toBe([$second['document_id']]);
 });
 
 it('locks with four eyes, and returns to the teacher with a reason', function (): void {

@@ -34,6 +34,7 @@ final class Results
         private readonly TermGrades $grades,
         private readonly Marks $marks,
         private readonly Clock $clock,
+        private readonly Papers $papers,
     ) {}
 
     /** @return array<string, mixed> */
@@ -169,17 +170,19 @@ final class Results
 
         $assessments = $this->grades->assessments($class['id'], $period['id']);
         $marks = $this->marks->ofLearner($learnerId, array_column($assessments, 'id'));
+        $papers = $this->papers->of(array_column($assessments, 'id'), $learnerId);
         $rows = [];
 
         foreach (array_reverse($assessments) as $a) {
             $mark = $marks[$a['id']] ?? null;
             $locked = $a['state'] === State::Locked->value;
             $rows[] = [
-                'id' => $a['id'], 'held_on' => $a['held_on'], 'subject' => $names[$a['subject_id']] ?? '', 'kind' => $a['kind'],
+                'id' => $a['id'], 'held_on' => $a['held_on'], 'subject_id' => $a['subject_id'], 'subject' => $names[$a['subject_id']] ?? '', 'kind' => $a['kind'],
                 'kind_label' => AssessmentKind::tryFrom($a['kind'])?->label() ?? $a['kind'], 'title' => $a['title'], 'counts' => $a['counts'],
                 'state' => $a['state'], 'locked' => $locked, 'out_of' => $a['out_of'],
                 'value' => $locked ? $mark['value'] ?? null : null, 'reason' => $locked ? $mark['reason'] ?? null : null,
                 'percent' => $locked && $mark !== null && $mark['value'] !== null ? Marks::percent($mark['value'], $a['out_of']) : null,
+                'paper' => $locked ? ($papers[$a['id']][$learnerId] ?? []) : [],
             ];
         }
 

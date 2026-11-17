@@ -66,7 +66,17 @@ final class DocumentAccess
             return $this->access->allows($who, DocumentPermission::Manage);
         }
 
-        return $this->access->allows($who, $write ? $kind->writePermission() : $kind->readPermission(), $scope);
+        if ($this->access->allows($who, $write ? $kind->writePermission() : $kind->readPermission(), $scope)) {
+            return true;
+        }
+
+        foreach (! $write && $kind instanceof AlsoReadWith ? $kind->alsoReadWith() : [] as $permission) {
+            if ($this->access->allows($who, $permission, $scope)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function resolver(DocumentKind $kind): DocumentOwner

@@ -2357,6 +2357,32 @@
                                                             "string",
                                                             "null"
                                                         ]
+                                                    },
+                                                    "paper": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "document_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "position": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "type": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "document_id",
+                                                                "position",
+                                                                "type"
+                                                            ]
+                                                        }
                                                     }
                                                 },
                                                 "required": [
@@ -2370,7 +2396,8 @@
                                                     "entered_by",
                                                     "entered_at",
                                                     "corrected",
-                                                    "note"
+                                                    "note",
+                                                    "paper"
                                                 ]
                                             }
                                         },
@@ -2569,6 +2596,9 @@
                                         },
                                         "can_correct": {
                                             "type": "boolean"
+                                        },
+                                        "can_add_papers": {
+                                            "type": "boolean"
                                         }
                                     },
                                     "required": [
@@ -2585,7 +2615,8 @@
                                         "can_lock",
                                         "can_return",
                                         "lock_note",
-                                        "can_correct"
+                                        "can_correct",
+                                        "can_add_papers"
                                     ]
                                 }
                             }
@@ -2785,6 +2816,32 @@
                                                             "string",
                                                             "null"
                                                         ]
+                                                    },
+                                                    "paper": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "document_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "position": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "type": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "document_id",
+                                                                "position",
+                                                                "type"
+                                                            ]
+                                                        }
                                                     }
                                                 },
                                                 "required": [
@@ -2798,7 +2855,8 @@
                                                     "entered_by",
                                                     "entered_at",
                                                     "corrected",
-                                                    "note"
+                                                    "note",
+                                                    "paper"
                                                 ]
                                             }
                                         },
@@ -2997,6 +3055,9 @@
                                         },
                                         "can_correct": {
                                             "type": "boolean"
+                                        },
+                                        "can_add_papers": {
+                                            "type": "boolean"
                                         }
                                     },
                                     "required": [
@@ -3013,7 +3074,8 @@
                                         "can_lock",
                                         "can_return",
                                         "lock_note",
-                                        "can_correct"
+                                        "can_correct",
+                                        "can_add_papers"
                                     ]
                                 }
                             }
@@ -3233,6 +3295,32 @@
                                                                     "string",
                                                                     "null"
                                                                 ]
+                                                            },
+                                                            "paper": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "document_id": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "position": {
+                                                                            "type": "integer"
+                                                                        },
+                                                                        "type": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "id",
+                                                                        "document_id",
+                                                                        "position",
+                                                                        "type"
+                                                                    ]
+                                                                }
                                                             }
                                                         },
                                                         "required": [
@@ -3246,7 +3334,8 @@
                                                             "entered_by",
                                                             "entered_at",
                                                             "corrected",
-                                                            "note"
+                                                            "note",
+                                                            "paper"
                                                         ]
                                                     }
                                                 },
@@ -3445,6 +3534,9 @@
                                                 },
                                                 "can_correct": {
                                                     "type": "boolean"
+                                                },
+                                                "can_add_papers": {
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "required": [
@@ -3461,7 +3553,8 @@
                                                 "can_lock",
                                                 "can_return",
                                                 "lock_note",
-                                                "can_correct"
+                                                "can_correct",
+                                                "can_add_papers"
                                             ]
                                         }
                                     },
@@ -3667,6 +3760,32 @@
                                                             "string",
                                                             "null"
                                                         ]
+                                                    },
+                                                    "paper": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "document_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "position": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "type": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "document_id",
+                                                                "position",
+                                                                "type"
+                                                            ]
+                                                        }
                                                     }
                                                 },
                                                 "required": [
@@ -3680,7 +3799,8 @@
                                                     "entered_by",
                                                     "entered_at",
                                                     "corrected",
-                                                    "note"
+                                                    "note",
+                                                    "paper"
                                                 ]
                                             }
                                         },
@@ -3879,6 +3999,9 @@
                                         },
                                         "can_correct": {
                                             "type": "boolean"
+                                        },
+                                        "can_add_papers": {
+                                            "type": "boolean"
                                         }
                                     },
                                     "required": [
@@ -3895,7 +4018,8 @@
                                         "can_lock",
                                         "can_return",
                                         "lock_note",
-                                        "can_correct"
+                                        "can_correct",
+                                        "can_add_papers"
                                     ]
                                 }
                             }
@@ -4095,6 +4219,32 @@
                                                             "string",
                                                             "null"
                                                         ]
+                                                    },
+                                                    "paper": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "document_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "position": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "type": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "document_id",
+                                                                "position",
+                                                                "type"
+                                                            ]
+                                                        }
                                                     }
                                                 },
                                                 "required": [
@@ -4108,7 +4258,8 @@
                                                     "entered_by",
                                                     "entered_at",
                                                     "corrected",
-                                                    "note"
+                                                    "note",
+                                                    "paper"
                                                 ]
                                             }
                                         },
@@ -4307,6 +4458,9 @@
                                         },
                                         "can_correct": {
                                             "type": "boolean"
+                                        },
+                                        "can_add_papers": {
+                                            "type": "boolean"
                                         }
                                     },
                                     "required": [
@@ -4323,7 +4477,8 @@
                                         "can_lock",
                                         "can_return",
                                         "lock_note",
-                                        "can_correct"
+                                        "can_correct",
+                                        "can_add_papers"
                                     ]
                                 }
                             }
@@ -4523,6 +4678,32 @@
                                                             "string",
                                                             "null"
                                                         ]
+                                                    },
+                                                    "paper": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "document_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "position": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "type": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "document_id",
+                                                                "position",
+                                                                "type"
+                                                            ]
+                                                        }
                                                     }
                                                 },
                                                 "required": [
@@ -4536,7 +4717,8 @@
                                                     "entered_by",
                                                     "entered_at",
                                                     "corrected",
-                                                    "note"
+                                                    "note",
+                                                    "paper"
                                                 ]
                                             }
                                         },
@@ -4735,6 +4917,9 @@
                                         },
                                         "can_correct": {
                                             "type": "boolean"
+                                        },
+                                        "can_add_papers": {
+                                            "type": "boolean"
                                         }
                                     },
                                     "required": [
@@ -4751,7 +4936,8 @@
                                         "can_lock",
                                         "can_return",
                                         "lock_note",
-                                        "can_correct"
+                                        "can_correct",
+                                        "can_add_papers"
                                     ]
                                 }
                             }
@@ -4968,6 +5154,32 @@
                                                             "string",
                                                             "null"
                                                         ]
+                                                    },
+                                                    "paper": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "document_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "position": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "type": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "document_id",
+                                                                "position",
+                                                                "type"
+                                                            ]
+                                                        }
                                                     }
                                                 },
                                                 "required": [
@@ -4981,7 +5193,8 @@
                                                     "entered_by",
                                                     "entered_at",
                                                     "corrected",
-                                                    "note"
+                                                    "note",
+                                                    "paper"
                                                 ]
                                             }
                                         },
@@ -5180,6 +5393,9 @@
                                         },
                                         "can_correct": {
                                             "type": "boolean"
+                                        },
+                                        "can_add_papers": {
+                                            "type": "boolean"
                                         }
                                     },
                                     "required": [
@@ -5196,7 +5412,1428 @@
                                         "can_lock",
                                         "can_return",
                                         "lock_note",
-                                        "can_correct"
+                                        "can_correct",
+                                        "can_add_papers"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/assessment/assessments/{id}/papers": {
+            "post": {
+                "operationId": "assessment.assessments.papers.store",
+                "summary": "Adds one page of a learner's marked paper: multipart `learner_id`, `file` (a photo or a PDF). Optional. The response is the marks sheet",
+                "tags": [
+                    "Assessment"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "learner_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "contentMediaType": "application/octet-stream"
+                                    }
+                                },
+                                "required": [
+                                    "learner_id",
+                                    "file"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "assessment": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "class_id": {
+                                                    "type": "string"
+                                                },
+                                                "class": {
+                                                    "type": "string"
+                                                },
+                                                "level": {
+                                                    "type": "string"
+                                                },
+                                                "subject_id": {
+                                                    "type": "string"
+                                                },
+                                                "subject": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "kind_label": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "held_on": {
+                                                    "type": "string"
+                                                },
+                                                "out_of": {
+                                                    "type": "integer"
+                                                },
+                                                "counts": {
+                                                    "type": "boolean"
+                                                },
+                                                "part": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "key": {
+                                                            "type": "string"
+                                                        },
+                                                        "label": {
+                                                            "type": "string"
+                                                        },
+                                                        "weight": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "key",
+                                                        "label",
+                                                        "weight"
+                                                    ]
+                                                },
+                                                "state": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "marking",
+                                                        "submitted",
+                                                        "returned",
+                                                        "locked"
+                                                    ]
+                                                },
+                                                "state_label": {
+                                                    "type": "string"
+                                                },
+                                                "set_by": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "class_id",
+                                                "class",
+                                                "level",
+                                                "subject_id",
+                                                "subject",
+                                                "kind",
+                                                "kind_label",
+                                                "title",
+                                                "held_on",
+                                                "out_of",
+                                                "counts",
+                                                "part",
+                                                "state",
+                                                "state_label",
+                                                "set_by"
+                                            ]
+                                        },
+                                        "learners": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "admission_number": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "value": {
+                                                        "type": [
+                                                            "number",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ],
+                                                        "enum": [
+                                                            "absent",
+                                                            "excused",
+                                                            "exempt",
+                                                            null
+                                                        ]
+                                                    },
+                                                    "percent": {
+                                                        "type": [
+                                                            "number",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "grade": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "entered_by": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "entered_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "corrected": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "note": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "paper": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "document_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "position": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "type": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "document_id",
+                                                                "position",
+                                                                "type"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "admission_number",
+                                                    "value",
+                                                    "reason",
+                                                    "percent",
+                                                    "grade",
+                                                    "entered_by",
+                                                    "entered_at",
+                                                    "corrected",
+                                                    "note",
+                                                    "paper"
+                                                ]
+                                            }
+                                        },
+                                        "stats": {
+                                            "type": "object",
+                                            "properties": {
+                                                "learners": {
+                                                    "type": "integer"
+                                                },
+                                                "marked": {
+                                                    "type": "integer"
+                                                },
+                                                "missing": {
+                                                    "type": "integer"
+                                                },
+                                                "absent": {
+                                                    "type": "integer"
+                                                },
+                                                "average": {
+                                                    "type": [
+                                                        "number",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "highest": {
+                                                    "type": [
+                                                        "number",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "lowest": {
+                                                    "type": [
+                                                        "number",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "below_half": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "learners",
+                                                "marked",
+                                                "missing",
+                                                "absent",
+                                                "average",
+                                                "highest",
+                                                "lowest",
+                                                "below_half"
+                                            ]
+                                        },
+                                        "scale": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "ladder": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "done": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "current": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "by": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label",
+                                                    "done",
+                                                    "current",
+                                                    "by",
+                                                    "at"
+                                                ]
+                                            }
+                                        },
+                                        "history": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "step": {
+                                                        "type": "string"
+                                                    },
+                                                    "outcome": {
+                                                        "type": "string"
+                                                    },
+                                                    "by": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "step",
+                                                    "outcome",
+                                                    "by",
+                                                    "at",
+                                                    "reason"
+                                                ]
+                                            }
+                                        },
+                                        "reasons": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "value": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "value",
+                                                    "label"
+                                                ]
+                                            }
+                                        },
+                                        "can_enter": {
+                                            "type": "boolean"
+                                        },
+                                        "can_submit": {
+                                            "type": "boolean"
+                                        },
+                                        "submit_blocked": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "reason": {
+                                                    "type": "string"
+                                                },
+                                                "remedy": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "reason",
+                                                "remedy"
+                                            ]
+                                        },
+                                        "can_lock": {
+                                            "type": "boolean"
+                                        },
+                                        "can_return": {
+                                            "type": "boolean"
+                                        },
+                                        "lock_note": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "can_correct": {
+                                            "type": "boolean"
+                                        },
+                                        "can_add_papers": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "assessment",
+                                        "learners",
+                                        "stats",
+                                        "scale",
+                                        "ladder",
+                                        "history",
+                                        "reasons",
+                                        "can_enter",
+                                        "can_submit",
+                                        "submit_blocked",
+                                        "can_lock",
+                                        "can_return",
+                                        "lock_note",
+                                        "can_correct",
+                                        "can_add_papers"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/assessment/papers/{id}/move": {
+            "post": {
+                "operationId": "assessment.papers.move",
+                "summary": "Moves a page of a paper one place: `{earlier}`. The response is the marks sheet",
+                "tags": [
+                    "Assessment"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "earlier": {
+                                        "type": "boolean",
+                                        "default": false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "assessment": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "class_id": {
+                                                    "type": "string"
+                                                },
+                                                "class": {
+                                                    "type": "string"
+                                                },
+                                                "level": {
+                                                    "type": "string"
+                                                },
+                                                "subject_id": {
+                                                    "type": "string"
+                                                },
+                                                "subject": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "kind_label": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "held_on": {
+                                                    "type": "string"
+                                                },
+                                                "out_of": {
+                                                    "type": "integer"
+                                                },
+                                                "counts": {
+                                                    "type": "boolean"
+                                                },
+                                                "part": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "key": {
+                                                            "type": "string"
+                                                        },
+                                                        "label": {
+                                                            "type": "string"
+                                                        },
+                                                        "weight": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "key",
+                                                        "label",
+                                                        "weight"
+                                                    ]
+                                                },
+                                                "state": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "marking",
+                                                        "submitted",
+                                                        "returned",
+                                                        "locked"
+                                                    ]
+                                                },
+                                                "state_label": {
+                                                    "type": "string"
+                                                },
+                                                "set_by": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "class_id",
+                                                "class",
+                                                "level",
+                                                "subject_id",
+                                                "subject",
+                                                "kind",
+                                                "kind_label",
+                                                "title",
+                                                "held_on",
+                                                "out_of",
+                                                "counts",
+                                                "part",
+                                                "state",
+                                                "state_label",
+                                                "set_by"
+                                            ]
+                                        },
+                                        "learners": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "admission_number": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "value": {
+                                                        "type": [
+                                                            "number",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ],
+                                                        "enum": [
+                                                            "absent",
+                                                            "excused",
+                                                            "exempt",
+                                                            null
+                                                        ]
+                                                    },
+                                                    "percent": {
+                                                        "type": [
+                                                            "number",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "grade": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "entered_by": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "entered_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "corrected": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "note": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "paper": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "document_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "position": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "type": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "document_id",
+                                                                "position",
+                                                                "type"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "admission_number",
+                                                    "value",
+                                                    "reason",
+                                                    "percent",
+                                                    "grade",
+                                                    "entered_by",
+                                                    "entered_at",
+                                                    "corrected",
+                                                    "note",
+                                                    "paper"
+                                                ]
+                                            }
+                                        },
+                                        "stats": {
+                                            "type": "object",
+                                            "properties": {
+                                                "learners": {
+                                                    "type": "integer"
+                                                },
+                                                "marked": {
+                                                    "type": "integer"
+                                                },
+                                                "missing": {
+                                                    "type": "integer"
+                                                },
+                                                "absent": {
+                                                    "type": "integer"
+                                                },
+                                                "average": {
+                                                    "type": [
+                                                        "number",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "highest": {
+                                                    "type": [
+                                                        "number",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "lowest": {
+                                                    "type": [
+                                                        "number",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "below_half": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "learners",
+                                                "marked",
+                                                "missing",
+                                                "absent",
+                                                "average",
+                                                "highest",
+                                                "lowest",
+                                                "below_half"
+                                            ]
+                                        },
+                                        "scale": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "ladder": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "done": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "current": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "by": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label",
+                                                    "done",
+                                                    "current",
+                                                    "by",
+                                                    "at"
+                                                ]
+                                            }
+                                        },
+                                        "history": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "step": {
+                                                        "type": "string"
+                                                    },
+                                                    "outcome": {
+                                                        "type": "string"
+                                                    },
+                                                    "by": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "step",
+                                                    "outcome",
+                                                    "by",
+                                                    "at",
+                                                    "reason"
+                                                ]
+                                            }
+                                        },
+                                        "reasons": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "value": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "value",
+                                                    "label"
+                                                ]
+                                            }
+                                        },
+                                        "can_enter": {
+                                            "type": "boolean"
+                                        },
+                                        "can_submit": {
+                                            "type": "boolean"
+                                        },
+                                        "submit_blocked": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "reason": {
+                                                    "type": "string"
+                                                },
+                                                "remedy": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "reason",
+                                                "remedy"
+                                            ]
+                                        },
+                                        "can_lock": {
+                                            "type": "boolean"
+                                        },
+                                        "can_return": {
+                                            "type": "boolean"
+                                        },
+                                        "lock_note": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "can_correct": {
+                                            "type": "boolean"
+                                        },
+                                        "can_add_papers": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "assessment",
+                                        "learners",
+                                        "stats",
+                                        "scale",
+                                        "ladder",
+                                        "history",
+                                        "reasons",
+                                        "can_enter",
+                                        "can_submit",
+                                        "submit_blocked",
+                                        "can_lock",
+                                        "can_return",
+                                        "lock_note",
+                                        "can_correct",
+                                        "can_add_papers"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/assessment/papers/{id}": {
+            "delete": {
+                "operationId": "assessment.papers.remove",
+                "summary": "Removes a page of a paper. It stays recorded. The response is the marks sheet",
+                "tags": [
+                    "Assessment"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "assessment": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "class_id": {
+                                                    "type": "string"
+                                                },
+                                                "class": {
+                                                    "type": "string"
+                                                },
+                                                "level": {
+                                                    "type": "string"
+                                                },
+                                                "subject_id": {
+                                                    "type": "string"
+                                                },
+                                                "subject": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "kind_label": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "held_on": {
+                                                    "type": "string"
+                                                },
+                                                "out_of": {
+                                                    "type": "integer"
+                                                },
+                                                "counts": {
+                                                    "type": "boolean"
+                                                },
+                                                "part": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "key": {
+                                                            "type": "string"
+                                                        },
+                                                        "label": {
+                                                            "type": "string"
+                                                        },
+                                                        "weight": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "key",
+                                                        "label",
+                                                        "weight"
+                                                    ]
+                                                },
+                                                "state": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "marking",
+                                                        "submitted",
+                                                        "returned",
+                                                        "locked"
+                                                    ]
+                                                },
+                                                "state_label": {
+                                                    "type": "string"
+                                                },
+                                                "set_by": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "class_id",
+                                                "class",
+                                                "level",
+                                                "subject_id",
+                                                "subject",
+                                                "kind",
+                                                "kind_label",
+                                                "title",
+                                                "held_on",
+                                                "out_of",
+                                                "counts",
+                                                "part",
+                                                "state",
+                                                "state_label",
+                                                "set_by"
+                                            ]
+                                        },
+                                        "learners": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "admission_number": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "value": {
+                                                        "type": [
+                                                            "number",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ],
+                                                        "enum": [
+                                                            "absent",
+                                                            "excused",
+                                                            "exempt",
+                                                            null
+                                                        ]
+                                                    },
+                                                    "percent": {
+                                                        "type": [
+                                                            "number",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "grade": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "entered_by": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "entered_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "corrected": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "note": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "paper": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "document_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "position": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "type": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "document_id",
+                                                                "position",
+                                                                "type"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "admission_number",
+                                                    "value",
+                                                    "reason",
+                                                    "percent",
+                                                    "grade",
+                                                    "entered_by",
+                                                    "entered_at",
+                                                    "corrected",
+                                                    "note",
+                                                    "paper"
+                                                ]
+                                            }
+                                        },
+                                        "stats": {
+                                            "type": "object",
+                                            "properties": {
+                                                "learners": {
+                                                    "type": "integer"
+                                                },
+                                                "marked": {
+                                                    "type": "integer"
+                                                },
+                                                "missing": {
+                                                    "type": "integer"
+                                                },
+                                                "absent": {
+                                                    "type": "integer"
+                                                },
+                                                "average": {
+                                                    "type": [
+                                                        "number",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "highest": {
+                                                    "type": [
+                                                        "number",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "lowest": {
+                                                    "type": [
+                                                        "number",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "below_half": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "learners",
+                                                "marked",
+                                                "missing",
+                                                "absent",
+                                                "average",
+                                                "highest",
+                                                "lowest",
+                                                "below_half"
+                                            ]
+                                        },
+                                        "scale": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "ladder": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "done": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "current": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "by": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label",
+                                                    "done",
+                                                    "current",
+                                                    "by",
+                                                    "at"
+                                                ]
+                                            }
+                                        },
+                                        "history": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "step": {
+                                                        "type": "string"
+                                                    },
+                                                    "outcome": {
+                                                        "type": "string"
+                                                    },
+                                                    "by": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "step",
+                                                    "outcome",
+                                                    "by",
+                                                    "at",
+                                                    "reason"
+                                                ]
+                                            }
+                                        },
+                                        "reasons": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "value": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "value",
+                                                    "label"
+                                                ]
+                                            }
+                                        },
+                                        "can_enter": {
+                                            "type": "boolean"
+                                        },
+                                        "can_submit": {
+                                            "type": "boolean"
+                                        },
+                                        "submit_blocked": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "reason": {
+                                                    "type": "string"
+                                                },
+                                                "remedy": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "reason",
+                                                "remedy"
+                                            ]
+                                        },
+                                        "can_lock": {
+                                            "type": "boolean"
+                                        },
+                                        "can_return": {
+                                            "type": "boolean"
+                                        },
+                                        "lock_note": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "can_correct": {
+                                            "type": "boolean"
+                                        },
+                                        "can_add_papers": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "assessment",
+                                        "learners",
+                                        "stats",
+                                        "scale",
+                                        "ladder",
+                                        "history",
+                                        "reasons",
+                                        "can_enter",
+                                        "can_submit",
+                                        "submit_blocked",
+                                        "can_lock",
+                                        "can_return",
+                                        "lock_note",
+                                        "can_correct",
+                                        "can_add_papers"
                                     ]
                                 }
                             }
@@ -21243,6 +22880,9 @@
                                                     "held_on": {
                                                         "type": "string"
                                                     },
+                                                    "subject_id": {
+                                                        "type": "string"
+                                                    },
                                                     "subject": {
                                                         "type": "string"
                                                     },
@@ -21290,11 +22930,38 @@
                                                             "number",
                                                             "null"
                                                         ]
+                                                    },
+                                                    "paper": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "document_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "position": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "type": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "document_id",
+                                                                "position",
+                                                                "type"
+                                                            ]
+                                                        }
                                                     }
                                                 },
                                                 "required": [
                                                     "id",
                                                     "held_on",
+                                                    "subject_id",
                                                     "subject",
                                                     "kind",
                                                     "kind_label",
@@ -21305,7 +22972,8 @@
                                                     "out_of",
                                                     "value",
                                                     "reason",
-                                                    "percent"
+                                                    "percent",
+                                                    "paper"
                                                 ]
                                             }
                                         }

@@ -328,6 +328,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/assessment/assessments/{id}/papers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adds one page of a learner's marked paper: multipart `learner_id`, `file` (a photo or a PDF). Optional. The response is the marks sheet */
+        post: operations["assessment.assessments.papers.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/papers/{id}/move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Moves a page of a paper one place: `{earlier}`. The response is the marks sheet */
+        post: operations["assessment.papers.move"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/papers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Removes a page of a paper. It stays recorded. The response is the marks sheet */
+        delete: operations["assessment.papers.remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/me/context": {
         parameters: {
             query?: never;
@@ -3069,6 +3120,12 @@ export interface operations {
                             entered_at: string | null;
                             corrected: boolean;
                             note: string | null;
+                            paper: {
+                                id: string;
+                                document_id: string;
+                                position: number;
+                                type: string;
+                            }[];
                         }[];
                         stats: {
                             learners: number;
@@ -3113,6 +3170,7 @@ export interface operations {
                         can_return: boolean;
                         lock_note: string | null;
                         can_correct: boolean;
+                        can_add_papers: boolean;
                     };
                 };
             };
@@ -3172,6 +3230,12 @@ export interface operations {
                             entered_at: string | null;
                             corrected: boolean;
                             note: string | null;
+                            paper: {
+                                id: string;
+                                document_id: string;
+                                position: number;
+                                type: string;
+                            }[];
                         }[];
                         stats: {
                             learners: number;
@@ -3216,6 +3280,7 @@ export interface operations {
                         can_return: boolean;
                         lock_note: string | null;
                         can_correct: boolean;
+                        can_add_papers: boolean;
                     };
                 };
             };
@@ -3283,6 +3348,12 @@ export interface operations {
                                 entered_at: string | null;
                                 corrected: boolean;
                                 note: string | null;
+                                paper: {
+                                    id: string;
+                                    document_id: string;
+                                    position: number;
+                                    type: string;
+                                }[];
                             }[];
                             stats: {
                                 learners: number;
@@ -3327,6 +3398,7 @@ export interface operations {
                             can_return: boolean;
                             lock_note: string | null;
                             can_correct: boolean;
+                            can_add_papers: boolean;
                         };
                     };
                 };
@@ -3387,6 +3459,12 @@ export interface operations {
                             entered_at: string | null;
                             corrected: boolean;
                             note: string | null;
+                            paper: {
+                                id: string;
+                                document_id: string;
+                                position: number;
+                                type: string;
+                            }[];
                         }[];
                         stats: {
                             learners: number;
@@ -3431,6 +3509,7 @@ export interface operations {
                         can_return: boolean;
                         lock_note: string | null;
                         can_correct: boolean;
+                        can_add_papers: boolean;
                     };
                 };
             };
@@ -3490,6 +3569,12 @@ export interface operations {
                             entered_at: string | null;
                             corrected: boolean;
                             note: string | null;
+                            paper: {
+                                id: string;
+                                document_id: string;
+                                position: number;
+                                type: string;
+                            }[];
                         }[];
                         stats: {
                             learners: number;
@@ -3534,6 +3619,7 @@ export interface operations {
                         can_return: boolean;
                         lock_note: string | null;
                         can_correct: boolean;
+                        can_add_papers: boolean;
                     };
                 };
             };
@@ -3593,6 +3679,12 @@ export interface operations {
                             entered_at: string | null;
                             corrected: boolean;
                             note: string | null;
+                            paper: {
+                                id: string;
+                                document_id: string;
+                                position: number;
+                                type: string;
+                            }[];
                         }[];
                         stats: {
                             learners: number;
@@ -3637,6 +3729,7 @@ export interface operations {
                         can_return: boolean;
                         lock_note: string | null;
                         can_correct: boolean;
+                        can_add_papers: boolean;
                     };
                 };
             };
@@ -3703,6 +3796,12 @@ export interface operations {
                             entered_at: string | null;
                             corrected: boolean;
                             note: string | null;
+                            paper: {
+                                id: string;
+                                document_id: string;
+                                position: number;
+                                type: string;
+                            }[];
                         }[];
                         stats: {
                             learners: number;
@@ -3747,6 +3846,354 @@ export interface operations {
                         can_return: boolean;
                         lock_note: string | null;
                         can_correct: boolean;
+                        can_add_papers: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.assessments.papers.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: uuid */
+                    learner_id: string;
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        assessment: {
+                            id: string;
+                            class_id: string;
+                            class: string;
+                            level: string;
+                            subject_id: string;
+                            subject: string;
+                            kind: string;
+                            kind_label: string;
+                            title: string;
+                            held_on: string;
+                            out_of: number;
+                            counts: boolean;
+                            part: {
+                                key: string;
+                                label: string;
+                                weight: number;
+                            } | null;
+                            /** @enum {string} */
+                            state: "marking" | "submitted" | "returned" | "locked";
+                            state_label: string;
+                            set_by: string;
+                        };
+                        learners: {
+                            id: string;
+                            name: string;
+                            admission_number: string | null;
+                            value: number | null;
+                            /** @enum {string|null} */
+                            reason: "absent" | "excused" | "exempt" | null;
+                            percent: number | null;
+                            grade: string | null;
+                            entered_by: string | null;
+                            entered_at: string | null;
+                            corrected: boolean;
+                            note: string | null;
+                            paper: {
+                                id: string;
+                                document_id: string;
+                                position: number;
+                                type: string;
+                            }[];
+                        }[];
+                        stats: {
+                            learners: number;
+                            marked: number;
+                            missing: number;
+                            absent: number;
+                            average: number | null;
+                            highest: number | null;
+                            lowest: number | null;
+                            below_half: number;
+                        };
+                        scale: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        ladder: {
+                            key: string;
+                            label: string;
+                            done: boolean;
+                            current: boolean;
+                            by: string | null;
+                            at: string | null;
+                        }[];
+                        history: {
+                            step: string;
+                            outcome: string;
+                            by: string;
+                            at: string;
+                            reason: string | null;
+                        }[];
+                        reasons: {
+                            value: string;
+                            label: string;
+                        }[];
+                        can_enter: boolean;
+                        can_submit: boolean;
+                        submit_blocked: {
+                            reason: string;
+                            remedy: string;
+                        } | null;
+                        can_lock: boolean;
+                        can_return: boolean;
+                        lock_note: string | null;
+                        can_correct: boolean;
+                        can_add_papers: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "assessment.papers.move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @default false */
+                    earlier?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        assessment: {
+                            id: string;
+                            class_id: string;
+                            class: string;
+                            level: string;
+                            subject_id: string;
+                            subject: string;
+                            kind: string;
+                            kind_label: string;
+                            title: string;
+                            held_on: string;
+                            out_of: number;
+                            counts: boolean;
+                            part: {
+                                key: string;
+                                label: string;
+                                weight: number;
+                            } | null;
+                            /** @enum {string} */
+                            state: "marking" | "submitted" | "returned" | "locked";
+                            state_label: string;
+                            set_by: string;
+                        };
+                        learners: {
+                            id: string;
+                            name: string;
+                            admission_number: string | null;
+                            value: number | null;
+                            /** @enum {string|null} */
+                            reason: "absent" | "excused" | "exempt" | null;
+                            percent: number | null;
+                            grade: string | null;
+                            entered_by: string | null;
+                            entered_at: string | null;
+                            corrected: boolean;
+                            note: string | null;
+                            paper: {
+                                id: string;
+                                document_id: string;
+                                position: number;
+                                type: string;
+                            }[];
+                        }[];
+                        stats: {
+                            learners: number;
+                            marked: number;
+                            missing: number;
+                            absent: number;
+                            average: number | null;
+                            highest: number | null;
+                            lowest: number | null;
+                            below_half: number;
+                        };
+                        scale: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        ladder: {
+                            key: string;
+                            label: string;
+                            done: boolean;
+                            current: boolean;
+                            by: string | null;
+                            at: string | null;
+                        }[];
+                        history: {
+                            step: string;
+                            outcome: string;
+                            by: string;
+                            at: string;
+                            reason: string | null;
+                        }[];
+                        reasons: {
+                            value: string;
+                            label: string;
+                        }[];
+                        can_enter: boolean;
+                        can_submit: boolean;
+                        submit_blocked: {
+                            reason: string;
+                            remedy: string;
+                        } | null;
+                        can_lock: boolean;
+                        can_return: boolean;
+                        lock_note: string | null;
+                        can_correct: boolean;
+                        can_add_papers: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.papers.remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        assessment: {
+                            id: string;
+                            class_id: string;
+                            class: string;
+                            level: string;
+                            subject_id: string;
+                            subject: string;
+                            kind: string;
+                            kind_label: string;
+                            title: string;
+                            held_on: string;
+                            out_of: number;
+                            counts: boolean;
+                            part: {
+                                key: string;
+                                label: string;
+                                weight: number;
+                            } | null;
+                            /** @enum {string} */
+                            state: "marking" | "submitted" | "returned" | "locked";
+                            state_label: string;
+                            set_by: string;
+                        };
+                        learners: {
+                            id: string;
+                            name: string;
+                            admission_number: string | null;
+                            value: number | null;
+                            /** @enum {string|null} */
+                            reason: "absent" | "excused" | "exempt" | null;
+                            percent: number | null;
+                            grade: string | null;
+                            entered_by: string | null;
+                            entered_at: string | null;
+                            corrected: boolean;
+                            note: string | null;
+                            paper: {
+                                id: string;
+                                document_id: string;
+                                position: number;
+                                type: string;
+                            }[];
+                        }[];
+                        stats: {
+                            learners: number;
+                            marked: number;
+                            missing: number;
+                            absent: number;
+                            average: number | null;
+                            highest: number | null;
+                            lowest: number | null;
+                            below_half: number;
+                        };
+                        scale: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        ladder: {
+                            key: string;
+                            label: string;
+                            done: boolean;
+                            current: boolean;
+                            by: string | null;
+                            at: string | null;
+                        }[];
+                        history: {
+                            step: string;
+                            outcome: string;
+                            by: string;
+                            at: string;
+                            reason: string | null;
+                        }[];
+                        reasons: {
+                            value: string;
+                            label: string;
+                        }[];
+                        can_enter: boolean;
+                        can_submit: boolean;
+                        submit_blocked: {
+                            reason: string;
+                            remedy: string;
+                        } | null;
+                        can_lock: boolean;
+                        can_return: boolean;
+                        lock_note: string | null;
+                        can_correct: boolean;
+                        can_add_papers: boolean;
                     };
                 };
             };
@@ -8632,6 +9079,7 @@ export interface operations {
                         assessments: {
                             id: string;
                             held_on: string;
+                            subject_id: string;
                             subject: string;
                             kind: string;
                             kind_label: string;
@@ -8644,6 +9092,12 @@ export interface operations {
                             value: number | null;
                             reason: string | null;
                             percent: number | null;
+                            paper: {
+                                id: string;
+                                document_id: string;
+                                position: number;
+                                type: string;
+                            }[];
                         }[];
                     };
                 };

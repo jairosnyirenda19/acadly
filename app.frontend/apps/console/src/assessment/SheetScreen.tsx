@@ -5,6 +5,7 @@ import { copy } from '../copy'
 import { Input, Select } from '../setup/parts'
 import { Tag } from '../settings/parts'
 import { assessmentApi, markText, type MarkInput, type SheetLearner, type SheetState } from './api'
+import { PaperKey, PaperPanel } from './papers'
 import { BackLink, InLink, LockPanel, SmallBand, StateTag } from './parts'
 
 const a = copy.assessment
@@ -64,6 +65,7 @@ function Sheet({ sheet, onSheet }: { sheet: SheetState; onSheet: (next: SheetSta
   const x = sheet.assessment
   const [draft, setDraft] = useState<Draft>(() => (sheet.can_enter ? readDraft(x.id) : {}))
   const [open, setOpen] = useState<string | null>(null)
+  const [paperOpen, setPaperOpen] = useState<string | null>(null)
   const [working, setWorking] = useState<'save' | 'submit' | null>(null)
   const [failed, setFailed] = useState<string | null>(null)
   const inputs = useRef<Record<string, HTMLInputElement | null>>({})
@@ -93,6 +95,7 @@ function Sheet({ sheet, onSheet }: { sheet: SheetState; onSheet: (next: SheetSta
 
     return { l, e, value, bad, percent }
   })
+  const withPaper = sheet.learners.filter((l) => l.paper.length > 0).length
   const done = rows.filter((r) => r.e.reason !== null || typeof r.value === 'number').length
   const left = rows.length - done
   const anyBad = rows.some((r) => r.bad)
@@ -184,12 +187,14 @@ function Sheet({ sheet, onSheet }: { sheet: SheetState; onSheet: (next: SheetSta
           { label: t.bandMarked, value: a.fraction(done, rows.length), tone: 'ink' },
           { label: t.bandAverage, value: a.pct(average) },
           { label: t.bandBelow, value: String(below), tone: below > 0 ? 'attention' : 'plain' },
+          ...(sheet.can_add_papers || withPaper > 0 ? [{ label: t.bandPapers, value: String(withPaper) }] : []),
         ]}
       />
 
       <div className="flex flex-1 flex-wrap items-stretch bg-sheet">
         <section aria-label={x.title} className="min-w-0 flex-[2_1_420px]">
           {editable && <p className="border-b border-rule bg-paper px-4 py-2 text-[13px] md:px-[clamp(16px,3vw,40px)]">{t.hint}</p>}
+          {sheet.can_add_papers && <p className="border-b border-rule bg-paper px-4 py-2 text-[13px] text-text-muted md:px-[clamp(16px,3vw,40px)]">{t.papersHint}</p>}
           {!editable && x.state === 'submitted' && !sheet.can_lock && <p className="border-b border-rule bg-paper px-4 py-2 text-[13px] md:px-[clamp(16px,3vw,40px)]">{t.waiting}</p>}
           {x.state === 'locked' && <p className="border-b border-rule bg-paper px-4 py-2 text-[13px] md:px-[clamp(16px,3vw,40px)]">{t.lockedNote}</p>}
 
@@ -215,6 +220,7 @@ function Sheet({ sheet, onSheet }: { sheet: SheetState; onSheet: (next: SheetSta
                       <span className="block text-base font-extrabold break-words">{r.l.name}</span>
                       <span className={`block text-[13px] ${r.bad ? 'font-bold text-red-text' : 'text-text-muted'}`}>
                         {line}
+                        {r.l.paper.length > 0 && ` · ${t.paperLine(r.l.paper.length)}`}
                         {r.l.corrected && (
                           <>
                             {' '}
@@ -248,6 +254,15 @@ function Sheet({ sheet, onSheet }: { sheet: SheetState; onSheet: (next: SheetSta
                         <span className={`ref min-w-16 text-right text-lg font-bold ${reasonLabel !== null ? 'text-[13px]' : ''}`}>{reasonLabel ?? markText(r.l.value)}</span>
                       )}
                       <span className="ref w-11 text-[13px] text-text-muted">{a.outOf(x.out_of)}</span>
+                      {(sheet.can_add_papers || r.l.paper.length > 0) && (
+                        <PaperKey
+                          name={r.l.name}
+                          pages={r.l.paper.length}
+                          open={paperOpen === r.l.id}
+                          disabled={r.l.paper.length === 0 && (r.e.reason === 'absent' || r.l.reason === 'absent')}
+                          onClick={() => setPaperOpen(paperOpen === r.l.id ? null : r.l.id)}
+                        />
+                      )}
                       {editable && (
                         <button
                           type="button"
@@ -261,6 +276,17 @@ function Sheet({ sheet, onSheet }: { sheet: SheetState; onSheet: (next: SheetSta
                       )}
                     </span>
                   </div>
+                  {paperOpen === r.l.id && (
+                    <PaperPanel
+                      assessmentId={x.id}
+                      learnerId={r.l.id}
+                      pages={r.l.paper}
+                      canAdd={sheet.can_add_papers}
+                      onSheet={onSheet}
+                      onClose={() => setPaperOpen(null)}
+                      onNext={rows[i + 1] !== undefined ? () => setPaperOpen(rows[i + 1]?.l.id ?? null) : null}
+                    />
+                  )}
                   {open === r.l.id && editable && (
                     <div className="flex flex-wrap gap-2 pr-3 pb-2.5 pl-[56px]">
                       {sheet.reasons.map((reason) => (

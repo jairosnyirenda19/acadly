@@ -50,6 +50,17 @@ export const assessmentApi = {
   correct: (id: string, body: { learner_id: string; value: number | null; reason: string | null; note: string }) =>
     settle(api.POST('/v1/assessment/assessments/{id}/correct', { params: { path: { id } }, body: body as never }) as Done<SheetState>),
 
+  /** Adds one page of a learner's marked paper: a photo or a PDF. */
+  addPaper: (id: string, learnerId: string, file: File) => {
+    const form = new FormData()
+    form.append('learner_id', learnerId)
+    form.append('file', file)
+
+    return settle(api.POST('/v1/assessment/assessments/{id}/papers', { params: { path: { id } }, body: form as never, bodySerializer: (body: unknown) => body as FormData }) as Done<SheetState>)
+  },
+  movePaper: (pageId: string, earlier: boolean) => settle(api.POST('/v1/assessment/papers/{id}/move', { params: { path: { id: pageId } }, body: { earlier } as never }) as Done<SheetState>),
+  removePaper: (pageId: string) => settle(api.DELETE('/v1/assessment/papers/{id}', { params: { path: { id: pageId } } }) as Done<SheetState>),
+
   results: (classId: string, periodId: string | null) =>
     read(api.GET('/v1/assessment/results', { params: { query: { class_id: classId, ...(periodId !== null ? { period_id: periodId } : {}) } as never } })),
   working: (q: { class_id: string; learner_id: string; subject_id: string; period_id: string }) => read(api.GET('/v1/assessment/results/working', { params: { query: q as never } })),

@@ -18,6 +18,8 @@ enum AssessmentAudit: string implements AuditAction
     case AssessmentSet = 'assessment.set';
     case MarksSaved = 'assessment.marks_saved';
     case MarkCorrected = 'assessment.mark_corrected';
+    case PaperAdded = 'assessment.paper_added';
+    case PaperChanged = 'assessment.paper_changed';
 
     public function key(): string
     {
@@ -33,6 +35,8 @@ enum AssessmentAudit: string implements AuditAction
             self::AssessmentSet => 'Set an assessment for a class and subject.',
             self::MarksSaved => 'Entered or changed marks of an assessment.',
             self::MarkCorrected => 'Corrected a locked mark.',
+            self::PaperAdded => "Added a page of a learner's marked paper.",
+            self::PaperChanged => "Removed or moved a page of a learner's marked paper.",
         };
     }
 

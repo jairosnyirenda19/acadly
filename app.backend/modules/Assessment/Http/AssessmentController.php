@@ -8,6 +8,7 @@ use Acadly\Kernel\Grid\Grids;
 use Acadly\Kernel\Identity\User;
 use Acadly\Modules\Assessment\Application\Actions\CorrectMark;
 use Acadly\Modules\Assessment\Application\Actions\MarksSteps;
+use Acadly\Modules\Assessment\Application\Actions\PaperActions;
 use Acadly\Modules\Assessment\Application\Actions\SaveMarks;
 use Acadly\Modules\Assessment\Application\Actions\SetAssessment;
 use Acadly\Modules\Assessment\Application\Assessments;
@@ -15,6 +16,10 @@ use Acadly\Modules\Assessment\Application\Sheets;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /** The Marks screens (the approved designs): a teacher's marks, a new assessment, the marks sheet and the office list. */
 final class AssessmentController
@@ -47,7 +52,7 @@ final class AssessmentController
     /**
      * Sets an assessment: `{class_id, subject_id, kind, title, held_on, out_of, counts}`. Answers with its marks sheet.
      *
-     * @response array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool}
+     * @response array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null, paper: list<array{id: string, document_id: string, position: int, type: string}>}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool, can_add_papers: bool}
      */
     public function store(Request $request, SetAssessment $set): JsonResponse
     {
@@ -60,7 +65,7 @@ final class AssessmentController
     /**
      * The marks sheet: learners, the marks in force, the numbers, the ladder and what the viewer may do.
      *
-     * @response array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool}
+     * @response array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null, paper: list<array{id: string, document_id: string, position: int, type: string}>}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool, can_add_papers: bool}
      */
     public function show(Request $request, string $id): JsonResponse
     {
@@ -70,7 +75,7 @@ final class AssessmentController
     /**
      * Saves marks: `{marks: [{learner_id, value, reason}]}`. Only a mark that changed adds a row.
      *
-     * @response array{saved: int, sheet: array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool}}
+     * @response array{saved: int, sheet: array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null, paper: list<array{id: string, document_id: string, position: int, type: string}>}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool, can_add_papers: bool}}
      */
     public function marks(Request $request, string $id, SaveMarks $save): JsonResponse
     {
@@ -83,7 +88,7 @@ final class AssessmentController
     /**
      * Submits the marks.
      *
-     * @response array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool}
+     * @response array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null, paper: list<array{id: string, document_id: string, position: int, type: string}>}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool, can_add_papers: bool}
      */
     public function submit(Request $request, string $id, MarksSteps $steps): JsonResponse
     {
@@ -96,7 +101,7 @@ final class AssessmentController
     /**
      * Locks submitted marks. Never marks the viewer submitted.
      *
-     * @response array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool}
+     * @response array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null, paper: list<array{id: string, document_id: string, position: int, type: string}>}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool, can_add_papers: bool}
      */
     public function lock(Request $request, string $id, MarksSteps $steps): JsonResponse
     {
@@ -109,7 +114,7 @@ final class AssessmentController
     /**
      * Returns submitted marks to the teacher: `{reason}`.
      *
-     * @response array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool}
+     * @response array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null, paper: list<array{id: string, document_id: string, position: int, type: string}>}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool, can_add_papers: bool}
      */
     public function return(Request $request, string $id, MarksSteps $steps): JsonResponse
     {
@@ -122,7 +127,7 @@ final class AssessmentController
     /**
      * Corrects a locked mark: `{learner_id, value, reason, note}`.
      *
-     * @response array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool}
+     * @response array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null, paper: list<array{id: string, document_id: string, position: int, type: string}>}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool, can_add_papers: bool}
      */
     public function correct(Request $request, string $id, CorrectMark $correct): JsonResponse
     {
@@ -131,6 +136,63 @@ final class AssessmentController
         $correct->handle($viewer, $id, self::text($request, 'learner_id'), $request->input('value'), is_string($reason) ? $reason : null, self::text($request, 'note'));
 
         return response()->json($this->sheets->sheet($viewer, $id));
+    }
+
+    /**
+     * Adds one page of a learner's marked paper: multipart `learner_id`, `file` (a photo or a PDF). Optional. The response is the marks sheet.
+     *
+     * @response array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null, paper: list<array{id: string, document_id: string, position: int, type: string}>}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool, can_add_papers: bool}
+     */
+    public function addPaper(Request $request, string $id, PaperActions $papers): JsonResponse
+    {
+        $viewer = self::user($request);
+        // Access before the input is looked at: someone who may not see the assessment learns nothing.
+        $this->sheets->find($viewer, $id);
+        $request->validate(['learner_id' => ['required', 'uuid'], 'file' => ['required', 'file']]);
+        $file = $request->file('file');
+
+        if (! $file instanceof UploadedFile) {
+            throw ValidationException::withMessages(['file' => ['Choose a photo or a PDF.']]);
+        }
+
+        $papers->add($viewer, $id, self::text($request, 'learner_id'), $file);
+
+        return response()->json($this->sheets->sheet($viewer, $id));
+    }
+
+    /**
+     * Moves a page of a paper one place: `{earlier}`. The response is the marks sheet.
+     *
+     * @response array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null, paper: list<array{id: string, document_id: string, position: int, type: string}>}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool, can_add_papers: bool}
+     */
+    public function movePaper(Request $request, string $id, PaperActions $papers): JsonResponse
+    {
+        $viewer = self::user($request);
+        $assessment = self::paperAssessment($id);
+        $papers->move($viewer, $id, $request->boolean('earlier'));
+
+        return response()->json($this->sheets->sheet($viewer, $assessment));
+    }
+
+    /**
+     * Removes a page of a paper. It stays recorded. The response is the marks sheet.
+     *
+     * @response array{assessment: array{id: string, class_id: string, class: string, level: string, subject_id: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, counts: bool, part: array{key: string, label: string, weight: int}|null, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, set_by: string}, learners: list<array{id: string, name: string, admission_number: string|null, value: float|null, reason: 'absent'|'excused'|'exempt'|null, percent: float|null, grade: string|null, entered_by: string|null, entered_at: string|null, corrected: bool, note: string|null, paper: list<array{id: string, document_id: string, position: int, type: string}>}>, stats: array{learners: int, marked: int, missing: int, absent: int, average: float|null, highest: float|null, lowest: float|null, below_half: int}, scale: array{id: string, name: string}|null, ladder: list<array{key: string, label: string, done: bool, current: bool, by: string|null, at: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>, reasons: list<array{value: string, label: string}>, can_enter: bool, can_submit: bool, submit_blocked: array{reason: string, remedy: string}|null, can_lock: bool, can_return: bool, lock_note: string|null, can_correct: bool, can_add_papers: bool}
+     */
+    public function removePaper(Request $request, string $id, PaperActions $papers): JsonResponse
+    {
+        $viewer = self::user($request);
+        $assessment = self::paperAssessment($id);
+        $papers->remove($viewer, $id);
+
+        return response()->json($this->sheets->sheet($viewer, $assessment));
+    }
+
+    private static function paperAssessment(string $id): string
+    {
+        $assessment = DB::table('assessment_papers')->where('id', $id)->value('assessment_id');
+
+        return is_string($assessment) ? $assessment : throw new NotFoundHttpException;
     }
 
     /**

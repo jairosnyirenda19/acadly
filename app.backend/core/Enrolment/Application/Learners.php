@@ -19,6 +19,7 @@ use Acadly\Kernel\Approvals\Approvals;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Module\ModuleActivation;
 use Acadly\Kernel\Notify\Messages;
+use Acadly\Kernel\Support\Phone;
 use Acadly\Kernel\Support\Row;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
@@ -38,6 +39,7 @@ final class Learners
         private readonly SchoolDirectory $school,
         private readonly LearnerPlaces $places,
         private readonly Contacts $contacts,
+        private readonly Families $families,
         private readonly Numbers $numbers,
         private readonly Duplicates $duplicates,
         private readonly Approvals $approvals,
@@ -108,6 +110,7 @@ final class Learners
         $siblings = $class === null ? [] : array_values(array_filter($this->calendar->classesInYear($class['year_id']),
             fn (array $c): bool => $c['id'] !== $class['id'] && $c['campus_id'] === $class['campus_id'] && $c['level_code'] === $class['level_code']
                 && $this->access->allows($viewer, EnrolmentPermission::Manage, ScopeRef::of(ScopeType::ClassGroup, $c['id']))));
+        $inPortal = $this->families->portalPhones($learner->id);
         $siblingCounts = $siblings === [] ? [] : DB::table('placements')->whereIn('class_id', array_column($siblings, 'id'))->whereNull('ends_on')
             ->groupBy('class_id')->selectRaw('class_id, count(*) as n')->pluck('n', 'class_id')->all();
 
@@ -132,7 +135,9 @@ final class Learners
             'campus' => $place !== null ? $this->school->campus($place['campus_id'])?->name : null,
             'class_teacher' => $teacher !== null ? self::userName($teacher) : null,
             'placements' => $this->placements($learner->id),
-            'contacts' => $this->contacts->of($learner->id),
+            // A contact who is also the contact of other learners: the family, found by phone (D-083).
+            'contacts' => array_map(fn (array $c): array => [...$c, 'also' => $this->families->alsoContactOf($viewer, $c['phone'], $learner->id),
+                'in_portal' => in_array(Phone::international($c['phone']), $inPortal, true)], $this->contacts->of($learner->id)),
             'activity' => $this->activity($learner->id),
             'possible_duplicate' => $this->duplicates->like($learner->first_name, $learner->surname, $learner->date_of_birth->toDateString(), $learner->id) !== null,
             'move_to' => array_map(fn (array $c): array => ['id' => $c['id'], 'name' => $c['name'], 'count' => is_numeric($siblingCounts[$c['id']] ?? null) ? (int) $siblingCounts[$c['id']] : 0], $siblings),

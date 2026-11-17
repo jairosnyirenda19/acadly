@@ -10,7 +10,10 @@ use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Blueprint\Engine\JourneyEngine;
 use Acadly\Kernel\Identity\Jobs\SendSignInCodeText;
 use Acadly\Kernel\Identity\User;
+use Acadly\Kernel\Notify\PortalLink;
 use Acadly\Kernel\Support\Ids;
+use Acadly\Modules\Assessment\Notifications\ResultsPublished;
+use Acadly\Modules\Attendance\Notifications\LearnerAbsent;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Auth;
@@ -216,5 +219,67 @@ describe('the office', function (): void {
         expect(EnrolmentPermission::Families->isSight())->toBeTrue()
             ->and(EnrolmentPermission::Families->help())->toStartWith('SEES EVERY FAMILY')
             ->and(Ids::isValid($this->alinafe))->toBeTrue();
+    });
+});
+
+describe('bringing families in', function (): void {
+    it('ends the results message with the portal address, and leaves absence messages as they are', function (): void {
+        config(['acadly.portal_url' => 'https://sunrise.acadly.mw/p/']);
+
+        $results = ResultsPublished::notice();
+        $absent = LearnerAbsent::notice();
+
+        expect(PortalLink::after($results, 'Ready.'))->toBe('Ready. See it on your phone: sunrise.acadly.mw/p')
+            ->and(PortalLink::after($absent, 'Absent.'))->toBe('Absent.')
+            ->and($this->actingAs($this->admin, 'web')->getJson('/api/v1/messages/notices/assessment.results_published')->assertOk()->json('portal_line'))
+            ->toBe('See it on your phone: sunrise.acadly.mw/p');
+
+        config(['acadly.portal_url' => '']);
+        expect(PortalLink::after($results, 'Ready.'))->toBe('Ready.');
+    });
+
+    it('invites a family once a week by one text message, and passes over a family already in the portal', function (): void {
+        config(['acadly.portal_url' => 'https://sunrise.acadly.mw/p']);
+
+        $answer = $this->actingAs($this->admin, 'web')->postJson('/api/v1/families/invite', ['phones' => ['0884 771 900', '0881 000 111', '0888 555 444']])->assertOk()->json();
+        $sms = DB::table('notification_deliveries')->where('topic_key', 'enrolment.portal_invitation')->where('channel', 'sms')->get();
+
+        expect($answer['invited'])->toBe(2)
+            ->and($sms)->toHaveCount(2)
+            ->and($sms->pluck('recipient_phone')->sort()->values()->all())->toBe(['+265881000111', '+265884771900'])
+            ->and((string) $sms->first()?->short)->toEndWith('See it on your phone: sunrise.acadly.mw/p')
+            ->and((string) $sms->first()?->short)->not->toContain('Alinafe');
+
+        $family = collect($answer['families']['families'])->firstWhere('phone', '0884 771 900');
+        expect($family['portal']['invited_at'])->not->toBeNull()
+            ->and($family['portal']['may_invite'])->toBeFalse();
+
+        expect($this->actingAs($this->admin, 'web')->postJson('/api/v1/families/invite', ['phones' => ['0884 771 900']])->json('invited'))->toBe(0);
+
+        $this->travel(8)->days();
+        parentSignsIn($this);
+        expect($this->actingAs($this->admin)->postJson('/api/v1/families/invite', ['phones' => ['0884 771 900', '0881 000 111']])->assertOk()->json('invited'))->toBe(1);
+    });
+
+    it('refuses invitations from someone who does not keep families', function (): void {
+        $this->actingAs(User::factory()->create(), 'web')->postJson('/api/v1/families/invite', ['phones' => ['0884 771 900']])->assertForbidden();
+        expect(DB::table('portal_invitations')->count())->toBe(0);
+    });
+
+    it('shows on a contact the other learners it is also the contact of', function (): void {
+        $contacts = $this->actingAs($this->admin, 'web')->getJson("/api/v1/learners/{$this->alinafe}")->assertOk()->json('contacts');
+        $mother = collect($contacts)->firstWhere('name', 'Alice Jere');
+        $father = collect($contacts)->firstWhere('name', 'Daniel Jere');
+
+        expect(collect($mother['also'])->pluck('name')->all())->toBe(['Chikondi Jere'])
+            ->and(collect($father['also'])->pluck('name')->sort()->values()->all())->toBe(['Chikondi Jere', 'Wezi Jere'])
+            ->and($mother['in_portal'])->toBeFalse();
+
+        $parent = parentSignsIn($this);
+        $this->actingAs($parent)->postJson('/api/v1/portal/family/confirm', ['mine' => [$this->alinafe, $this->chikondi], 'not_mine' => []])->assertOk();
+        $after = $this->actingAs($this->admin)->getJson("/api/v1/learners/{$this->alinafe}")->json('contacts');
+
+        expect(collect($after)->firstWhere('name', 'Alice Jere')['in_portal'])->toBeTrue()
+            ->and(collect($after)->firstWhere('name', 'Daniel Jere')['in_portal'])->toBeFalse();
     });
 });

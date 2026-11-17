@@ -16,6 +16,19 @@ const familiesApi = {
   all: () => read(api.GET('/v1/families')),
   link: (id: string, action: string, reason: string) =>
     settle(api.POST('/v1/families/links/{id}', { params: { path: { id } }, body: { action, reason } as never }) as Promise<{ data?: FamiliesState; error?: unknown; response: Response }>),
+  invite: (phones: string[]) =>
+    settle(api.POST('/v1/families/invite', { body: { phones } as never }) as Promise<{ data?: { invited: number; families: FamiliesState }; error?: unknown; response: Response }>),
+}
+
+/** Sends invitations, then shows how many went and the families as they are now. */
+async function sendInvites(phones: string[], onChanged: (next: FamiliesState) => void): Promise<void> {
+  const r = await familiesApi.invite(phones)
+
+  if (r.kind === 'saved') {
+    forgetLoads()
+    slips.done({ word: copy.slips.saved, title: r.data.invited > 0 ? t.invitedDone(r.data.invited) : t.inviteNone })
+    onChanged(r.data.families)
+  } else slips.wrong({ word: copy.settings.failed, title: t.inviteNone })
 }
 
 /** What the office may do with a link in each state. */
@@ -35,6 +48,7 @@ export function FamiliesScreen() {
   const loaded = useLoad('families', () => familiesApi.all())
   const [filter, setFilter] = useState<'all' | 'check'>('all')
   const [find, setFind] = useState('')
+  const [inviting, setInviting] = useState<'closed' | 'asking' | 'sending'>('closed')
   const data = loaded.data
 
   if (data === undefined) {
@@ -59,9 +73,12 @@ export function FamiliesScreen() {
         title={t.title}
         intro={t.intro}
         actions={
-          <Button variant="secondary" onClick={() => navigate('/learners')}>
-            {t.back}
-          </Button>
+          <>
+            <Button variant="secondary" onClick={() => navigate('/learners')}>
+              {t.back}
+            </Button>
+            {data.totals.invitable > 0 && inviting === 'closed' && <Button onClick={() => setInviting('asking')}>{t.inviteAll(data.totals.invitable)}</Button>}
+          </>
         }
       />
       <TotalsBand compact>
@@ -70,6 +87,28 @@ export function FamiliesScreen() {
         <Total compact tone={data.totals.to_check > 0 ? 'attention' : 'ink'} label={t.bandCheck} value={String(data.totals.to_check)} note={t.bandCheckNote} />
       </TotalsBand>
       <section aria-label={t.title} className="flex-1 bg-sheet px-4 pt-4 pb-8 md:px-[clamp(16px,3vw,40px)]">
+        {inviting !== 'closed' && (
+          <div className="mb-4 grid max-w-[640px] gap-2.5 border-l-[6px] border-marigold bg-marigold-wash px-3.5 py-3 text-sm">
+            <span>{t.inviteConfirm(data.totals.invitable)}</span>
+            <span className="flex flex-wrap gap-2">
+              <Button
+                busy={inviting === 'sending'}
+                onClick={() => {
+                  setInviting('sending')
+                  void sendInvites(
+                    data.families.filter((f) => f.portal.may_invite && f.phone !== null).map((f) => f.phone ?? ''),
+                    loaded.set,
+                  ).finally(() => setInviting('closed'))
+                }}
+              >
+                {t.inviteSend}
+              </Button>
+              <Button variant="secondary" disabled={inviting === 'sending'} onClick={() => setInviting('closed')}>
+                {t.cancel}
+              </Button>
+            </span>
+          </div>
+        )}
         <div className="mb-3 flex flex-wrap items-end gap-3">
           <div role="group" aria-label={t.title} className="flex border-2 border-ink text-sm font-extrabold">
             {(
@@ -131,14 +170,33 @@ function FamilyRow({ family, onChanged }: { family: Family; onChanged: (next: Fa
           </span>
         ))}
       </span>
-      <span className="text-sm">
+      <span className="grid content-start justify-items-start gap-1.5 text-sm">
         {family.portal.signed_in && family.portal.last_signed_in_at !== null ? (
           <Tag tone="done">✓ {t.signedIn(day(family.portal.last_signed_in_at))}</Tag>
+        ) : family.portal.invited_at !== null ? (
+          <span>{t.invited(day(family.portal.invited_at))}</span>
         ) : (
           <span className="text-text-muted">{t.notSignedIn}</span>
         )}
+        {family.portal.may_invite && family.phone !== null && <InviteOne phone={family.phone} onChanged={onChanged} />}
       </span>
     </li>
+  )
+}
+
+function InviteOne({ phone, onChanged }: { phone: string; onChanged: (next: FamiliesState) => void }) {
+  const [busy, setBusy] = useState(false)
+
+  return (
+    <SmallButton
+      disabled={busy}
+      onClick={() => {
+        setBusy(true)
+        void sendInvites([phone], onChanged).finally(() => setBusy(false))
+      }}
+    >
+      {t.invite}
+    </SmallButton>
   )
 }
 

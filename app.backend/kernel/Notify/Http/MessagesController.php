@@ -92,7 +92,7 @@ final class MessagesController
     /**
      * One notice: the declared words, the school's own, and what it may use.
      *
-     * @response array{key: string, name: string, audience: 'contacts'|'staff', channels: list<string>, enabled: bool, can_switch_off: bool, contacts: 'main'|'every'|null, facts: list<string>, examples: array<string, string|null>, declared: array{subject: string, lines: list<string>, short: string|null}, own: array{subject: string|null, lines: list<string>|null, short: string|null}|null, budget: int, short_length: array{characters: int, units: int, unicode: bool}|null}
+     * @response array{key: string, name: string, audience: 'contacts'|'staff', channels: list<string>, enabled: bool, can_switch_off: bool, contacts: 'main'|'every'|null, facts: list<string>, examples: array<string, string|null>, declared: array{subject: string, lines: list<string>, short: string|null}, own: array{subject: string|null, lines: list<string>|null, short: string|null}|null, budget: int, short_length: array{characters: int, units: int, unicode: bool}|null, portal_line: string|null}
      */
     public function notice(Request $request, string $key): JsonResponse
     {

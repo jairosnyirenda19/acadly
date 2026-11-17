@@ -66,6 +66,9 @@ return [
     */
     'frontend_url' => env('ACADLY_FRONTEND_URL', 'http://localhost:5173'),
 
+    // The parent portal's address, as families type it. Text messages that open the portal end with it (D-083).
+    'portal_url' => env('ACADLY_PORTAL_URL', 'http://localhost:5174'),
+
     /*
     | Compiled blueprints and the lock of released versions (02 §1). Made by
     | blueprint:compile and blueprint:release; read by the journey engine.

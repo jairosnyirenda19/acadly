@@ -113,7 +113,8 @@ function Form({ notice, onSaved }: { notice: NoticeState; onSaved: (next: Notice
   const sms = notice.channels.includes('sms')
   const email = notice.channels.includes('email') || notice.channels.includes('in_app')
   const examples = notice.examples as Record<string, string | null>
-  const length = smsLength(fill(short, examples))
+  const portalLine = notice.portal_line
+  const length = smsLength(`${fill(short, examples).trimEnd()}${portalLine !== null ? ` ${portalLine}` : ''}`)
 
   const run = async (request: Promise<Saved<NoticeState>>, title: string) => {
     setWorking(true)
@@ -201,6 +202,11 @@ function Form({ notice, onSaved }: { notice: NoticeState; onSaved: (next: Notice
               <span className={`text-sm font-extrabold ${length.units > 1 ? 'text-red-text' : ''}`}>{t.smsCount(length.characters, length.unicode ? 70 : notice.budget, length.units)}</span>
               <span className="text-[13px] text-text-muted">{t.smsCountNote}</span>
             </div>
+            {portalLine !== null && (
+              <p className="mt-2 text-[13px]">
+                <strong>{t.portalLine}</strong> “{portalLine}”
+              </p>
+            )}
             <div className="mt-3 flex flex-wrap items-center gap-1.5" aria-label={t.facts}>
               <span className="label-caps mr-1 text-text-muted">{t.facts}</span>
               {notice.facts.map((f) => (

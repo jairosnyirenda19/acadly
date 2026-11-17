@@ -62,6 +62,8 @@ final class Notice
 
     private bool $startsOff = false;
 
+    private bool $portal = false;
+
     /** @var list<Channel> */
     private array $fallback = [];
 
@@ -115,6 +117,24 @@ final class Notice
         $this->short = $short;
 
         return $this;
+    }
+
+    /**
+     * The SMS ends with the parent portal's address (`PortalLink`), added
+     * after the words, so a school's own wording keeps it. Use it where the
+     * portal shows what the message is about: a link adds to the cost of
+     * every message.
+     */
+    public function portalLink(): self
+    {
+        $this->portal = true;
+
+        return $this;
+    }
+
+    public function opensPortal(): bool
+    {
+        return $this->portal;
     }
 
     /**

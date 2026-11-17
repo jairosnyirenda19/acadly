@@ -5,18 +5,23 @@ declare(strict_types=1);
 namespace Acadly\Core\Enrolment\Application;
 
 use Acadly\Core\Academics\Contracts\AcademicCalendar;
+use Acadly\Core\Enrolment\Application\Actions\FamilyActions;
 use Acadly\Core\Enrolment\Contracts\EnrolmentPermission;
 use Acadly\Core\Enrolment\Contracts\FamilyLine;
 use Acadly\Core\Enrolment\Contracts\Guardianship;
 use Acadly\Core\Enrolment\Contracts\Relationship;
 use Acadly\Core\Enrolment\Journeys\GuardianLink\State;
 use Acadly\Kernel\Access\Access;
+use Acadly\Kernel\Access\ScopeRef;
+use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Identity\PhoneHolders;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\School\SchoolProfile;
+use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Kernel\Support\Phone;
 use Acadly\Kernel\Support\Row;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Facades\DB;
 
@@ -38,6 +43,7 @@ final class Families implements Guardianship, PhoneHolders
         private readonly LearnerPlaces $places,
         private readonly Access $access,
         private readonly SchoolProfile $school,
+        private readonly Clock $clock,
         private readonly iterable $lines = [],
     ) {}
 
@@ -140,9 +146,56 @@ final class Families implements Guardianship, PhoneHolders
     }
 
     /**
+     * The other learners at the school whose contacts share this phone
+     * number, as the learner record shows them ("Also the contact of").
+     * Only learners the viewer may see are named.
+     *
+     * @return list<array{id: string, name: string, class: string}>
+     */
+    public function alsoContactOf(User $viewer, string $phoneWritten, string $exceptLearner): array
+    {
+        $phone = Phone::international($phoneWritten);
+
+        if ($phone === null) {
+            return [];
+        }
+
+        $out = [];
+
+        foreach ($this->contactsInForce() as $c) {
+            if ($c['phone'] !== $phone || $c['learner_id'] === $exceptLearner || isset($out[$c['learner_id']])) {
+                continue;
+            }
+
+            $place = $this->places->current($c['learner_id']);
+            $classId = $place !== null && $place['open'] ? $place['class_id'] : null;
+
+            if ($classId === null || ! $this->access->allows($viewer, EnrolmentPermission::View, ScopeRef::of(ScopeType::ClassGroup, $classId))) {
+                continue;
+            }
+
+            $out[$c['learner_id']] = ['id' => $c['learner_id'], 'name' => $c['learner'], 'class' => $this->className($classId)];
+        }
+
+        return array_values($out);
+    }
+
+    /**
+     * The phone numbers, in the international form, of the parents who see
+     * this learner in the portal now (an active link).
+     *
+     * @return list<string>
+     */
+    public function portalPhones(string $learnerId): array
+    {
+        return array_values(array_filter(DB::table('learner_guardian_relationships as r')->join('guardians as g', 'g.id', '=', 'r.guardian_id')
+            ->where('r.learner_id', $learnerId)->where('r.state', State::Active->value)->pluck('g.phone')->all(), 'is_string'));
+    }
+
+    /**
      * Every family, by phone number, for the office (Learners › Families).
      *
-     * @return array{families: list<array<string, mixed>>, totals: array{families: int, in_portal: int, to_check: int}}
+     * @return array{families: list<array<string, mixed>>, totals: array{families: int, in_portal: int, to_check: int, invitable: int}}
      */
     public function forOffice(User $by): array
     {
@@ -180,6 +233,9 @@ final class Families implements Guardianship, PhoneHolders
         }
 
         $classNames = $this->calendar->classNames(array_values(array_unique($classIds)));
+        $invitedAt = DB::table('portal_invitations')->groupBy('phone')->selectRaw('phone, max(invited_at) as at')->pluck('at', 'phone')->all();
+        $againAfter = $this->clock->now()->subDays(FamilyActions::INVITE_AGAIN_DAYS);
+        $invitable = 0;
         $families = [];
         $inPortal = 0;
         $toCheck = 0;
@@ -220,14 +276,17 @@ final class Families implements Guardianship, PhoneHolders
             }
 
             $signedIn = $guardian !== null ? Row::maybeText($guardian, 'last_signed_in_at') : null;
+            $invited = is_string($invitedAt[$phone] ?? null) ? $invitedAt[$phone] : null;
+            $mayInvite = $signedIn === null && ($invited === null || CarbonImmutable::parse($invited)->lessThan($againAfter));
             $inPortal += $signedIn !== null ? 1 : 0;
+            $invitable += $mayInvite ? 1 : 0;
             $toCheck += $checks !== [] ? 1 : 0;
 
             $families[] = [
                 'phone' => Phone::forPeople($phone),
                 'names' => array_values($names),
                 'children' => array_values($children),
-                'portal' => ['signed_in' => $signedIn !== null, 'last_signed_in_at' => $signedIn],
+                'portal' => ['signed_in' => $signedIn !== null, 'last_signed_in_at' => $signedIn, 'invited_at' => $invited, 'may_invite' => $mayInvite],
                 'checks' => $checks,
             ];
         }
@@ -235,7 +294,7 @@ final class Families implements Guardianship, PhoneHolders
         usort($families, fn (array $a, array $b): int => [$b['checks'] !== [], count($b['children']), $a['names'][0]]
             <=> [$a['checks'] !== [], count($a['children']), $b['names'][0]]);
 
-        return ['families' => $families, 'totals' => ['families' => count($families), 'in_portal' => $inPortal, 'to_check' => $toCheck]];
+        return ['families' => $families, 'totals' => ['families' => count($families), 'in_portal' => $inPortal, 'to_check' => $toCheck, 'invitable' => $invitable]];
     }
 
     /**

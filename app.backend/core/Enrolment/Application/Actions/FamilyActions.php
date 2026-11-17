@@ -6,16 +6,21 @@ namespace Acadly\Core\Enrolment\Application\Actions;
 
 use Acadly\Core\Enrolment\Application\Families;
 use Acadly\Core\Enrolment\Contracts\EnrolmentAudit;
+use Acadly\Core\Enrolment\Contracts\EnrolmentPermission;
 use Acadly\Core\Enrolment\Domain\GuardianLink;
 use Acadly\Core\Enrolment\Journeys\GuardianLink\OutcomeId;
 use Acadly\Core\Enrolment\Journeys\GuardianLink\State;
 use Acadly\Core\Enrolment\Journeys\GuardianLink\StepId;
+use Acadly\Core\Enrolment\Notifications\PortalInvitation;
+use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Blueprint\Blueprints;
 use Acadly\Kernel\Blueprint\Engine\JourneyEngine;
 use Acadly\Kernel\Identity\User;
+use Acadly\Kernel\Notify\Notifier;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
+use Acadly\Kernel\Support\Phone;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -35,12 +40,17 @@ final class FamilyActions
         'revoke' => [StepId::Revoke, OutcomeId::Revoked],
     ];
 
+    /** A family invited this many days ago or less is not invited again. */
+    public const int INVITE_AGAIN_DAYS = 7;
+
     public function __construct(
         private readonly Families $families,
         private readonly JourneyEngine $engine,
         private readonly Blueprints $blueprints,
         private readonly Audit $audit,
         private readonly Clock $clock,
+        private readonly Access $access,
+        private readonly Notifier $notifier,
     ) {}
 
     /**
@@ -101,6 +111,43 @@ final class FamilyActions
         $this->engine->perform($link, $by, $step, $outcome, ['reason' => trim($reason)]);
 
         return $link;
+    }
+
+    /**
+     * Invites families to the parent portal by text message (D-083). A number
+     * already in the portal, invited in the last week, or no longer a contact
+     * is passed over. Answers how many were invited.
+     *
+     * @param  list<string>  $phones  as written; read in the international form
+     */
+    public function invite(User $by, array $phones): int
+    {
+        $this->access->check($by, EnrolmentPermission::Families);
+
+        $now = $this->clock->now();
+        $wanted = array_values(array_unique(array_filter(array_map(Phone::international(...), $phones))));
+        $inPortal = DB::table('users')->whereIn('phone', $wanted ?: ['-'])->whereNotNull('last_signed_in_at')->pluck('phone')->all();
+        $recent = DB::table('portal_invitations')->whereIn('phone', $wanted ?: ['-'])->where('invited_at', '>', $now->subDays(self::INVITE_AGAIN_DAYS))->pluck('phone')->all();
+        $invited = 0;
+
+        DB::transaction(function () use ($by, $wanted, $inPortal, $recent, $now, &$invited): void {
+            foreach ($wanted as $phone) {
+                if (in_array($phone, $inPortal, true) || in_array($phone, $recent, true) || $this->families->nameFor($phone) === null) {
+                    continue;
+                }
+
+                $id = Ids::next();
+                DB::table('portal_invitations')->insert(['id' => $id, 'phone' => $phone, 'invited_by' => $by->id, 'invited_at' => $now]);
+                $this->notifier->send(new PortalInvitation($id, $phone), $by);
+                $invited++;
+            }
+
+            if ($invited > 0) {
+                $this->audit->record(EnrolmentAudit::FamiliesInvited, actor: $this->audit->actorFor($by), meta: ['families' => $invited]);
+            }
+        });
+
+        return $invited;
     }
 
     /** The role record of this parent; made at the first answer. */

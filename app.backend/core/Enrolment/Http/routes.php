@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/families', [FamiliesController::class, 'index'])->name('families.index');
+    Route::post('/families/invite', [FamiliesController::class, 'invite'])->middleware('throttle:10,1')->name('families.invite');
     Route::post('/families/links/{id}', [FamiliesController::class, 'link'])->whereUuid('id')->name('families.link');
 
     // The parent portal: a parent's own family. No permission: a person reads their own record.

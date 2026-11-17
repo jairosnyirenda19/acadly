@@ -81,7 +81,7 @@ final class FamiliesController
      * Learners grouped by contact phone number, which children each parent
      * sees in the portal, and what needs checking.
      *
-     * @response array{families: list<array{phone: string|null, names: list<string>, children: list<array{id: string, name: string, class: string, relationship: string, link: array{id: string, state: string, label: string}|null}>, portal: array{signed_in: bool, last_signed_in_at: string|null}, checks: list<array{kind: 'not_their_child'|'names_differ', learner: string|null}>}>, totals: array{families: int, in_portal: int, to_check: int}}
+     * @response array{families: list<array{phone: string|null, names: list<string>, children: list<array{id: string, name: string, class: string, relationship: string, link: array{id: string, state: string, label: string}|null}>, portal: array{signed_in: bool, last_signed_in_at: string|null, invited_at: string|null, may_invite: bool}, checks: list<array{kind: 'not_their_child'|'names_differ', learner: string|null}>}>, totals: array{families: int, in_portal: int, to_check: int, invitable: int}}
      */
     public function index(Request $request): JsonResponse
     {
@@ -94,7 +94,7 @@ final class FamiliesController
      * `{action: suspend|reinstate|recheck|revoke, reason}`. The answer is
      * every family as it is now.
      *
-     * @response array{families: list<array{phone: string|null, names: list<string>, children: list<array{id: string, name: string, class: string, relationship: string, link: array{id: string, state: string, label: string}|null}>, portal: array{signed_in: bool, last_signed_in_at: string|null}, checks: list<array{kind: 'not_their_child'|'names_differ', learner: string|null}>}>, totals: array{families: int, in_portal: int, to_check: int}}
+     * @response array{families: list<array{phone: string|null, names: list<string>, children: list<array{id: string, name: string, class: string, relationship: string, link: array{id: string, state: string, label: string}|null}>, portal: array{signed_in: bool, last_signed_in_at: string|null, invited_at: string|null, may_invite: bool}, checks: list<array{kind: 'not_their_child'|'names_differ', learner: string|null}>}>, totals: array{families: int, in_portal: int, to_check: int, invitable: int}}
      */
     public function link(Request $request, string $id, Access $access): JsonResponse
     {
@@ -110,6 +110,30 @@ final class FamiliesController
         $this->actions->office($by, $id, $request->string('action')->toString(), $request->string('reason')->toString());
 
         return response()->json(app(Families::class)->forOffice($by));
+    }
+
+    /**
+     * Invite families to the portal.
+     *
+     * `{phones: [...]}`: one text message to each number not yet in the
+     * portal and not invited in the last week. The answer is how many were
+     * invited, and every family as it is now.
+     *
+     * @response array{invited: int, families: array{families: list<array{phone: string|null, names: list<string>, children: list<array{id: string, name: string, class: string, relationship: string, link: array{id: string, state: string, label: string}|null}>, portal: array{signed_in: bool, last_signed_in_at: string|null, invited_at: string|null, may_invite: bool}, checks: list<array{kind: 'not_their_child'|'names_differ', learner: string|null}>}>, totals: array{families: int, in_portal: int, to_check: int, invitable: int}}}
+     */
+    public function invite(Request $request, Access $access): JsonResponse
+    {
+        $by = self::user($request);
+        $access->check($by, EnrolmentPermission::Families);
+
+        $request->validate([
+            'phones' => ['required', 'array', 'min:1', 'max:2000'],
+            'phones.*' => ['string', 'max:30'],
+        ]);
+
+        $invited = $this->actions->invite($by, self::ids($request, 'phones'));
+
+        return response()->json(['invited' => $invited, 'families' => $this->families->forOffice($by)]);
     }
 
     /** @return list<string> */

@@ -1,4 +1,4 @@
-import { useLoad, useLocation } from '@acadly/kernel'
+import { navigate, useLoad, useLocation } from '@acadly/kernel'
 import { Button, Notice, slips, Waiting } from '@acadly/ui'
 import { useEffect, useState, type ReactNode } from 'react'
 import { copy } from '../copy'
@@ -545,13 +545,27 @@ function ContactLine({
         </span>
       </div>
       <div className="ref mt-0.5 text-[13px] break-all">{[contact.phone, contact.email].filter(Boolean).join(' · ')}</div>
+      {contact.also.length > 0 && (
+        <div className="mt-1 text-[13px]">
+          <span className="text-text-muted">{t.alsoContactOf}: </span>
+          {contact.also.map((a, i) => (
+            <span key={a.id}>
+              {i > 0 && ', '}
+              <a href={`/learners/${a.id}`} onClick={(e) => (e.preventDefault(), navigate(`/learners/${a.id}`))} className="font-extrabold text-ink">
+                {a.name}
+              </a>
+              {a.class !== '' && `, ${a.class}`}
+            </span>
+          ))}
+        </div>
+      )}
       {contact.main && (
         <a href={`tel:${contact.phone.replace(/\s+/g, '')}`} className="mt-2 inline-flex h-11 items-center bg-teal px-4 text-[15px] font-extrabold text-sheet no-underline hover:bg-ink md:hidden">
           {t.record.call(contact.phone)}
         </a>
       )}
       <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-        <Tag tone="plain">{t.contactOnly}</Tag>
+        {contact.in_portal ? <Tag tone="done">✓ {t.inPortal}</Tag> : <Tag tone="plain">{t.contactOnly}</Tag>}
         <Tag tone="plain">{t.noticesTag(contact.notices_by)}</Tag>
         {told !== undefined && <span className="text-[13px] text-text-muted">{told}</span>}
         {record.can_manage && (contact.notices_by === 'email' || contact.email !== null) && (

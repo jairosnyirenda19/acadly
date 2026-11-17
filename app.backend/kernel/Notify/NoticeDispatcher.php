@@ -526,7 +526,7 @@ final class NoticeDispatcher
         return [
             'subject' => Words::fill($templates['subject'], $tokens),
             'body' => implode("\n\n", array_map(fn (string $line): string => Words::fill($line, $tokens), $templates['lines'])),
-            'short' => $templates['short'] !== null ? Words::fill($templates['short'], $tokens) : null,
+            'short' => $templates['short'] !== null ? PortalLink::after($notice, Words::fill($templates['short'], $tokens)) : null,
             'action_url' => $notice->actionPath() !== null
                 ? rtrim(config()->string('acadly.frontend_url'), '/').Words::fill($notice->actionPath(), $tokens)
                 : null,

@@ -18,6 +18,7 @@ enum EnrolmentAudit: string implements AuditAction
     case PhotoReplaced = 'enrolment.photo_replaced';
     case LearnersImported = 'enrolment.learners_imported';
     case ParentLinkAsked = 'enrolment.parent_link_asked';
+    case FamiliesInvited = 'enrolment.families_invited';
 
     public function key(): string
     {
@@ -37,6 +38,7 @@ enum EnrolmentAudit: string implements AuditAction
             self::PhotoReplaced => 'Set the photo of a learner.',
             self::LearnersImported => 'Admitted learners from a spreadsheet.',
             self::ParentLinkAsked => 'Was asked by the parent portal to confirm a child.',
+            self::FamiliesInvited => 'Invited families to the parent portal by text message.',
         };
     }
 

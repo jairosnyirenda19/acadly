@@ -38,7 +38,8 @@ final readonly class ResultsPublished implements AboutLearner, Topic
             ->subject(':period results for :learner')
             ->line('The :period results and report card of :learner, :class, are ready.')
             ->line('Ask the school for the report card, or call :school_phone.')
-            ->short(':institution: the :period results and report card of :learner, :class, are ready. Ask the school for the report card.')
+            ->short(':institution: the :period results and report card of :learner, :class, are ready.')
+            ->portalLink()
             ->toParty(LearnerContacts::class)
             ->channels(default: [Channel::Sms], allowed: [Channel::Sms, Channel::Email]);
     }

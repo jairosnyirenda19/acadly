@@ -8,6 +8,7 @@ use Acadly\Core\Academics\AcademicsCore;
 use Acadly\Core\Enrolment\Contracts\EnrolmentAudit;
 use Acadly\Core\Enrolment\Contracts\EnrolmentDocument;
 use Acadly\Core\Enrolment\Contracts\EnrolmentPermission;
+use Acadly\Core\Enrolment\Notifications\PortalInvitation;
 use Acadly\Core\Institution\InstitutionCore;
 use Acadly\Kernel\Module\Module;
 use Acadly\Kernel\Module\Tier;
@@ -71,7 +72,7 @@ final class EnrolmentCore implements Module
 
     public function topics(): array
     {
-        return [];
+        return [PortalInvitation::class];
     }
 
     public function documentKinds(): array

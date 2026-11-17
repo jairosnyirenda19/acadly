@@ -548,6 +548,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/families/invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Invite families to the portal
+         * @description `{phones: [...]}`: one text message to each number not yet in the
+         *     portal and not invited in the last week. The answer is how many were
+         *     invited, and every family as it is now.
+         */
+        post: operations["families.invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/families/links/{id}": {
         parameters: {
             query?: never;
@@ -4946,6 +4968,8 @@ export interface operations {
                             portal: {
                                 signed_in: boolean;
                                 last_signed_in_at: string | null;
+                                invited_at: string | null;
+                                may_invite: boolean;
                             };
                             checks: {
                                 /** @enum {string} */
@@ -4957,11 +4981,76 @@ export interface operations {
                             families: number;
                             in_portal: number;
                             to_check: number;
+                            invitable: number;
                         };
                     };
                 };
             };
             401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "families.invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    phones: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        invited: number;
+                        families: {
+                            families: {
+                                phone: string | null;
+                                names: string[];
+                                children: {
+                                    id: string;
+                                    name: string;
+                                    class: string;
+                                    relationship: string;
+                                    link: {
+                                        id: string;
+                                        state: string;
+                                        label: string;
+                                    } | null;
+                                }[];
+                                portal: {
+                                    signed_in: boolean;
+                                    last_signed_in_at: string | null;
+                                    invited_at: string | null;
+                                    may_invite: boolean;
+                                };
+                                checks: {
+                                    /** @enum {string} */
+                                    kind: "not_their_child" | "names_differ";
+                                    learner: string | null;
+                                }[];
+                            }[];
+                            totals: {
+                                families: number;
+                                in_portal: number;
+                                to_check: number;
+                                invitable: number;
+                            };
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "families.link": {
@@ -5006,6 +5095,8 @@ export interface operations {
                             portal: {
                                 signed_in: boolean;
                                 last_signed_in_at: string | null;
+                                invited_at: string | null;
+                                may_invite: boolean;
                             };
                             checks: {
                                 /** @enum {string} */
@@ -5017,6 +5108,7 @@ export interface operations {
                             families: number;
                             in_portal: number;
                             to_check: number;
+                            invitable: number;
                         };
                     };
                 };
@@ -6237,6 +6329,12 @@ export interface operations {
                             email: string | null;
                             notices_by: string;
                             main: boolean;
+                            also: {
+                                id: string;
+                                name: string;
+                                class: string;
+                            }[];
+                            in_portal: boolean;
                         }[];
                         activity: {
                             at: string;
@@ -6333,6 +6431,7 @@ export interface operations {
                         campus: string | null;
                         class_teacher: string | null;
                         placements: unknown[];
+                        /** @description A contact who is also the contact of other learners: the family, found by phone (D-083). */
                         contacts: unknown[];
                         activity: unknown[];
                         possible_duplicate: boolean;
@@ -6440,6 +6539,7 @@ export interface operations {
                         campus: string | null;
                         class_teacher: string | null;
                         placements: unknown[];
+                        /** @description A contact who is also the contact of other learners: the family, found by phone (D-083). */
                         contacts: unknown[];
                         activity: unknown[];
                         possible_duplicate: boolean;
@@ -6517,6 +6617,7 @@ export interface operations {
                         campus: string | null;
                         class_teacher: string | null;
                         placements: unknown[];
+                        /** @description A contact who is also the contact of other learners: the family, found by phone (D-083). */
                         contacts: unknown[];
                         activity: unknown[];
                         possible_duplicate: boolean;
@@ -6588,6 +6689,7 @@ export interface operations {
                         campus: string | null;
                         class_teacher: string | null;
                         placements: unknown[];
+                        /** @description A contact who is also the contact of other learners: the family, found by phone (D-083). */
                         contacts: unknown[];
                         activity: unknown[];
                         possible_duplicate: boolean;
@@ -6659,6 +6761,7 @@ export interface operations {
                         campus: string | null;
                         class_teacher: string | null;
                         placements: unknown[];
+                        /** @description A contact who is also the contact of other learners: the family, found by phone (D-083). */
                         contacts: unknown[];
                         activity: unknown[];
                         possible_duplicate: boolean;
@@ -6730,6 +6833,7 @@ export interface operations {
                         campus: string | null;
                         class_teacher: string | null;
                         placements: unknown[];
+                        /** @description A contact who is also the contact of other learners: the family, found by phone (D-083). */
                         contacts: unknown[];
                         activity: unknown[];
                         possible_duplicate: boolean;
@@ -6823,6 +6927,7 @@ export interface operations {
                         campus: string | null;
                         class_teacher: string | null;
                         placements: unknown[];
+                        /** @description A contact who is also the contact of other learners: the family, found by phone (D-083). */
                         contacts: unknown[];
                         activity: unknown[];
                         possible_duplicate: boolean;
@@ -7928,6 +8033,7 @@ export interface operations {
                             units: number;
                             unicode: boolean;
                         } | null;
+                        portal_line: string | null;
                     };
                 };
             };
@@ -8004,6 +8110,7 @@ export interface operations {
                             units: number;
                             unicode: boolean;
                         } | null;
+                        portal_line: string | null;
                     } | Record<string, never>;
                 };
             };
@@ -8069,6 +8176,7 @@ export interface operations {
                             units: number;
                             unicode: boolean;
                         } | null;
+                        portal_line: string | null;
                     } | Record<string, never>;
                 };
             };

@@ -145,7 +145,8 @@ final class Messages
             'declared' => ['subject' => $notice->subjectText(), 'lines' => $notice->lines(), 'short' => $notice->shortText()],
             'own' => $own,
             'budget' => Notice::SHORT_BUDGET,
-            'short_length' => $short !== null ? SmsLength::of(Words::fill($short, $examples)) : null,
+            'short_length' => $short !== null ? SmsLength::of(PortalLink::after($notice, Words::fill($short, $examples))) : null,
+            'portal_line' => $notice->opensPortal() ? PortalLink::sentence() : null,
         ];
     }
 

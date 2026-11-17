@@ -8363,11 +8363,22 @@
                                                                     "string",
                                                                     "null"
                                                                 ]
+                                                            },
+                                                            "invited_at": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "may_invite": {
+                                                                "type": "boolean"
                                                             }
                                                         },
                                                         "required": [
                                                             "signed_in",
-                                                            "last_signed_in_at"
+                                                            "last_signed_in_at",
+                                                            "invited_at",
+                                                            "may_invite"
                                                         ]
                                                     },
                                                     "checks": {
@@ -8416,12 +8427,16 @@
                                                 },
                                                 "to_check": {
                                                     "type": "integer"
+                                                },
+                                                "invitable": {
+                                                    "type": "integer"
                                                 }
                                             },
                                             "required": [
                                                 "families",
                                                 "in_portal",
-                                                "to_check"
+                                                "to_check",
+                                                "invitable"
                                             ]
                                         }
                                     },
@@ -8432,6 +8447,232 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/families/invite": {
+            "post": {
+                "operationId": "families.invite",
+                "description": "`{phones: [...]}`: one text message to each number not yet in the\nportal and not invited in the last week. The answer is how many were\ninvited, and every family as it is now.",
+                "summary": "Invite families to the portal",
+                "tags": [
+                    "Families"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "phones": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "maxLength": 30
+                                        },
+                                        "minItems": 1,
+                                        "maxItems": 2000
+                                    }
+                                },
+                                "required": [
+                                    "phones"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "invited": {
+                                            "type": "integer"
+                                        },
+                                        "families": {
+                                            "type": "object",
+                                            "properties": {
+                                                "families": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "phone": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "names": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "children": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "name": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "class": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "relationship": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "link": {
+                                                                            "type": [
+                                                                                "object",
+                                                                                "null"
+                                                                            ],
+                                                                            "properties": {
+                                                                                "id": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "state": {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                "label": {
+                                                                                    "type": "string"
+                                                                                }
+                                                                            },
+                                                                            "required": [
+                                                                                "id",
+                                                                                "state",
+                                                                                "label"
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "id",
+                                                                        "name",
+                                                                        "class",
+                                                                        "relationship",
+                                                                        "link"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "portal": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "signed_in": {
+                                                                        "type": "boolean"
+                                                                    },
+                                                                    "last_signed_in_at": {
+                                                                        "type": [
+                                                                            "string",
+                                                                            "null"
+                                                                        ]
+                                                                    },
+                                                                    "invited_at": {
+                                                                        "type": [
+                                                                            "string",
+                                                                            "null"
+                                                                        ]
+                                                                    },
+                                                                    "may_invite": {
+                                                                        "type": "boolean"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "signed_in",
+                                                                    "last_signed_in_at",
+                                                                    "invited_at",
+                                                                    "may_invite"
+                                                                ]
+                                                            },
+                                                            "checks": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "kind": {
+                                                                            "type": "string",
+                                                                            "enum": [
+                                                                                "not_their_child",
+                                                                                "names_differ"
+                                                                            ]
+                                                                        },
+                                                                        "learner": {
+                                                                            "type": [
+                                                                                "string",
+                                                                                "null"
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "kind",
+                                                                        "learner"
+                                                                    ]
+                                                                }
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "phone",
+                                                            "names",
+                                                            "children",
+                                                            "portal",
+                                                            "checks"
+                                                        ]
+                                                    }
+                                                },
+                                                "totals": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "families": {
+                                                            "type": "integer"
+                                                        },
+                                                        "in_portal": {
+                                                            "type": "integer"
+                                                        },
+                                                        "to_check": {
+                                                            "type": "integer"
+                                                        },
+                                                        "invitable": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "families",
+                                                        "in_portal",
+                                                        "to_check",
+                                                        "invitable"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "families",
+                                                "totals"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "invited",
+                                        "families"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -8571,11 +8812,22 @@
                                                                     "string",
                                                                     "null"
                                                                 ]
+                                                            },
+                                                            "invited_at": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "may_invite": {
+                                                                "type": "boolean"
                                                             }
                                                         },
                                                         "required": [
                                                             "signed_in",
-                                                            "last_signed_in_at"
+                                                            "last_signed_in_at",
+                                                            "invited_at",
+                                                            "may_invite"
                                                         ]
                                                     },
                                                     "checks": {
@@ -8624,12 +8876,16 @@
                                                 },
                                                 "to_check": {
                                                     "type": "integer"
+                                                },
+                                                "invitable": {
+                                                    "type": "integer"
                                                 }
                                             },
                                             "required": [
                                                 "families",
                                                 "in_portal",
-                                                "to_check"
+                                                "to_check",
+                                                "invitable"
                                             ]
                                         }
                                     },
@@ -12215,6 +12471,31 @@
                                                     },
                                                     "main": {
                                                         "type": "boolean"
+                                                    },
+                                                    "also": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                },
+                                                                "class": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name",
+                                                                "class"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "in_portal": {
+                                                        "type": "boolean"
                                                     }
                                                 },
                                                 "required": [
@@ -12225,7 +12506,9 @@
                                                     "phone",
                                                     "email",
                                                     "notices_by",
-                                                    "main"
+                                                    "main",
+                                                    "also",
+                                                    "in_portal"
                                                 ]
                                             }
                                         },
@@ -12608,6 +12891,7 @@
                                         },
                                         "contacts": {
                                             "type": "array",
+                                            "description": "A contact who is also the contact of other learners: the family, found by phone (D-083).",
                                             "items": {}
                                         },
                                         "activity": {
@@ -12968,6 +13252,7 @@
                                         },
                                         "contacts": {
                                             "type": "array",
+                                            "description": "A contact who is also the contact of other learners: the family, found by phone (D-083).",
                                             "items": {}
                                         },
                                         "activity": {
@@ -13234,6 +13519,7 @@
                                         },
                                         "contacts": {
                                             "type": "array",
+                                            "description": "A contact who is also the contact of other learners: the family, found by phone (D-083).",
                                             "items": {}
                                         },
                                         "activity": {
@@ -13493,6 +13779,7 @@
                                         },
                                         "contacts": {
                                             "type": "array",
+                                            "description": "A contact who is also the contact of other learners: the family, found by phone (D-083).",
                                             "items": {}
                                         },
                                         "activity": {
@@ -13752,6 +14039,7 @@
                                         },
                                         "contacts": {
                                             "type": "array",
+                                            "description": "A contact who is also the contact of other learners: the family, found by phone (D-083).",
                                             "items": {}
                                         },
                                         "activity": {
@@ -14011,6 +14299,7 @@
                                         },
                                         "contacts": {
                                             "type": "array",
+                                            "description": "A contact who is also the contact of other learners: the family, found by phone (D-083).",
                                             "items": {}
                                         },
                                         "activity": {
@@ -14262,6 +14551,7 @@
                                         },
                                         "contacts": {
                                             "type": "array",
+                                            "description": "A contact who is also the contact of other learners: the family, found by phone (D-083).",
                                             "items": {}
                                         },
                                         "activity": {
@@ -18113,6 +18403,12 @@
                                                 "units",
                                                 "unicode"
                                             ]
+                                        },
+                                        "portal_line": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
                                         }
                                     },
                                     "required": [
@@ -18128,7 +18424,8 @@
                                         "declared",
                                         "own",
                                         "budget",
-                                        "short_length"
+                                        "short_length",
+                                        "portal_line"
                                     ]
                                 }
                             }
@@ -18388,6 +18685,12 @@
                                                         "units",
                                                         "unicode"
                                                     ]
+                                                },
+                                                "portal_line": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
                                                 }
                                             },
                                             "required": [
@@ -18403,7 +18706,8 @@
                                                 "declared",
                                                 "own",
                                                 "budget",
-                                                "short_length"
+                                                "short_length",
+                                                "portal_line"
                                             ]
                                         },
                                         {
@@ -18616,6 +18920,12 @@
                                                         "units",
                                                         "unicode"
                                                     ]
+                                                },
+                                                "portal_line": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
                                                 }
                                             },
                                             "required": [
@@ -18631,7 +18941,8 @@
                                                 "declared",
                                                 "own",
                                                 "budget",
-                                                "short_length"
+                                                "short_length",
+                                                "portal_line"
                                             ]
                                         },
                                         {

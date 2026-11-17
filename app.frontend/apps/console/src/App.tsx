@@ -22,6 +22,8 @@ import { AdmitScreen } from './learners/AdmitScreen'
 import { ExportScreen } from './exports/ExportScreen'
 import { MarksScreen } from './assessment/MarksScreen'
 import { NewAssessmentScreen } from './assessment/NewAssessmentScreen'
+import { CommentsScreen } from './assessment/CommentsScreen'
+import { ReportCardScreen } from './assessment/ReportCardScreen'
 import { ResultsScreen } from './assessment/ResultsScreen'
 import { SheetScreen } from './assessment/SheetScreen'
 import { AssessmentSettingsScreen } from './settings/AssessmentSettingsScreen'
@@ -70,6 +72,7 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const lesson = /^\/registers\/lesson\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const sheet = /^\/marks\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const marks = seesMarks(context)
+  const cards = /^\/marks\/cards\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const exported = /^\/exports\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const approval = /^\/approvals\/([0-9a-f-]{36})$/.exec(path)?.[1]
 
@@ -104,6 +107,8 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/marks/all' && marks) page = <MarksScreen view="all" />
   else if (path === '/marks/new' && marks) page = <NewAssessmentScreen />
   else if (path === '/marks/results' && marks) page = <ResultsScreen />
+  else if (path === '/marks/publish' && marks) page = <MarksScreen view="publish" />
+  else if (path === '/marks/comments' && marks) page = <CommentsScreen />
   else if (sheet !== undefined && marks) page = <SheetScreen key={sheet} id={sheet} />
   else if (path === '/settings/assessment' && keepsGrading(context)) page = <AssessmentSettingsScreen view="plans" />
   else if (path === '/settings/assessment/scales' && keepsGrading(context)) page = <AssessmentSettingsScreen view="scales" />
@@ -113,6 +118,9 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (approval !== undefined) page = <ApprovalScreen key={approval} id={approval} />
   // Anyone signed in may open an export; the server shows each person only their own.
   else if (exported !== undefined) page = <ExportScreen key={exported} id={exported} />
+
+  // A report card is a printed page: no console around it. The server decides who may read it.
+  if (cards !== undefined && marks) return <ReportCardScreen key={cards} id={cards} />
 
   if (page !== undefined) {
     return (

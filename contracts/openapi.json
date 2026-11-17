@@ -1704,13 +1704,32 @@
                                         },
                                         "can_set": {
                                             "type": "boolean"
+                                        },
+                                        "looks_after": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "class_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "class_id",
+                                                    "class"
+                                                ]
+                                            }
                                         }
                                     },
                                     "required": [
                                         "today",
                                         "totals",
                                         "assessments",
-                                        "can_set"
+                                        "can_set",
+                                        "looks_after"
                                     ]
                                 }
                             }
@@ -20058,6 +20077,1414 @@
                 }
             }
         },
+        "/v1/assessment/publishing": {
+            "get": {
+                "operationId": "assessment.publishing",
+                "summary": "The classes the viewer may publish, each with its term, how ready it is and its latest version",
+                "tags": [
+                    "Publish"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "classes": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "class_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "level": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus": {
+                                                        "type": "string"
+                                                    },
+                                                    "period": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name"
+                                                        ]
+                                                    },
+                                                    "learners": {
+                                                        "type": "integer"
+                                                    },
+                                                    "subjects": {
+                                                        "type": "integer"
+                                                    },
+                                                    "subjects_ready": {
+                                                        "type": "integer"
+                                                    },
+                                                    "comments": {
+                                                        "type": "integer"
+                                                    },
+                                                    "ready": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "missing": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "not_ready",
+                                                            "ready",
+                                                            "published",
+                                                            "changed"
+                                                        ]
+                                                    },
+                                                    "latest": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "version": {
+                                                                "type": "integer"
+                                                            },
+                                                            "published_at": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "version",
+                                                            "published_at"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "class_id",
+                                                    "class",
+                                                    "level",
+                                                    "campus",
+                                                    "period",
+                                                    "learners",
+                                                    "subjects",
+                                                    "subjects_ready",
+                                                    "comments",
+                                                    "ready",
+                                                    "missing",
+                                                    "state",
+                                                    "latest"
+                                                ]
+                                            }
+                                        },
+                                        "settings": {
+                                            "type": "object",
+                                            "properties": {
+                                                "show_position": {
+                                                    "type": "boolean"
+                                                },
+                                                "head_comment": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "show_position",
+                                                "head_comment"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "classes",
+                                        "settings"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "assessment.publishing.publish",
+                "summary": "Publishes the classes chosen: `{class_ids: [...]}`. Returns the screen as it is now",
+                "tags": [
+                    "Publish"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "class_ids": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "published": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "class_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "publication_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "version": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "class_id",
+                                                    "publication_id",
+                                                    "version"
+                                                ]
+                                            }
+                                        },
+                                        "classes": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "class_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "level": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus": {
+                                                        "type": "string"
+                                                    },
+                                                    "period": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name"
+                                                        ]
+                                                    },
+                                                    "learners": {
+                                                        "type": "integer"
+                                                    },
+                                                    "subjects": {
+                                                        "type": "integer"
+                                                    },
+                                                    "subjects_ready": {
+                                                        "type": "integer"
+                                                    },
+                                                    "comments": {
+                                                        "type": "integer"
+                                                    },
+                                                    "ready": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "missing": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "not_ready",
+                                                            "ready",
+                                                            "published",
+                                                            "changed"
+                                                        ]
+                                                    },
+                                                    "latest": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "version": {
+                                                                "type": "integer"
+                                                            },
+                                                            "published_at": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "version",
+                                                            "published_at"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "class_id",
+                                                    "class",
+                                                    "level",
+                                                    "campus",
+                                                    "period",
+                                                    "learners",
+                                                    "subjects",
+                                                    "subjects_ready",
+                                                    "comments",
+                                                    "ready",
+                                                    "missing",
+                                                    "state",
+                                                    "latest"
+                                                ]
+                                            }
+                                        },
+                                        "settings": {
+                                            "type": "object",
+                                            "properties": {
+                                                "show_position": {
+                                                    "type": "boolean"
+                                                },
+                                                "head_comment": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "show_position",
+                                                "head_comment"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "published",
+                                        "classes",
+                                        "settings"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/assessment/publishing/settings": {
+            "put": {
+                "operationId": "assessment.publishing.settings",
+                "summary": "What report cards show: `{show_position: bool, head_comment: bool}`",
+                "tags": [
+                    "Publish"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "show_position": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "head_comment": {
+                                        "type": "boolean",
+                                        "default": false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "classes": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "class_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "level": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus": {
+                                                        "type": "string"
+                                                    },
+                                                    "period": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name"
+                                                        ]
+                                                    },
+                                                    "learners": {
+                                                        "type": "integer"
+                                                    },
+                                                    "subjects": {
+                                                        "type": "integer"
+                                                    },
+                                                    "subjects_ready": {
+                                                        "type": "integer"
+                                                    },
+                                                    "comments": {
+                                                        "type": "integer"
+                                                    },
+                                                    "ready": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "missing": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "not_ready",
+                                                            "ready",
+                                                            "published",
+                                                            "changed"
+                                                        ]
+                                                    },
+                                                    "latest": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "version": {
+                                                                "type": "integer"
+                                                            },
+                                                            "published_at": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "version",
+                                                            "published_at"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "class_id",
+                                                    "class",
+                                                    "level",
+                                                    "campus",
+                                                    "period",
+                                                    "learners",
+                                                    "subjects",
+                                                    "subjects_ready",
+                                                    "comments",
+                                                    "ready",
+                                                    "missing",
+                                                    "state",
+                                                    "latest"
+                                                ]
+                                            }
+                                        },
+                                        "settings": {
+                                            "type": "object",
+                                            "properties": {
+                                                "show_position": {
+                                                    "type": "boolean"
+                                                },
+                                                "head_comment": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "show_position",
+                                                "head_comment"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "classes",
+                                        "settings"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/assessment/comments": {
+            "get": {
+                "operationId": "assessment.comments",
+                "summary": "The report comments of a class this term: `?class_id=`",
+                "tags": [
+                    "Publish"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "class": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "period": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "can_class": {
+                                            "type": "boolean"
+                                        },
+                                        "can_head": {
+                                            "type": "boolean"
+                                        },
+                                        "head_comment": {
+                                            "type": "boolean"
+                                        },
+                                        "max": {
+                                            "type": "integer"
+                                        },
+                                        "learners": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "total": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "total": {
+                                                                "type": "number"
+                                                            },
+                                                            "out_of": {
+                                                                "type": "integer"
+                                                            },
+                                                            "complete": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "total",
+                                                            "out_of",
+                                                            "complete"
+                                                        ]
+                                                    },
+                                                    "position": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "position": {
+                                                                "type": "integer"
+                                                            },
+                                                            "of": {
+                                                                "type": "integer"
+                                                            },
+                                                            "shared": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "position",
+                                                            "of",
+                                                            "shared"
+                                                        ]
+                                                    },
+                                                    "grades": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "subject": {
+                                                                    "type": "string"
+                                                                },
+                                                                "short": {
+                                                                    "type": "string"
+                                                                },
+                                                                "grade": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "ready": {
+                                                                    "type": "boolean"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "subject",
+                                                                "short",
+                                                                "grade",
+                                                                "ready"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "lines": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "label": {
+                                                                    "type": "string"
+                                                                },
+                                                                "value": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "label",
+                                                                "value"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "comments": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "class_teacher": {
+                                                                "type": [
+                                                                    "object",
+                                                                    "null"
+                                                                ],
+                                                                "properties": {
+                                                                    "text": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "by": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "at": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "text",
+                                                                    "by",
+                                                                    "at"
+                                                                ]
+                                                            },
+                                                            "head": {
+                                                                "type": [
+                                                                    "object",
+                                                                    "null"
+                                                                ],
+                                                                "properties": {
+                                                                    "text": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "by": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "at": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "text",
+                                                                    "by",
+                                                                    "at"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "class_teacher",
+                                                            "head"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "total",
+                                                    "position",
+                                                    "grades",
+                                                    "lines",
+                                                    "comments"
+                                                ]
+                                            }
+                                        },
+                                        "written": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "class",
+                                        "period",
+                                        "can_class",
+                                        "can_head",
+                                        "head_comment",
+                                        "max",
+                                        "learners",
+                                        "written"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "assessment.comments.write",
+                "summary": "Writes a learner's comment: `{class_id, learner_id, author: 'class_teacher'|'head', text}`. An empty text takes it away",
+                "tags": [
+                    "Publish"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "class": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "period": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "can_class": {
+                                            "type": "boolean"
+                                        },
+                                        "can_head": {
+                                            "type": "boolean"
+                                        },
+                                        "head_comment": {
+                                            "type": "boolean"
+                                        },
+                                        "max": {
+                                            "type": "integer"
+                                        },
+                                        "learners": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "total": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "total": {
+                                                                "type": "number"
+                                                            },
+                                                            "out_of": {
+                                                                "type": "integer"
+                                                            },
+                                                            "complete": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "total",
+                                                            "out_of",
+                                                            "complete"
+                                                        ]
+                                                    },
+                                                    "position": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "position": {
+                                                                "type": "integer"
+                                                            },
+                                                            "of": {
+                                                                "type": "integer"
+                                                            },
+                                                            "shared": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "position",
+                                                            "of",
+                                                            "shared"
+                                                        ]
+                                                    },
+                                                    "grades": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "subject": {
+                                                                    "type": "string"
+                                                                },
+                                                                "short": {
+                                                                    "type": "string"
+                                                                },
+                                                                "grade": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "ready": {
+                                                                    "type": "boolean"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "subject",
+                                                                "short",
+                                                                "grade",
+                                                                "ready"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "lines": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "label": {
+                                                                    "type": "string"
+                                                                },
+                                                                "value": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "label",
+                                                                "value"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "comments": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "class_teacher": {
+                                                                "type": [
+                                                                    "object",
+                                                                    "null"
+                                                                ],
+                                                                "properties": {
+                                                                    "text": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "by": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "at": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "text",
+                                                                    "by",
+                                                                    "at"
+                                                                ]
+                                                            },
+                                                            "head": {
+                                                                "type": [
+                                                                    "object",
+                                                                    "null"
+                                                                ],
+                                                                "properties": {
+                                                                    "text": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "by": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "at": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "text",
+                                                                    "by",
+                                                                    "at"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "class_teacher",
+                                                            "head"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "total",
+                                                    "position",
+                                                    "grades",
+                                                    "lines",
+                                                    "comments"
+                                                ]
+                                            }
+                                        },
+                                        "written": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "class",
+                                        "period",
+                                        "can_class",
+                                        "can_head",
+                                        "head_comment",
+                                        "max",
+                                        "learners",
+                                        "written"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/assessment/cards/{id}": {
+            "get": {
+                "operationId": "assessment.cards",
+                "summary": "The report cards of a published version, or one learner's: `?learner_id=`",
+                "tags": [
+                    "Publish"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "school": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "has_logo": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "has_logo"
+                                            ]
+                                        },
+                                        "publication": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "class_id": {
+                                                    "type": "string"
+                                                },
+                                                "period_id": {
+                                                    "type": "string"
+                                                },
+                                                "version": {
+                                                    "type": "integer"
+                                                },
+                                                "published_at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "class_id",
+                                                "period_id",
+                                                "version",
+                                                "published_at"
+                                            ]
+                                        },
+                                        "cards": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "reference": {
+                                                        "type": "string"
+                                                    },
+                                                    "learner": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "admission_number": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name",
+                                                            "admission_number"
+                                                        ]
+                                                    },
+                                                    "class": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name"
+                                                        ]
+                                                    },
+                                                    "period": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "starts_on": {
+                                                                "type": "string"
+                                                            },
+                                                            "ends_on": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name",
+                                                            "starts_on",
+                                                            "ends_on"
+                                                        ]
+                                                    },
+                                                    "scale": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "overall": {
+                                                                "type": "string"
+                                                            },
+                                                            "pass_from": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "name",
+                                                            "overall",
+                                                            "pass_from"
+                                                        ]
+                                                    },
+                                                    "subjects": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "subject_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "subject": {
+                                                                    "type": "string"
+                                                                },
+                                                                "short": {
+                                                                    "type": "string"
+                                                                },
+                                                                "parts": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "object",
+                                                                        "properties": {
+                                                                            "label": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "weight": {
+                                                                                "type": "integer"
+                                                                            },
+                                                                            "score": {
+                                                                                "type": [
+                                                                                    "number",
+                                                                                    "null"
+                                                                                ]
+                                                                            },
+                                                                            "points": {
+                                                                                "type": [
+                                                                                    "number",
+                                                                                    "null"
+                                                                                ]
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "label",
+                                                                            "weight",
+                                                                            "score",
+                                                                            "points"
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                "percent": {
+                                                                    "type": [
+                                                                        "number",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "grade": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "word": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "passes": {
+                                                                    "type": [
+                                                                        "boolean",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "ready": {
+                                                                    "type": "boolean"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "subject_id",
+                                                                "subject",
+                                                                "short",
+                                                                "parts",
+                                                                "percent",
+                                                                "grade",
+                                                                "word",
+                                                                "passes",
+                                                                "ready"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "summary": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "kind": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "average_percent",
+                                                                    "average_grade",
+                                                                    "best_six"
+                                                                ]
+                                                            },
+                                                            "value": {
+                                                                "type": [
+                                                                    "number",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "of": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "kind",
+                                                            "value",
+                                                            "of"
+                                                        ]
+                                                    },
+                                                    "total": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "total": {
+                                                                "type": "number"
+                                                            },
+                                                            "out_of": {
+                                                                "type": "integer"
+                                                            },
+                                                            "complete": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "total",
+                                                            "out_of",
+                                                            "complete"
+                                                        ]
+                                                    },
+                                                    "position": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "position": {
+                                                                "type": "integer"
+                                                            },
+                                                            "of": {
+                                                                "type": "integer"
+                                                            },
+                                                            "shared": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "position",
+                                                            "of",
+                                                            "shared"
+                                                        ]
+                                                    },
+                                                    "comments": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "class_teacher": {
+                                                                "type": [
+                                                                    "object",
+                                                                    "null"
+                                                                ],
+                                                                "properties": {
+                                                                    "text": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "by": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "at": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "text",
+                                                                    "by",
+                                                                    "at"
+                                                                ]
+                                                            },
+                                                            "head": {
+                                                                "type": [
+                                                                    "object",
+                                                                    "null"
+                                                                ],
+                                                                "properties": {
+                                                                    "text": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "by": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "at": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "text",
+                                                                    "by",
+                                                                    "at"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "class_teacher",
+                                                            "head"
+                                                        ]
+                                                    },
+                                                    "lines": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "label": {
+                                                                    "type": "string"
+                                                                },
+                                                                "value": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "label",
+                                                                "value"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "next_term": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "reference",
+                                                    "learner",
+                                                    "class",
+                                                    "period",
+                                                    "scale",
+                                                    "subjects",
+                                                    "summary",
+                                                    "total",
+                                                    "position",
+                                                    "comments",
+                                                    "lines",
+                                                    "next_term"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "school",
+                                        "publication",
+                                        "cards"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/ready": {
             "get": {
                 "operationId": "kernel.ready",
@@ -22976,6 +24403,167 @@
                                                     "paper"
                                                 ]
                                             }
+                                        },
+                                        "published": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "publication_id": {
+                                                    "type": "string"
+                                                },
+                                                "version": {
+                                                    "type": "integer"
+                                                },
+                                                "published_at": {
+                                                    "type": "string"
+                                                },
+                                                "reference": {
+                                                    "type": "string"
+                                                },
+                                                "subjects": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "subject_id": {
+                                                                "type": "string"
+                                                            },
+                                                            "subject": {
+                                                                "type": "string"
+                                                            },
+                                                            "short": {
+                                                                "type": "string"
+                                                            },
+                                                            "percent": {
+                                                                "type": [
+                                                                    "number",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "grade": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "word": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "passes": {
+                                                                "type": [
+                                                                    "boolean",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "ready": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "subject_id",
+                                                            "subject",
+                                                            "short",
+                                                            "percent",
+                                                            "grade",
+                                                            "word",
+                                                            "passes",
+                                                            "ready"
+                                                        ]
+                                                    }
+                                                },
+                                                "total": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "number"
+                                                        },
+                                                        "out_of": {
+                                                            "type": "integer"
+                                                        },
+                                                        "complete": {
+                                                            "type": "boolean"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "total",
+                                                        "out_of",
+                                                        "complete"
+                                                    ]
+                                                },
+                                                "position": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "position": {
+                                                            "type": "integer"
+                                                        },
+                                                        "of": {
+                                                            "type": "integer"
+                                                        },
+                                                        "shared": {
+                                                            "type": "boolean"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "position",
+                                                        "of",
+                                                        "shared"
+                                                    ]
+                                                },
+                                                "versions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "publication_id": {
+                                                                "type": "string"
+                                                            },
+                                                            "version": {
+                                                                "type": "integer"
+                                                            },
+                                                            "published_at": {
+                                                                "type": "string"
+                                                            },
+                                                            "by": {
+                                                                "type": "string"
+                                                            },
+                                                            "reason": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "publication_id",
+                                                            "version",
+                                                            "published_at",
+                                                            "by",
+                                                            "reason"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "publication_id",
+                                                "version",
+                                                "published_at",
+                                                "reference",
+                                                "subjects",
+                                                "total",
+                                                "position",
+                                                "versions"
+                                            ]
                                         }
                                     },
                                     "required": [
@@ -22987,7 +24575,8 @@
                                         "summary",
                                         "total",
                                         "position",
-                                        "assessments"
+                                        "assessments",
+                                        "published"
                                     ]
                                 }
                             }

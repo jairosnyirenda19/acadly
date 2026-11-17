@@ -41,6 +41,7 @@ const RECORD_ROUTES = [
     'documents.versions.store' => 'DocumentsTest: answers not found to a person who may not open the document',
     'documents.trash' => 'DocumentsTest: answers not found to a person who may not open the document',
     'documents.restore' => 'DocumentsTest: trashes with a reason, restores a batch together',
+    'assessment.publishing.publish' => 'AssessmentTest: publishes a ready class; a class outside the reach of the viewer is not found',
     'people.import.template' => 'PeopleImportTest: the template lists only the roles and places the viewer can give',
     'people.import.check' => 'PeopleImportTest: a row for a place outside the viewer\'s reach is not imported',
     'people.import' => 'PeopleImportTest: a row for a place outside the viewer\'s reach is not imported',
@@ -62,7 +63,7 @@ const RECORD_ROUTES = [
  * For these the test checks that nothing of campus B is in the answer.
  */
 const LIST_ROUTES = ['people.index', 'academics.teaching.index', 'academics.timetable.index', 'learners.index', 'learners.grid', 'people.grid', 'registers.index',
-    'registers.lessons', 'registers.missed', 'registers.levels', 'assessment.mine', 'assessment.options', 'assessment.grid'];
+    'registers.lessons', 'registers.missed', 'registers.levels', 'assessment.mine', 'assessment.options', 'assessment.grid', 'assessment.publishing'];
 
 uses(DatabaseTransactions::class);
 

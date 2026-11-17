@@ -12,6 +12,7 @@ use Acadly\Modules\Assessment\Application\AssessmentsGrid;
 use Acadly\Modules\Assessment\Application\LearnerResults;
 use Acadly\Modules\Assessment\Application\LockApproval;
 use Acadly\Modules\Assessment\Application\Plans;
+use Acadly\Modules\Assessment\Application\Publishing;
 use Acadly\Modules\Assessment\Application\Reach;
 use Acadly\Modules\Assessment\Application\Scales;
 use Acadly\Modules\Assessment\Application\ScaleSeeds;
@@ -26,6 +27,7 @@ final class AssessmentServiceProvider extends ServiceProvider
         $this->app->scoped(Scales::class);
         $this->app->scoped(Plans::class);
         $this->app->scoped(Reach::class);
+        $this->app->scoped(Publishing::class);
         $this->app->scoped(LearnerResults::class);
         $this->app->tag([LearnerResults::class], LearnerRecordPart::TAG);
         $this->app->tag([AssessmentsGrid::class], Grids::TAG);

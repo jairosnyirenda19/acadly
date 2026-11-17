@@ -87,12 +87,17 @@ export function takesRegisters(context: AppContext): boolean {
 
 /** Whether the account works with marks anywhere: sets, enters, locks or sees assessments, with the module on. */
 export function seesMarks(context: AppContext): boolean {
-  return moduleOn(context, 'assessment') && ['assessment.create', 'assessment.enter', 'assessment.lock', 'assessment.view'].some((p) => holdsAnywhere(context, p))
+  return moduleOn(context, 'assessment') && ['assessment.create', 'assessment.enter', 'assessment.lock', 'assessment.view', 'assessment.publish'].some((p) => holdsAnywhere(context, p))
 }
 
 /** Whether the account sees every assessment of its classes: the office's list, with lock and return. */
 export function seesAllMarks(context: AppContext): boolean {
   return moduleOn(context, 'assessment') && ['assessment.lock', 'assessment.view'].some((p) => holdsAnywhere(context, p))
+}
+
+/** Whether the account publishes term results somewhere, with the module on. */
+export function publishesResults(context: AppContext): boolean {
+  return moduleOn(context, 'assessment') && holdsAnywhere(context, 'assessment.publish')
 }
 
 /** Whether the account keeps the scales and grading plans somewhere, with the module on. */

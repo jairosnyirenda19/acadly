@@ -469,3 +469,81 @@ it('tells anyone without access that nothing is there', function (): void {
     app()->forgetScopedInstances();
     $this->actingAs($this->people['tadala'])->getJson("/api/v1/assessment/assessments/{$id}")->assertForbidden()->assertJsonPath('code', 'module_inactive');
 });
+
+it('publishes a ready class as a version with report cards, tells families, and republishes a correction', function (): void {
+    $t = $this->people['tadala'];
+    $martha = User::factory()->create(['name' => 'Martha Kalua']);
+    $head = Role::query()->create(['key' => 'head_teacher', 'name' => 'Head teacher']);
+    $head->grant([AssessmentPermission::Publish, AssessmentPermission::View]);
+    RoleAssignment::query()->create(['user_id' => $martha->id, 'role_id' => $head->id, 'scope_type' => ScopeType::Institution, 'scope_id' => null, 'starts_at' => now()->subMinute()]);
+    DB::table('academic_teaching')->insert(['id' => Ids::next(), 'class_id' => $this->class, 'subject_id' => null, 'user_id' => $t->id,
+        'given_by' => $this->people['admin']->id, 'given_at' => now()->subMonth()]);
+
+    $weekly = assessmentSet($t, 'weekly_test', 'Weekly test 1', 20);
+    assessmentLocked($t, $weekly, [16, 12, 16]);
+    assessmentLocked($t, assessmentSet($t, 'end_of_term', 'End-of-term exam', 100), [80, 60, 70]);
+
+    // Mathematics has no work yet: the class is not ready.
+    $row = fn (): array => collect($this->actingAs($martha)->getJson('/api/v1/assessment/publishing')->assertOk()->json('classes'))->firstWhere('class_id', $this->class);
+    expect($row())->toMatchArray(['state' => 'not_ready', 'ready' => false, 'subjects' => 2, 'subjects_ready' => 1, 'learners' => 3, 'latest' => null])
+        ->and($row()['missing'][0])->toStartWith('Mathematics: ');
+    $this->actingAs($martha)->postJson('/api/v1/assessment/publishing', ['class_ids' => [$this->class]])->assertUnprocessable();
+
+    assessmentLocked($this->people['admin'], assessmentSet($this->people['admin'], 'weekly_test', 'Weekly test 1', 20, 'MAT'), [10, 10, 10]);
+    assessmentLocked($this->people['admin'], assessmentSet($this->people['admin'], 'end_of_term', 'End-of-term exam', 100, 'MAT'), [50, 90, 50]);
+
+    // The class teacher writes the comment; only a publisher writes the head teacher's.
+    $comment = fn (User $by, string $author, string $text) => $this->actingAs($by)->putJson('/api/v1/assessment/comments',
+        ['class_id' => $this->class, 'learner_id' => $this->learners[0], 'author' => $author, 'text' => $text]);
+    $comment($t, 'class_teacher', '  Works   steadily. ')->assertOk()->assertJsonPath('written', 1)->assertJsonPath('can_head', false);
+    $comment($t, 'head', 'A good start.')->assertForbidden();
+    $comment($martha, 'head', 'A good start.')->assertOk();
+    $comment($t, 'class_teacher', str_repeat('a', 301))->assertUnprocessable();
+    $this->actingAs($this->people['stranger'])->getJson("/api/v1/assessment/comments?class_id={$this->class}")->assertNotFound();
+    $this->actingAs($this->people['stranger'])->postJson('/api/v1/assessment/publishing', ['class_ids' => [$this->class]])->assertNotFound();
+
+    expect($row())->toMatchArray(['state' => 'ready', 'comments' => 1]);
+
+    // Someone who submitted marks that count here does not publish them.
+    $this->actingAs($this->people['admin'])->postJson('/api/v1/assessment/publishing', ['class_ids' => [$this->class]])
+        ->assertForbidden()->assertJsonPath('code', 'another_person_required');
+
+    $first = $this->actingAs($martha)->postJson('/api/v1/assessment/publishing', ['class_ids' => [$this->class]])->assertOk();
+    $publication = $first->json('published.0.publication_id');
+    expect($first->json('published.0.version'))->toBe(1)
+        ->and($row())->toMatchArray(['state' => 'published'])
+        ->and(DB::table('notification_deliveries')->where('topic_key', 'assessment.results_published')->count())->toBeGreaterThan(0);
+
+    $cards = $this->actingAs($martha)->getJson("/api/v1/assessment/cards/{$publication}")->assertOk();
+    $alinafe = collect($cards->json('cards'))->firstWhere('learner.id', $this->learners[0]);
+    expect($cards->json('cards'))->toHaveCount(3)
+        ->and($alinafe['reference'])->toMatch('/^R1-[A-Z0-9]{4}-[A-Z0-9]{4}$/')
+        ->and($alinafe['position'])->toEqual(['position' => 2, 'of' => 3, 'shared' => false])
+        ->and($alinafe['comments']['class_teacher']['text'])->toBe('Works steadily.')
+        ->and($alinafe['comments']['head']['text'])->toBe('A good start.')
+        ->and($alinafe)->not->toHaveKey('rank')
+        ->and(array_column($alinafe['subjects'], 'percent'))->toEqual([80, 50]);
+    $this->actingAs($this->people['stranger'])->getJson("/api/v1/assessment/cards/{$publication}")->assertNotFound();
+
+    // Nothing changed: nothing to publish again.
+    $this->actingAs($martha)->postJson('/api/v1/assessment/publishing', ['class_ids' => [$this->class]])->assertUnprocessable();
+
+    // A corrected mark: the class shows changed, and the next version says what changed. Version 1 is kept.
+    $this->actingAs($this->people['mercy'])->postJson("/api/v1/assessment/assessments/{$weekly}/correct",
+        ['learner_id' => $this->learners[1], 'value' => 14, 'note' => 'Added up again.'])->assertOk();
+    expect($row()['state'])->toBe('changed');
+    $second = $this->actingAs($martha)->postJson('/api/v1/assessment/publishing', ['class_ids' => [$this->class]])->assertOk();
+    expect($second->json('published.0.version'))->toBe(2)
+        ->and(DB::table('result_publications')->where('class_id', $this->class)->orderByDesc('version')->value('reason'))->toBe('Changed: Biology (1 learner).')
+        ->and(DB::table('result_publication_learners')->where('publication_id', $publication)->count())->toBe(3);
+
+    $mine = $this->actingAs($martha)->getJson("/api/v1/assessment/learner/{$this->learners[1]}")->assertOk();
+    expect($mine->json('published.version'))->toBe(2)
+        ->and(array_column($mine->json('published.versions'), 'version'))->toBe([2, 1])
+        ->and($mine->json('published.versions.0.by'))->toBe('Martha Kalua');
+
+    // What the cards show is the school's choice, from the next version on.
+    $this->actingAs($martha)->putJson('/api/v1/assessment/publishing/settings', ['show_position' => false, 'head_comment' => true])->assertOk()
+        ->assertJsonPath('settings', ['show_position' => false, 'head_comment' => true]);
+    $this->actingAs($t)->putJson('/api/v1/assessment/publishing/settings', ['show_position' => true, 'head_comment' => true])->assertForbidden();
+});

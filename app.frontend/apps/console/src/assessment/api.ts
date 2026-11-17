@@ -25,6 +25,12 @@ export type Overall = Scale['overall']
 export type PlansState = Json<'/v1/assessment/plans', 'get'>
 export type Plan = PlansState['plan']
 export type PlanPart = Plan['parts'][number]
+export type PublishingState = Json<'/v1/assessment/publishing', 'get'>
+export type PublishRow = PublishingState['classes'][number]
+export type CommentsState = Json<'/v1/assessment/comments', 'get'>
+export type CommentRow = CommentsState['learners'][number]
+export type CardsState = Json<'/v1/assessment/cards/{id}', 'get'>
+export type Card = CardsState['cards'][number]
 
 /** A mark as the sheet sends it: a value, or no value and a reason. */
 export interface MarkInput {
@@ -65,6 +71,15 @@ export const assessmentApi = {
     read(api.GET('/v1/assessment/results', { params: { query: { class_id: classId, ...(periodId !== null ? { period_id: periodId } : {}) } as never } })),
   working: (q: { class_id: string; learner_id: string; subject_id: string; period_id: string }) => read(api.GET('/v1/assessment/results/working', { params: { query: q as never } })),
   learner: (id: string) => read(api.GET('/v1/assessment/learner/{id}', { params: { path: { id } } })),
+
+  publishing: () => read(api.GET('/v1/assessment/publishing')),
+  publish: (classIds: string[]) => settle(api.POST('/v1/assessment/publishing', { body: { class_ids: classIds } as never }) as Done<PublishingState & { published: { class_id: string; publication_id: string; version: number }[] }>),
+  cardSettings: (body: { show_position: boolean; head_comment: boolean }) => settle(api.PUT('/v1/assessment/publishing/settings', { body: body as never }) as Done<PublishingState>),
+  comments: (classId: string) => read(api.GET('/v1/assessment/comments', { params: { query: { class_id: classId } as never } })),
+  comment: (body: { class_id: string; learner_id: string; author: 'class_teacher' | 'head'; text: string }) =>
+    settle(api.PUT('/v1/assessment/comments', { body: body as never }) as Done<CommentsState>),
+  cards: (publicationId: string, learnerId: string | null) =>
+    read(api.GET('/v1/assessment/cards/{id}', { params: { path: { id: publicationId }, query: (learnerId !== null ? { learner_id: learnerId } : {}) as never } })),
 
   scales: () => read(api.GET('/v1/assessment/scales')),
   addScale: (body: { name: string; overall: Overall; pass_from: string | null; track: string; bands: Band[] }) =>

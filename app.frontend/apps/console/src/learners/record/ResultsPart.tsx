@@ -119,6 +119,7 @@ export function ResultsTab({ learner }: { learner: LearnerState }) {
   return (
     <Columns top>
       <Column grow="flex-[2_1_520px]" label={t.soFar(period.name)}>
+        {data.published !== null && <Published learnerId={learner.id} period={period.name} published={data.published} />}
         <SectionTitle>{t.soFar(period.name)}</SectionTitle>
         <Standing data={data} />
         <p className="mb-3 text-[13px] text-text-muted">{t.soFarNote}</p>
@@ -228,6 +229,48 @@ export function ResultsTab({ learner }: { learner: LearnerState }) {
         )}
       </Column>
     </Columns>
+  )
+}
+
+/** What was published of the learner this term (the approved design): the version in force and every version. */
+function Published({ learnerId, period, published }: { learnerId: string; period: string; published: NonNullable<LearnerResultsState['published']> }) {
+  const card = `/marks/cards/${published.publication_id}?learner_id=${learnerId}`
+  const position = published.position !== null ? t.positionOf(published.position.position, published.position.of, published.position.shared) : null
+
+  return (
+    <section aria-label={t.publishedTitle(period)} className="mb-6">
+      <SectionTitle>{t.publishedTitle(period)}</SectionTitle>
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <Tag tone="done">{t.publishedTag}</Tag>
+        <span className="text-sm">{t.publishedLine(position, published.total !== null ? a.num(published.total.total) : copy.dash, a.day(published.published_at))}</span>
+        <span className="flex-1" />
+        <InLink href={card}>{t.reportCard}</InLink>
+      </div>
+      <ul>
+        {published.subjects.map((s) => (
+          <li key={s.subject_id} className="grid min-h-11 grid-cols-[minmax(0,1fr)_72px_48px] items-center gap-x-3 border-b border-rule md:grid-cols-[minmax(0,1.2fr)_90px_56px_minmax(0,1fr)]">
+            <span className="text-sm font-extrabold">{s.subject}</span>
+            <span className="ref text-right text-sm">{a.pct(s.percent)}</span>
+            <span>{s.grade !== null && <GradeTag grade={s.grade} passes={s.passes} />}</span>
+            <span className="hidden text-[13px] md:block">{s.word ?? ''}</span>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-2 text-[13px] text-text-muted">{t.publishedNote}</p>
+      <div className="label-caps mt-4 mb-1 text-text-muted">{t.versions}</div>
+      <ul>
+        {published.versions.map((v, i) => (
+          <li key={v.publication_id} className="border-b border-rule py-2">
+            <span className="flex items-center gap-2">
+              <strong className="text-sm">{t.version(v.version)}</strong>
+              <Tag tone={i === 0 ? 'done' : 'plain'}>{i === 0 ? t.current : t.replaced}</Tag>
+            </span>
+            <span className="block text-[13px] text-text-muted">{t.versionLine(a.day(v.published_at), v.by, v.reason)}</span>
+            <InLink href={`/marks/cards/${v.publication_id}?learner_id=${learnerId}`}>{t.reportCard}</InLink>
+          </li>
+        ))}
+      </ul>
+    </section>
   )
 }
 

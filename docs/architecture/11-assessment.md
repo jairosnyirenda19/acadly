@@ -113,7 +113,7 @@ Audit: creating, submitting, returning, locking, every mark correction (old → 
 
 ## 9. First release, as approved (16 November 2026)
 
-Designs: the canvas, Page 5 (Assessment: marks and term grades). In scope: scales, grading plans, setting assessments, the marks sheet, submit, lock and return, term grades with their working, class results, and the learner record's Results part. Not in scope: publishing (`results.termly`), report cards, the parent portal, ECD observations (an observational level shows no Marks screens).
+Designs: the canvas, Page 5 (Assessment: marks and term grades). In scope: scales, grading plans, setting assessments, the marks sheet, submit, lock and return, term grades with their working, class results, and the learner record's Results part. Not in scope: publishing and report cards (built later, §9.2), the parent portal, ECD observations (an observational level shows no Marks screens).
 
 **Module.** `modules/Assessment` (key `assessment`, optional tier), requiring Institution, Academics and Enrolment cores. It reads classes, subjects, teaching and terms through `AcademicCalendar` / `Timetable`-style contracts and learners through `EnrolmentDirectory`. Binding slot `AssessmentSlot::Model` (`marks` | `observational`, fallback `marks`); the Nursery profile binds `observational`.
 
@@ -142,3 +142,17 @@ Designs: the canvas, Page 5 (Assessment: marks and term grades). In scope: scale
 ### 9.1 Class position (D-076)
 
 Every class result ranks learners by **total marks**: the term percentages added up, each subject out of 100. The highest total is first. Equal totals share a position and the next is skipped (1, 2, =3, =3, 5). A learner with any term grade not ready is not ranked until it is. Position is computed, never stored, like the grades it comes from. It shows on Class results and on the learner record; publishing it to families comes with report cards.
+
+### 9.2 Publishing results and report cards (D-080)
+
+Designs: the canvas, Page 6 (Publishing results, and report cards).
+
+- **Ready.** A class can be published when every learner's term grade in every subject is ready. The Publish results screen lists what is missing, subject by subject.
+- **Who.** `assessment.publish` at the class. Never a person who submitted marks of a counted assessment of the class that term (403 `another_person_required`).
+- **What publishing keeps.** `result_publications` (class, term, version, what changed, fingerprint, the card settings used, who, when) and `result_publication_learners` (each learner's card as JSON, with a reference such as `R1-7K4Q-29XD`). Both append-only. Each learner's family is told: `assessment.results_published`.
+- **Changed.** When the grades or comments worked out now differ from the latest version, the class shows *Changed*. Publishing again makes the next version; it says which subjects changed and for how many learners.
+- **Comments.** `result_comments`, append-only, latest wins, up to 300 characters. The class teacher's comment by the class teacher or a publisher; the head teacher's by a publisher, while the school shows it. A missing comment warns; it does not block.
+- **Report card settings.** `result_card_settings`, append-only: show class position; show the head teacher comment. They apply from the next version.
+- **Lines from other modules.** `ReportCardLine` (Enrolment Contracts, tag `acadly.report-card-lines`). Attendance gives days present out of days the morning register was taken.
+- **Addresses.** `GET/POST /assessment/publishing`, `PUT /assessment/publishing/settings`, `GET/PUT /assessment/comments`, `GET /assessment/cards/{id}?learner_id=`. `GET /assessment/learner/{id}` gives `published`: the version in force and every version.
+- **Later.** An approval chain before publishing; the parent portal; a PDF made by the server.

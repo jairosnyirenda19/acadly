@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Acadly\Modules\Assessment\Http\AssessmentController;
+use Acadly\Modules\Assessment\Http\PublishController;
 use Acadly\Modules\Assessment\Http\ResultsController;
 use Acadly\Modules\Assessment\Http\SettingsController;
 use Illuminate\Support\Facades\Route;
@@ -32,4 +33,11 @@ Route::middleware(['auth:sanctum', 'module:assessment'])->prefix('assessment')->
     Route::get('/results', [ResultsController::class, 'index'])->name('results');
     Route::get('/results/working', [ResultsController::class, 'working'])->name('results.working');
     Route::get('/learner/{id}', [ResultsController::class, 'learner'])->whereUuid('id')->name('learner');
+
+    Route::get('/publishing', [PublishController::class, 'index'])->name('publishing');
+    Route::post('/publishing', [PublishController::class, 'publish'])->name('publishing.publish');
+    Route::put('/publishing/settings', [PublishController::class, 'settings'])->name('publishing.settings');
+    Route::get('/comments', [PublishController::class, 'comments'])->name('comments');
+    Route::put('/comments', [PublishController::class, 'comment'])->name('comments.write');
+    Route::get('/cards/{id}', [PublishController::class, 'cards'])->whereUuid('id')->name('cards');
 });

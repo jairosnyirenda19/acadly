@@ -5,7 +5,8 @@ import { copy } from '../copy'
 import { gridsApi, type BulkAnswer } from '../grid/api'
 import { BulkResult } from '../grid/BulkResult'
 import { gridAddress, startExport, useGridPage, useGridPrefs, useGridQuery, useGridSelection } from '../grid/useGrid'
-import { seesAllMarks } from '../shell/navigation'
+import { publishesResults, seesAllMarks } from '../shell/navigation'
+import { PublishScreen } from './PublishScreen'
 import { assessmentApi, stateTone, type AssessRow, type MineRow } from './api'
 import { InLink, LockPanel, SmallBand, StateTag, follow } from './parts'
 
@@ -14,13 +15,15 @@ const t = a.marks
 const s = copy.settings
 const GRID = 'assessments'
 
-type View = 'mine' | 'all'
+type View = 'mine' | 'all' | 'publish'
 
 /** Marks (the approved designs): a teacher's assessments, phone first; for the office, every assessment with lock and return. */
 export function MarksScreen({ view }: { view: View }) {
   const context = useAppContext()
   const office = seesAllMarks(context)
-  const shown: View = view === 'all' && office ? 'all' : 'mine'
+  const publisher = publishesResults(context)
+  const shown: View = view === 'all' && office ? 'all' : view === 'publish' && publisher ? 'publish' : 'mine'
+  const tabs: View[] = ['mine', ...(office ? (['all'] as const) : []), ...(publisher ? (['publish'] as const) : [])]
 
   return (
     <>
@@ -28,13 +31,13 @@ export function MarksScreen({ view }: { view: View }) {
         <div className="min-w-0 flex-[1_1_420px]">
           <div className="label-caps text-text-muted">{t.kicker(context.user.name)}</div>
           <h1 className="type-display mt-1 mb-2 text-[clamp(48px,7vw,88px)]">{t.title}</h1>
-          <p className="hidden max-w-[680px] text-[15px] text-text-muted md:block">{shown === 'all' ? t.officeIntro : t.intro}</p>
+          <p className="hidden max-w-[680px] text-[15px] text-text-muted md:block">{shown === 'all' ? t.officeIntro : shown === 'publish' ? a.publish.intro : t.intro}</p>
         </div>
       </div>
-      {office && (
+      {tabs.length > 1 && (
         <nav aria-label={t.tabsLabel} className="flex gap-1 overflow-x-auto border-b-2 border-ink bg-sheet px-2 [scrollbar-width:none] md:px-[clamp(16px,3vw,40px)]">
-          {(['mine', 'all'] as const).map((key) => {
-            const href = key === 'mine' ? '/marks' : '/marks/all'
+          {tabs.map((key) => {
+            const href = key === 'mine' ? '/marks' : `/marks/${key}`
 
             return (
               <a
@@ -50,7 +53,7 @@ export function MarksScreen({ view }: { view: View }) {
           })}
         </nav>
       )}
-      {shown === 'all' ? <AllAssessments /> : <Mine office={office} />}
+      {shown === 'all' ? <AllAssessments /> : shown === 'publish' ? <PublishScreen /> : <Mine office={office} />}
     </>
   )
 }
@@ -71,6 +74,17 @@ function Mine({ office }: { office: boolean }) {
         ]}
       />
       <section className="flex flex-1 flex-col bg-sheet">
+        {data.looks_after.length > 0 && (
+          <div className="flex flex-wrap items-baseline gap-x-3 border-b border-rule px-4 py-2.5 md:px-[clamp(16px,3vw,40px)]">
+            <span className="label-caps text-text-muted">{t.looksAfter}</span>
+            {data.looks_after.map((c) => (
+              <InLink key={c.class_id} href={`/marks/comments?class_id=${c.class_id}`}>
+                {c.class} ›
+              </InLink>
+            ))}
+            <span className="basis-full text-[13px] text-text-muted md:basis-auto">{t.looksAfterNote}</span>
+          </div>
+        )}
         {data.assessments.length === 0 ? (
           <div className="m-4 border-2 border-ink p-4 md:mx-[clamp(16px,3vw,40px)]">
             <p className="type-display mb-1.5 text-[22px] leading-none">{t.emptyTitle}</p>

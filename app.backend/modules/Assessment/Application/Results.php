@@ -35,6 +35,7 @@ final class Results
         private readonly Marks $marks,
         private readonly Clock $clock,
         private readonly Papers $papers,
+        private readonly Publishing $publishing,
     ) {}
 
     /** @return array<string, mixed> */
@@ -144,7 +145,7 @@ final class Results
 
         if ($period === null) {
             return ['learner_id' => $learnerId, 'class' => ['id' => $class['id'], 'name' => $class['name']], 'period' => null, 'scale' => null,
-                'grades' => [], 'summary' => ['kind' => 'average_percent', 'value' => null, 'of' => 0], 'total' => null, 'position' => null, 'assessments' => []];
+                'grades' => [], 'summary' => ['kind' => 'average_percent', 'value' => null, 'of' => 0], 'total' => null, 'position' => null, 'assessments' => [], 'published' => null];
         }
 
         // The whole class, so the learner's position can be found.
@@ -196,6 +197,7 @@ final class Results
             'total' => TermGrades::total($bySubject),
             'position' => TermGrades::positions($totals)[$learnerId] ?? null,
             'assessments' => $rows,
+            'published' => $this->publishing->forLearner($learnerId, $class['id'], $period['id']),
         ];
     }
 

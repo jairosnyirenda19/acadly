@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Acadly\Modules\Assessment\Application;
 
+use Acadly\Core\Academics\Contracts\AcademicCalendar;
 use Acadly\Core\Academics\Contracts\Teaching;
 use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
 use Acadly\Kernel\Identity\User;
@@ -29,6 +30,7 @@ final class Assessments
         private readonly Marks $marks,
         private readonly Plans $plans,
         private readonly Clock $clock,
+        private readonly AcademicCalendar $calendar,
     ) {}
 
     /**
@@ -103,6 +105,9 @@ final class Assessments
             ],
             'assessments' => $out,
             'can_set' => $this->options($viewer)['choices'] !== [],
+            // The classes the viewer looks after as class teacher: they write the report comments.
+            'looks_after' => array_values(array_map(fn (array $c): array => ['class_id' => $c['id'], 'class' => $c['name']],
+                array_filter($classes, fn (array $c): bool => $this->calendar->classTeacherId($c['id']) === $viewer->id))),
         ];
     }
 

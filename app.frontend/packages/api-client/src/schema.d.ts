@@ -1695,6 +1695,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/assessment/publishing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The classes the viewer may publish, each with its term, how ready it is and its latest version */
+        get: operations["assessment.publishing"];
+        put?: never;
+        /** Publishes the classes chosen: `{class_ids: [...]}`. Returns the screen as it is now */
+        post: operations["assessment.publishing.publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/publishing/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** What report cards show: `{show_position: bool, head_comment: bool}` */
+        put: operations["assessment.publishing.settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The report comments of a class this term: `?class_id=` */
+        get: operations["assessment.comments"];
+        /** Writes a learner's comment: `{class_id, learner_id, author: 'class_teacher'|'head', text}`. An empty text takes it away */
+        put: operations["assessment.comments.write"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/cards/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The report cards of a published version, or one learner's: `?learner_id=` */
+        get: operations["assessment.cards"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/ready": {
         parameters: {
             query?: never;
@@ -2931,6 +3001,10 @@ export interface operations {
                             absent: number;
                         }[];
                         can_set: boolean;
+                        looks_after: {
+                            class_id: string;
+                            class: string;
+                        }[];
                     };
                 };
             };
@@ -8301,6 +8375,416 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "assessment.publishing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        classes: {
+                            class_id: string;
+                            class: string;
+                            level: string;
+                            campus: string;
+                            period: {
+                                id: string;
+                                name: string;
+                            };
+                            learners: number;
+                            subjects: number;
+                            subjects_ready: number;
+                            comments: number;
+                            ready: boolean;
+                            missing: string[];
+                            /** @enum {string} */
+                            state: "not_ready" | "ready" | "published" | "changed";
+                            latest: {
+                                id: string;
+                                version: number;
+                                published_at: string;
+                            } | null;
+                        }[];
+                        settings: {
+                            show_position: boolean;
+                            head_comment: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.publishing.publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    class_ids?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        published: {
+                            class_id: string;
+                            publication_id: string;
+                            version: number;
+                        }[];
+                        classes: {
+                            class_id: string;
+                            class: string;
+                            level: string;
+                            campus: string;
+                            period: {
+                                id: string;
+                                name: string;
+                            };
+                            learners: number;
+                            subjects: number;
+                            subjects_ready: number;
+                            comments: number;
+                            ready: boolean;
+                            missing: string[];
+                            /** @enum {string} */
+                            state: "not_ready" | "ready" | "published" | "changed";
+                            latest: {
+                                id: string;
+                                version: number;
+                                published_at: string;
+                            } | null;
+                        }[];
+                        settings: {
+                            show_position: boolean;
+                            head_comment: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.publishing.settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @default false */
+                    show_position?: boolean;
+                    /** @default false */
+                    head_comment?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        classes: {
+                            class_id: string;
+                            class: string;
+                            level: string;
+                            campus: string;
+                            period: {
+                                id: string;
+                                name: string;
+                            };
+                            learners: number;
+                            subjects: number;
+                            subjects_ready: number;
+                            comments: number;
+                            ready: boolean;
+                            missing: string[];
+                            /** @enum {string} */
+                            state: "not_ready" | "ready" | "published" | "changed";
+                            latest: {
+                                id: string;
+                                version: number;
+                                published_at: string;
+                            } | null;
+                        }[];
+                        settings: {
+                            show_position: boolean;
+                            head_comment: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        period: {
+                            id: string;
+                            name: string;
+                        };
+                        can_class: boolean;
+                        can_head: boolean;
+                        head_comment: boolean;
+                        max: number;
+                        learners: {
+                            id: string;
+                            name: string;
+                            total: {
+                                total: number;
+                                out_of: number;
+                                complete: boolean;
+                            };
+                            position: {
+                                position: number;
+                                of: number;
+                                shared: boolean;
+                            } | null;
+                            grades: {
+                                subject: string;
+                                short: string;
+                                grade: string | null;
+                                ready: boolean;
+                            }[];
+                            lines: {
+                                label: string;
+                                value: string;
+                            }[];
+                            comments: {
+                                class_teacher: {
+                                    text: string;
+                                    by: string;
+                                    at: string;
+                                } | null;
+                                head: {
+                                    text: string;
+                                    by: string;
+                                    at: string;
+                                } | null;
+                            };
+                        }[];
+                        written: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.comments.write": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        period: {
+                            id: string;
+                            name: string;
+                        };
+                        can_class: boolean;
+                        can_head: boolean;
+                        head_comment: boolean;
+                        max: number;
+                        learners: {
+                            id: string;
+                            name: string;
+                            total: {
+                                total: number;
+                                out_of: number;
+                                complete: boolean;
+                            };
+                            position: {
+                                position: number;
+                                of: number;
+                                shared: boolean;
+                            } | null;
+                            grades: {
+                                subject: string;
+                                short: string;
+                                grade: string | null;
+                                ready: boolean;
+                            }[];
+                            lines: {
+                                label: string;
+                                value: string;
+                            }[];
+                            comments: {
+                                class_teacher: {
+                                    text: string;
+                                    by: string;
+                                    at: string;
+                                } | null;
+                                head: {
+                                    text: string;
+                                    by: string;
+                                    at: string;
+                                } | null;
+                            };
+                        }[];
+                        written: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.cards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        school: {
+                            name: string;
+                            has_logo: boolean;
+                        };
+                        publication: {
+                            id: string;
+                            class_id: string;
+                            period_id: string;
+                            version: number;
+                            published_at: string;
+                        };
+                        cards: {
+                            reference: string;
+                            learner: {
+                                id: string;
+                                name: string;
+                                admission_number: string | null;
+                            };
+                            class: {
+                                id: string;
+                                name: string;
+                            };
+                            period: {
+                                id: string;
+                                name: string;
+                                starts_on: string;
+                                ends_on: string;
+                            };
+                            scale: {
+                                name: string;
+                                overall: string;
+                                pass_from: string | null;
+                            } | null;
+                            subjects: {
+                                subject_id: string;
+                                subject: string;
+                                short: string;
+                                parts: {
+                                    label: string;
+                                    weight: number;
+                                    score: number | null;
+                                    points: number | null;
+                                }[];
+                                percent: number | null;
+                                grade: string | null;
+                                word: string | null;
+                                passes: boolean | null;
+                                ready: boolean;
+                            }[];
+                            summary: {
+                                /** @enum {string} */
+                                kind: "average_percent" | "average_grade" | "best_six";
+                                value: number | null;
+                                of: number;
+                            };
+                            total: {
+                                total: number;
+                                out_of: number;
+                                complete: boolean;
+                            };
+                            position: {
+                                position: number;
+                                of: number;
+                                shared: boolean;
+                            } | null;
+                            comments: {
+                                class_teacher: {
+                                    text: string;
+                                    by: string;
+                                    at: string;
+                                } | null;
+                                head: {
+                                    text: string;
+                                    by: string;
+                                    at: string;
+                                } | null;
+                            };
+                            lines: {
+                                label: string;
+                                value: string;
+                            }[];
+                            next_term: string | null;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "kernel.ready": {
         parameters: {
             query?: never;
@@ -9099,6 +9583,39 @@ export interface operations {
                                 type: string;
                             }[];
                         }[];
+                        published: {
+                            publication_id: string;
+                            version: number;
+                            published_at: string;
+                            reference: string;
+                            subjects: {
+                                subject_id: string;
+                                subject: string;
+                                short: string;
+                                percent: number | null;
+                                grade: string | null;
+                                word: string | null;
+                                passes: boolean | null;
+                                ready: boolean;
+                            }[];
+                            total: {
+                                total: number;
+                                out_of: number;
+                                complete: boolean;
+                            } | null;
+                            position: {
+                                position: number;
+                                of: number;
+                                shared: boolean;
+                            } | null;
+                            versions: {
+                                publication_id: string;
+                                version: number;
+                                published_at: string;
+                                by: string;
+                                reason: string | null;
+                            }[];
+                        } | null;
                     };
                 };
             };

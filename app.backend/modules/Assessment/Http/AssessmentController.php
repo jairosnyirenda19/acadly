@@ -32,7 +32,7 @@ final class AssessmentController
     /**
      * The viewer's assessments this term, with how far each is marked.
      *
-     * @response array{today: string, totals: array{all: int, to_finish: int, submitted: int, locked: int}, assessments: list<array{id: string, class_id: string, class: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, learners: int, marked: int, absent: int}>, can_set: bool}
+     * @response array{today: string, totals: array{all: int, to_finish: int, submitted: int, locked: int}, assessments: list<array{id: string, class_id: string, class: string, subject: string, kind: string, kind_label: string, title: string, held_on: string, out_of: int, state: 'marking'|'submitted'|'returned'|'locked', state_label: string, learners: int, marked: int, absent: int}>, can_set: bool, looks_after: list<array{class_id: string, class: string}>}
      */
     public function mine(Request $request): JsonResponse
     {

@@ -20,6 +20,9 @@ enum AssessmentAudit: string implements AuditAction
     case MarkCorrected = 'assessment.mark_corrected';
     case PaperAdded = 'assessment.paper_added';
     case PaperChanged = 'assessment.paper_changed';
+    case CommentWritten = 'assessment.comment_written';
+    case ResultsPublished = 'assessment.results_published';
+    case CardSettingsSaved = 'assessment.card_settings_saved';
 
     public function key(): string
     {
@@ -37,6 +40,9 @@ enum AssessmentAudit: string implements AuditAction
             self::MarkCorrected => 'Corrected a locked mark.',
             self::PaperAdded => "Added a page of a learner's marked paper.",
             self::PaperChanged => "Removed or moved a page of a learner's marked paper.",
+            self::CommentWritten => "Wrote a report card comment for a learner's term.",
+            self::ResultsPublished => "Published a class's term results and report cards.",
+            self::CardSettingsSaved => 'Changed what report cards show.',
         };
     }
 

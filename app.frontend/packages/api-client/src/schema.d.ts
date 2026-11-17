@@ -674,6 +674,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/portal/children/{id}/absences/{day}/reason": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Give the reason for an absence
+         * @description The reason for a morning absence of the child, up to 14 days after it.
+         *     The register keeps the mark; staff see the reason beside it. A later
+         *     reason replaces what staff see, and every reason is kept.
+         */
+        post: operations["portal.absence-reason"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/portal/children/{id}/card": {
         parameters: {
             query?: never;
@@ -5311,12 +5333,99 @@ export interface operations {
                                     future: boolean;
                                 }[];
                             }[];
+                            absences: {
+                                day: string;
+                                open: boolean;
+                                reason: {
+                                    /** @enum {string} */
+                                    kind: "sick" | "family" | "travel" | "other";
+                                    note: string | null;
+                                    by: string;
+                                    by_me: boolean;
+                                    at: string;
+                                } | null;
+                            }[];
                         } | null;
                     };
                 };
             };
             401: components["responses"]["AuthenticationException"];
             404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "portal.absence-reason": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                day: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    kind?: string;
+                    note?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        child: {
+                            id: string;
+                            first_name: string;
+                            name: string;
+                            class_id: string | null;
+                            class: string;
+                        };
+                        attendance: {
+                            term: {
+                                name: string;
+                                starts_on: string;
+                                ends_on: string;
+                            } | null;
+                            today: string;
+                            totals: {
+                                marked: number;
+                                present: number;
+                                absent: number;
+                                late: number;
+                                share: number | null;
+                                last_absent: string | null;
+                            };
+                            weeks: {
+                                week: string;
+                                days: {
+                                    day: string;
+                                    mark: string | null;
+                                    school_day: boolean;
+                                    future: boolean;
+                                }[];
+                            }[];
+                            absences: {
+                                day: string;
+                                open: boolean;
+                                reason: {
+                                    /** @enum {string} */
+                                    kind: "sick" | "family" | "travel" | "other";
+                                    note: string | null;
+                                    by: string;
+                                    by_me: boolean;
+                                    at: string;
+                                } | null;
+                            }[];
+                        } | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "portal.card": {
@@ -7277,6 +7386,13 @@ export interface operations {
                             lesson: string | null;
                             register_id: string;
                             reason: string | null;
+                            from_family: {
+                                /** @enum {string} */
+                                kind: "sick" | "family" | "travel" | "other";
+                                note: string | null;
+                                by: string;
+                                at: string;
+                            } | null;
                             told: {
                                 to: string;
                                 channel: string;
@@ -9912,6 +10028,13 @@ export interface operations {
                                     at: string;
                                 }[];
                                 next: string | null;
+                                from_family: {
+                                    /** @enum {string} */
+                                    kind: "sick" | "family" | "travel" | "other";
+                                    note: string | null;
+                                    by: string;
+                                    at: string;
+                                } | null;
                                 follow_ups: {
                                     /** @enum {string} */
                                     kind: "told_next" | "called";

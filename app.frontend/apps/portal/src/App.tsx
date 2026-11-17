@@ -1,6 +1,6 @@
 import { getAccount, getSchoolName, navigate, signOut, useLocation, type Account } from '@acadly/kernel'
 import { useEffect, useState } from 'react'
-import { AttendancePage, CardPage, MessagesPage } from './ChildPages'
+import { AttendancePage, CardPage, MessagesPage, ReasonPage } from './ChildPages'
 import type { Language } from './copy'
 import { ChildScreen, Home } from './Family'
 import { keepLanguage, LanguageContext, savedLanguage } from './parts'
@@ -33,7 +33,7 @@ export function App() {
   }
 
   let screen
-  const child = /^\/child\/([0-9a-f-]{36})(?:\/(card|attendance|messages))?$/.exec(path)
+  const child = /^\/child\/([0-9a-f-]{36})(?:\/(card|attendance|messages|reason)(?:\/(\d{4}-\d{2}-\d{2}))?)?$/.exec(path)
 
   if (account === undefined) screen = <div className="min-h-screen bg-paper" />
   else if (account === null) {
@@ -48,7 +48,18 @@ export function App() {
     )
   } else if (child !== null && child[1] !== undefined) {
     const id = child[1]
-    screen = child[2] === 'card' ? <CardPage id={id} /> : child[2] === 'attendance' ? <AttendancePage id={id} /> : child[2] === 'messages' ? <MessagesPage id={id} /> : <ChildScreen id={id} />
+    screen =
+      child[2] === 'card' ? (
+        <CardPage id={id} />
+      ) : child[2] === 'attendance' ? (
+        <AttendancePage id={id} />
+      ) : child[2] === 'messages' ? (
+        <MessagesPage id={id} />
+      ) : child[2] === 'reason' ? (
+        <ReasonPage id={id} day={child[3] ?? null} />
+      ) : (
+        <ChildScreen id={id} />
+      )
   } else {
     screen = <Home onSignOut={() => void signOut().then(() => setAccount(null))} />
   }

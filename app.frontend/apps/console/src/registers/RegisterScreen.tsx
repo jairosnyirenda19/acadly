@@ -440,6 +440,16 @@ function Told({ absence }: { absence: Absence }) {
           <span className="ref text-xs text-text-muted">{clock(d.at)}</span>
         </span>
       ))}
+      {absence.from_family !== null && (
+        <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          <Tag tone="done">✓ {t.fromFamily}</Tag>
+          <span>
+            <strong>{t.absenceReasons[absence.from_family.kind] ?? absence.from_family.kind}</strong>
+            {absence.from_family.note !== null && <> · “{absence.from_family.note}”</>}
+          </span>
+          <span className="text-text-muted">{t.familyGave(absence.from_family.by, clock(absence.from_family.at))}</span>
+        </span>
+      )}
       {absence.follow_ups.map((f, i) => (
         <span key={`f${i}`} className="text-text-muted">
           {(t.followUp[f.kind] ?? ((by: string) => by))(f.by)}, {clock(f.at)}

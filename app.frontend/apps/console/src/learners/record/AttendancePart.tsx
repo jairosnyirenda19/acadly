@@ -199,7 +199,17 @@ export function AttendanceTab({ learner }: { learner: LearnerState }) {
                       <MarginCell>{t.day(x.day)}</MarginCell>
                       <Td>{x.lesson ?? t.morning}</Td>
                       <Td>{x.what === 'absent' ? <Tag tone="wrong">{t.absent}</Tag> : <Tag tone="attention">{t.missed}</Tag>}</Td>
-                      <Td wide>{x.reason ?? <span className="text-text-muted">{t.noReason}</span>}</Td>
+                      <Td wide>
+                        {x.from_family !== null ? (
+                          <>
+                            <span className="block font-bold">{copy.registers.absenceReasons[x.from_family.kind] ?? x.from_family.kind}</span>
+                            {x.from_family.note !== null && <span className="block">“{x.from_family.note}”</span>}
+                            <span className="block text-[13px] text-text-muted">{t.familyGave(x.from_family.by, t.time(x.from_family.at))}</span>
+                          </>
+                        ) : (
+                          (x.reason ?? <span className="text-text-muted">{t.noReason}</span>)
+                        )}
+                      </Td>
                       <Td wide>
                         {x.told.length === 0 && x.follow_ups.length === 0 && <span className="text-text-muted">{t.notTold}</span>}
                         {x.told.map((told, j) => (

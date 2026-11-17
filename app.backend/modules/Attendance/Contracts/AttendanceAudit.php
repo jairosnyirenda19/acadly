@@ -13,6 +13,7 @@ enum AttendanceAudit: string implements AuditAction
     case LessonRegisterSubmitted = 'attendance.lesson_register_submitted';
     case AwaySet = 'attendance.away_set';
     case CoverAsked = 'attendance.cover_asked';
+    case AbsenceReasonGiven = 'attendance.absence_reason_given';
 
     public function key(): string
     {
@@ -27,6 +28,7 @@ enum AttendanceAudit: string implements AuditAction
             self::LessonRegisterSubmitted => 'Submitted the register of a lesson.',
             self::AwaySet => 'Marked a member of staff away for a day, or back.',
             self::CoverAsked => 'Asked a member of staff to cover a lesson.',
+            self::AbsenceReasonGiven => 'Gave the reason for an absence in the parent portal.',
         };
     }
 

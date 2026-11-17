@@ -150,6 +150,7 @@ it('refuses every place-bound route to an account that holds everything, but onl
         'registers.' => ['id' => $school->id('class_secondary_b'), 'register' => $school->id('class_secondary_b'), 'learner' => $learner, 'slot' => $slot],
         'assessment.' => ['id' => $assessment],
         'assessment.learner' => ['id' => $learner],
+        'portal.' => ['id' => $learner, 'day' => '2026-10-01'],
     ];
     $b = [
         'id' => $school->id('campus_b'),

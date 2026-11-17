@@ -9541,13 +9541,350 @@
                                                             "days"
                                                         ]
                                                     }
+                                                },
+                                                "absences": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "day": {
+                                                                "type": "string"
+                                                            },
+                                                            "open": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "reason": {
+                                                                "type": [
+                                                                    "object",
+                                                                    "null"
+                                                                ],
+                                                                "properties": {
+                                                                    "kind": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "sick",
+                                                                            "family",
+                                                                            "travel",
+                                                                            "other"
+                                                                        ]
+                                                                    },
+                                                                    "note": {
+                                                                        "type": [
+                                                                            "string",
+                                                                            "null"
+                                                                        ]
+                                                                    },
+                                                                    "by": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "by_me": {
+                                                                        "type": "boolean"
+                                                                    },
+                                                                    "at": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "kind",
+                                                                    "note",
+                                                                    "by",
+                                                                    "by_me",
+                                                                    "at"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "day",
+                                                            "open",
+                                                            "reason"
+                                                        ]
+                                                    }
                                                 }
                                             },
                                             "required": [
                                                 "term",
                                                 "today",
                                                 "totals",
-                                                "weeks"
+                                                "weeks",
+                                                "absences"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "child",
+                                        "attendance"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/portal/children/{id}/absences/{day}/reason": {
+            "post": {
+                "operationId": "portal.absence-reason",
+                "description": "The reason for a morning absence of the child, up to 14 days after it.\nThe register keeps the mark; staff see the reason beside it. A later\nreason replaces what staff see, and every reason is kept.",
+                "summary": "Give the reason for an absence",
+                "tags": [
+                    "FamilyAttendance"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "day",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string"
+                                    },
+                                    "note": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "child": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "first_name": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "class_id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "class": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "first_name",
+                                                "name",
+                                                "class_id",
+                                                "class"
+                                            ]
+                                        },
+                                        "attendance": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "term": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "starts_on": {
+                                                            "type": "string"
+                                                        },
+                                                        "ends_on": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "name",
+                                                        "starts_on",
+                                                        "ends_on"
+                                                    ]
+                                                },
+                                                "today": {
+                                                    "type": "string"
+                                                },
+                                                "totals": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "marked": {
+                                                            "type": "integer"
+                                                        },
+                                                        "present": {
+                                                            "type": "integer"
+                                                        },
+                                                        "absent": {
+                                                            "type": "integer"
+                                                        },
+                                                        "late": {
+                                                            "type": "integer"
+                                                        },
+                                                        "share": {
+                                                            "type": [
+                                                                "integer",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "last_absent": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "marked",
+                                                        "present",
+                                                        "absent",
+                                                        "late",
+                                                        "share",
+                                                        "last_absent"
+                                                    ]
+                                                },
+                                                "weeks": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "week": {
+                                                                "type": "string"
+                                                            },
+                                                            "days": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "day": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "mark": {
+                                                                            "type": [
+                                                                                "string",
+                                                                                "null"
+                                                                            ]
+                                                                        },
+                                                                        "school_day": {
+                                                                            "type": "boolean"
+                                                                        },
+                                                                        "future": {
+                                                                            "type": "boolean"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "day",
+                                                                        "mark",
+                                                                        "school_day",
+                                                                        "future"
+                                                                    ]
+                                                                }
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "week",
+                                                            "days"
+                                                        ]
+                                                    }
+                                                },
+                                                "absences": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "day": {
+                                                                "type": "string"
+                                                            },
+                                                            "open": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "reason": {
+                                                                "type": [
+                                                                    "object",
+                                                                    "null"
+                                                                ],
+                                                                "properties": {
+                                                                    "kind": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "sick",
+                                                                            "family",
+                                                                            "travel",
+                                                                            "other"
+                                                                        ]
+                                                                    },
+                                                                    "note": {
+                                                                        "type": [
+                                                                            "string",
+                                                                            "null"
+                                                                        ]
+                                                                    },
+                                                                    "by": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "by_me": {
+                                                                        "type": "boolean"
+                                                                    },
+                                                                    "at": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "kind",
+                                                                    "note",
+                                                                    "by",
+                                                                    "by_me",
+                                                                    "at"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "day",
+                                                            "open",
+                                                            "reason"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "term",
+                                                "today",
+                                                "totals",
+                                                "weeks",
+                                                "absences"
                                             ]
                                         }
                                     },
@@ -9561,9 +9898,6 @@
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "404": {
-                        "$ref": "#/components/responses/NotFoundHttpException"
                     }
                 }
             }
@@ -15863,6 +16197,41 @@
                                                             "null"
                                                         ]
                                                     },
+                                                    "from_family": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "kind": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "sick",
+                                                                    "family",
+                                                                    "travel",
+                                                                    "other"
+                                                                ]
+                                                            },
+                                                            "note": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "by": {
+                                                                "type": "string"
+                                                            },
+                                                            "at": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "kind",
+                                                            "note",
+                                                            "by",
+                                                            "at"
+                                                        ]
+                                                    },
                                                     "told": {
                                                         "type": "array",
                                                         "items": {
@@ -15937,6 +16306,7 @@
                                                     "lesson",
                                                     "register_id",
                                                     "reason",
+                                                    "from_family",
                                                     "told",
                                                     "follow_ups"
                                                 ]
@@ -24669,6 +25039,41 @@
                                                                     "null"
                                                                 ]
                                                             },
+                                                            "from_family": {
+                                                                "type": [
+                                                                    "object",
+                                                                    "null"
+                                                                ],
+                                                                "properties": {
+                                                                    "kind": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "sick",
+                                                                            "family",
+                                                                            "travel",
+                                                                            "other"
+                                                                        ]
+                                                                    },
+                                                                    "note": {
+                                                                        "type": [
+                                                                            "string",
+                                                                            "null"
+                                                                        ]
+                                                                    },
+                                                                    "by": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "at": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "kind",
+                                                                    "note",
+                                                                    "by",
+                                                                    "at"
+                                                                ]
+                                                            },
                                                             "follow_ups": {
                                                                 "type": "array",
                                                                 "items": {
@@ -24709,6 +25114,7 @@
                                                         "required": [
                                                             "told",
                                                             "next",
+                                                            "from_family",
                                                             "follow_ups",
                                                             "can_follow_up"
                                                         ]

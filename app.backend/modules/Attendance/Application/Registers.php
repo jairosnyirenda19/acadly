@@ -40,6 +40,7 @@ final class Registers
         private readonly Reach $reach,
         private readonly Modes $modes,
         private readonly Deliveries $deliveries,
+        private readonly AbsenceReasons $reasons,
         private readonly Clock $clock,
         private readonly ApprovalRequests $approvals,
         private readonly Approvals $chains,
@@ -186,9 +187,10 @@ final class Registers
 
     /**
      * For each learner first marked absent: who was told and how it stands,
-     * the next contact not yet told, and what staff did after.
+     * the next contact not yet told, the reason the family gave (D-084), and
+     * what staff did after.
      *
-     * @return array<string, array{told: list<array{to: string, relationship: string, channel: string, state: string, at: string}>, next: string|null, follow_ups: list<array{kind: string, by: string, at: string, note: string|null}>}>
+     * @return array<string, array{told: list<array{to: string, relationship: string, channel: string, state: string, at: string}>, next: string|null, from_family: array{kind: string, note: string|null, by: string, at: string}|null, follow_ups: list<array{kind: string, by: string, at: string, note: string|null}>}>
      */
     private function absences(string $registerId): array
     {
@@ -206,6 +208,7 @@ final class Registers
 
         $about = $this->deliveries->about(AbsenceTopic::SUBJECT, array_column($first, 'id'));
         $steps = DB::table('attendance_follow_ups')->where('register_id', $registerId)->orderBy('done_at')->get();
+        $family = $this->reasons->latest([$registerId]);
         $names = $this->userNames(array_values(array_map(fn (object $s): string => Row::text($s, 'done_by'), $steps->all())));
         $out = [];
 
@@ -229,6 +232,7 @@ final class Registers
             $out[$learner] = [
                 'told' => array_map(fn (array $d): array => ['to' => $d['to'], 'relationship' => $relation($d['to']), 'channel' => $d['channel'], 'state' => $d['state'], 'at' => $d['at']], $told),
                 'next' => $next,
+                'from_family' => AbsenceReasons::forStaff($family, $registerId, $learner),
                 'follow_ups' => array_values(array_map(fn (object $s): array => ['kind' => Row::text($s, 'kind'), 'by' => $names[Row::text($s, 'done_by')] ?? '',
                     'at' => Row::text($s, 'done_at'), 'note' => Row::maybeText($s, 'note')], array_filter($steps->all(), fn (object $s): bool => Row::text($s, 'learner_id') === $learner))),
             ];

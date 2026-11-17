@@ -979,6 +979,7 @@ export const copy = {
       absent: 'Absent',
       missed: 'Missed a lesson',
       noReason: 'No reason given.',
+      familyGave: (by: string, time: string) => `From ${by}, in the parent portal, ${time}.`,
       toldLine: (channel: string, to: string, state: string, time: string) => `${channel} to ${to} · ${state} ${time}`,
       followUp: {
         called: (by: string, time: string) => `Called by ${by} at ${time}.`,
@@ -1395,6 +1396,14 @@ export const copy = {
       called: (by: string) => `Family called by ${by}`,
     } as Record<string, (by: string) => string>,
     followUpsKept: 'Both are kept in the history of the learner.',
+    fromFamily: 'Reason from the family',
+    familyGave: (by: string, time: string) => `${by}, in the parent portal at ${time}`,
+    absenceReasons: {
+      sick: 'Sick or seeing a doctor',
+      family: 'Family matter',
+      travel: 'Could not travel to school',
+      other: 'Another reason',
+    } as Record<string, string>,
     toldNext: 'The next contact has been told.',
     callRecorded: 'The call has been recorded.',
 

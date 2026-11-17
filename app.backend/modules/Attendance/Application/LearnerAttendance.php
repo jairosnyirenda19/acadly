@@ -39,6 +39,7 @@ final class LearnerAttendance implements LearnerRecordPart
         private readonly SchoolDays $days,
         private readonly Reach $reach,
         private readonly Deliveries $deliveries,
+        private readonly AbsenceReasons $reasons,
         private readonly Clock $clock,
     ) {}
 
@@ -94,13 +95,14 @@ final class LearnerAttendance implements LearnerRecordPart
     }
 
     /**
-     * What a parent sees of the term (the parent portal): the totals and the
-     * mornings. Nothing about staff, follow-ups or corrections. The caller
+     * What a parent sees of the term (the parent portal): the totals, the
+     * mornings, and each morning absence with the reason the family gave
+     * (D-084). Nothing about staff, follow-ups or corrections. The caller
      * checks that the parent sees the learner.
      *
-     * @return array{term: array{name: string, starts_on: string, ends_on: string}|null, today: string, totals: array{marked: int, present: int, absent: int, late: int, share: int|null, last_absent: string|null}, weeks: list<array{week: string, days: list<array{day: string, mark: string|null, school_day: bool, future: bool}>}>}|null
+     * @return array{term: array{name: string, starts_on: string, ends_on: string}|null, today: string, totals: array{marked: int, present: int, absent: int, late: int, share: int|null, last_absent: string|null}, weeks: list<array{week: string, days: list<array{day: string, mark: string|null, school_day: bool, future: bool}>}>, absences: list<array{day: string, open: bool, reason: array{kind: string, note: string|null, by: string, by_me: bool, at: string}|null}>}|null
      */
-    public function forFamily(string $learnerId): ?array
+    public function forFamily(string $learnerId, User $parent): ?array
     {
         $place = $this->learners->placeOf($learnerId);
 
@@ -115,12 +117,23 @@ final class LearnerAttendance implements LearnerRecordPart
         $term = $all['term'];
         /** @var list<array{week: string, days: list<array{day: string, mark: string|null, school_day: bool, future: bool}>}> $weeks */
         $weeks = $all['weeks'];
+        /** @var list<array{day: string, what: string, register_id: string}> $absences */
+        $absences = $all['absences'];
+        $mornings = array_values(array_filter($absences, fn (array $a): bool => $a['what'] === 'absent'));
+        $latest = $this->reasons->latest(array_column($mornings, 'register_id'), $learnerId);
+        $openFrom = CarbonImmutable::parse($this->clock->today())->subDays(AbsenceReasons::OPEN_DAYS)->toDateString();
 
         return [
             'term' => $term,
             'today' => $this->clock->today(),
             'totals' => ['marked' => $t['marked'], 'present' => $t['present'], 'absent' => $t['absent'], 'late' => $t['late'], 'share' => $t['share'], 'last_absent' => $t['last_absent']],
             'weeks' => $weeks,
+            'absences' => array_map(function (array $a) use ($latest, $learnerId, $openFrom, $parent): array {
+                $r = $latest[$a['register_id'].':'.$learnerId] ?? null;
+
+                return ['day' => $a['day'], 'open' => $a['day'] >= $openFrom,
+                    'reason' => $r === null ? null : ['kind' => $r['kind'], 'note' => $r['note'], 'by' => $r['by'], 'by_me' => $r['by_id'] === $parent->id, 'at' => $r['at']]];
+            }, $mornings),
         ];
     }
 
@@ -307,7 +320,8 @@ final class LearnerAttendance implements LearnerRecordPart
         $steps = DB::table('attendance_follow_ups')->where('learner_id', $learnerId)->whereIn('register_id', $registers ?: [Lessons::NONE])->orderBy('done_at')->get();
         $names = DB::table('users')->whereIn('id', array_map(fn (object $s): string => Row::text($s, 'done_by'), $steps->all()) ?: [Lessons::NONE])->pluck('name', 'id')->all();
 
-        $out = array_map(fn (array $a): array => [...$a, 'follow_ups' => array_values(array_map(fn (object $s): array => [
+        $family = $this->reasons->latest($registers, $learnerId);
+        $out = array_map(fn (array $a): array => [...$a, 'from_family' => $a['what'] === 'absent' && is_string($a['register_id'] ?? null) ? AbsenceReasons::forStaff($family, $a['register_id'], $learnerId) : null, 'follow_ups' => array_values(array_map(fn (object $s): array => [
             'kind' => Row::text($s, 'kind'), 'by' => is_string($names[Row::text($s, 'done_by')] ?? null) ? $names[Row::text($s, 'done_by')] : '',
             'at' => Row::text($s, 'done_at'), 'note' => Row::maybeText($s, 'note'),
         ], array_filter($steps->all(), fn (object $s): bool => Row::text($s, 'register_id') === $a['register_id'])))], $absences);

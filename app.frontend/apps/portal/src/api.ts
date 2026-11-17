@@ -36,6 +36,17 @@ export const portalApi = {
     }
   },
   attendance: (id: string) => read(api.GET('/v1/portal/children/{id}/attendance', { params: { path: { id } } })),
+  /** Give the reason for a morning absence; the child's attendance as it now stands, or null when it was not saved. */
+  giveReason: async (id: string, day: string, kind: string, note: string): Promise<AttendanceState | null> => {
+    try {
+      await api.GET('/v1/auth/csrf-cookie')
+      const { data } = await api.POST('/v1/portal/children/{id}/absences/{day}/reason', { params: { path: { id, day } }, body: { kind, note } as never })
+
+      return data ?? null
+    } catch {
+      return null
+    }
+  },
   card: (id: string) => read(api.GET('/v1/portal/children/{id}/card', { params: { path: { id } } })),
   messages: (id: string) => read(api.GET('/v1/portal/children/{id}/messages', { params: { path: { id } } })),
 }

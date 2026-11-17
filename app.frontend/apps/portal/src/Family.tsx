@@ -47,9 +47,12 @@ function ChildCard({ child }: { child: Child }) {
   const href = `/child/${child.id}`
   const today = child.lines.find((l) => l.key === 'today')
   const card = child.lines.find((l) => l.key === 'card')
+  const reason = `/child/${child.id}/reason`
+  const ask = today !== undefined && today.word === 'absent_ask' && child.state !== 'suspended'
 
   return (
-    <a href={href} onClick={(e) => go(e, href)} className="mb-3 block border-2 border-ink bg-sheet text-ink no-underline">
+    <div className="mb-3 border-2 border-ink bg-sheet">
+    <a href={href} onClick={(e) => go(e, href)} className="block text-ink no-underline">
       <span className="flex items-center gap-3 px-3.5 py-3">
         <Badge name={child.name} />
         <span className="min-w-0 flex-1">
@@ -77,6 +80,15 @@ function ChildCard({ child }: { child: Child }) {
         <span className="block border-t border-rule bg-marigold-wash px-3.5 py-2.5 text-base font-extrabold">{t.home.newCard(card.label ?? '')}</span>
       )}
     </a>
+    {ask && (
+      <div className="border-t border-rule bg-marigold-wash px-3.5 pt-3 pb-3.5">
+        <p className="mb-2.5 text-[15px] leading-snug">{t.home.askNote}</p>
+        <a href={reason} onClick={(e) => go(e, reason)} className="flex h-14 items-center justify-center bg-ink text-lg font-extrabold text-sheet no-underline">
+          {t.home.tellWhy}
+        </a>
+      </div>
+    )}
+    </div>
   )
 }
 

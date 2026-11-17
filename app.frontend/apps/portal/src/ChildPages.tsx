@@ -1,9 +1,12 @@
-import { useLoad } from '@acadly/kernel'
+import { navigate, useLoad } from '@acadly/kernel'
 import { Button } from '@acadly/ui'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { portalApi, readCard, type AttendanceState } from './api'
 import { useFamily } from './Family'
-import { Bar, Loading, Mark, Screen, shortDay, longDay, useWords, when, type Tone, Note } from './parts'
+import { Bar, go, Loading, Mark, Screen, shortDay, longDay, useWords, when, type Tone, Note } from './parts'
+
+/** The child whose reason was just sent, so the attendance page says so once. */
+let sentFor: string | null = null
 
 /** The frame of a child's page: the way back to the child, then the page. */
 function ChildPage<T>({ id, phase, data, onRetry, children, foot }: { id: string; phase: string; data: T | undefined; onRetry: () => void; children: (data: T) => ReactNode; foot?: ReactNode }) {
@@ -155,15 +158,21 @@ const markTone: Record<string, Tone> = { present: 'done', late: 'attention', abs
 /** Attendance this term: the totals, then every school morning by week. */
 export function AttendancePage({ id }: { id: string }) {
   const loaded = useLoad(`portal:attendance:${id}`, () => portalApi.attendance(id))
+  const [sent] = useState(() => {
+    const was = sentFor === id
+    sentFor = null
+
+    return was
+  })
 
   return (
     <ChildPage id={id} phase={loaded.phase} data={loaded.data} onRetry={loaded.reload}>
-      {(data) => <Attendance data={data} />}
+      {(data) => <Attendance id={id} data={data} sent={sent} />}
     </ChildPage>
   )
 }
 
-function Attendance({ data }: { data: AttendanceState }) {
+function Attendance({ id, data, sent }: { id: string; data: AttendanceState; sent: boolean }) {
   const a = useWords().attendance
   const term = data.attendance
 
@@ -180,6 +189,15 @@ function Attendance({ data }: { data: AttendanceState }) {
 
   return (
     <>
+      {sent && (
+        <div role="status" className="mx-4 mt-3.5 flex items-start gap-2.5 border-2 border-teal bg-sheet px-3.5 py-3">
+          <Mark tone="done" />
+          <span className="text-[15px] leading-snug">
+            <strong className="block text-base">{a.sentTitle}</strong>
+            {a.sentNote}
+          </span>
+        </div>
+      )}
       <div className="px-4 pt-4 pb-2.5">
         <div className="label-caps text-[11px] text-text-muted">{a.kicker(term.term?.name ?? '')}</div>
         <h1 className="type-display mt-1 text-[34px] leading-[0.9]">{data.child.name}</h1>
@@ -200,6 +218,7 @@ function Attendance({ data }: { data: AttendanceState }) {
       </div>
       <div className="bg-sheet px-4 pt-3 pb-6">
         {tot.last_absent !== null && <p className="mb-3 text-[15px]">{a.lastAbsent(longDay(tot.last_absent))}</p>}
+        <Absences id={id} absences={term.absences} />
         <div aria-hidden="true" className="mb-1 grid grid-cols-[1fr_repeat(5,36px)] gap-1.5 text-center text-[11px] font-extrabold text-text-muted">
           <span />
           {a.weekdays.map((d) => (
@@ -245,6 +264,186 @@ function Attendance({ data }: { data: AttendanceState }) {
         </div>
       </div>
     </>
+  )
+}
+
+type Absence = NonNullable<AttendanceState['attendance']>['absences'][number]
+
+/** Each morning absence of the term and its reason: sent, still to give, or closed (the approved design, D-084). */
+function Absences({ id, absences }: { id: string; absences: Absence[] }) {
+  const t = useWords()
+  const a = t.attendance
+
+  if (absences.length === 0) return null
+
+  return (
+    <section className="mb-5">
+      <h2 className="label-caps mb-1 text-[10px] text-text-muted">{a.daysAbsent}</h2>
+      <ul>
+        {absences.map((x) => {
+          const href = `/child/${id}/reason/${x.day}`
+
+          return (
+            <li key={x.day} className="border-b border-rule py-3">
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                <span className="flex-1 text-[17px] font-extrabold">{longDay(x.day)}</span>
+                {x.reason !== null ? (
+                  <span className="label-caps bg-teal px-[7px] py-[3px] text-[10px] text-sheet">✓ {a.reasonSent}</span>
+                ) : x.open ? (
+                  <span className="label-caps bg-marigold px-[7px] py-[3px] text-[10px] text-ink">! {a.noReason}</span>
+                ) : (
+                  <span className="label-caps bg-field px-[7px] py-[3px] text-[10px] text-ink">{a.closed}</span>
+                )}
+              </div>
+              {x.reason !== null && (
+                <>
+                  <div className="mt-1 text-[15px]">
+                    {t.reason.kinds[x.reason.kind] ?? x.reason.kind}
+                    {x.reason.note !== null && <> · “{x.reason.note}”</>}
+                  </div>
+                  <div className="mt-0.5 text-[13px] text-text-muted">
+                    {a.sentBy(x.reason.by_me ? a.you : x.reason.by, when(x.reason.at))}
+                    {x.open && (
+                      <>
+                        {' · '}
+                        <a href={href} onClick={(e) => go(e, href)} className="font-bold text-ink underline underline-offset-[3px]">
+                          {a.change}
+                        </a>
+                      </>
+                    )}
+                  </div>
+                </>
+              )}
+              {x.reason === null && x.open && (
+                <a href={href} onClick={(e) => go(e, href)} className="mt-2 flex h-12 items-center justify-center border-2 border-ink text-base font-extrabold text-ink no-underline">
+                  {a.tellWhy}
+                </a>
+              )}
+              {x.reason === null && !x.open && <div className="mt-1 text-sm text-text-muted">{a.closedNote(14)}</div>}
+            </li>
+          )
+        })}
+      </ul>
+    </section>
+  )
+}
+
+/** Why the child was absent: four big choices and a few words (the approved design, D-084). */
+export function ReasonPage({ id, day }: { id: string; day: string | null }) {
+  const loaded = useLoad(`portal:attendance:${id}`, () => portalApi.attendance(id))
+  const family = useFamily()
+
+  return (
+    <ChildPage
+      id={id}
+      phase={loaded.phase}
+      data={loaded.data}
+      onRetry={loaded.reload}
+    >
+      {(data) => (
+        <ReasonForm
+          id={id}
+          day={day ?? data.attendance?.today ?? ''}
+          data={data}
+          onSent={(next) => {
+            loaded.set(next)
+            family.reload()
+            sentFor = id
+            navigate(`/child/${id}/attendance`, true)
+          }}
+        />
+      )}
+    </ChildPage>
+  )
+}
+
+function ReasonForm({ id, day, data, onSent }: { id: string; day: string; data: AttendanceState; onSent: (next: AttendanceState) => void }) {
+  const t = useWords()
+  const r = t.reason
+  const absence = data.attendance?.absences.find((x) => x.day === day)
+  const [kind, setKind] = useState(absence?.reason?.kind ?? '')
+  const [note, setNote] = useState(absence?.reason?.note ?? '')
+  const [problem, setProblem] = useState<'choose' | 'failed' | null>(null)
+  const [working, setWorking] = useState(false)
+
+  if (absence === undefined || !absence.open) {
+    return (
+      <div className="px-4 pt-4">
+        <h1 className="type-display mb-3 text-[34px] leading-[0.9]">{data.child.name}</h1>
+        <Note tone="attention" title={r.notOpenTitle}>
+          {r.notOpen}
+        </Note>
+      </div>
+    )
+  }
+
+  const send = async () => {
+    if (kind === '') {
+      setProblem('choose')
+
+      return
+    }
+
+    setWorking(true)
+    setProblem(null)
+    const next = await portalApi.giveReason(id, day, kind, note)
+    setWorking(false)
+
+    if (next === null) setProblem('failed')
+    else onSent(next)
+  }
+
+  return (
+    <form
+      className="flex flex-col pb-6"
+      onSubmit={(e) => {
+        e.preventDefault()
+        void send()
+      }}
+    >
+      <div className="px-4 pt-4 pb-3">
+        <div className="label-caps text-[11px] text-text-muted">{r.kicker(longDay(day))}</div>
+        <h1 className="type-display mt-1 text-[34px] leading-[0.9]">{r.title(data.child.first_name)}</h1>
+      </div>
+      <fieldset className="grid gap-2 px-4">
+        <legend className="sr-only">{r.legend}</legend>
+        {Object.entries(r.kinds).map(([value, label]) => (
+          <label
+            key={value}
+            className={`flex min-h-[60px] items-center gap-3.5 bg-sheet px-3.5 text-lg ${kind === value ? 'border-[3px] border-ink font-extrabold' : 'border-2 border-rule-dashed font-bold'}`}
+          >
+            <input type="radio" name="kind" value={value} checked={kind === value} onChange={() => setKind(value)} className="size-6 accent-ink" />
+            {label}
+          </label>
+        ))}
+      </fieldset>
+      <div className="px-4 pt-3.5">
+        <label htmlFor="reason-note" className="mb-1.5 block text-[15px] font-extrabold">
+          {r.note} <span className="font-medium text-text-muted">({r.noteHint})</span>
+        </label>
+        <textarea
+          id="reason-note"
+          rows={3}
+          maxLength={255}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          className="w-full resize-none border-2 border-ink bg-sheet px-3 py-2.5 text-base"
+        />
+      </div>
+      <p className="mx-4 mt-2.5 text-sm leading-snug text-text-muted">{r.keeps}</p>
+      {problem !== null && (
+        <div className="mx-4 mt-3">
+          <Note tone="attention" title={problem === 'choose' ? r.chooseTitle : r.failedTitle}>
+            {problem === 'failed' ? r.failed : null}
+          </Note>
+        </div>
+      )}
+      <div className="mx-4 mt-4">
+        <Button type="submit" busy={working} className="h-14 w-full text-lg">
+          {r.send}
+        </Button>
+      </div>
+    </form>
   )
 }
 

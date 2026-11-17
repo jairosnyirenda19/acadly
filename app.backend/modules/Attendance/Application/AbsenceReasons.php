@@ -23,6 +23,9 @@ final class AbsenceReasons
 
     public const array KINDS = [self::SICK, self::FAMILY, self::TRAVEL, self::OTHER];
 
+    /** The words staff read in a correction's reason. */
+    public const array LABELS = [self::SICK => 'Sick or seeing a doctor', self::FAMILY => 'Family matter', self::TRAVEL => 'Could not travel to school', self::OTHER => 'Another reason'];
+
     /** A family may give a reason up to this many days after the absence. */
     public const int OPEN_DAYS = 14;
 

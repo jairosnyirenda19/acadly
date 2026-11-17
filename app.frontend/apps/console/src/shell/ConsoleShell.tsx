@@ -198,6 +198,19 @@ export function ConsoleShell({ children, onSignedOut }: { children: ReactNode; o
   const [open, setOpen] = useState(false)
   const [choosing, setChoosing] = useState(false)
   const opener = useRef<HTMLButtonElement>(null)
+  const top = useRef<HTMLDivElement>(null)
+
+  // The height of the strip and header pinned at the top, for anything else that pins itself below them.
+  useEffect(() => {
+    const el = top.current
+    if (el === null || typeof ResizeObserver === 'undefined') return
+    const set = () => document.documentElement.style.setProperty('--shell-top', `${el.offsetHeight}px`)
+    const watch = new ResizeObserver(set)
+    watch.observe(el)
+    set()
+
+    return () => watch.disconnect()
+  }, [])
   const drawer = useRef<HTMLDivElement>(null)
 
   const overlay = width !== 'desktop' && open
@@ -327,7 +340,7 @@ export function ConsoleShell({ children, onSignedOut }: { children: ReactNode; o
       {choosing && <WorkInPanel onClose={closeChoosing} className={width === 'phone' ? 'left-0 w-full' : overlay ? 'left-[312px]' : railFolded ? 'left-16' : 'left-[248px]'} />}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="sticky top-0 z-30">
+        <div ref={top} className="sticky top-0 z-30">
         <ViewAsBar name={context.user.name} />
         <header className="relative flex h-[60px] items-center gap-2.5 border-b-2 border-ink bg-paper px-3 md:h-16 md:gap-3 md:px-[clamp(16px,3vw,40px)]">
           <LoadingRule active={busy} />

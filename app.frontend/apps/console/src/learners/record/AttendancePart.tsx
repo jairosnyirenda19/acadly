@@ -198,7 +198,7 @@ export function AttendanceTab({ learner }: { learner: LearnerState }) {
                     <tr key={`${x.register_id}-${i}`} className={x.what === 'missed' ? 'bg-marigold-wash' : ''}>
                       <MarginCell>{t.day(x.day)}</MarginCell>
                       <Td>{x.lesson ?? t.morning}</Td>
-                      <Td>{x.what === 'absent' ? <Tag tone="wrong">{t.absent}</Tag> : <Tag tone="attention">{t.missed}</Tag>}</Td>
+                      <Td>{x.what === 'absent' ? <Tag tone="wrong">{t.absent}</Tag> : x.what === 'excused' ? <Tag tone="done">✓ {t.excused}</Tag> : <Tag tone="attention">{t.missed}</Tag>}</Td>
                       <Td wide>
                         {x.from_family !== null ? (
                           <>

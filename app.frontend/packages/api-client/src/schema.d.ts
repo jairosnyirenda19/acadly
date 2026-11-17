@@ -2106,6 +2106,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/registers/{register}/absences/{learner}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accepts the reason the family gave for an absence: asks for a correction from absent to excused (D-085) */
+        post: operations["registers.absences.accept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/registers/{register}/absences/{learner}/called": {
         parameters: {
             query?: never;
@@ -5336,6 +5353,7 @@ export interface operations {
                             absences: {
                                 day: string;
                                 open: boolean;
+                                excused_at: string | null;
                                 reason: {
                                     /** @enum {string} */
                                     kind: "sick" | "family" | "travel" | "other";
@@ -5412,6 +5430,7 @@ export interface operations {
                             absences: {
                                 day: string;
                                 open: boolean;
+                                excused_at: string | null;
                                 reason: {
                                     /** @enum {string} */
                                     kind: "sick" | "family" | "travel" | "other";
@@ -7382,7 +7401,7 @@ export interface operations {
                         absences: {
                             day: string;
                             /** @enum {string} */
-                            what: "absent" | "missed";
+                            what: "absent" | "missed" | "excused";
                             lesson: string | null;
                             register_id: string;
                             reason: string | null;
@@ -10214,6 +10233,100 @@ export interface operations {
         };
     };
     "registers.absences.next": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                register: string;
+                learner: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        day: string;
+                        today: string;
+                        school_day: boolean;
+                        teacher: string | null;
+                        register: {
+                            id: string | null;
+                            submitted_at: string;
+                            submitted_by: string;
+                        } | null;
+                        days_before: string[];
+                        learners: unknown[];
+                        can_take: boolean;
+                        /** @description A register for an earlier day asks first, when the school has steps for it (D-081). */
+                        late: boolean;
+                        late_request: {
+                            id: string;
+                            reason: string;
+                            marks: {
+                                [key: string]: string;
+                            };
+                            asked_by: string;
+                            waiting_for: string[];
+                        } | null;
+                        can_request: boolean;
+                    } | {
+                        class: {
+                            id: string;
+                            name: string;
+                        };
+                        lesson: {
+                            slot_id: string;
+                            period: number;
+                            name: string;
+                            starts: string;
+                            ends: string;
+                            /** @enum {string} */
+                            kind: "activity" | "lesson";
+                            whole_level: boolean;
+                            required: boolean;
+                            subject: string;
+                            teacher: string | null;
+                        };
+                        previous: {
+                            /** @enum {string} */
+                            kind: "lesson" | "morning";
+                            name: string | null;
+                            by: string;
+                            at: string;
+                        } | null;
+                        day: string;
+                        today: string;
+                        school_day: boolean;
+                        morning_taken: boolean;
+                        earlier: {
+                            period: number;
+                        } | null;
+                        register: {
+                            id: string;
+                            submitted_at: string;
+                            submitted_by: string;
+                            cover: boolean;
+                        } | null;
+                        cover: boolean;
+                        learners: unknown[];
+                        can_take: boolean;
+                        can_request: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "registers.absences.accept": {
         parameters: {
             query?: never;
             header?: never;

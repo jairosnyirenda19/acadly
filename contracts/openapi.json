@@ -9553,6 +9553,12 @@
                                                             "open": {
                                                                 "type": "boolean"
                                                             },
+                                                            "excused_at": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
                                                             "reason": {
                                                                 "type": [
                                                                     "object",
@@ -9596,6 +9602,7 @@
                                                         "required": [
                                                             "day",
                                                             "open",
+                                                            "excused_at",
                                                             "reason"
                                                         ]
                                                     }
@@ -9831,6 +9838,12 @@
                                                             "open": {
                                                                 "type": "boolean"
                                                             },
+                                                            "excused_at": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
                                                             "reason": {
                                                                 "type": [
                                                                     "object",
@@ -9874,6 +9887,7 @@
                                                         "required": [
                                                             "day",
                                                             "open",
+                                                            "excused_at",
                                                             "reason"
                                                         ]
                                                     }
@@ -16179,7 +16193,8 @@
                                                         "type": "string",
                                                         "enum": [
                                                             "absent",
-                                                            "missed"
+                                                            "missed",
+                                                            "excused"
                                                         ]
                                                     },
                                                     "lesson": {
@@ -25730,6 +25745,366 @@
             "post": {
                 "operationId": "registers.absences.next",
                 "summary": "Tells the next contact of an absent learner, when the first could not be reached",
+                "tags": [
+                    "Registers"
+                ],
+                "parameters": [
+                    {
+                        "name": "register",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "learner",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "class": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name"
+                                                    ]
+                                                },
+                                                "day": {
+                                                    "type": "string"
+                                                },
+                                                "today": {
+                                                    "type": "string"
+                                                },
+                                                "school_day": {
+                                                    "type": "boolean"
+                                                },
+                                                "teacher": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "register": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "submitted_at": {
+                                                            "type": "string"
+                                                        },
+                                                        "submitted_by": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "submitted_at",
+                                                        "submitted_by"
+                                                    ]
+                                                },
+                                                "days_before": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "learners": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "can_take": {
+                                                    "type": "boolean"
+                                                },
+                                                "late": {
+                                                    "type": "boolean",
+                                                    "description": "A register for an earlier day asks first, when the school has steps for it (D-081)."
+                                                },
+                                                "late_request": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "reason": {
+                                                            "type": "string"
+                                                        },
+                                                        "marks": {
+                                                            "type": "object",
+                                                            "additionalProperties": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "asked_by": {
+                                                            "type": "string"
+                                                        },
+                                                        "waiting_for": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "reason",
+                                                        "marks",
+                                                        "asked_by",
+                                                        "waiting_for"
+                                                    ]
+                                                },
+                                                "can_request": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "class",
+                                                "day",
+                                                "today",
+                                                "school_day",
+                                                "teacher",
+                                                "register",
+                                                "days_before",
+                                                "learners",
+                                                "can_take",
+                                                "late",
+                                                "late_request",
+                                                "can_request"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "class": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name"
+                                                    ]
+                                                },
+                                                "lesson": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "slot_id": {
+                                                            "type": "string"
+                                                        },
+                                                        "period": {
+                                                            "type": "integer"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "starts": {
+                                                            "type": "string"
+                                                        },
+                                                        "ends": {
+                                                            "type": "string"
+                                                        },
+                                                        "kind": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "activity",
+                                                                "lesson"
+                                                            ]
+                                                        },
+                                                        "whole_level": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "required": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "subject": {
+                                                            "type": "string"
+                                                        },
+                                                        "teacher": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "slot_id",
+                                                        "period",
+                                                        "name",
+                                                        "starts",
+                                                        "ends",
+                                                        "kind",
+                                                        "whole_level",
+                                                        "required",
+                                                        "subject",
+                                                        "teacher"
+                                                    ]
+                                                },
+                                                "previous": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "kind": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "lesson",
+                                                                "morning"
+                                                            ]
+                                                        },
+                                                        "name": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "by": {
+                                                            "type": "string"
+                                                        },
+                                                        "at": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "kind",
+                                                        "name",
+                                                        "by",
+                                                        "at"
+                                                    ]
+                                                },
+                                                "day": {
+                                                    "type": "string"
+                                                },
+                                                "today": {
+                                                    "type": "string"
+                                                },
+                                                "school_day": {
+                                                    "type": "boolean"
+                                                },
+                                                "morning_taken": {
+                                                    "type": "boolean"
+                                                },
+                                                "earlier": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "period": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "period"
+                                                    ]
+                                                },
+                                                "register": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "submitted_at": {
+                                                            "type": "string"
+                                                        },
+                                                        "submitted_by": {
+                                                            "type": "string"
+                                                        },
+                                                        "cover": {
+                                                            "type": "boolean"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "submitted_at",
+                                                        "submitted_by",
+                                                        "cover"
+                                                    ]
+                                                },
+                                                "cover": {
+                                                    "type": "boolean"
+                                                },
+                                                "learners": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                },
+                                                "can_take": {
+                                                    "type": "boolean"
+                                                },
+                                                "can_request": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "class",
+                                                "lesson",
+                                                "previous",
+                                                "day",
+                                                "today",
+                                                "school_day",
+                                                "morning_taken",
+                                                "earlier",
+                                                "register",
+                                                "cover",
+                                                "learners",
+                                                "can_take",
+                                                "can_request"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/registers/{register}/absences/{learner}/accept": {
+            "post": {
+                "operationId": "registers.absences.accept",
+                "summary": "Accepts the reason the family gave for an absence: asks for a correction from absent to excused (D-085)",
                 "tags": [
                     "Registers"
                 ],

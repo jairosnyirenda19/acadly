@@ -11,6 +11,7 @@ use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Row;
 use Acadly\Modules\Attendance\Application\Actions\AbsenceFollowUp;
+use Acadly\Modules\Attendance\Application\Actions\AcceptAbsenceReason;
 use Acadly\Modules\Attendance\Application\Actions\CorrectionActions;
 use Acadly\Modules\Attendance\Application\Actions\SubmitLessonRegister;
 use Acadly\Modules\Attendance\Application\Actions\SubmitRegister;
@@ -113,6 +114,14 @@ final class RegistersController
     public function tellNext(Request $request, string $register, string $learner, AbsenceFollowUp $followUp): JsonResponse
     {
         $followUp->tellNext(self::user($request), $register, $learner);
+
+        return $this->registerOf(self::user($request), $register);
+    }
+
+    /** Accepts the reason the family gave for an absence: asks for a correction from absent to excused (D-085). */
+    public function accept(Request $request, string $register, string $learner, AcceptAbsenceReason $accept): JsonResponse
+    {
+        $accept->accept(self::user($request), $register, $learner);
 
         return $this->registerOf(self::user($request), $register);
     }

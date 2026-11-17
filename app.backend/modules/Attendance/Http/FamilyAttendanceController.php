@@ -22,7 +22,7 @@ final class FamilyAttendanceController
      * The mornings of the term and the totals, for a parent whose link to the
      * child is active.
      *
-     * @response array{child: array{id: string, first_name: string, name: string, class_id: string|null, class: string}, attendance: array{term: array{name: string, starts_on: string, ends_on: string}|null, today: string, totals: array{marked: int, present: int, absent: int, late: int, share: int|null, last_absent: string|null}, weeks: list<array{week: string, days: list<array{day: string, mark: string|null, school_day: bool, future: bool}>}>, absences: list<array{day: string, open: bool, reason: array{kind: 'sick'|'family'|'travel'|'other', note: string|null, by: string, by_me: bool, at: string}|null}>}|null}
+     * @response array{child: array{id: string, first_name: string, name: string, class_id: string|null, class: string}, attendance: array{term: array{name: string, starts_on: string, ends_on: string}|null, today: string, totals: array{marked: int, present: int, absent: int, late: int, share: int|null, last_absent: string|null}, weeks: list<array{week: string, days: list<array{day: string, mark: string|null, school_day: bool, future: bool}>}>, absences: list<array{day: string, open: bool, excused_at: string|null, reason: array{kind: 'sick'|'family'|'travel'|'other', note: string|null, by: string, by_me: bool, at: string}|null}>}|null}
      */
     public function show(Request $request, string $id, Guardianship $guardianship, LearnerAttendance $attendance): JsonResponse
     {
@@ -39,7 +39,7 @@ final class FamilyAttendanceController
      * The register keeps the mark; staff see the reason beside it. A later
      * reason replaces what staff see, and every reason is kept.
      *
-     * @response array{child: array{id: string, first_name: string, name: string, class_id: string|null, class: string}, attendance: array{term: array{name: string, starts_on: string, ends_on: string}|null, today: string, totals: array{marked: int, present: int, absent: int, late: int, share: int|null, last_absent: string|null}, weeks: list<array{week: string, days: list<array{day: string, mark: string|null, school_day: bool, future: bool}>}>, absences: list<array{day: string, open: bool, reason: array{kind: 'sick'|'family'|'travel'|'other', note: string|null, by: string, by_me: bool, at: string}|null}>}|null}
+     * @response array{child: array{id: string, first_name: string, name: string, class_id: string|null, class: string}, attendance: array{term: array{name: string, starts_on: string, ends_on: string}|null, today: string, totals: array{marked: int, present: int, absent: int, late: int, share: int|null, last_absent: string|null}, weeks: list<array{week: string, days: list<array{day: string, mark: string|null, school_day: bool, future: bool}>}>, absences: list<array{day: string, open: bool, excused_at: string|null, reason: array{kind: 'sick'|'family'|'travel'|'other', note: string|null, by: string, by_me: bool, at: string}|null}>}|null}
      */
     public function reason(Request $request, string $id, string $day, GiveAbsenceReason $give, Guardianship $guardianship, LearnerAttendance $attendance): JsonResponse
     {

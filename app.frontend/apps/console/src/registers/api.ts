@@ -32,6 +32,9 @@ export const registersApi = {
   tellNext: (registerId: string, learnerId: string) =>
     settle(api.POST('/v1/registers/{register}/absences/{learner}/next', { params: { path: { register: registerId, learner: learnerId } } }) as Done<RegisterState>),
 
+  acceptReason: (registerId: string, learnerId: string) =>
+    settle(api.POST('/v1/registers/{register}/absences/{learner}/accept', { params: { path: { register: registerId, learner: learnerId } } }) as Done<RegisterState>),
+
   called: (registerId: string, learnerId: string, note: string) =>
     settle(api.POST('/v1/registers/{register}/absences/{learner}/called', { params: { path: { register: registerId, learner: learnerId } }, body: { note } as never }) as Done<RegisterState>),
 

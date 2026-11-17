@@ -28,6 +28,7 @@ Route::middleware(['auth:sanctum', 'module:attendance'])->prefix('registers')->n
     Route::post('/class/{id}', [RegistersController::class, 'submit'])->whereUuid('id')->name('submit');
     Route::post('/{register}/corrections', [RegistersController::class, 'requestCorrection'])->whereUuid('register')->name('corrections.store');
     Route::post('/{register}/absences/{learner}/next', [RegistersController::class, 'tellNext'])->whereUuid(['register', 'learner'])->name('absences.next');
+    Route::post('/{register}/absences/{learner}/accept', [RegistersController::class, 'accept'])->whereUuid(['register', 'learner'])->name('absences.accept');
     Route::post('/{register}/absences/{learner}/called', [RegistersController::class, 'called'])->whereUuid(['register', 'learner'])->name('absences.called');
     Route::post('/corrections/{id}/decide', [RegistersController::class, 'decide'])->whereUuid('id')->name('corrections.decide');
 });

@@ -157,7 +157,7 @@ export function RolesScreen() {
       )}
 
       <div className="flex-1 border-t-2 border-ink bg-sheet">
-        <div ref={head} className="sticky top-[60px] z-20 overflow-hidden border-b-2 border-ink bg-sheet md:top-16">
+        <div ref={head} className="sticky top-[var(--shell-top,60px)] z-20 overflow-hidden border-b-2 border-ink bg-sheet">
           <div className="grid" style={{ gridTemplateColumns: cols, minWidth: `${300 + state.roles.length * 120}px` }}>
             <div className="label-caps flex items-end bg-sheet px-[clamp(16px,3vw,40px)] py-3.5 text-text-muted md:sticky md:left-0 md:z-10 md:border-r-2 md:border-ink">{t.permission}</div>
             {state.roles.map((role) => {

@@ -212,7 +212,7 @@ function Attendance({ id, data, sent }: { id: string; data: AttendanceState; sen
         <div className="border-l-2 border-ink px-4 py-2.5">
           <div className="label-caps text-[10px] text-text-muted">{a.absent}</div>
           <div className="type-display text-[38px] leading-[0.9]">
-            {tot.absent} <span className="text-xl">{a.days.toLowerCase()}</span>
+            {tot.absent} <span className="text-xl">{a.dayCount(tot.absent)}</span>
           </div>
         </div>
       </div>
@@ -287,8 +287,10 @@ function Absences({ id, absences }: { id: string; absences: Absence[] }) {
             <li key={x.day} className="border-b border-rule py-3">
               <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
                 <span className="flex-1 text-[17px] font-extrabold">{longDay(x.day)}</span>
-                {x.reason !== null ? (
-                  <span className="label-caps bg-teal px-[7px] py-[3px] text-[10px] text-sheet">✓ {a.reasonSent}</span>
+                {x.excused_at !== null ? (
+                  <span className="label-caps bg-teal px-[7px] py-[3px] text-[10px] text-sheet">✓ {a.excused}</span>
+                ) : x.reason !== null ? (
+                  <span className="label-caps bg-field px-[7px] py-[3px] text-[10px] text-ink">✓ {a.reasonSent}</span>
                 ) : x.open ? (
                   <span className="label-caps bg-marigold px-[7px] py-[3px] text-[10px] text-ink">! {a.noReason}</span>
                 ) : (
@@ -302,7 +304,7 @@ function Absences({ id, absences }: { id: string; absences: Absence[] }) {
                     {x.reason.note !== null && <> · “{x.reason.note}”</>}
                   </div>
                   <div className="mt-0.5 text-[13px] text-text-muted">
-                    {a.sentBy(x.reason.by_me ? a.you : x.reason.by, when(x.reason.at))}
+                    {x.excused_at !== null ? a.excusedNote(shortDay(x.excused_at)) : a.sentBy(x.reason.by_me ? a.you : x.reason.by, when(x.reason.at))}
                     {x.open && (
                       <>
                         {' · '}
@@ -319,7 +321,8 @@ function Absences({ id, absences }: { id: string; absences: Absence[] }) {
                   {a.tellWhy}
                 </a>
               )}
-              {x.reason === null && !x.open && <div className="mt-1 text-sm text-text-muted">{a.closedNote(14)}</div>}
+              {x.reason === null && x.excused_at !== null && <div className="mt-1 text-sm text-text-muted">{a.excusedNote(shortDay(x.excused_at))}</div>}
+              {x.reason === null && x.excused_at === null && !x.open && <div className="mt-1 text-sm text-text-muted">{a.closedNote(14)}</div>}
             </li>
           )
         })}

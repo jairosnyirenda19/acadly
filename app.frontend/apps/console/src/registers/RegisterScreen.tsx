@@ -367,6 +367,17 @@ function SubmittedRegister({ state, onChange }: { state: RegisterState; onChange
                     </span>
                   </div>
                   {l.absence !== null && <Told absence={l.absence} />}
+                  {l.absence?.from_family != null && l.mark?.status === 'absent' && !pending && state.can_request && state.register !== null && (
+                    <AcceptReason
+                      registerId={state.register.id}
+                      learner={l}
+                      day={state.day}
+                      onDone={(next) => {
+                        onChange(next)
+                        slips.done({ word: copy.slips.sent, title: t.accepted })
+                      }}
+                    />
+                  )}
                   {asking === l.id && state.register !== null && l.mark !== null && (
                     <AskForm
                       send={(body) => registersApi.requestCorrection(state.register?.id ?? '', body)}
@@ -456,6 +467,47 @@ function Told({ absence }: { absence: Absence }) {
           {f.note !== null && <> · {f.note}</>}
         </span>
       ))}
+    </div>
+  )
+}
+
+/** Accept the family's reason (the approved design, D-085): ask for a correction from absent to excused. */
+function AcceptReason({ registerId, learner, day, onDone }: { registerId: string; learner: RegisterLearner; day: string; onDone: (next: RegisterState) => void }) {
+  const [open, setOpen] = useState(false)
+  const save = useSave<RegisterState>()
+
+  if (!open) {
+    return (
+      <div className="mt-1.5 mb-1 md:ml-[60px]">
+        <SmallButton onClick={() => setOpen(true)}>{t.acceptReason}</SmallButton>
+      </div>
+    )
+  }
+
+  return (
+    <div role="group" aria-label={t.acceptTitle} className="mt-2 mb-1 border-t-4 border-ink bg-sheet px-4 pt-3.5 pb-4 md:ml-[60px] md:border-2 md:border-t-4">
+      <div className="label-caps text-[10px] text-text-muted">{t.acceptKicker(learner.name, shortDay(day))}</div>
+      <h3 className="type-display mt-1 mb-2 text-[26px] leading-[0.9]">{t.acceptTitle}</h3>
+      <div className="mb-2.5 flex items-center gap-2 text-[15px] font-extrabold">
+        <span className="flex items-center gap-1.5"><Glyph mark="absent" /> {t.marks.absent}</span>
+        <span aria-hidden="true">→</span>
+        <span className="flex items-center gap-1.5"><Glyph mark="excused" /> {t.marks.excused}</span>
+      </div>
+      <p className="mb-1.5 text-sm leading-normal">{t.acceptNote}</p>
+      <p className="mb-3.5 border-l-4 border-marigold bg-marigold-wash px-2.5 py-2 text-sm leading-snug">{t.acceptApproval}</p>
+      {(save.failed !== null || Object.keys(save.errors).length > 0) && (
+        <div className="mb-3">
+          <Notice tone="wrong" title={save.failed ?? Object.values(save.errors)[0]?.[0] ?? ''} />
+        </div>
+      )}
+      <div className="flex flex-wrap gap-2.5">
+        <Button variant="secondary" onClick={() => setOpen(false)}>
+          {t.acceptCancel}
+        </Button>
+        <Button busy={save.working} onClick={() => void save.run(registersApi.acceptReason(registerId, learner.id), onDone)}>
+          {t.acceptSend}
+        </Button>
+      </div>
     </div>
   )
 }

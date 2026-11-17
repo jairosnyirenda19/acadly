@@ -143,3 +143,38 @@ it('refuses a child that is not the parent\'s, a day that was not absent, an old
 
     expect(DB::table('attendance_absence_reasons')->count())->toBe(0);
 });
+
+it('lets staff accept the reason: a correction to excused that the family sees once approved', function (): void {
+    $parent = familySignsIn($this, '0884 771 900');
+    $register = (string) DB::table('attendance_registers')->where('day', '2026-11-17')->value('id');
+    $accept = "/api/v1/registers/{$register}/absences/{$this->chikondi}/accept";
+    $head = User::factory()->create(['name' => 'Agnes Chilembwe']);
+    RoleAssignment::query()->create(['user_id' => $head->id, 'role_id' => Role::query()->where('is_system', true)->value('id'),
+        'scope_type' => ScopeType::Institution, 'scope_id' => null, 'starts_at' => now()->subMinute()]);
+
+    $this->actingAs($this->admin)->postJson($accept)->assertUnprocessable()->assertJsonValidationErrors(['learner_id']);
+    $this->actingAs($parent)->postJson("/api/v1/portal/children/{$this->chikondi}/absences/2026-11-17/reason", ['kind' => 'sick', 'note' => 'Fever.'])->assertOk();
+
+    $row = collect($this->actingAs($this->admin)->postJson($accept)->assertOk()->json('learners'))->firstWhere('id', $this->chikondi);
+
+    expect($row['mark']['status'])->toBe('absent')
+        ->and($row['correction'])->toMatchArray(['from' => 'absent', 'to' => 'excused', 'state' => 'requested'])
+        ->and($row['correction']['reason'])->toBe('Reason from the family: Sick or seeing a doctor. “Fever.” Given by Ruth Banda.');
+
+    $this->actingAs($this->admin)->postJson($accept)->assertUnprocessable();
+
+    $this->actingAs($head)->postJson("/api/v1/registers/corrections/{$row['correction']['id']}/decide", ['approve' => true])->assertOk();
+
+    $absences = $this->actingAs($parent)->getJson("/api/v1/portal/children/{$this->chikondi}/attendance")->assertOk()->json('attendance');
+
+    expect($absences['totals']['absent'])->toBe(1)
+        ->and($absences['absences'][0])->toMatchArray(['day' => '2026-11-17', 'open' => false])
+        ->and($absences['absences'][0]['excused_at'])->not->toBeNull()
+        ->and($absences['absences'][0]['reason']['kind'])->toBe('sick');
+
+    $record = $this->actingAs($this->admin)->getJson("/api/v1/registers/learner/{$this->chikondi}")->assertOk()->json('absences');
+    expect(collect($record)->firstWhere('day', '2026-11-17')['what'])->toBe('excused');
+
+    // The reason cannot change once the day is excused.
+    $this->actingAs($parent)->postJson("/api/v1/portal/children/{$this->chikondi}/absences/2026-11-17/reason", ['kind' => 'family'])->assertUnprocessable();
+});

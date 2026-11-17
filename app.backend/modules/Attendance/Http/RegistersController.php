@@ -48,19 +48,19 @@ final class RegistersController
     /**
      * One class's register on a day: `?day=YYYY-MM-DD`.
      *
-     * @response array{class: array{id: string, name: string}, day: string, today: string, school_day: bool, teacher: string|null, register: array{id: string, submitted_at: string, submitted_by: string}|null, days_before: list<string>, learners: list<array{id: string, name: string, admission_number: string|null, history: list<string|null>, mark: array{status: string, note: string|null, corrected: bool}|null, correction: array{id: string, from: string, to: string, reason: string, state: string, requested_by: string, requested_at: string, can_decide: bool, waiting_for: string|null}|null, absence: array{told: list<array{to: string, relationship: string, channel: string, state: 'delivered'|'sent'|'accepted'|'not_delivered'|'waiting'|'not_reachable', at: string}>, next: string|null, follow_ups: list<array{kind: 'told_next'|'called', by: string, at: string, note: string|null}>, can_follow_up: bool}|null}>, can_take: bool, can_request: bool}
+     * @response array{class: array{id: string, name: string}, day: string, today: string, school_day: bool, teacher: string|null, register: array{id: string, submitted_at: string, submitted_by: string}|null, days_before: list<string>, learners: list<array{id: string, name: string, admission_number: string|null, history: list<string|null>, mark: array{status: string, note: string|null, corrected: bool}|null, correction: array{id: string, from: string, to: string, reason: string, state: string, requested_by: string, requested_at: string, can_decide: bool, waiting_for: string|null}|null, absence: array{told: list<array{to: string, relationship: string, channel: string, state: 'delivered'|'sent'|'accepted'|'not_delivered'|'waiting'|'not_reachable', at: string}>, next: string|null, follow_ups: list<array{kind: 'told_next'|'called', by: string, at: string, note: string|null}>, can_follow_up: bool}|null}>, can_take: bool, late: bool, late_request: array{id: string, reason: string, marks: array<string, string>, asked_by: string, waiting_for: list<string>}|null, can_request: bool}
      */
     public function show(Request $request, string $id): JsonResponse
     {
         return response()->json($this->registers->register(self::user($request), $id, $this->day($request)));
     }
 
-    /** Submits the register: `{day, marks: [{learner_id, status, note}]}`. */
+    /** Submits the register: `{day, marks: [{learner_id, status, note}], reason}`. A register for an earlier day may be asked for instead, with the reason. */
     public function submit(Request $request, string $id, SubmitRegister $submit): JsonResponse
     {
         $viewer = self::user($request);
         $day = $this->day($request);
-        $submit->handle($viewer, $id, $day, self::marksOf($request->input('marks')));
+        $submit->handle($viewer, $id, $day, self::marksOf($request->input('marks')), self::text($request, 'reason'));
 
         return response()->json($this->registers->register($viewer, $id, $day));
     }

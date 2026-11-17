@@ -166,3 +166,26 @@ it('shows a register only to those who take, see or correct it, and only while t
 
     $this->actingAs($this->teacher)->getJson('/api/v1/registers?day='.SCHOOL_DAY)->assertForbidden()->assertJsonPath('code', 'module_inactive');
 });
+
+it('asks before a late register counts when the school sets steps, and submits it as the person who took it at the last yes', function (): void {
+    $url = "/api/v1/registers/class/{$this->class}";
+    $this->actingAs($this->admin)->putJson('/api/v1/approvals/topics/attendance.late_register', ['steps' => [['kind' => 'anyone', 'needs' => 1]]])->assertOk();
+
+    // A register for an earlier day needs a reason, and then waits; it counts for nothing yet.
+    $this->actingAs($this->teacher)->postJson($url, ['day' => SCHOOL_DAY, 'marks' => marksFor($this->learners, ['present', 'absent', 'present'])])
+        ->assertUnprocessable()->assertJsonValidationErrors(['reason' => 'Say why the register is late, in up to 255 characters.']);
+    $asked = $this->actingAs($this->teacher)->postJson($url, ['day' => SCHOOL_DAY, 'marks' => marksFor($this->learners, ['present', 'absent', 'present']), 'reason' => 'On a school trip.'])
+        ->assertOk()->assertJsonPath('register', null)->assertJsonPath('can_take', false)->assertJsonPath('late_request.reason', 'On a school trip.')
+        ->assertJsonPath('late_request.asked_by', 'Mercy Banda');
+    expect($asked->json('late_request.waiting_for'))->toContain('Office')
+        ->and(DB::table('attendance_registers')->where('class_id', $this->class)->count())->toBe(0);
+    $this->actingAs($this->teacher)->postJson($url, ['day' => SCHOOL_DAY, 'marks' => marksFor($this->learners, ['present', 'present', 'present']), 'reason' => 'Again.'])
+        ->assertUnprocessable()->assertJsonValidationErrors(['register' => 'This late register is already waiting for approval.']);
+
+    // The last yes submits it as the teacher; nobody is told of the absence: the day has passed.
+    $request = DB::table('approval_requests')->where('topic_key', 'attendance.late_register')->where('state', 'waiting')->value('id');
+    $this->actingAs($this->office)->postJson("/api/v1/approvals/{$request}/answer", ['approve' => true])->assertOk()->assertJsonPath('state', 'approved');
+    $this->actingAs($this->teacher)->getJson("{$url}?day=".SCHOOL_DAY)->assertOk()->assertJsonPath('register.submitted_by', 'Mercy Banda')
+        ->assertJsonPath('learners.1.mark.status', 'absent')->assertJsonPath('late_request', null);
+    expect(DB::table('notification_requests')->where('topic_key', 'attendance.learner_absent')->count())->toBe(0);
+});

@@ -144,6 +144,37 @@ final class ApprovalActions
     }
 
     /**
+     * Takes back a request still waiting: by the person who asked, or by the
+     * module when what was asked no longer holds (it says why). Nothing changes.
+     */
+    public function withdraw(?User $by, string $topicKey, string $subjectId, string $why): bool
+    {
+        $request = DB::table('approval_requests')->where('topic_key', $topicKey)->where('subject_id', $subjectId)->where('state', 'waiting')->first();
+
+        if ($request === null) {
+            return false;
+        }
+
+        if ($by !== null && $by->id !== Row::text($request, 'requester_id')) {
+            throw new AuthorizationException('Only the person who asked can withdraw a request.');
+        }
+
+        $topic = $this->approvals->topic($topicKey) ?? throw new NotFoundHttpException;
+        $case = $topic->case($subjectId);
+        $now = $this->clock->now();
+
+        DB::transaction(function () use ($request, $by, $topic, $case, $subjectId, $why, $now): void {
+            $id = Row::text($request, 'id');
+            DB::table('approval_steps')->where('request_id', $id)->whereIn('state', ['waiting', 'pending'])->update(['state' => 'withdrawn', 'finished_at' => $now]);
+            DB::table('approval_requests')->where('id', $id)->update(['state' => 'withdrawn', 'decided_at' => $now]);
+            $this->audit->record(KernelAudit::ApprovalWithdrawn, at: $case?->at, actor: $by !== null ? $this->audit->actorFor($by) : null, reason: mb_substr($why, 0, 255),
+                meta: ['topic' => $topic->key(), 'subject' => $subjectId, 'request' => $id]);
+        });
+
+        return true;
+    }
+
+    /**
      * Asks the next step that applies. False when no step is left.
      */
     private function advance(ApprovalTopic $topic, ApprovalCase $case, string $requestId): bool

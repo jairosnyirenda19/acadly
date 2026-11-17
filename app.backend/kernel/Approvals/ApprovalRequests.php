@@ -63,7 +63,7 @@ final class ApprovalRequests
     /**
      * One request and how its chain stands. Seen by the person who asked, the people asked, and anyone who may decide it there.
      *
-     * @return array{id: string, kind: string, area: string, title: string, where: string, reason: string|null, link: string, state: string, asked_by: string, asked_at: string, decided_at: string|null, steps: list<array{position: int, label: string, state: string, needs: int, asked: list<string>, note: string|null, answers: list<array{by: string, answer: string, reason: string|null, at: string}>}>, can_answer: bool}
+     * @return array{id: string, kind: string, area: string, title: string, where: string, reason: string|null, link: string, state: string, asked_by: string, asked_at: string, decided_at: string|null, steps: list<array{position: int, label: string, state: string, needs: int, asked: list<string>, note: string|null, answers: list<array{by: string, answer: string, reason: string|null, at: string}>}>, can_answer: bool, can_withdraw: bool}
      */
     public function show(User $viewer, string $id): array
     {
@@ -116,6 +116,7 @@ final class ApprovalRequests
             'id' => $id, 'kind' => $topic->title(), 'area' => $topic->area(), 'title' => $case->title, 'where' => $case->where, 'reason' => $case->reason, 'link' => $case->link,
             'state' => Row::text($request, 'state'), 'asked_by' => $this->name(Row::text($request, 'requester_id')), 'asked_at' => Row::text($request, 'created_at'),
             'decided_at' => Row::maybeText($request, 'decided_at'), 'steps' => $out, 'can_answer' => $canAnswer,
+            'can_withdraw' => Row::text($request, 'state') === 'waiting' && $viewer->id === Row::text($request, 'requester_id'),
         ];
     }
 
@@ -140,6 +141,29 @@ final class ApprovalRequests
         return ['asks' => ! $answered && in_array($viewer->id, self::ids(Row::text($row, 'asked')), true), 'step' => Row::text($row, 'label')];
     }
 
+    /**
+     * The request of a record still waiting, for the module's own screens:
+     * who asked, the step it is at and the people that step asks.
+     *
+     * @return array{id: string, asked_by: string, asked_by_id: string, asked_at: string, step: string, waiting_for: list<string>}|null
+     */
+    public function pending(string $topicKey, string $subjectId): ?array
+    {
+        $request = DB::table('approval_requests')->where('topic_key', $topicKey)->where('subject_id', $subjectId)->where('state', 'waiting')->first();
+
+        if ($request === null) {
+            return null;
+        }
+
+        $step = DB::table('approval_steps')->where('request_id', Row::text($request, 'id'))->where('state', 'waiting')->first(['label', 'asked']);
+
+        return [
+            'id' => Row::text($request, 'id'), 'asked_by' => $this->name(Row::text($request, 'requester_id')), 'asked_by_id' => Row::text($request, 'requester_id'),
+            'asked_at' => Row::text($request, 'created_at'), 'step' => $step !== null ? Row::text($step, 'label') : '',
+            'waiting_for' => $step !== null ? array_map(fn (string $u): string => $this->name($u), self::ids(Row::text($step, 'asked'))) : [],
+        ];
+    }
+
     /** The request of a record still waiting, if any: for the module's own screens. */
     public function waitingOf(string $topicKey, string $subjectId): ?string
     {
@@ -151,7 +175,7 @@ final class ApprovalRequests
     /**
      * The catalogue: every kind of request, grouped by area, with its chain.
      *
-     * @return array{areas: list<array{area: string, topics: list<array{key: string, title: string, description: string, steps: list<string>, changed: bool}>}>, can_edit: bool}
+     * @return array{areas: list<array{area: string, topics: list<array{key: string, title: string, description: string, steps: list<string>, changed: bool, optional: bool}>}>, can_edit: bool}
      */
     public function catalogue(User $viewer): array
     {
@@ -161,7 +185,8 @@ final class ApprovalRequests
         foreach ($this->approvals->topics() as $topic) {
             $chain = $this->approvals->chain($topic);
             $areas[$topic->area()][] = ['key' => $topic->key(), 'title' => $topic->title(), 'description' => $topic->description(),
-                'steps' => array_map(fn (array $s): string => $this->approvals->label($topic, $s), $chain['steps']), 'changed' => $chain['changed']];
+                'steps' => array_map(fn (array $s): string => $this->approvals->label($topic, $s), $chain['steps']), 'changed' => $chain['changed'],
+                'optional' => $topic instanceof OptionalApproval];
         }
 
         return ['areas' => array_map(fn (string $area, array $topics): array => ['area' => $area, 'topics' => $topics], array_keys($areas), array_values($areas)),
@@ -171,7 +196,7 @@ final class ApprovalRequests
     /**
      * One kind of request and its chain, with every choice the editor offers.
      *
-     * @return array{key: string, title: string, area: string, description: string, permission: string, chain: array{steps: list<Spec>, fallback_role_id: string|null, changed: bool, saved_by: string|null, saved_at: string|null}, labels: list<string>, relations: list<array{key: string, label: string}>, facts: list<array{key: string, label: string}>, roles: list<array{id: string, name: string}>, people: list<array{id: string, name: string}>, can_edit: bool}
+     * @return array{key: string, title: string, area: string, description: string, permission: string, optional: bool, chain: array{steps: list<Spec>, fallback_role_id: string|null, changed: bool, saved_by: string|null, saved_at: string|null}, labels: list<string>, relations: list<array{key: string, label: string}>, facts: list<array{key: string, label: string}>, roles: list<array{id: string, name: string}>, people: list<array{id: string, name: string}>, can_edit: bool}
      */
     public function topic(User $viewer, string $key): array
     {
@@ -182,6 +207,7 @@ final class ApprovalRequests
         return [
             'key' => $topic->key(), 'title' => $topic->title(), 'area' => $topic->area(), 'description' => $topic->description(),
             'permission' => $topic->permission()->label(),
+            'optional' => $topic instanceof OptionalApproval,
             'chain' => [...$chain, 'saved_by' => $chain['saved_by'] !== null ? $this->name($chain['saved_by']) : null],
             'labels' => array_map(fn (array $s): string => $this->approvals->label($topic, $s), $chain['steps']),
             'relations' => array_map(fn (string $k, string $l): array => ['key' => $k, 'label' => $l], array_keys($topic->relations()), array_values($topic->relations())),

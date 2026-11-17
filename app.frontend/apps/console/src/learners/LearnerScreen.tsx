@@ -10,6 +10,7 @@ import { initials, learnersApi, today, type ContactInput, type LearnerState } fr
 import { BackToList } from './back'
 import { NoticesBy } from './NoticesBy'
 import { PhotoPicker } from './PhotoPicker'
+import { WaitingFor } from '../approvals/WaitingFor'
 import { PART_VIEWS } from './record/registry'
 import { Activity, HistoryTab, MessagesTab, Placements, useFamilyMessages } from './record/tabs'
 import { Column, Columns, InLink, SectionTitle, follow, tabHref } from './record/ui'
@@ -151,6 +152,25 @@ export function LearnerScreen({ id }: { id: string }) {
           <Attention title={t.possibleDuplicate}>{t.duplicateNote}</Attention>
         </div>
       )}
+      {record.details_request !== null && (
+        <div className="px-4 pb-4 md:px-[clamp(16px,3vw,40px)]">
+          <WaitingFor
+            title={t.detailsWaiting}
+            askedBy={record.details_request.asked_by}
+            waitingFor={record.details_request.waiting_for}
+            requestId={record.details_request.id}
+            mine={record.details_request.mine}
+            onWithdrawn={() => loaded.reload()}
+          >
+            {record.details_request.changes.map((c) => (
+              <span key={c.field} className="block text-[13px]">
+                {t.detailsChange(c.label, c.from, c.to)}
+              </span>
+            ))}
+            <span className="block text-[13px]">“{record.details_request.reason}”</span>
+          </WaitingFor>
+        </div>
+      )}
       {panel === 'photo' && (
         <Box>
           <PhotoUpload id={record.id} word={word} current={photo} onDone={(next) => done(next, t.photoSaved)} onCancel={() => setPanel('none')} />
@@ -158,7 +178,7 @@ export function LearnerScreen({ id }: { id: string }) {
       )}
       {panel === 'correct' && (
         <Box>
-          <CorrectForm record={record} onDone={(next) => done(next, t.corrected)} onCancel={() => setPanel('none')} />
+          <CorrectForm record={record} onDone={(next) => done(next, next.details_request !== null && record.details_request === null ? t.correctAsked : t.corrected)} onCancel={() => setPanel('none')} />
         </Box>
       )}
       {panel === 'move' && record.class !== null && (
@@ -398,9 +418,10 @@ function CorrectForm({ record, onDone, onCancel }: { record: LearnerState; onDon
         <Input label={t.admissionNumber} value={number} onChange={(ev) => setNumber(ev.target.value)} error={errorFor(e, 'admission_number')} maxLength={40} />
         <Input label={t.correctReason} required wide value={reason} onChange={(ev) => setReason(ev.target.value)} error={errorFor(e, 'reason')} maxLength={255} />
       </div>
+      {record.details_asks && <p className="mt-3 text-[13px] text-text-muted">{t.correctAsks}</p>}
       <div className="mt-4 flex flex-wrap gap-2.5">
         <Button type="submit" busy={save.working}>
-          {save.working ? s.saving : t.correctSubmit}
+          {save.working ? s.saving : record.details_asks ? t.correctAsk : t.correctSubmit}
         </Button>
         <Button variant="secondary" onClick={onCancel}>
           {s.cancel}

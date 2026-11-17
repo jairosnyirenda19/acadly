@@ -69,14 +69,25 @@ final class Approvals
         return ['kind' => 'anyone', 'target' => null, 'needs' => 1, 'when' => null];
     }
 
-    /** @return Chain the chain in force: the newest saved, or the default of anyone who may decide */
+    /**
+     * Whether a request of this kind needs anyone's yes now: false only for an
+     * optional kind the school has given no steps.
+     */
+    public function needed(string $topicKey): bool
+    {
+        $topic = $this->topic($topicKey);
+
+        return $topic !== null && $this->chain($topic)['steps'] !== [];
+    }
+
+    /** @return Chain the chain in force: the newest saved, or the default: anyone who may decide, or no steps for an optional kind */
     public function chain(ApprovalTopic $topic): array
     {
         $row = DB::table('approval_chains')->where('topic_key', $topic->key())->orderByDesc('seq')->first();
         $steps = $row !== null ? json_decode(Row::maybeText($row, 'steps') ?? 'null', true) : null;
 
         if (! is_array($steps) || $steps === []) {
-            return ['steps' => [self::anyone()], 'fallback_role_id' => null, 'changed' => false,
+            return ['steps' => $topic instanceof OptionalApproval ? [] : [self::anyone()], 'fallback_role_id' => null, 'changed' => false,
                 'saved_by' => $row !== null ? Row::maybeText($row, 'saved_by') : null, 'saved_at' => $row !== null ? Row::maybeText($row, 'created_at') : null];
         }
 

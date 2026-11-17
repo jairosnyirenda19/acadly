@@ -8,6 +8,7 @@ use Acadly\Core\Academics\Contracts\AcademicCalendar;
 use Acadly\Core\Academics\Contracts\Teaching;
 use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
 use Acadly\Kernel\Approvals\ApprovalRequests;
+use Acadly\Kernel\Approvals\Approvals;
 use Acadly\Kernel\Blueprint\Engine\JourneyEngine;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
@@ -44,6 +45,8 @@ final class Sheets
         private readonly Clock $clock,
         private readonly ApprovalRequests $approvals,
         private readonly Papers $papers,
+        private readonly Requests $requests,
+        private readonly Approvals $chains,
     ) {}
 
     /** The assessment, when the viewer may see its class; otherwise "not found". */
@@ -102,6 +105,7 @@ final class Sheets
         $rows = [];
         $values = [];
         $papers = $this->papers->of([$a->id])[$a->id] ?? [];
+        $asked = $this->requests->marks($a->id);
 
         foreach ($learners as $learner) {
             $mark = $marks[$learner['id']] ?? null;
@@ -118,6 +122,10 @@ final class Sheets
                 'entered_by' => $mark !== null ? ($names[$mark['entered_by']] ?? '') : null, 'entered_at' => $mark['entered_at'] ?? null,
                 'corrected' => $mark['corrected'] ?? false, 'note' => $mark['note'] ?? null,
                 'paper' => $papers[$learner['id']] ?? [],
+                // A correction of the locked mark asked for, and who it waits for (D-081).
+                'correction' => isset($asked[$learner['id']]) ? ['value' => $asked[$learner['id']]['value'], 'reason' => $asked[$learner['id']]['reason'],
+                    'note' => $asked[$learner['id']]['note'], 'asked_by' => $asked[$learner['id']]['pending']['asked_by'], 'waiting_for' => $asked[$learner['id']]['pending']['waiting_for'],
+                    'request_id' => $asked[$learner['id']]['pending']['id']] : null,
             ];
         }
 
@@ -168,6 +176,7 @@ final class Sheets
             'lock_note' => $lock !== null && ! $lock->permitted && $mayLock ? 'You cannot lock marks you submitted.'
                 : ($asked !== null && ! $asked['asks'] && $mayLock ? "Waiting for: {$asked['step']}." : null),
             'can_correct' => $state === State::Locked && $mayLock,
+            'correction_asks' => $this->chains->needed(MarkApproval::KEY),
             // Papers are optional, and kept by the teacher whose assessment it is, whatever its state.
             'can_add_papers' => $owns && $this->reach->may($viewer, AssessmentPermission::Enter, $a->class_id),
         ];

@@ -158,6 +158,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/approvals/{id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Takes back a request you asked for, while it waits. Nothing changes. The response is the request as it now stands */
+        post: operations["approvals.withdraw"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/assessment/mine": {
         parameters: {
             query?: never;
@@ -1814,7 +1831,7 @@ export interface paths {
         /** One class's register on a day: `?day=YYYY-MM-DD` */
         get: operations["registers.show"];
         put?: never;
-        /** Submits the register: `{day, marks: [{learner_id, status, note}]}` */
+        /** Submits the register: `{day, marks: [{learner_id, status, note}], reason}`. A register for an earlier day may be asked for instead, with the reason */
         post: operations["registers.submit"];
         delete?: never;
         options?: never;
@@ -2715,6 +2732,7 @@ export interface operations {
                                 description: string;
                                 steps: string[];
                                 changed: boolean;
+                                optional: boolean;
                             }[];
                         }[];
                         can_edit: boolean;
@@ -2746,6 +2764,7 @@ export interface operations {
                         area: string;
                         description: string;
                         permission: string;
+                        optional: boolean;
                         chain: {
                             steps: {
                                 /** @enum {string} */
@@ -2812,6 +2831,7 @@ export interface operations {
                         area: string;
                         description: string;
                         permission: string;
+                        optional: boolean;
                         chain: {
                             steps: {
                                 /** @enum {string} */
@@ -2874,7 +2894,7 @@ export interface operations {
                         reason: string | null;
                         link: string;
                         /** @enum {string} */
-                        state: "waiting" | "approved" | "declined";
+                        state: "waiting" | "approved" | "declined" | "withdrawn";
                         asked_by: string;
                         asked_at: string;
                         decided_at: string | null;
@@ -2882,7 +2902,7 @@ export interface operations {
                             position: number;
                             label: string;
                             /** @enum {string} */
-                            state: "pending" | "waiting" | "approved" | "declined" | "skipped";
+                            state: "pending" | "waiting" | "approved" | "declined" | "skipped" | "withdrawn";
                             needs: number;
                             asked: string[];
                             note: string | null;
@@ -2895,6 +2915,7 @@ export interface operations {
                             }[];
                         }[];
                         can_answer: boolean;
+                        can_withdraw: boolean;
                     };
                 };
             };
@@ -2934,7 +2955,7 @@ export interface operations {
                         reason: string | null;
                         link: string;
                         /** @enum {string} */
-                        state: "waiting" | "approved" | "declined";
+                        state: "waiting" | "approved" | "declined" | "withdrawn";
                         asked_by: string;
                         asked_at: string;
                         decided_at: string | null;
@@ -2942,7 +2963,7 @@ export interface operations {
                             position: number;
                             label: string;
                             /** @enum {string} */
-                            state: "pending" | "waiting" | "approved" | "declined" | "skipped";
+                            state: "pending" | "waiting" | "approved" | "declined" | "skipped" | "withdrawn";
                             needs: number;
                             asked: string[];
                             note: string | null;
@@ -2955,10 +2976,65 @@ export interface operations {
                             }[];
                         }[];
                         can_answer: boolean;
+                        can_withdraw: boolean;
                     };
                 };
             };
             401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "approvals.withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        kind: string;
+                        area: string;
+                        title: string;
+                        where: string;
+                        reason: string | null;
+                        link: string;
+                        /** @enum {string} */
+                        state: "waiting" | "approved" | "declined" | "withdrawn";
+                        asked_by: string;
+                        asked_at: string;
+                        decided_at: string | null;
+                        steps: {
+                            position: number;
+                            label: string;
+                            /** @enum {string} */
+                            state: "pending" | "waiting" | "approved" | "declined" | "skipped" | "withdrawn";
+                            needs: number;
+                            asked: string[];
+                            note: string | null;
+                            answers: {
+                                by: string;
+                                /** @enum {string} */
+                                answer: "approved" | "declined";
+                                reason: string | null;
+                                at: string;
+                            }[];
+                        }[];
+                        can_answer: boolean;
+                        can_withdraw: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
         };
     };
     "assessment.mine": {
@@ -3200,6 +3276,14 @@ export interface operations {
                                 position: number;
                                 type: string;
                             }[];
+                            correction: {
+                                value: number | null;
+                                reason: string | null;
+                                note: string;
+                                asked_by: string;
+                                waiting_for: string[];
+                                request_id: string;
+                            } | null;
                         }[];
                         stats: {
                             learners: number;
@@ -3244,6 +3328,7 @@ export interface operations {
                         can_return: boolean;
                         lock_note: string | null;
                         can_correct: boolean;
+                        correction_asks: boolean;
                         can_add_papers: boolean;
                     };
                 };
@@ -3310,6 +3395,14 @@ export interface operations {
                                 position: number;
                                 type: string;
                             }[];
+                            correction: {
+                                value: number | null;
+                                reason: string | null;
+                                note: string;
+                                asked_by: string;
+                                waiting_for: string[];
+                                request_id: string;
+                            } | null;
                         }[];
                         stats: {
                             learners: number;
@@ -3354,6 +3447,7 @@ export interface operations {
                         can_return: boolean;
                         lock_note: string | null;
                         can_correct: boolean;
+                        correction_asks: boolean;
                         can_add_papers: boolean;
                     };
                 };
@@ -3428,6 +3522,14 @@ export interface operations {
                                     position: number;
                                     type: string;
                                 }[];
+                                correction: {
+                                    value: number | null;
+                                    reason: string | null;
+                                    note: string;
+                                    asked_by: string;
+                                    waiting_for: string[];
+                                    request_id: string;
+                                } | null;
                             }[];
                             stats: {
                                 learners: number;
@@ -3472,6 +3574,7 @@ export interface operations {
                             can_return: boolean;
                             lock_note: string | null;
                             can_correct: boolean;
+                            correction_asks: boolean;
                             can_add_papers: boolean;
                         };
                     };
@@ -3539,6 +3642,14 @@ export interface operations {
                                 position: number;
                                 type: string;
                             }[];
+                            correction: {
+                                value: number | null;
+                                reason: string | null;
+                                note: string;
+                                asked_by: string;
+                                waiting_for: string[];
+                                request_id: string;
+                            } | null;
                         }[];
                         stats: {
                             learners: number;
@@ -3583,6 +3694,7 @@ export interface operations {
                         can_return: boolean;
                         lock_note: string | null;
                         can_correct: boolean;
+                        correction_asks: boolean;
                         can_add_papers: boolean;
                     };
                 };
@@ -3649,6 +3761,14 @@ export interface operations {
                                 position: number;
                                 type: string;
                             }[];
+                            correction: {
+                                value: number | null;
+                                reason: string | null;
+                                note: string;
+                                asked_by: string;
+                                waiting_for: string[];
+                                request_id: string;
+                            } | null;
                         }[];
                         stats: {
                             learners: number;
@@ -3693,6 +3813,7 @@ export interface operations {
                         can_return: boolean;
                         lock_note: string | null;
                         can_correct: boolean;
+                        correction_asks: boolean;
                         can_add_papers: boolean;
                     };
                 };
@@ -3759,6 +3880,14 @@ export interface operations {
                                 position: number;
                                 type: string;
                             }[];
+                            correction: {
+                                value: number | null;
+                                reason: string | null;
+                                note: string;
+                                asked_by: string;
+                                waiting_for: string[];
+                                request_id: string;
+                            } | null;
                         }[];
                         stats: {
                             learners: number;
@@ -3803,6 +3932,7 @@ export interface operations {
                         can_return: boolean;
                         lock_note: string | null;
                         can_correct: boolean;
+                        correction_asks: boolean;
                         can_add_papers: boolean;
                     };
                 };
@@ -3876,6 +4006,14 @@ export interface operations {
                                 position: number;
                                 type: string;
                             }[];
+                            correction: {
+                                value: number | null;
+                                reason: string | null;
+                                note: string;
+                                asked_by: string;
+                                waiting_for: string[];
+                                request_id: string;
+                            } | null;
                         }[];
                         stats: {
                             learners: number;
@@ -3920,6 +4058,7 @@ export interface operations {
                         can_return: boolean;
                         lock_note: string | null;
                         can_correct: boolean;
+                        correction_asks: boolean;
                         can_add_papers: boolean;
                     };
                 };
@@ -3995,6 +4134,14 @@ export interface operations {
                                 position: number;
                                 type: string;
                             }[];
+                            correction: {
+                                value: number | null;
+                                reason: string | null;
+                                note: string;
+                                asked_by: string;
+                                waiting_for: string[];
+                                request_id: string;
+                            } | null;
                         }[];
                         stats: {
                             learners: number;
@@ -4039,6 +4186,7 @@ export interface operations {
                         can_return: boolean;
                         lock_note: string | null;
                         can_correct: boolean;
+                        correction_asks: boolean;
                         can_add_papers: boolean;
                     };
                 };
@@ -4113,6 +4261,14 @@ export interface operations {
                                 position: number;
                                 type: string;
                             }[];
+                            correction: {
+                                value: number | null;
+                                reason: string | null;
+                                note: string;
+                                asked_by: string;
+                                waiting_for: string[];
+                                request_id: string;
+                            } | null;
                         }[];
                         stats: {
                             learners: number;
@@ -4157,6 +4313,7 @@ export interface operations {
                         can_return: boolean;
                         lock_note: string | null;
                         can_correct: boolean;
+                        correction_asks: boolean;
                         can_add_papers: boolean;
                     };
                 };
@@ -4223,6 +4380,14 @@ export interface operations {
                                 position: number;
                                 type: string;
                             }[];
+                            correction: {
+                                value: number | null;
+                                reason: string | null;
+                                note: string;
+                                asked_by: string;
+                                waiting_for: string[];
+                                request_id: string;
+                            } | null;
                         }[];
                         stats: {
                             learners: number;
@@ -4267,6 +4432,7 @@ export interface operations {
                         can_return: boolean;
                         lock_note: string | null;
                         can_correct: boolean;
+                        correction_asks: boolean;
                         can_add_papers: boolean;
                     };
                 };
@@ -5540,6 +5706,21 @@ export interface operations {
                             count: number;
                         }[];
                         can_manage: boolean;
+                        details_request: {
+                            id: string;
+                            changes: {
+                                field: string;
+                                label: string;
+                                from: string;
+                                to: string;
+                            }[];
+                            reason: string;
+                            asked_by: string;
+                            asked_by_id: string;
+                            waiting_for: string[];
+                            mine: boolean;
+                        } | null;
+                        details_asks: boolean;
                         relationships: {
                             value: string;
                             label: string;
@@ -5612,6 +5793,13 @@ export interface operations {
                         possible_duplicate: boolean;
                         move_to: unknown[];
                         can_manage: boolean;
+                        /** @description A correction of the name, date of birth or sex waiting for a yes (D-081). */
+                        details_request: ({
+                            mine: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        }) | null;
+                        details_asks: boolean;
                         relationships: unknown[];
                         parts: {
                             key: string;
@@ -5712,6 +5900,13 @@ export interface operations {
                         possible_duplicate: boolean;
                         move_to: unknown[];
                         can_manage: boolean;
+                        /** @description A correction of the name, date of birth or sex waiting for a yes (D-081). */
+                        details_request: ({
+                            mine: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        }) | null;
+                        details_asks: boolean;
                         relationships: unknown[];
                         parts: {
                             key: string;
@@ -5782,6 +5977,13 @@ export interface operations {
                         possible_duplicate: boolean;
                         move_to: unknown[];
                         can_manage: boolean;
+                        /** @description A correction of the name, date of birth or sex waiting for a yes (D-081). */
+                        details_request: ({
+                            mine: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        }) | null;
+                        details_asks: boolean;
                         relationships: unknown[];
                         parts: {
                             key: string;
@@ -5846,6 +6048,13 @@ export interface operations {
                         possible_duplicate: boolean;
                         move_to: unknown[];
                         can_manage: boolean;
+                        /** @description A correction of the name, date of birth or sex waiting for a yes (D-081). */
+                        details_request: ({
+                            mine: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        }) | null;
+                        details_asks: boolean;
                         relationships: unknown[];
                         parts: {
                             key: string;
@@ -5910,6 +6119,13 @@ export interface operations {
                         possible_duplicate: boolean;
                         move_to: unknown[];
                         can_manage: boolean;
+                        /** @description A correction of the name, date of birth or sex waiting for a yes (D-081). */
+                        details_request: ({
+                            mine: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        }) | null;
+                        details_asks: boolean;
                         relationships: unknown[];
                         parts: {
                             key: string;
@@ -5974,6 +6190,13 @@ export interface operations {
                         possible_duplicate: boolean;
                         move_to: unknown[];
                         can_manage: boolean;
+                        /** @description A correction of the name, date of birth or sex waiting for a yes (D-081). */
+                        details_request: ({
+                            mine: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        }) | null;
+                        details_asks: boolean;
                         relationships: unknown[];
                         parts: {
                             key: string;
@@ -6060,6 +6283,13 @@ export interface operations {
                         possible_duplicate: boolean;
                         move_to: unknown[];
                         can_manage: boolean;
+                        /** @description A correction of the name, date of birth or sex waiting for a yes (D-081). */
+                        details_request: ({
+                            mine: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        }) | null;
+                        details_asks: boolean;
                         relationships: unknown[];
                         parts: {
                             key: string;
@@ -8406,7 +8636,16 @@ export interface operations {
                             ready: boolean;
                             missing: string[];
                             /** @enum {string} */
-                            state: "not_ready" | "ready" | "published" | "changed";
+                            state: "not_ready" | "ready" | "published" | "changed" | "waiting";
+                            waiting: {
+                                id: string;
+                                asked_by: string;
+                                asked_by_id: string;
+                                asked_at: string;
+                                step: string;
+                                waiting_for: string[];
+                                changed: boolean;
+                            } | null;
                             latest: {
                                 id: string;
                                 version: number;
@@ -8417,6 +8656,7 @@ export interface operations {
                             show_position: boolean;
                             head_comment: boolean;
                         };
+                        asks: boolean;
                     };
                 };
             };
@@ -8446,8 +8686,9 @@ export interface operations {
                     "application/json": {
                         published: {
                             class_id: string;
-                            publication_id: string;
-                            version: number;
+                            publication_id: string | null;
+                            version: number | null;
+                            asked: boolean;
                         }[];
                         classes: {
                             class_id: string;
@@ -8465,7 +8706,16 @@ export interface operations {
                             ready: boolean;
                             missing: string[];
                             /** @enum {string} */
-                            state: "not_ready" | "ready" | "published" | "changed";
+                            state: "not_ready" | "ready" | "published" | "changed" | "waiting";
+                            waiting: {
+                                id: string;
+                                asked_by: string;
+                                asked_by_id: string;
+                                asked_at: string;
+                                step: string;
+                                waiting_for: string[];
+                                changed: boolean;
+                            } | null;
                             latest: {
                                 id: string;
                                 version: number;
@@ -8476,6 +8726,7 @@ export interface operations {
                             show_position: boolean;
                             head_comment: boolean;
                         };
+                        asks: boolean;
                     };
                 };
             };
@@ -8522,7 +8773,16 @@ export interface operations {
                             ready: boolean;
                             missing: string[];
                             /** @enum {string} */
-                            state: "not_ready" | "ready" | "published" | "changed";
+                            state: "not_ready" | "ready" | "published" | "changed" | "waiting";
+                            waiting: {
+                                id: string;
+                                asked_by: string;
+                                asked_by_id: string;
+                                asked_at: string;
+                                step: string;
+                                waiting_for: string[];
+                                changed: boolean;
+                            } | null;
                             latest: {
                                 id: string;
                                 version: number;
@@ -8533,6 +8793,7 @@ export interface operations {
                             show_position: boolean;
                             head_comment: boolean;
                         };
+                        asks: boolean;
                     };
                 };
             };
@@ -8935,6 +9196,16 @@ export interface operations {
                             } | null;
                         }[];
                         can_take: boolean;
+                        late: boolean;
+                        late_request: {
+                            id: string;
+                            reason: string;
+                            marks: {
+                                [key: string]: string;
+                            };
+                            asked_by: string;
+                            waiting_for: string[];
+                        } | null;
                         can_request: boolean;
                     };
                 };
@@ -8981,6 +9252,17 @@ export interface operations {
                         days_before: string[];
                         learners: unknown[];
                         can_take: boolean;
+                        /** @description A register for an earlier day asks first, when the school has steps for it (D-081). */
+                        late: boolean;
+                        late_request: {
+                            id: string;
+                            reason: string;
+                            marks: {
+                                [key: string]: string;
+                            };
+                            asked_by: string;
+                            waiting_for: string[];
+                        } | null;
                         can_request: boolean;
                     };
                 };
@@ -9021,6 +9303,17 @@ export interface operations {
                         days_before: string[];
                         learners: unknown[];
                         can_take: boolean;
+                        /** @description A register for an earlier day asks first, when the school has steps for it (D-081). */
+                        late: boolean;
+                        late_request: {
+                            id: string;
+                            reason: string;
+                            marks: {
+                                [key: string]: string;
+                            };
+                            asked_by: string;
+                            waiting_for: string[];
+                        } | null;
                         can_request: boolean;
                     } | {
                         class: {
@@ -9104,6 +9397,17 @@ export interface operations {
                         days_before: string[];
                         learners: unknown[];
                         can_take: boolean;
+                        /** @description A register for an earlier day asks first, when the school has steps for it (D-081). */
+                        late: boolean;
+                        late_request: {
+                            id: string;
+                            reason: string;
+                            marks: {
+                                [key: string]: string;
+                            };
+                            asked_by: string;
+                            waiting_for: string[];
+                        } | null;
                         can_request: boolean;
                     } | {
                         class: {
@@ -9193,6 +9497,17 @@ export interface operations {
                         days_before: string[];
                         learners: unknown[];
                         can_take: boolean;
+                        /** @description A register for an earlier day asks first, when the school has steps for it (D-081). */
+                        late: boolean;
+                        late_request: {
+                            id: string;
+                            reason: string;
+                            marks: {
+                                [key: string]: string;
+                            };
+                            asked_by: string;
+                            waiting_for: string[];
+                        } | null;
                         can_request: boolean;
                     } | {
                         class: {
@@ -9282,6 +9597,17 @@ export interface operations {
                         days_before: string[];
                         learners: unknown[];
                         can_take: boolean;
+                        /** @description A register for an earlier day asks first, when the school has steps for it (D-081). */
+                        late: boolean;
+                        late_request: {
+                            id: string;
+                            reason: string;
+                            marks: {
+                                [key: string]: string;
+                            };
+                            asked_by: string;
+                            waiting_for: string[];
+                        } | null;
                         can_request: boolean;
                     } | {
                         class: {
@@ -10102,6 +10428,17 @@ export interface operations {
                             label: string;
                         }[];
                         can_edit: boolean;
+                        waiting: {
+                            summary: string;
+                            reason: string;
+                            id: string;
+                            asked_by: string;
+                            asked_by_id: string;
+                            asked_at: string;
+                            step: string;
+                            waiting_for: string[];
+                            mine: boolean;
+                        } | null;
                     };
                 };
             };
@@ -10217,6 +10554,17 @@ export interface operations {
                             label: string;
                         }[];
                         can_edit: boolean;
+                        waiting: {
+                            summary: string;
+                            reason: string;
+                            id: string;
+                            asked_by: string;
+                            asked_by_id: string;
+                            asked_at: string;
+                            step: string;
+                            waiting_for: string[];
+                            mine: boolean;
+                        } | null;
                     };
                 };
             };

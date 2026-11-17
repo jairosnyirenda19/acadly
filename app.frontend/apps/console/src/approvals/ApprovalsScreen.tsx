@@ -143,7 +143,7 @@ export function ApprovalScreen({ id }: { id: string }) {
         </div>
         <h1 className="type-display mt-1 mb-2 text-[clamp(36px,5vw,64px)] break-words">{data.title}</h1>
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <Tag tone={data.state === 'approved' ? 'done' : data.state === 'declined' ? 'wrong' : 'attention'}>{t.requestStates[data.state] ?? data.state}</Tag>
+          <Tag tone={data.state === 'approved' ? 'done' : data.state === 'declined' ? 'wrong' : data.state === 'withdrawn' ? 'plain' : 'attention'}>{t.requestStates[data.state] ?? data.state}</Tag>
           <span>{data.where}</span>
           <a href={data.link} onClick={(e) => follow(e, data.link)} className="font-extrabold text-ink underline underline-offset-[3px]">
             {t.openRecord}
@@ -190,9 +190,38 @@ export function ApprovalScreen({ id }: { id: string }) {
               <Answer id={data.id} wide onDone={(next) => loaded.set(next)} />
             </div>
           )}
+          {data.can_withdraw && <Withdraw id={data.id} onDone={(next) => loaded.set(next)} />}
         </section>
       </div>
     </>
+  )
+}
+
+/** The person who asked takes the request back while it waits. */
+function Withdraw({ id, onDone }: { id: string; onDone: (next: RequestState) => void }) {
+  const [busy, setBusy] = useState(false)
+
+  return (
+    <div className="mt-4 flex flex-wrap items-center gap-3">
+      <Button
+        variant="secondary"
+        busy={busy}
+        onClick={() => {
+          setBusy(true)
+          void approvalsApi.withdraw(id).then((r) => {
+            setBusy(false)
+            if (r.kind === 'saved') {
+              forgetLoads()
+              slips.done({ word: copy.slips.saved, title: t.waitingBox.withdrawn })
+              onDone(r.data)
+            } else slips.wrong({ word: copy.settings.failed, title: t.waitingBox.notWithdrawn })
+          })
+        }}
+      >
+        {t.withdraw}
+      </Button>
+      <span className="text-[13px] text-text-muted">{t.withdrawNote}</span>
+    </div>
   )
 }
 

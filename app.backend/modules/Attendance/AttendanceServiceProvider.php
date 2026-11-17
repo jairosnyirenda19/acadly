@@ -9,6 +9,7 @@ use Acadly\Core\Enrolment\Contracts\ReportCardLine;
 use Acadly\Kernel\Approvals\ApprovalTopic;
 use Acadly\Modules\Attendance\Application\AttendanceReportLine;
 use Acadly\Modules\Attendance\Application\CorrectionApproval;
+use Acadly\Modules\Attendance\Application\LateRegisterApproval;
 use Acadly\Modules\Attendance\Application\LearnerAttendance;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -20,7 +21,7 @@ final class AttendanceServiceProvider extends ServiceProvider
     {
         $this->app->scoped(LearnerAttendance::class);
         $this->app->tag([LearnerAttendance::class], LearnerRecordPart::TAG);
-        $this->app->tag([CorrectionApproval::class], ApprovalTopic::TAG);
+        $this->app->tag([CorrectionApproval::class, LateRegisterApproval::class], ApprovalTopic::TAG);
         $this->app->tag([AttendanceReportLine::class], ReportCardLine::TAG);
     }
 

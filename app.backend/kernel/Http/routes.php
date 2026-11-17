@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::put('/topics/{key}', [ApprovalsController::class, 'save'])->where('key', '[a-z][a-z0-9_.]*')->name('topic.save');
         Route::get('/{id}', [ApprovalsController::class, 'show'])->whereUuid('id')->name('show');
         Route::post('/{id}/answer', [ApprovalsController::class, 'answer'])->whereUuid('id')->name('answer');
+        Route::post('/{id}/withdraw', [ApprovalsController::class, 'withdraw'])->whereUuid('id')->name('withdraw');
     });
 
     // View as (development only; 404 wherever it is not available).

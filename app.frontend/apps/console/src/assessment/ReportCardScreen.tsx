@@ -78,10 +78,10 @@ function Page({ card, data }: { card: Card; data: CardsState }) {
                 {t.part(p.label, p.weight)}
               </th>
             ))}
-            <th scope="col" className="border-b-2 border-ink pb-1.5">
+            <th scope="col" className="border-b-2 border-ink pr-3 pb-1.5">
               {t.termCol}
             </th>
-            <th scope="col" className="border-b-2 border-ink pb-1.5">
+            <th scope="col" className="w-16 border-b-2 border-ink pb-1.5">
               {t.grade}
             </th>
             <th scope="col" className="border-b-2 border-ink pb-1.5">
@@ -104,7 +104,7 @@ function Page({ card, data }: { card: Card; data: CardsState }) {
                   </td>
                 )
               })}
-              <td className="ref py-2 font-extrabold">{a.pct(s.percent)}</td>
+              <td className="ref py-2 pr-3 font-extrabold">{a.pct(s.percent)}</td>
               <td className="py-2">{s.grade !== null && <span className="ref inline-block min-w-7 border border-ink px-1.5 text-center font-extrabold">{s.grade}</span>}</td>
               <td className="py-2">{s.word ?? ''}</td>
             </tr>

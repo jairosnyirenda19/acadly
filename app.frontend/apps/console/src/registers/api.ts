@@ -23,8 +23,8 @@ export const registersApi = {
     read(api.GET('/v1/registers', { params: { query: { ...(day !== null ? { day } : {}), ...(inPlace !== null ? { in: inPlace } : {}) } as never } })),
   register: (classId: string, day: string | null) => read(api.GET('/v1/registers/class/{id}', { params: { path: { id: classId }, query: (day !== null ? { day } : {}) as never } })),
 
-  submit: (classId: string, day: string, marks: { learner_id: string; status: MarkValue; note: string | null }[]) =>
-    settle(api.POST('/v1/registers/class/{id}', { params: { path: { id: classId } }, body: { day, marks } as never }) as Done<RegisterState>),
+  submit: (classId: string, day: string, marks: { learner_id: string; status: MarkValue; note: string | null }[], reason: string | null = null) =>
+    settle(api.POST('/v1/registers/class/{id}', { params: { path: { id: classId } }, body: { day, marks, reason } as never }) as Done<RegisterState>),
 
   requestCorrection: (registerId: string, body: { learner_id: string; to: MarkValue; reason: string }) =>
     settle(api.POST('/v1/registers/{register}/corrections', { params: { path: { register: registerId } }, body: body as never }) as Done<RegisterState>),

@@ -11,9 +11,13 @@ use Acadly\Kernel\Grid\Grids;
 use Acadly\Modules\Assessment\Application\AssessmentsGrid;
 use Acadly\Modules\Assessment\Application\LearnerResults;
 use Acadly\Modules\Assessment\Application\LockApproval;
+use Acadly\Modules\Assessment\Application\MarkApproval;
+use Acadly\Modules\Assessment\Application\PlanApproval;
 use Acadly\Modules\Assessment\Application\Plans;
+use Acadly\Modules\Assessment\Application\PublishApproval;
 use Acadly\Modules\Assessment\Application\Publishing;
 use Acadly\Modules\Assessment\Application\Reach;
+use Acadly\Modules\Assessment\Application\Requests;
 use Acadly\Modules\Assessment\Application\Scales;
 use Acadly\Modules\Assessment\Application\ScaleSeeds;
 use Illuminate\Support\Facades\Route;
@@ -31,7 +35,8 @@ final class AssessmentServiceProvider extends ServiceProvider
         $this->app->scoped(LearnerResults::class);
         $this->app->tag([LearnerResults::class], LearnerRecordPart::TAG);
         $this->app->tag([AssessmentsGrid::class], Grids::TAG);
-        $this->app->tag([LockApproval::class], ApprovalTopic::TAG);
+        $this->app->tag([LockApproval::class, PublishApproval::class, MarkApproval::class, PlanApproval::class], ApprovalTopic::TAG);
+        $this->app->scoped(Requests::class);
         $this->app->tag([ScaleSeeds::class], SyncStep::TAG);
     }
 

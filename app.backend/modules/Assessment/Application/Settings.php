@@ -35,6 +35,7 @@ final class Settings
         private readonly Plans $plans,
         private readonly Reach $reach,
         private readonly Clock $clock,
+        private readonly Requests $requests,
     ) {}
 
     /**
@@ -119,6 +120,9 @@ final class Settings
             'rules' => array_map(fn (PartRule $r): array => ['value' => $r->value, 'label' => $r->label()], PartRule::cases()),
             'missing' => array_map(fn (MissingRule $r): array => ['value' => $r->value, 'label' => $r->label()], MissingRule::cases()),
             'can_edit' => $this->access->allows($viewer, AssessmentPermission::Plan, $at),
+            // A new version asked for once the term began, and who it waits for (D-081).
+            'waiting' => ($w = $this->requests->plan($division->id, $levelCode, $period['id'], $subjectId)) !== null
+                ? ['summary' => $w['summary'], 'reason' => $w['reason'], ...$w['pending'], 'mine' => $w['pending']['asked_by_id'] === $viewer->id] : null,
         ];
     }
 

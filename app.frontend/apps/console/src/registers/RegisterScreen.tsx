@@ -7,6 +7,7 @@ import { Input, nn, Total, TotalsBand } from '../setup/parts'
 import { PageHead, SmallButton, Tag } from '../settings/parts'
 import { clock, longDay, markLook, MARKS, registersApi, shortDay, unreached, type Absence, type MarkValue, type RegisterLearner, type RegisterState } from './api'
 import { AskForm, DecideCard, Glyph, useSave } from './parts'
+import { WaitingFor } from '../approvals/WaitingFor'
 
 const t = copy.registers
 const s = copy.settings
@@ -45,6 +46,8 @@ export function RegisterScreen({ classId }: { classId: string }) {
   if (state === undefined) {
     return <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} band={[t.bandMarked, t.bandPresent, t.bandAbsent, t.bandLate]} rows={8} onRetry={loaded.reload} />
   }
+
+  if (state.late_request !== null && state.register === null) return <LateWaiting state={state} />
 
   return state.can_take ? <TakeRegister state={state} onDone={loaded.set} /> : <SubmittedRegister state={state} onChange={loaded.set} />
 }
@@ -113,6 +116,8 @@ function TakeRegister({ state, onDone }: { state: RegisterState; onDone: (next: 
     }
   }
 
+  const [lateReason, setLateReason] = useState('')
+
   const submit = async () => {
     setWorking(true)
     setFailed(null)
@@ -120,13 +125,14 @@ function TakeRegister({ state, onDone }: { state: RegisterState; onDone: (next: 
       state.class.id,
       state.day,
       state.learners.map((l) => ({ learner_id: l.id, status: draft[l.id]?.status ?? 'present', note: draft[l.id]?.note.trim() || null })),
+      state.late ? lateReason.trim() : null,
     )
     setWorking(false)
 
     if (result.kind === 'saved') {
       writeDraft(key, null)
       onDone(result.data)
-      slips.done({ word: copy.slips.saved, title: t.submitted(state.class.name) })
+      slips.done({ word: copy.slips.saved, title: state.late ? t.lateAsked : t.submitted(state.class.name) })
     } else if (result.kind === 'invalid') setFailed(Object.values(result.errors)[0]?.[0] ?? s.failed)
     else setFailed(result.kind === 'refused' ? s.refused : s.failed)
   }
@@ -233,6 +239,13 @@ function TakeRegister({ state, onDone }: { state: RegisterState; onDone: (next: 
           })}
         </div>
         <p className="mt-2.5 text-[13px] text-text-muted">{t.draftKept}</p>
+        {state.late && (
+          <div className="mt-3 grid max-w-[640px] gap-2 border-l-[6px] border-marigold bg-marigold-wash px-3.5 py-3 text-sm">
+            <strong>{t.lateTitle}</strong>
+            <span>{t.late(longDay(state.day))}</span>
+            <Input label={t.lateReason} required value={lateReason} onChange={(e) => setLateReason(e.target.value)} maxLength={255} />
+          </div>
+        )}
       </section>
 
       <footer className="sticky bottom-0 flex flex-wrap items-center gap-2 border-t-2 border-ink bg-sheet px-3 py-2.5 md:gap-3 md:px-[clamp(16px,3vw,40px)] md:py-4">
@@ -248,8 +261,8 @@ function TakeRegister({ state, onDone }: { state: RegisterState; onDone: (next: 
         </span>
         <span className="hidden flex-[1_1_240px] text-sm font-bold md:block">{left === 0 ? t.readyNote : t.leftNote(left)}</span>
         <span className="ml-auto">
-          <Button busy={working} disabled={left > 0 || state.learners.length === 0} onClick={() => void submit()}>
-            {working ? t.submitting : (
+          <Button busy={working} disabled={left > 0 || state.learners.length === 0 || (state.late && lateReason.trim() === '')} onClick={() => void submit()}>
+            {working ? t.submitting : state.late ? t.lateSubmit : (
               <>
                 <span className="hidden md:inline">{t.submit}</span>
                 <span className="md:hidden">{t.submitShort(left)}</span>
@@ -258,6 +271,32 @@ function TakeRegister({ state, onDone }: { state: RegisterState; onDone: (next: 
           </Button>
         </span>
       </footer>
+    </>
+  )
+}
+
+/** A late register sent for approval: kept as taken, counting for nothing until the last yes. */
+function LateWaiting({ state }: { state: RegisterState }) {
+  const late = state.late_request
+
+  if (late === null) return null
+
+  const absent = Object.values(late.marks).filter((m) => m === 'absent').length
+
+  return (
+    <>
+      <PageHead kicker={t.registerKicker(longDay(state.day))} title={state.class.name} intro={null} />
+      <div className="max-w-[720px] px-4 pb-6 md:px-[clamp(16px,3vw,40px)]">
+        <WaitingFor title={t.lateWaiting} askedBy={late.asked_by} waitingFor={late.waiting_for} requestId={late.id}>
+          <span className="block text-[13px]">{t.lateMarks(Object.keys(late.marks).length, absent)}</span>
+          <span className="block text-[13px]">“{late.reason}”</span>
+        </WaitingFor>
+        <div className="mt-3">
+          <Button variant="secondary" onClick={() => navigate('/registers')}>
+            {t.back}
+          </Button>
+        </div>
+      </div>
     </>
   )
 }

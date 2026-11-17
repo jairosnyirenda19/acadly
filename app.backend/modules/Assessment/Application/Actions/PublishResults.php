@@ -9,6 +9,8 @@ use Acadly\Core\Academics\Contracts\Teaching;
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
+use Acadly\Kernel\Approvals\Actions\ApprovalActions;
+use Acadly\Kernel\Approvals\Approvals;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Http\Problem;
 use Acadly\Kernel\Identity\User;
@@ -16,8 +18,10 @@ use Acadly\Kernel\Notify\Notifier;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Kernel\Support\Row;
+use Acadly\Modules\Assessment\Application\PublishApproval;
 use Acadly\Modules\Assessment\Application\Publishing;
 use Acadly\Modules\Assessment\Application\Reach;
+use Acadly\Modules\Assessment\Application\Requests;
 use Acadly\Modules\Assessment\Contracts\AssessmentAudit;
 use Acadly\Modules\Assessment\Contracts\AssessmentPermission;
 use Acadly\Modules\Assessment\Domain\Publication;
@@ -34,6 +38,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * class is ready, only by those who may publish there, and never by a person
  * who submitted marks that count in these results. A version is never
  * changed; a correction is published as the next one, which says what changed.
+ *
+ * When the school has steps for publishing (D-081), Publish asks instead, and
+ * the last yes publishes the results as they are then, by the person who
+ * gave it. Results that changed after the asking are not published: ask again.
+ *
+ * @phpstan-import-type ClassRow from Reach
+ * @phpstan-import-type Period from Teaching
  */
 final class PublishResults
 {
@@ -46,11 +57,14 @@ final class PublishResults
         private readonly Notifier $notifier,
         private readonly Audit $audit,
         private readonly Clock $clock,
+        private readonly Approvals $approvals,
+        private readonly ApprovalActions $asks,
+        private readonly Requests $requests,
     ) {}
 
     /**
      * @param  list<string>  $classIds
-     * @return list<array{class_id: string, publication_id: string, version: int}>
+     * @return list<array{class_id: string, publication_id: string|null, version: int|null, asked: bool}>
      */
     public function handle(User $by, array $classIds): array
     {
@@ -61,16 +75,32 @@ final class PublishResults
         }
 
         $out = [];
+        $ask = $this->approvals->needed(PublishApproval::KEY);
 
         foreach ($classIds as $classId) {
-            $out[] = $this->one($by, $classId);
+            [$class, $period] = $this->place($by, $classId);
+            $out[] = $ask ? $this->ask($by, $class, $period) : [...$this->publish($by, $class, $period, null), 'asked' => false];
         }
 
         return $out;
     }
 
-    /** @return array{class_id: string, publication_id: string, version: int} */
-    private function one(User $by, string $classId): array
+    /** The last yes to a publishing request: publishes, by the person who gave it, if nothing changed since the asking. */
+    public function settle(User $by, string $requestId): void
+    {
+        $row = DB::table('result_publish_requests')->where('id', $requestId)->first() ?? throw new NotFoundHttpException;
+        $class = $this->calendar->classInForce(Row::text($row, 'class_id')) ?? throw new NotFoundHttpException;
+        $period = $this->teaching->period(Row::text($row, 'period_id')) ?? throw new NotFoundHttpException;
+        $this->access->check($by, AssessmentPermission::Publish, ScopeRef::of(ScopeType::ClassGroup, $class['id']));
+        $this->publish($by, $class, $period, Row::text($row, 'fingerprint'));
+    }
+
+    /**
+     * The class, when the person may publish it, and its current term.
+     *
+     * @return array{0: ClassRow, 1: Period}
+     */
+    private function place(User $by, string $classId): array
     {
         $class = $this->calendar->classInForce($classId);
 
@@ -78,29 +108,66 @@ final class PublishResults
             throw new NotFoundHttpException;
         }
 
-        $at = ScopeRef::of(ScopeType::ClassGroup, $class['id']);
-        $this->access->check($by, AssessmentPermission::Publish, $at);
+        $this->access->check($by, AssessmentPermission::Publish, ScopeRef::of(ScopeType::ClassGroup, $class['id']));
         $period = $this->teaching->periodAt($class['division_id'], $this->clock->today()) ?? throw new NotFoundHttpException;
 
+        return [$class, $period];
+    }
+
+    /**
+     * Asks to publish: keeps the results' fingerprint as asked, and asks the first step.
+     *
+     * @param  ClassRow  $class
+     * @param  Period  $period
+     * @return array{class_id: string, publication_id: null, version: null, asked: true}
+     */
+    private function ask(User $by, array $class, array $period): array
+    {
+        $now = $this->checked($class, $period);
+        $waiting = $this->requests->publish($class['id'], $period['id']);
+
+        if ($waiting !== null && $waiting['fingerprint'] === $now['fingerprint']) {
+            throw ValidationException::withMessages(['class_ids' => [$class['name'].' is already waiting for approval to publish.']]);
+        }
+
+        DB::transaction(function () use ($by, $class, $period, $now, $waiting): void {
+            if ($waiting !== null) {
+                // The results changed since that request: it no longer says what would be published.
+                $this->asks->withdraw(null, PublishApproval::KEY, $waiting['subject_id'], 'The results changed; publishing was asked for again.');
+            }
+
+            $id = Ids::next();
+            DB::table('result_publish_requests')->insert(['id' => $id, 'class_id' => $class['id'], 'period_id' => $period['id'],
+                'fingerprint' => $now['fingerprint'], 'requested_by' => $by->id, 'requested_at' => $this->clock->now()]);
+            $this->asks->open(PublishApproval::KEY, $id);
+        });
+
+        return ['class_id' => $class['id'], 'publication_id' => null, 'version' => null, 'asked' => true];
+    }
+
+    /**
+     * @param  ClassRow  $class
+     * @param  Period  $period
+     * @return array{class_id: string, publication_id: string, version: int}
+     */
+    private function publish(User $by, array $class, array $period, ?string $asked): array
+    {
         if ($this->submittedHere($by, $class['id'], $period['id'])) {
             throw Problem::anotherPersonRequired();
         }
 
-        return DB::transaction(function () use ($by, $class, $period, $at): array {
+        $at = ScopeRef::of(ScopeType::ClassGroup, $class['id']);
+
+        return DB::transaction(function () use ($by, $class, $period, $at, $asked): array {
             // One publisher at a time for a class and term.
             DB::select('select pg_advisory_xact_lock(hashtext(?))', ['result_publications:'.$class['id'].':'.$period['id']]);
-            $now = $this->publishing->current($class, $period);
+            $now = $this->checked($class, $period);
 
-            if (! $now['ready']) {
-                throw ValidationException::withMessages(['class_ids' => [$class['name'].' is not ready: '.($now['missing'][0] ?? 'some results are missing.')]]);
+            if ($asked !== null && $asked !== $now['fingerprint']) {
+                throw ValidationException::withMessages(['class_ids' => ['The results of '.$class['name'].' changed after publishing was asked for. Ask again.']]);
             }
 
             $latest = $this->publishing->latest($class['id'], $period['id']);
-
-            if ($latest !== null && $latest['fingerprint'] === $now['fingerprint']) {
-                throw ValidationException::withMessages(['class_ids' => [$class['name'].' is published already, and nothing has changed since.']]);
-            }
-
             $settings = $this->publishing->settings();
             $publication = Publication::query()->create([
                 'class_id' => $class['id'], 'period_id' => $period['id'], 'version' => ($latest['version'] ?? 0) + 1,
@@ -123,6 +190,30 @@ final class PublishResults
 
             return ['class_id' => $class['id'], 'publication_id' => $publication->id, 'version' => $publication->version];
         });
+    }
+
+    /**
+     * The results worked out now, when they can be published: ready, and not the version already published.
+     *
+     * @param  ClassRow  $class
+     * @param  Period  $period
+     * @return array{cards: array<string, array<string, mixed>>, fingerprint: string}
+     */
+    private function checked(array $class, array $period): array
+    {
+        $now = $this->publishing->current($class, $period);
+
+        if (! $now['ready']) {
+            throw ValidationException::withMessages(['class_ids' => [$class['name'].' is not ready: '.($now['missing'][0] ?? 'some results are missing.')]]);
+        }
+
+        $latest = $this->publishing->latest($class['id'], $period['id']);
+
+        if ($latest !== null && $latest['fingerprint'] === $now['fingerprint']) {
+            throw ValidationException::withMessages(['class_ids' => [$class['name'].' is published already, and nothing has changed since.']]);
+        }
+
+        return ['cards' => $now['cards'], 'fingerprint' => $now['fingerprint']];
     }
 
     /** Whether the person submitted marks of an assessment of the class this term: then someone else publishes. */

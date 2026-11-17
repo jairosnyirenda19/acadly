@@ -15,6 +15,7 @@ use Acadly\Core\Institution\Contracts\Term;
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
+use Acadly\Kernel\Approvals\Approvals;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Module\ModuleActivation;
 use Acadly\Kernel\Notify\Messages;
@@ -39,6 +40,7 @@ final class Learners
         private readonly Contacts $contacts,
         private readonly Numbers $numbers,
         private readonly Duplicates $duplicates,
+        private readonly Approvals $approvals,
     ) {}
 
     /**
@@ -135,6 +137,9 @@ final class Learners
             'possible_duplicate' => $this->duplicates->like($learner->first_name, $learner->surname, $learner->date_of_birth->toDateString(), $learner->id) !== null,
             'move_to' => array_map(fn (array $c): array => ['id' => $c['id'], 'name' => $c['name'], 'count' => is_numeric($siblingCounts[$c['id']] ?? null) ? (int) $siblingCounts[$c['id']] : 0], $siblings),
             'can_manage' => $at !== null && $this->access->allows($viewer, EnrolmentPermission::Manage, $at),
+            // A correction of the name, date of birth or sex waiting for a yes (D-081).
+            'details_request' => ($w = DetailsApproval::waiting($learner->id)) !== null ? [...$w, 'mine' => $w['asked_by_id'] === $viewer->id] : null,
+            'details_asks' => $this->approvals->needed(DetailsApproval::KEY),
             'relationships' => array_map(fn (Relationship $r): array => ['value' => $r->value, 'label' => $r->label()], Relationship::cases()),
             ...$this->parts($viewer, $learner->id, $at),
         ];

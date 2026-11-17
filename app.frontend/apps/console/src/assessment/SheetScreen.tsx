@@ -6,6 +6,7 @@ import { Input, Select } from '../setup/parts'
 import { Tag } from '../settings/parts'
 import { assessmentApi, markText, type MarkInput, type SheetLearner, type SheetState } from './api'
 import { PaperKey, PaperPanel } from './papers'
+import { WaitingFor } from '../approvals/WaitingFor'
 import { BackLink, InLink, LockPanel, SmallBand, StateTag } from './parts'
 
 const a = copy.assessment
@@ -365,12 +366,29 @@ function CorrectForm({ sheet, onDone }: { sheet: SheetState; onDone: (next: Shee
   const [failed, setFailed] = useState<string | null>(null)
   const [working, setWorking] = useState(false)
 
+  const waiting = sheet.learners.filter((l) => l.correction !== null)
+
   if (!open) {
     return (
-      <div className="px-4 pt-3 md:px-[clamp(16px,3vw,40px)]">
-        <Button variant="secondary" onClick={() => setOpen(true)}>
-          {t.correct}
-        </Button>
+      <div className="grid gap-2 px-4 pt-3 md:px-[clamp(16px,3vw,40px)]">
+        {waiting.map((l) =>
+          l.correction === null ? null : (
+            <WaitingFor
+              key={l.id}
+              title={t.correctionWaiting(l.name, l.correction.value !== null ? `${markText(l.correction.value)}/${sheet.assessment.out_of}` : (l.correction.reason ?? ''))}
+              askedBy={l.correction.asked_by}
+              waitingFor={l.correction.waiting_for}
+              requestId={l.correction.request_id}
+            >
+              <span className="text-[13px]">“{l.correction.note}”</span>
+            </WaitingFor>
+          ),
+        )}
+        <span>
+          <Button variant="secondary" onClick={() => setOpen(true)}>
+            {t.correct}
+          </Button>
+        </span>
       </div>
     )
   }
@@ -389,7 +407,7 @@ function CorrectForm({ sheet, onDone }: { sheet: SheetState; onDone: (next: Shee
           .then((r) => {
             setWorking(false)
             if (r.kind === 'saved') {
-              slips.done({ word: copy.slips.saved, title: t.corrected })
+              slips.done({ word: copy.slips.saved, title: sheet.correction_asks ? t.correctAsked : t.corrected })
               setOpen(false)
               onDone(r.data)
             } else setFailed(r.kind === 'invalid' ? (Object.values(r.errors)[0]?.[0] ?? s.failed) : r.kind === 'refused' ? s.refused : s.failed)
@@ -418,9 +436,10 @@ function CorrectForm({ sheet, onDone }: { sheet: SheetState; onDone: (next: Shee
         </Select>
       </div>
       <Input label={t.correctNote} required value={note} onChange={(e) => setNote(e.target.value)} maxLength={255} />
+      {sheet.correction_asks && <p className="text-[13px] text-text-muted">{t.correctAsks}</p>}
       <div className="flex flex-wrap gap-2">
         <Button type="submit" busy={working} disabled={learner === '' || note.trim() === '' || (reason === '' && typeof parsed !== 'number')}>
-          {t.correctSave}
+          {sheet.correction_asks ? t.correctAsk : t.correctSave}
         </Button>
         <Button variant="secondary" onClick={() => setOpen(false)}>
           {s.cancel}

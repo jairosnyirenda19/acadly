@@ -49,7 +49,7 @@ export function ApprovalSettingsScreen() {
                         </span>
                         <span className="block text-[13px] text-text-muted">{x.description}</span>
                         <span className="block text-xs font-bold">
-                          {t.stepsCount(x.steps.length)}: {x.steps.join(' → ')}
+                          {x.steps.length === 0 ? t.noSteps : `${t.stepsCount(x.steps.length)}: ${x.steps.join(' → ')}`}
                         </span>
                       </a>
                     )
@@ -143,6 +143,7 @@ function Chain({ data, onSaved }: { data: TopicState; onSaved: (next: TopicState
         </div>
       )}
 
+      {steps.length === 0 && <p className="mt-3 mb-3 border-2 border-dashed border-rule-dashed bg-sheet px-3.5 py-3 text-sm">{t.noStepsNote}</p>}
       <ol className="mt-3">
         {steps.map((step, i) => {
           const last = i === steps.length - 1
@@ -207,7 +208,7 @@ function Chain({ data, onSaved }: { data: TopicState; onSaved: (next: TopicState
                         {t.down}
                       </button>
                     )}
-                    {steps.length > 1 && (
+                    {(steps.length > 1 || data.optional) && (
                       <button type="button" aria-label={t.remove(i + 1)} onClick={() => setSteps((all) => all.filter((_, j) => j !== i))} className="min-h-11 text-red-text underline underline-offset-[3px]">
                         {t.removeShort}
                       </button>
@@ -248,7 +249,7 @@ function Chain({ data, onSaved }: { data: TopicState; onSaved: (next: TopicState
       </div>
 
       <footer className="mt-5 flex flex-wrap items-center gap-3 border-t-2 border-ink pt-4 sm:ml-[52px]">
-        <Button type="submit" busy={working} disabled={!complete || steps.length === 0}>
+        <Button type="submit" busy={working} disabled={!complete || (steps.length === 0 && !data.optional)}>
           {t.save}
         </Button>
         {data.chain.changed && (

@@ -60,6 +60,7 @@ enum KernelAudit: string implements AuditAction
     case ApprovalAsked = 'approvals.asked';
     case ApprovalAnswered = 'approvals.answered';
     case ChainSaved = 'approvals.chain_saved';
+    case ApprovalWithdrawn = 'approvals.withdrawn';
 
     public function key(): string
     {
@@ -122,6 +123,7 @@ enum KernelAudit: string implements AuditAction
             self::ApprovalAsked => 'Asked for an approval.',
             self::ApprovalAnswered => 'Approved or declined a step of an approval.',
             self::ChainSaved => 'Changed who approves a kind of request.',
+            self::ApprovalWithdrawn => 'Withdrew a request for an approval.',
         };
     }
 

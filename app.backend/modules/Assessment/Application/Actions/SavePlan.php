@@ -9,11 +9,15 @@ use Acadly\Core\Institution\Contracts\SchoolDirectory;
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
+use Acadly\Kernel\Approvals\Actions\ApprovalActions;
+use Acadly\Kernel\Approvals\Approvals;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
+use Acadly\Modules\Assessment\Application\PlanApproval;
 use Acadly\Modules\Assessment\Application\Plans;
+use Acadly\Modules\Assessment\Application\Requests;
 use Acadly\Modules\Assessment\Contracts\AssessmentAudit;
 use Acadly\Modules\Assessment\Contracts\AssessmentKind;
 use Acadly\Modules\Assessment\Contracts\AssessmentPermission;
@@ -28,7 +32,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * Saves a grading plan as a new version (the approved Grading plans screen).
  * The weights sum to 100; each kind is in at most one part; once the term
  * has begun, a new version needs a reason. Earlier versions are kept; term
- * grades are worked out from the newest from then on.
+ * grades are worked out from the newest from then on. Once the term has
+ * begun, and the school has steps for it (D-081), the version is asked for
+ * first and saved by the last yes; the version in force stays until then.
  *
  * @phpstan-import-type Part from Plans
  */
@@ -41,13 +47,16 @@ final class SavePlan
         private readonly Plans $plans,
         private readonly Audit $audit,
         private readonly Clock $clock,
+        private readonly Approvals $approvals,
+        private readonly ApprovalActions $asks,
+        private readonly Requests $requests,
     ) {}
 
     /**
      * @param  array<array-key, mixed>  $input  {division_id, level_code, period_id, subject_id, mode, parts, reason}
-     * @return string the new version's id
+     * @return string|null the new version's id; null when it was asked for
      */
-    public function handle(User $by, array $input): string
+    public function handle(User $by, array $input, bool $approved = false): ?string
     {
         $divisionId = is_string($input['division_id'] ?? null) ? $input['division_id'] : '';
         $division = Ids::isValid($divisionId) ? $this->school->division($divisionId) : null;
@@ -94,6 +103,22 @@ final class SavePlan
 
         if ($errors !== [] || $period === null || $mode === null) {
             throw ValidationException::withMessages($errors);
+        }
+
+        if ($begun && ! $approved && $this->approvals->needed(PlanApproval::KEY)) {
+            if ($this->requests->plan($division->id, $level, $period['id'], $subjectId) !== null) {
+                throw ValidationException::withMessages(['reason' => ['A change to this plan is already waiting for approval. Withdraw it first.']]);
+            }
+
+            DB::transaction(function () use ($by, $division, $level, $period, $subjectId, $mode, $parts, $reason): void {
+                $request = Ids::next();
+                DB::table('grading_plan_requests')->insert(['id' => $request, 'division_id' => $division->id, 'level_code' => $level, 'period_id' => $period['id'],
+                    'subject_id' => $subjectId, 'plan' => json_encode(['mode' => $mode->value, 'parts' => $parts], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),
+                    'reason' => $reason, 'requested_by' => $by->id, 'requested_at' => $this->clock->now()]);
+                $this->asks->open(PlanApproval::KEY, $request);
+            });
+
+            return null;
         }
 
         $id = Ids::next();

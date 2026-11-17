@@ -97,6 +97,14 @@ function assessmentLocked(User $teacher, string $id, array $given): void
     test()->actingAs(test()->people['mercy'])->postJson("/api/v1/assessment/assessments/{$id}/lock")->assertOk()->assertJsonPath('assessment.state', 'locked');
 }
 
+/** Says yes, as the person given, to the request of a kind still waiting. */
+function approveWaiting(User $by, string $topic): void
+{
+    $id = DB::table('approval_requests')->where('topic_key', $topic)->where('state', 'waiting')->value('id');
+    expect($id)->toBeString();
+    test()->actingAs($by)->postJson("/api/v1/approvals/{$id}/answer", ['approve' => true])->assertOk();
+}
+
 function scaleId(string $key): string
 {
     return (string) DB::table('assessment_scales')->where('seed_key', $key)->value('id');
@@ -148,14 +156,22 @@ it('saves a grading plan as a new version: weights add up to 100, and a reason o
     $this->actingAs($this->people['admin'])->postJson('/api/v1/assessment/plans', $plan([$ca(30), $exam(70)]))
         ->assertUnprocessable()->assertJsonValidationErrors(['reason' => 'The term has begun, so a new version needs a reason.']);
 
+    // Once the term has begun, a new version is asked for; the version in force stays until the last yes.
+    Role::query()->where('key', 'academic_officer')->firstOrFail()->grant([AssessmentPermission::Plan]);
     $this->actingAs($this->people['admin'])->postJson('/api/v1/assessment/plans', $plan([$ca(30), $exam(70)], 'Agreed by the heads of department.'))->assertCreated()
-        ->assertJsonPath('plan.version', 1)->assertJsonPath('plan.summary', 'Continuous assessment 30 · End-of-term exam 70');
+        ->assertJsonPath('plan.version', 0)->assertJsonPath('waiting.summary', 'Continuous assessment 30 · End-of-term exam 70')
+        ->assertJsonPath('waiting.waiting_for', ['Mercy Banda'])->assertJsonPath('waiting.mine', true);
+    $this->actingAs($this->people['admin'])->postJson('/api/v1/assessment/plans', $plan([$ca(40), $exam(60)], 'Another.'))
+        ->assertUnprocessable()->assertJsonValidationErrors(['reason' => 'A change to this plan is already waiting for approval. Withdraw it first.']);
+    approveWaiting($this->people['mercy'], 'assessment.plan_change');
     $this->actingAs($this->people['admin'])->postJson('/api/v1/assessment/plans', $plan([$ca(40), $exam(60)], 'Back to the board weights.'))->assertCreated();
+    approveWaiting($this->people['mercy'], 'assessment.plan_change');
 
     $read = $this->actingAs($this->people['admin'])->getJson('/api/v1/assessment/plans?division_id='.$this->school->id('secondary').'&level_code=F1&period_id='.$this->terms['secondary'])->assertOk();
     expect($read->json('plan.version'))->toBe(2)->and($read->json('begun'))->toBeTrue()
         ->and(array_column($read->json('versions'), 'version'))->toBe([2, 1])
-        ->and($read->json('versions.0.created_by'))->toBe('Grace Phiri');
+        ->and($read->json('versions.0.reason'))->toBe('Back to the board weights.')
+        ->and($read->json('waiting'))->toBeNull();
     expect(fn () => DB::transaction(fn () => DB::table('grading_plans')->update(['reason' => 'Changed.'])))->toThrow(Exception::class);
 
     // Before a term begins, a plan needs no reason.
@@ -286,7 +302,13 @@ it('locks with four eyes, and returns to the teacher with a reason', function ()
     $this->actingAs($this->people['mercy'])->postJson("/api/v1/assessment/assessments/{$id}/correct", ['learner_id' => $this->learners[1], 'value' => 12])
         ->assertUnprocessable()->assertJsonValidationErrors(['note']);
     $this->actingAs($this->people['mercy'])->postJson("/api/v1/assessment/assessments/{$id}/correct", ['learner_id' => $this->learners[1], 'value' => 12, 'note' => 'Added wrongly.'])
-        ->assertOk()->assertJsonPath('learners.1.value', 12)->assertJsonPath('learners.1.corrected', true);
+        ->assertOk()->assertJsonPath('learners.1.value', 11)->assertJsonPath('learners.1.correction.value', 12)
+        ->assertJsonPath('learners.1.correction.asked_by', 'Mercy Banda')->assertJsonPath('correction_asks', true);
+    $this->actingAs($this->people['mercy'])->postJson("/api/v1/assessment/assessments/{$id}/correct", ['learner_id' => $this->learners[1], 'value' => 13, 'note' => 'Again.'])
+        ->assertUnprocessable()->assertJsonValidationErrors(['learner_id' => 'A correction of this mark is already waiting for approval.']);
+    approveWaiting($this->people['admin'], 'assessment.mark_correction');
+    $this->actingAs($this->people['mercy'])->getJson("/api/v1/assessment/assessments/{$id}")->assertOk()
+        ->assertJsonPath('learners.1.value', 12)->assertJsonPath('learners.1.corrected', true)->assertJsonPath('learners.1.correction', null);
     expect(DB::table('assessment_marks')->where('assessment_id', $id)->whereNotNull('replaces_id')->count())->toBe(1)
         ->and(DB::table('audit_events')->where('action', 'assessment.mark_corrected')->value('reason'))->toBe('Added wrongly.');
 });
@@ -355,6 +377,7 @@ it('works out the term grade from locked marks only, with the working, and grade
 
     // A correction to a locked mark works the grade out again.
     $this->actingAs($this->people['mercy'])->postJson("/api/v1/assessment/assessments/{$exam}/correct", ['learner_id' => $this->learners[0], 'value' => 91, 'note' => 'Page two was not counted.'])->assertOk();
+    approveWaiting($this->people['admin'], 'assessment.mark_correction');
     expect($working(0))->toMatchArray(['percent' => 85.8, 'grade' => '1', 'word' => 'Distinction']);
 
     // Percent and letters: the same 85.8 is an A.
@@ -531,6 +554,7 @@ it('publishes a ready class as a version with report cards, tells families, and 
     // A corrected mark: the class shows changed, and the next version says what changed. Version 1 is kept.
     $this->actingAs($this->people['mercy'])->postJson("/api/v1/assessment/assessments/{$weekly}/correct",
         ['learner_id' => $this->learners[1], 'value' => 14, 'note' => 'Added up again.'])->assertOk();
+    approveWaiting($this->people['admin'], 'assessment.mark_correction');
     expect($row()['state'])->toBe('changed');
     $second = $this->actingAs($martha)->postJson('/api/v1/assessment/publishing', ['class_ids' => [$this->class]])->assertOk();
     expect($second->json('published.0.version'))->toBe(2)
@@ -546,4 +570,63 @@ it('publishes a ready class as a version with report cards, tells families, and 
     $this->actingAs($martha)->putJson('/api/v1/assessment/publishing/settings', ['show_position' => false, 'head_comment' => true])->assertOk()
         ->assertJsonPath('settings', ['show_position' => false, 'head_comment' => true]);
     $this->actingAs($t)->putJson('/api/v1/assessment/publishing/settings', ['show_position' => true, 'head_comment' => true])->assertForbidden();
+});
+
+it('asks before publishing when the school sets steps, publishes at the last yes, and stops when the results changed', function (): void {
+    $t = $this->people['tadala'];
+    $head = Role::query()->create(['key' => 'head_teacher', 'name' => 'Head teacher']);
+    $head->grant([AssessmentPermission::Publish, AssessmentPermission::View]);
+    $people = [];
+
+    foreach (['martha' => 'Martha Kalua', 'ruth' => 'Ruth Tembo'] as $key => $name) {
+        $people[$key] = User::factory()->create(['name' => $name]);
+        RoleAssignment::query()->create(['user_id' => $people[$key]->id, 'role_id' => $head->id, 'scope_type' => ScopeType::Institution, 'scope_id' => null, 'starts_at' => now()->subMinute()]);
+    }
+
+    $weekly = assessmentSet($t, 'weekly_test', 'Weekly test 1', 20);
+    assessmentLocked($t, $weekly, [16, 12, 16]);
+    assessmentLocked($t, assessmentSet($t, 'end_of_term', 'End-of-term exam', 100), [80, 60, 70]);
+    assessmentLocked($this->people['admin'], assessmentSet($this->people['admin'], 'weekly_test', 'Weekly test 1', 20, 'MAT'), [10, 10, 10]);
+    assessmentLocked($this->people['admin'], assessmentSet($this->people['admin'], 'end_of_term', 'End-of-term exam', 100, 'MAT'), [50, 90, 50]);
+    $row = fn (): array => collect($this->actingAs($people['martha'])->getJson('/api/v1/assessment/publishing')->assertOk()->json('classes'))->firstWhere('class_id', $this->class);
+
+    // No steps by default: the catalogue says so, and nothing asks.
+    $topic = collect($this->actingAs($this->people['admin'])->getJson('/api/v1/approvals/topics')->assertOk()->json('areas'))
+        ->flatMap(fn (array $a): array => $a['topics'])->firstWhere('key', 'assessment.publish');
+    expect($topic)->toMatchArray(['steps' => [], 'optional' => true]);
+    $this->actingAs($this->people['admin'])->putJson('/api/v1/approvals/topics/assessment.publish', ['steps' => [['kind' => 'role', 'target' => $head->id, 'needs' => 1]]])->assertOk();
+
+    $asked = $this->actingAs($people['martha'])->postJson('/api/v1/assessment/publishing', ['class_ids' => [$this->class]])->assertOk();
+    expect($asked->json('published.0'))->toMatchArray(['asked' => true, 'publication_id' => null])
+        ->and($asked->json('asks'))->toBeTrue()
+        ->and($row())->toMatchArray(['state' => 'waiting'])
+        ->and($row()['waiting'])->toMatchArray(['asked_by' => 'Martha Kalua', 'waiting_for' => ['Ruth Tembo'], 'changed' => false])
+        ->and(DB::table('result_publications')->count())->toBe(0);
+    $this->actingAs($people['martha'])->postJson('/api/v1/assessment/publishing', ['class_ids' => [$this->class]])->assertUnprocessable();
+
+    // A mark changes while the request waits: the yes publishes nothing, and asking again replaces the request.
+    $this->actingAs($this->people['mercy'])->postJson("/api/v1/assessment/assessments/{$weekly}/correct",
+        ['learner_id' => $this->learners[1], 'value' => 14, 'note' => 'Added up again.'])->assertOk();
+    approveWaiting($this->people['admin'], 'assessment.mark_correction');
+    expect($row()['waiting']['changed'])->toBeTrue();
+    $first = DB::table('approval_requests')->where('topic_key', 'assessment.publish')->where('state', 'waiting')->value('id');
+    $this->actingAs($people['ruth'])->postJson("/api/v1/approvals/{$first}/answer", ['approve' => true])->assertUnprocessable();
+    expect(DB::table('result_publications')->count())->toBe(0);
+
+    $this->actingAs($people['martha'])->postJson('/api/v1/assessment/publishing', ['class_ids' => [$this->class]])->assertOk();
+    expect(DB::table('approval_requests')->where('id', $first)->value('state'))->toBe('withdrawn');
+    approveWaiting($people['ruth'], 'assessment.publish');
+    expect($row()['state'])->toBe('published')
+        ->and(DB::table('result_publications')->where('class_id', $this->class)->value('published_by'))->toBe($people['ruth']->id);
+
+    // The person who asked may withdraw a request while it waits; then nobody can answer it.
+    $this->actingAs($this->people['mercy'])->postJson("/api/v1/assessment/assessments/{$weekly}/correct",
+        ['learner_id' => $this->learners[2], 'value' => 18, 'note' => 'Added up again.'])->assertOk();
+    approveWaiting($this->people['admin'], 'assessment.mark_correction');
+    $this->actingAs($people['martha'])->postJson('/api/v1/assessment/publishing', ['class_ids' => [$this->class]])->assertOk();
+    $again = DB::table('approval_requests')->where('topic_key', 'assessment.publish')->where('state', 'waiting')->value('id');
+    $this->actingAs($people['ruth'])->postJson("/api/v1/approvals/{$again}/withdraw")->assertForbidden();
+    $this->actingAs($people['martha'])->postJson("/api/v1/approvals/{$again}/withdraw")->assertOk()->assertJsonPath('state', 'withdrawn');
+    $this->actingAs($people['ruth'])->postJson("/api/v1/approvals/{$again}/answer", ['approve' => true])->assertUnprocessable();
+    expect($row()['state'])->toBe('changed');
 });

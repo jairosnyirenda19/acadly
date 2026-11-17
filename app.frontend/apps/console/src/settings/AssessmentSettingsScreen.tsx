@@ -7,6 +7,7 @@ import { copy } from '../copy'
 import { setupApi } from '../setup/api'
 import { Input, Select } from '../setup/parts'
 import { PageHead, SettingsTabs, Tag } from './parts'
+import { WaitingFor } from '../approvals/WaitingFor'
 
 const t = copy.assessment.settings
 const s = copy.settings
@@ -624,7 +625,7 @@ function PlanEditor({
     })
     setWorking(false)
     if (r.kind === 'saved') {
-      slips.done({ word: copy.slips.saved, title: t.planSaved })
+      slips.done({ word: copy.slips.saved, title: r.data.waiting !== null && r.data.waiting.mine ? t.planAsked : t.planSaved })
       onSaved(r.data)
     } else setFailed(r.kind === 'invalid' ? (Object.values(r.errors)[0]?.[0] ?? s.failed) : r.kind === 'refused' ? s.refused : s.failed)
   }
@@ -641,6 +642,20 @@ function PlanEditor({
         <span className="text-[13px] font-bold">{t.inForce(data.period.name, data.plan.version, data.plan.default)}</span>
       </div>
       <p className="mb-3 max-w-[70ch] text-[13px] text-text-muted">{t.appliesTo(data.level.label)}</p>
+      {data.waiting !== null && (
+        <div className="mb-3">
+          <WaitingFor
+            title={t.planWaiting(data.waiting.summary)}
+            askedBy={data.waiting.asked_by}
+            waitingFor={data.waiting.waiting_for}
+            requestId={data.waiting.id}
+            mine={data.waiting.mine}
+            onWithdrawn={() => void assessmentApi.plans(q).then((next) => next !== null && next !== 'refused' && onSaved(next))}
+          >
+            <span className="text-[13px]">“{data.waiting.reason}”</span>
+          </WaitingFor>
+        </div>
+      )}
       {failed !== null && (
         <div className="mb-3">
           <Notice tone="wrong" title={failed} />

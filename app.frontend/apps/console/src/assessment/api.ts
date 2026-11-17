@@ -73,7 +73,7 @@ export const assessmentApi = {
   learner: (id: string) => read(api.GET('/v1/assessment/learner/{id}', { params: { path: { id } } })),
 
   publishing: () => read(api.GET('/v1/assessment/publishing')),
-  publish: (classIds: string[]) => settle(api.POST('/v1/assessment/publishing', { body: { class_ids: classIds } as never }) as Done<PublishingState & { published: { class_id: string; publication_id: string; version: number }[] }>),
+  publish: (classIds: string[]) => settle(api.POST('/v1/assessment/publishing', { body: { class_ids: classIds } as never }) as Done<PublishingState & { published: { class_id: string; publication_id: string | null; version: number | null; asked: boolean }[] }>),
   cardSettings: (body: { show_position: boolean; head_comment: boolean }) => settle(api.PUT('/v1/assessment/publishing/settings', { body: body as never }) as Done<PublishingState>),
   comments: (classId: string) => read(api.GET('/v1/assessment/comments', { params: { query: { class_id: classId } as never } })),
   comment: (body: { class_id: string; learner_id: string; author: 'class_teacher' | 'head'; text: string }) =>

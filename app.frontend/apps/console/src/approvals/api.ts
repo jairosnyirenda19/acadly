@@ -16,6 +16,7 @@ export const approvalsApi = {
   request: (id: string) => read(api.GET('/v1/approvals/{id}', { params: { path: { id } } })),
   answer: (id: string, approve: boolean, reason: string | null) =>
     settle(api.POST('/v1/approvals/{id}/answer', { params: { path: { id } }, body: { approve, reason } as never }) as Done<RequestState>),
+  withdraw: (id: string) => settle(api.POST('/v1/approvals/{id}/withdraw', { params: { path: { id } } }) as Done<RequestState>),
   catalogue: () => read(api.GET('/v1/approvals/topics')),
   topic: (key: string) => read(api.GET('/v1/approvals/topics/{key}', { params: { path: { key } } })),
   save: (key: string, steps: Spec[], fallbackRoleId: string | null) =>

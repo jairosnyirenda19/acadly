@@ -10,7 +10,7 @@ import { InLink } from './parts'
 const a = copy.assessment
 const t = a.publish
 
-const tone = { ready: 'done', not_ready: 'attention', published: 'locked', changed: 'attention' } as const
+const tone = { ready: 'done', not_ready: 'attention', published: 'locked', changed: 'attention', waiting: 'attention' } as const
 
 /** Publish results (the approved design): each class with how ready it is, choose, then publish with what it means beside. */
 export function PublishScreen() {
@@ -25,7 +25,9 @@ export function PublishScreen() {
   if (shown === undefined) return <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} band={[t.bandClasses, t.bandReady, t.bandNotReady]} rows={6} onRetry={loaded.reload} />
 
   const rows = shown.classes
-  const can = (r: PublishRow) => r.state === 'ready' || (r.state === 'changed' && r.ready)
+  // A waiting request whose results changed since may be asked for again.
+  const can = (r: PublishRow) => r.state === 'ready' || (r.state === 'changed' && r.ready) || (r.state === 'waiting' && r.waiting?.changed === true && r.ready)
+  const asks = shown.asks
   const picked = rows.filter((r) => chosen.includes(r.class_id) && can(r))
   const toggle = (id: string) => setChosen(chosen.includes(id) ? chosen.filter((x) => x !== id) : [...chosen, id])
 
@@ -36,7 +38,8 @@ export function PublishScreen() {
     if (r.kind === 'saved') {
       setData(r.data)
       setChosen([])
-      slips.done({ word: copy.slips.saved, title: t.done(r.data.published.length) })
+      const asked = r.data.published.filter((p) => p.asked).length
+      slips.done({ word: copy.slips.saved, title: asked > 0 ? t.askedDone(asked) : t.done(r.data.published.length) })
     } else {
       const reason = r.kind === 'invalid' ? Object.values(r.errors)[0]?.[0] : undefined
       slips.wrong({ word: t.failed, title: reason ?? (r.kind === 'refused' ? t.who : copy.settings.failed) })
@@ -87,6 +90,7 @@ export function PublishScreen() {
                 canChoose={can(r)}
                 open={open === r.class_id}
                 busy={busy}
+                asks={asks}
                 onToggle={() => toggle(r.class_id)}
                 onOpen={() => setOpen(open === r.class_id ? null : r.class_id)}
                 onPublish={() => void publish([r.class_id])}
@@ -100,22 +104,49 @@ export function PublishScreen() {
           )}
         </section>
         <aside className="min-w-0 flex-[1_1_330px] border-ink bg-paper px-4 pt-4 pb-6 max-[1023px]:border-t-2 md:px-6 min-[1024px]:border-l-2">
-          {picked.length === 0 ? (
-            <p className="text-sm text-text-muted">{t.pick}</p>
-          ) : (
-            <Confirm rows={picked} settings={shown.settings} busy={busy} onPublish={() => void publish(picked.map((r) => r.class_id))} onCancel={() => setChosen([])} />
-          )}
-          <p className="mt-3 text-xs text-text-muted">{t.who}</p>
+          {/* The panel stays in view while the list scrolls past it. */}
+          <div className="min-[1024px]:sticky min-[1024px]:top-4">
+            {picked.length === 0 ? (
+              <p className="text-sm text-text-muted">{t.pick}</p>
+            ) : (
+              <Confirm rows={picked} settings={shown.settings} asks={asks} busy={busy} onPublish={() => void publish(picked.map((r) => r.class_id))} onCancel={() => setChosen([])} />
+            )}
+            <p className="mt-3 text-xs text-text-muted">{t.who}</p>
+          </div>
         </aside>
       </div>
     </>
   )
 }
 
-function Row({ row, chosen, canChoose, open, busy, onToggle, onOpen, onPublish }: { row: PublishRow; chosen: boolean; canChoose: boolean; open: boolean; busy: boolean; onToggle: () => void; onOpen: () => void; onPublish: () => void }) {
+function Row({
+  row,
+  chosen,
+  canChoose,
+  open,
+  busy,
+  asks,
+  onToggle,
+  onOpen,
+  onPublish,
+}: {
+  row: PublishRow
+  chosen: boolean
+  canChoose: boolean
+  open: boolean
+  busy: boolean
+  asks: boolean
+  onToggle: () => void
+  onOpen: () => void
+  onPublish: () => void
+}) {
   const missingComments = row.learners - row.comments
   const why =
-    row.state === 'not_ready'
+    row.state === 'waiting'
+      ? row.waiting !== null && row.waiting.changed
+        ? t.askedChanged
+        : ''
+      : row.state === 'not_ready'
       ? (row.missing[0] ?? '')
       : row.state === 'ready'
         ? missingComments > 0
@@ -136,7 +167,12 @@ function Row({ row, chosen, canChoose, open, busy, onToggle, onOpen, onPublish }
         <span className="min-w-0">
           <span className="block text-[15px] font-extrabold">{row.class}</span>
           <span className="block text-xs text-text-muted">{[row.level, row.campus, row.period.name].filter((x) => x !== '').join(a.joiner)}</span>
-          <span className="block text-[13px]">{why}</span>
+          {why !== '' && <span className="block text-[13px]">{why}</span>}
+          {row.waiting !== null && (
+            <span className="block text-[13px]">
+              {t.askedWhy(row.waiting.asked_by)} <strong>{t.waitingFor}</strong> {row.waiting.waiting_for.join(', ')}
+            </span>
+          )}
           {row.state === 'not_ready' && row.missing.length > 1 && (
             <button type="button" aria-expanded={open} onClick={onOpen} className="min-h-9 text-[13px] font-extrabold underline underline-offset-[3px]">
               {open ? t.hideMissing : t.seeMissing}
@@ -161,9 +197,10 @@ function Row({ row, chosen, canChoose, open, busy, onToggle, onOpen, onPublish }
           </span>
           {canChoose && (
             <Button variant="secondary" className="h-9 px-3 text-sm" disabled={busy} onClick={onPublish}>
-              {row.state === 'changed' ? t.republish : t.publish}
+              {row.state === 'waiting' ? t.askAgain : asks ? t.ask : row.state === 'changed' ? t.republish : t.publish}
             </Button>
           )}
+          {row.waiting !== null && <InLink href={`/approvals/${row.waiting.id}`}>{t.seeRequest}</InLink>}
           {row.latest !== null && <InLink href={`/marks/cards/${row.latest.id}`}>{t.cards}</InLink>}
           <InLink href={`/marks/comments?class_id=${row.class_id}`}>{t.comments}</InLink>
         </span>
@@ -179,19 +216,19 @@ function Row({ row, chosen, canChoose, open, busy, onToggle, onOpen, onPublish }
   )
 }
 
-function Confirm({ rows, settings, busy, onPublish, onCancel }: { rows: PublishRow[]; settings: PublishingState['settings']; busy: boolean; onPublish: () => void; onCancel: () => void }) {
+function Confirm({ rows, settings, asks, busy, onPublish, onCancel }: { rows: PublishRow[]; settings: PublishingState['settings']; asks: boolean; busy: boolean; onPublish: () => void; onCancel: () => void }) {
   const short = rows.filter((r) => r.comments < r.learners)
 
   return (
     <div className="border-2 border-ink bg-sheet">
       <div className="border-b-2 border-ink px-4 py-3">
-        <div className="label-caps text-text-muted">{t.panelKicker(rows.length)}</div>
+        <div className="label-caps text-text-muted">{asks ? t.askKicker(rows.length) : t.panelKicker(rows.length)}</div>
         <div className="type-display mt-1 text-[28px] leading-[0.9]">{rows.map((r) => r.class).join(', ')}</div>
       </div>
       <div className="px-4 py-3 text-sm leading-normal">
-        <div className="label-caps mb-1.5 text-text-muted">{t.whenTitle}</div>
+        <div className="label-caps mb-1.5 text-text-muted">{asks ? t.askTitle : t.whenTitle}</div>
         <ul className="list-disc pl-[18px]">
-          {t.when.map((line) => (
+          {(asks ? [...t.askWhen, ...t.when.slice(1)] : t.when).map((line) => (
             <li key={line}>{line}</li>
           ))}
           <li>{settings.show_position ? t.whenPosition : t.whenNoPosition}</li>
@@ -202,10 +239,15 @@ function Confirm({ rows, settings, busy, onPublish, onCancel }: { rows: PublishR
           <Attention title={t.attention}>{t.missingComments(r.learners - r.comments, r.class)}</Attention>
         </div>
       ))}
+      {asks && (
+        <div className="mx-4 mb-2">
+          <Attention title={t.attention}>{t.askAttention}</Attention>
+        </div>
+      )}
       <p className="px-4 py-2 text-[13px] text-text-muted">{t.later}</p>
       <div className="flex flex-wrap gap-2 px-4 pb-4">
         <Button className="h-11" disabled={busy} aria-busy={busy || undefined} onClick={onPublish}>
-          {t.publishMany(rows.length)}
+          {asks ? t.askMany(rows.length) : t.publishMany(rows.length)}
         </Button>
         <Button variant="secondary" className="h-11" onClick={onCancel}>
           {t.cancel}

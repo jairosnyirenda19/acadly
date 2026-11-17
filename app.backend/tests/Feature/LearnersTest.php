@@ -167,9 +167,20 @@ describe('the record', function (): void {
         $details = ['first_name' => 'Kumbukani', 'other_names' => 'Peter', 'surname' => 'Jere', 'sex' => 'male', 'date_of_birth' => '2019-05-03', 'admission_number' => 'X-11'];
 
         $this->actingAs($this->admin)->putJson("/api/v1/learners/{$id}", $details)->assertUnprocessable()->assertJsonValidationErrors(['reason']);
-        $record = $this->actingAs($this->admin)->putJson("/api/v1/learners/{$id}", [...$details, 'reason' => 'Birth certificate seen.'])->assertOk()->json();
 
-        expect($record)->toMatchArray(['name' => 'Kumbukani Peter Jere', 'date_of_birth' => '2019-05-03', 'admission_number' => 'X-11'])
+        // A new name, date of birth or sex is asked for first; the details in force stay until the last yes.
+        $officer = staffAt(ScopeRef::institution(), [EnrolmentPermission::View, EnrolmentPermission::Manage], 'Ruth Tembo');
+        $asked = $this->actingAs($this->admin)->putJson("/api/v1/learners/{$id}", [...$details, 'reason' => 'Birth certificate seen.'])->assertOk()->json();
+        expect($asked)->toMatchArray(['name' => 'Kumbukani Jere', 'admission_number' => 'X-10', 'details_asks' => true])
+            ->and($asked['details_request'])->toMatchArray(['reason' => 'Birth certificate seen.', 'waiting_for' => ['Ruth Tembo'], 'mine' => true])
+            ->and(array_column($asked['details_request']['changes'], 'label'))->toContain('Other names');
+        $this->actingAs($this->admin)->putJson("/api/v1/learners/{$id}", [...$details, 'reason' => 'Again.'])
+            ->assertUnprocessable()->assertJsonValidationErrors(['reason' => 'A correction of these details is already waiting for approval.']);
+        $request = DB::table('approval_requests')->where('topic_key', 'enrolment.details')->where('state', 'waiting')->value('id');
+        $this->actingAs($officer)->postJson("/api/v1/approvals/{$request}/answer", ['approve' => true])->assertOk();
+        $record = $this->actingAs($this->admin)->getJson("/api/v1/learners/{$id}")->assertOk()->json();
+
+        expect($record)->toMatchArray(['name' => 'Kumbukani Peter Jere', 'date_of_birth' => '2019-05-03', 'admission_number' => 'X-11', 'details_request' => null])
             ->and(DB::table('audit_events')->where('action', 'enrolment.details_corrected')->value('reason'))->toBe('Birth certificate seen.');
 
         $this->actingAs($this->admin)->postJson('/api/v1/learners', admission($class, ['first_name' => 'Wezi', 'admission_number' => 'X-10']))

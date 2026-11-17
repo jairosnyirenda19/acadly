@@ -12,6 +12,7 @@ use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Approvals\ApprovalRequests;
+use Acadly\Kernel\Approvals\Approvals;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Notify\Deliveries;
 use Acadly\Kernel\Support\Clock;
@@ -41,6 +42,7 @@ final class Registers
         private readonly Deliveries $deliveries,
         private readonly Clock $clock,
         private readonly ApprovalRequests $approvals,
+        private readonly Approvals $chains,
     ) {}
 
     /**
@@ -156,6 +158,7 @@ final class Registers
         $mayTake = $this->reach->takesMorning($viewer, $classId);
         $absences = $registerId === null ? [] : $this->absences($registerId);
         $mayFollow = $mayTake || $this->reach->may($viewer, AttendancePermission::Correct, $classId);
+        $late = $register === null ? LateRegisterApproval::waiting($classId, $day) : null;
 
         return [
             'class' => ['id' => $class['id'], 'name' => $class['name']],
@@ -173,7 +176,10 @@ final class Registers
                 'correction' => $corrections[$l['id']] ?? null,
                 'absence' => isset($absences[$l['id']]) ? [...$absences[$l['id']], 'can_follow_up' => $mayFollow] : null,
             ], $learners),
-            'can_take' => $mayTake && $register === null && $schoolDay && $day <= $this->today(),
+            'can_take' => $mayTake && $register === null && $schoolDay && $day <= $this->today() && $late === null,
+            // A register for an earlier day asks first, when the school has steps for it (D-081).
+            'late' => $register === null && $day < $this->today() && $this->chains->needed(LateRegisterApproval::KEY),
+            'late_request' => $late,
             'can_request' => $mayTake && $register !== null,
         ];
     }

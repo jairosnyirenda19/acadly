@@ -156,3 +156,7 @@ Designs: the canvas, Page 6 (Publishing results, and report cards).
 - **Lines from other modules.** `ReportCardLine` (Enrolment Contracts, tag `acadly.report-card-lines`). Attendance gives days present out of days the morning register was taken.
 - **Addresses.** `GET/POST /assessment/publishing`, `PUT /assessment/publishing/settings`, `GET/PUT /assessment/comments`, `GET /assessment/cards/{id}?learner_id=`. `GET /assessment/learner/{id}` gives `published`: the version in force and every version.
 - **Later.** An approval chain before publishing; the parent portal; a PDF made by the server.
+
+### 9.3 Asking first (D-081)
+
+Three assessment changes can need someone else's yes, set in Settings › Approvals: publishing results (no steps by default), correcting a locked mark, and a grading plan change once the term has begun (anyone else who may decide, by default). Until the last yes the mark, plan or results in force stay; the screens show what was asked and who it waits for. A publishing request keeps the fingerprint of the results as asked: a yes after they changed publishes nothing, and asking again replaces the request.

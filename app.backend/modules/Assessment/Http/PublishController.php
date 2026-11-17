@@ -24,7 +24,7 @@ final class PublishController
     /**
      * The classes the viewer may publish, each with its term, how ready it is and its latest version.
      *
-     * @response array{classes: list<array{class_id: string, class: string, level: string, campus: string, period: array{id: string, name: string}, learners: int, subjects: int, subjects_ready: int, comments: int, ready: bool, missing: list<string>, state: 'not_ready'|'ready'|'published'|'changed', latest: array{id: string, version: int, published_at: string}|null}>, settings: array{show_position: bool, head_comment: bool}}
+     * @response array{classes: list<array{class_id: string, class: string, level: string, campus: string, period: array{id: string, name: string}, learners: int, subjects: int, subjects_ready: int, comments: int, ready: bool, missing: list<string>, state: 'not_ready'|'ready'|'published'|'changed'|'waiting', waiting: array{id: string, asked_by: string, asked_by_id: string, asked_at: string, step: string, waiting_for: list<string>, changed: bool}|null, latest: array{id: string, version: int, published_at: string}|null}>, settings: array{show_position: bool, head_comment: bool}, asks: bool}
      */
     public function index(Request $request): JsonResponse
     {
@@ -34,7 +34,7 @@ final class PublishController
     /**
      * Publishes the classes chosen: `{class_ids: [...]}`. Returns the screen as it is now.
      *
-     * @response array{published: list<array{class_id: string, publication_id: string, version: int}>, classes: list<array{class_id: string, class: string, level: string, campus: string, period: array{id: string, name: string}, learners: int, subjects: int, subjects_ready: int, comments: int, ready: bool, missing: list<string>, state: 'not_ready'|'ready'|'published'|'changed', latest: array{id: string, version: int, published_at: string}|null}>, settings: array{show_position: bool, head_comment: bool}}
+     * @response array{published: list<array{class_id: string, publication_id: string|null, version: int|null, asked: bool}>, classes: list<array{class_id: string, class: string, level: string, campus: string, period: array{id: string, name: string}, learners: int, subjects: int, subjects_ready: int, comments: int, ready: bool, missing: list<string>, state: 'not_ready'|'ready'|'published'|'changed'|'waiting', waiting: array{id: string, asked_by: string, asked_by_id: string, asked_at: string, step: string, waiting_for: list<string>, changed: bool}|null, latest: array{id: string, version: int, published_at: string}|null}>, settings: array{show_position: bool, head_comment: bool}, asks: bool}
      */
     public function publish(Request $request): JsonResponse
     {
@@ -48,7 +48,7 @@ final class PublishController
     /**
      * What report cards show: `{show_position: bool, head_comment: bool}`.
      *
-     * @response array{classes: list<array{class_id: string, class: string, level: string, campus: string, period: array{id: string, name: string}, learners: int, subjects: int, subjects_ready: int, comments: int, ready: bool, missing: list<string>, state: 'not_ready'|'ready'|'published'|'changed', latest: array{id: string, version: int, published_at: string}|null}>, settings: array{show_position: bool, head_comment: bool}}
+     * @response array{classes: list<array{class_id: string, class: string, level: string, campus: string, period: array{id: string, name: string}, learners: int, subjects: int, subjects_ready: int, comments: int, ready: bool, missing: list<string>, state: 'not_ready'|'ready'|'published'|'changed'|'waiting', waiting: array{id: string, asked_by: string, asked_by_id: string, asked_at: string, step: string, waiting_for: list<string>, changed: bool}|null, latest: array{id: string, version: int, published_at: string}|null}>, settings: array{show_position: bool, head_comment: bool}, asks: bool}
      */
     public function settings(Request $request): JsonResponse
     {

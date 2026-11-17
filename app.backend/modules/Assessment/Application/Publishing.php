@@ -11,6 +11,7 @@ use Acadly\Core\Enrolment\Contracts\ReportCardLine;
 use Acadly\Core\Institution\Contracts\SchoolDirectory;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
+use Acadly\Kernel\Approvals\Approvals;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Module\ModuleActivation;
 use Acadly\Kernel\School\SchoolProfile;
@@ -57,6 +58,8 @@ final class Publishing
         private readonly SchoolDirectory $directory,
         private readonly ModuleActivation $activation,
         private readonly Clock $clock,
+        private readonly Approvals $approvals,
+        private readonly Requests $requests,
     ) {}
 
     /** @return array{show_position: bool, head_comment: bool} what report cards show; both on until the school says otherwise */
@@ -90,6 +93,7 @@ final class Publishing
             $now = $this->current($class, $period);
             $latest = $this->latest($class['id'], $period['id']);
             $changed = $latest !== null && $latest['fingerprint'] !== $now['fingerprint'];
+            $waiting = $this->requests->publish($class['id'], $period['id']);
             $comments = count(array_filter($now['cards'], fn (array $c): bool => $c['comments'][self::CLASS_TEACHER] !== null));
 
             $rows[] = [
@@ -104,12 +108,13 @@ final class Publishing
                 'comments' => $comments,
                 'ready' => $now['ready'],
                 'missing' => $now['missing'],
-                'state' => $latest === null ? ($now['ready'] ? 'ready' : 'not_ready') : ($changed ? 'changed' : 'published'),
+                'state' => $waiting !== null ? 'waiting' : ($latest === null ? ($now['ready'] ? 'ready' : 'not_ready') : ($changed ? 'changed' : 'published')),
+                'waiting' => $waiting !== null ? [...$waiting['pending'], 'changed' => $waiting['fingerprint'] !== $now['fingerprint']] : null,
                 'latest' => $latest !== null ? ['id' => $latest['id'], 'version' => $latest['version'], 'published_at' => $latest['published_at']] : null,
             ];
         }
 
-        return ['classes' => $rows, 'settings' => $this->settings()];
+        return ['classes' => $rows, 'settings' => $this->settings(), 'asks' => $this->approvals->needed(PublishApproval::KEY)];
     }
 
     /**

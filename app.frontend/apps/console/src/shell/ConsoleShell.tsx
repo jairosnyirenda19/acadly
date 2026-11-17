@@ -327,8 +327,9 @@ export function ConsoleShell({ children, onSignedOut }: { children: ReactNode; o
       {choosing && <WorkInPanel onClose={closeChoosing} className={width === 'phone' ? 'left-0 w-full' : overlay ? 'left-[312px]' : railFolded ? 'left-16' : 'left-[248px]'} />}
 
       <div className="flex min-w-0 flex-1 flex-col">
+        <div className="sticky top-0 z-30">
         <ViewAsBar name={context.user.name} />
-        <header className="sticky top-0 z-30 flex h-[60px] items-center gap-2.5 border-b-2 border-ink bg-paper px-3 md:h-16 md:gap-3 md:px-[clamp(16px,3vw,40px)]">
+        <header className="relative flex h-[60px] items-center gap-2.5 border-b-2 border-ink bg-paper px-3 md:h-16 md:gap-3 md:px-[clamp(16px,3vw,40px)]">
           <LoadingRule active={busy} />
           {width === 'phone' && (
             <>
@@ -353,6 +354,7 @@ export function ConsoleShell({ children, onSignedOut }: { children: ReactNode; o
             </span>
           </div>
         </header>
+        </div>
         <main className="settle-in flex min-w-0 flex-1 flex-col">{children}</main>
       </div>
     </div>

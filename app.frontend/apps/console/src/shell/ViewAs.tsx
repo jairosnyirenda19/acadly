@@ -44,7 +44,7 @@ export function ViewAsBar({ name }: { name: string }) {
   }
 
   return (
-    <div role="status" className="sticky top-0 z-40 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-b-4 border-marigold bg-ink px-3 py-1.5 text-sheet md:px-[clamp(16px,3vw,40px)]">
+    <div role="status" className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-b-4 border-marigold bg-ink px-3 py-1.5 text-sheet md:px-[clamp(16px,3vw,40px)]">
       <span aria-hidden="true" className="size-3 shrink-0 bg-marigold md:size-3.5" />
       <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-3 gap-y-0.5 md:flex-none">
         <span className="label-caps text-marigold">{t.label}</span>

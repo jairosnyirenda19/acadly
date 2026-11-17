@@ -28,7 +28,7 @@ final class MeController
      * `view_as` says whether this account may view as others (development
      * only), and, while it does, who is really signed in and when it ends.
      *
-     * @response array{user: array{id: string, name: string, email: string}, grants: list<array{permission: string, scope_type: 'institution'|'division'|'campus'|'class', scope_id: string|null}>, view_as: array{available: bool, by: array{id: string, name: string}|null, ends_at: string|null}}
+     * @response array{user: array{id: string, name: string, email: string|null, phone: string|null}, grants: list<array{permission: string, scope_type: 'institution'|'division'|'campus'|'class', scope_id: string|null}>, view_as: array{available: bool, by: array{id: string, name: string}|null, ends_at: string|null}}
      */
     public function __invoke(Request $request): JsonResponse
     {
@@ -50,6 +50,7 @@ final class MeController
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'phone' => $user->phone,
             ],
             'grants' => array_map(
                 fn (Grant $grant): array => [

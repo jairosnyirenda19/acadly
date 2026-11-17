@@ -4,7 +4,9 @@ import { forgetLoads } from './load'
 export interface Account {
   id: string
   name: string
-  email: string
+  /** Staff sign in by email; parents and guardians by phone. An account has one or both. */
+  email: string | null
+  phone: string | null
 }
 
 /** What a sign-in attempt came to. Named outcomes, never a boolean. */
@@ -56,6 +58,41 @@ export async function signIn(email: string, password: string): Promise<SignInOut
   try {
     await prepare()
     const { data, response } = await api.POST('/v1/auth/sign-in', { body: { email, password } })
+
+    if (data !== undefined) {
+      return { kind: 'signed_in', account: data.user }
+    }
+
+    return signInFailure(response.status)
+  } catch {
+    return { kind: 'unavailable' }
+  }
+}
+
+/** What asking for a sign-in code came to. The answer never says whether the number is known. */
+export type CodeOutcome = { kind: 'sent' } | { kind: 'invalid' } | { kind: 'paused' } | { kind: 'unavailable' }
+
+/** Asks the school to send a six-digit sign-in code by SMS to this number. */
+export async function sendSignInCode(phone: string, language: 'en' | 'ny'): Promise<CodeOutcome> {
+  try {
+    await prepare()
+    const { response } = await api.POST('/v1/auth/phone/code', { body: { phone, language } })
+
+    if (response.ok) return { kind: 'sent' }
+    if (response.status === 422) return { kind: 'invalid' }
+    if (response.status === 429) return { kind: 'paused' }
+
+    return { kind: 'unavailable' }
+  } catch {
+    return { kind: 'unavailable' }
+  }
+}
+
+/** Signs in with the phone number and the code sent to it. The phone stays signed in for 90 days. */
+export async function signInWithCode(phone: string, code: string): Promise<SignInOutcome> {
+  try {
+    await prepare()
+    const { data, response } = await api.POST('/v1/auth/phone/sign-in', { body: { phone, code } })
 
     if (data !== undefined) {
       return { kind: 'signed_in', account: data.user }

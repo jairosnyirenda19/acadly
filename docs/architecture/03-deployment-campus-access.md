@@ -100,7 +100,8 @@ Three different things. Never merge them.
 
 - `users.person_id` links a login to a person. A parent with children in two different schools has an account in each school's deployment.
 - A person may exist with **no user** (most young learners; guardians who never activate).
-- Guardian access is never inferred from surname, address or phone. It exists only as a `learner_guardian_relationships` row that went through the `guardian.link` journey.
+- Guardian access is never inferred from surname, address or phone. It exists only as a `learner_guardian_relationships` row that went through the `enrolment.guardian_link` journey and that the parent confirmed (D-082). A phone number lets a parent sign in; it never gives access by itself.
+- Parents and guardians sign in with the phone number the school keeps and a code sent by SMS (D-082).
 
 ### Sign-in
 

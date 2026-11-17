@@ -1,0 +1,171 @@
+{
+    "initial": "requested",
+    "kind": "journey",
+    "milestones": [],
+    "ref": "enrolment.guardian_link@2026.1",
+    "stages": [
+        {
+            "key": "parent",
+            "steps": [
+                "confirm"
+            ],
+            "title": "Parent"
+        },
+        {
+            "key": "office",
+            "steps": [
+                "suspend",
+                "reinstate",
+                "recheck",
+                "revoke"
+            ],
+            "title": "Office"
+        }
+    ],
+    "states": [
+        {
+            "id": "requested",
+            "label": "Awaiting the parent"
+        },
+        {
+            "id": "active",
+            "label": "Active"
+        },
+        {
+            "id": "disputed",
+            "label": "Not their child"
+        },
+        {
+            "id": "suspended",
+            "label": "Suspended"
+        },
+        {
+            "id": "revoked",
+            "label": "Ended"
+        }
+    ],
+    "steps": [
+        {
+            "capability": null,
+            "four_eyes": null,
+            "from": [
+                "requested"
+            ],
+            "gates": [],
+            "holder": true,
+            "id": "confirm",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "confirmed",
+                    "requires_reason": false,
+                    "title": "This is my child",
+                    "to": "active"
+                },
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "not_mine",
+                    "requires_reason": false,
+                    "title": "This is not my child",
+                    "to": "disputed"
+                }
+            ],
+            "stage": "parent",
+            "title": "Confirm the child"
+        },
+        {
+            "capability": "enrolment.families",
+            "four_eyes": null,
+            "from": [
+                "active"
+            ],
+            "gates": [],
+            "id": "suspend",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "suspended",
+                    "requires_reason": true,
+                    "title": "Suspend",
+                    "to": "suspended"
+                }
+            ],
+            "stage": "office",
+            "title": "Suspend access"
+        },
+        {
+            "capability": "enrolment.families",
+            "four_eyes": null,
+            "from": [
+                "suspended"
+            ],
+            "gates": [],
+            "id": "reinstate",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "reinstated",
+                    "requires_reason": true,
+                    "title": "Restore",
+                    "to": "active"
+                }
+            ],
+            "stage": "office",
+            "title": "Restore access"
+        },
+        {
+            "capability": "enrolment.families",
+            "four_eyes": null,
+            "from": [
+                "disputed"
+            ],
+            "gates": [],
+            "id": "recheck",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "asked_again",
+                    "requires_reason": true,
+                    "title": "Ask again",
+                    "to": "requested"
+                }
+            ],
+            "stage": "office",
+            "title": "Ask the parent again"
+        },
+        {
+            "capability": "enrolment.families",
+            "four_eyes": null,
+            "from": [
+                "requested",
+                "active",
+                "suspended",
+                "disputed"
+            ],
+            "gates": [],
+            "id": "revoke",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "revoked",
+                    "requires_reason": true,
+                    "title": "End",
+                    "to": "revoked"
+                }
+            ],
+            "stage": "office",
+            "title": "End the link"
+        }
+    ],
+    "subject": "Acadly\\Core\\Enrolment\\Domain\\GuardianLink",
+    "terminal": [
+        "revoked"
+    ],
+    "title": "Parent link"
+}

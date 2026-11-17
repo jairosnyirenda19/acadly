@@ -1,4 +1,4 @@
-import { navigate, useLoad } from '@acadly/kernel'
+import { navigate, useAppContext, useLoad } from '@acadly/kernel'
 import { Button, DataGrid, NO_SELECTION, Notice, viewState, Waiting, type GridQuery, type GridSelection } from '@acadly/ui'
 import { useState, type MouseEvent } from 'react'
 import { copy } from '../copy'
@@ -8,6 +8,7 @@ import { startExport, useGridPage, useGridPrefs, useGridQuery, useGridSelection 
 import { useRememberList } from './back'
 import { Input, Select, Total, TotalsBand } from '../setup/parts'
 import { PageHead, Tag } from '../settings/parts'
+import { holdsAnywhere } from '../shell/navigation'
 import { useWorkIn } from '../shell/WorkIn'
 import { learnersApi, today, type LearnerGridRow } from './api'
 
@@ -69,6 +70,7 @@ const card = (row: LearnerGridRow) => ({
 
 /** The list of learners on the data grid (the approved design). */
 export function LearnersScreen() {
+  const keepsFamilies = holdsAnywhere(useAppContext(), 'enrolment.families')
   const { place } = useWorkIn()
   const inPlace = place !== null && place.key !== 'institution:' ? place.key : null
   const loaded = useLoad(`learners:${inPlace ?? ''}`, () => learnersApi.list(inPlace))
@@ -123,12 +125,21 @@ export function LearnersScreen() {
         title={plural}
         intro={t.intro(word)}
         actions={
-          state.can_admit ? (
+          state.can_admit || keepsFamilies ? (
             <>
-              <Button variant="secondary" onClick={() => navigate('/learners/import')}>
-                {t.import}
-              </Button>
-              <Button onClick={() => navigate('/learners/admit')}>{t.admit(word)}</Button>
+              {keepsFamilies && (
+                <Button variant="secondary" onClick={() => navigate('/learners/families')}>
+                  {copy.families.open}
+                </Button>
+              )}
+              {state.can_admit && (
+                <>
+                  <Button variant="secondary" onClick={() => navigate('/learners/import')}>
+                    {t.import}
+                  </Button>
+                  <Button onClick={() => navigate('/learners/admit')}>{t.admit(word)}</Button>
+                </>
+              )}
             </>
           ) : undefined
         }

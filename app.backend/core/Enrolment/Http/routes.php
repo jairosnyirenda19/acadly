@@ -2,9 +2,20 @@
 
 declare(strict_types=1);
 
+use Acadly\Core\Enrolment\Http\FamiliesController;
 use Acadly\Core\Enrolment\Http\LearnerImportController;
 use Acadly\Core\Enrolment\Http\LearnersController;
 use Illuminate\Support\Facades\Route;
+
+Route::middleware('auth:sanctum')->group(function (): void {
+    Route::get('/families', [FamiliesController::class, 'index'])->name('families.index');
+    Route::post('/families/links/{id}', [FamiliesController::class, 'link'])->whereUuid('id')->name('families.link');
+
+    // The parent portal: a parent's own family. No permission: a person reads their own record.
+    Route::get('/portal/family', [FamiliesController::class, 'family'])->name('portal.family');
+    Route::post('/portal/family/confirm', [FamiliesController::class, 'confirm'])->name('portal.confirm');
+    Route::get('/portal/children/{id}/messages', [FamiliesController::class, 'messages'])->whereUuid('id')->name('portal.messages');
+});
 
 Route::middleware('auth:sanctum')->prefix('learners')->name('learners.')->group(function (): void {
     Route::get('/', [LearnersController::class, 'index'])->name('index');

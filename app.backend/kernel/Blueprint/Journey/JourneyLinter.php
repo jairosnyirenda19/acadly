@@ -63,7 +63,11 @@ final class JourneyLinter
                 }
             }
 
-            if ($step->capability === null) {
+            if ($step->holder) {
+                if ($step->capability !== null) {
+                    $problems[] = "{$where}: a step taken by the holder needs no capability.";
+                }
+            } elseif ($step->capability === null) {
                 $problems[] = "{$where}: the step needs a capability (the permission that allows it).";
             } elseif (! $this->permissions->has($step->capability)) {
                 $problems[] = "{$where}: [{$step->capability}] is not a permission in this build.";

@@ -22,7 +22,8 @@ use Illuminate\Notifications\Notifiable;
  *
  * @property string $id
  * @property string $name
- * @property string $email
+ * @property string|null $email
+ * @property string|null $phone
  * @property string $password
  * @property AccountStatus $status
  * @property CarbonImmutable|null $last_signed_in_at
@@ -32,7 +33,7 @@ final class User extends Authenticatable implements Auditable
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasUuids, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'status'];
+    protected $fillable = ['name', 'email', 'phone', 'password', 'status'];
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -63,6 +64,7 @@ final class User extends Authenticatable implements Auditable
         return [
             'name' => FieldClass::Plain,
             'email' => FieldClass::Personal,
+            'phone' => FieldClass::Personal,
             'password' => FieldClass::Secret,
             'status' => FieldClass::Plain,
         ];
@@ -73,10 +75,10 @@ final class User extends Authenticatable implements Auditable
         return UserFactory::new();
     }
 
-    /** @return Attribute<string, string> */
+    /** @return Attribute<string|null, string|null> */
     protected function email(): Attribute
     {
-        return Attribute::make(set: fn (string $value): string => mb_strtolower(trim($value)));
+        return Attribute::make(set: fn (?string $value): ?string => $value !== null ? mb_strtolower(trim($value)) : null);
     }
 
     protected function casts(): array

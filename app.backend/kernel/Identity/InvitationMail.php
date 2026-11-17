@@ -26,7 +26,7 @@ final class InvitationMail extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        $email = $notifiable instanceof User ? $notifiable->email : '';
+        $email = $notifiable instanceof User ? ($notifiable->email ?? '') : '';
         $url = rtrim(config()->string('acadly.frontend_url'), '/')
             .'/reset-password?invite=1&token='.urlencode($this->token)
             .'&email='.urlencode($email);

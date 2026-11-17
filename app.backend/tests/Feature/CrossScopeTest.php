@@ -26,12 +26,12 @@ use Tests\Fixtures\TwoCampusSchool;
 
 /** Routes open to anyone: they reveal nothing about a place. */
 const OPEN_ROUTES = [
-    'sanctum.csrf-cookie', 'auth.sign-in', 'auth.forgot-password', 'auth.reset-password',
+    'sanctum.csrf-cookie', 'auth.sign-in', 'auth.forgot-password', 'auth.reset-password', 'auth.phone.code', 'auth.phone.sign-in',
     'kernel.health', 'kernel.ready', 'kernel.school', 'institution.logo.public', 'notify.reports',
 ];
 
 /** Routes about the account itself, not about a place. */
-const OWN_ROUTES = ['auth.sign-out', 'me', 'me.context', 'me.notifications', 'me.notifications.read', 'view-as.leave', 'approvals.waiting'];
+const OWN_ROUTES = ['auth.sign-out', 'me', 'me.context', 'me.notifications', 'me.notifications.read', 'view-as.leave', 'approvals.waiting', 'portal.family', 'portal.confirm'];
 
 /** Routes decided per record by the owning domain, and proved in its own tests. */
 const RECORD_ROUTES = [

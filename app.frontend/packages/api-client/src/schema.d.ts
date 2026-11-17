@@ -527,6 +527,153 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/families": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Every family (the office)
+         * @description Learners grouped by contact phone number, which children each parent
+         *     sees in the portal, and what needs checking.
+         */
+        get: operations["families.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/families/links/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Act on a parent link
+         * @description `{action: suspend|reinstate|recheck|revoke, reason}`. The answer is
+         *     every family as it is now.
+         */
+        post: operations["families.link"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portal/family": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The parent's family
+         * @description The children this parent sees, each with its lines for today, and the
+         *     children the school's contact list proposes for the parent to confirm.
+         */
+        get: operations["portal.family"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portal/family/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm the children
+         * @description `{mine: [learner ids], not_mine: [learner ids]}`. A child left out stays
+         *     to confirm. The answer is the family as it is now.
+         */
+        post: operations["portal.confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portal/children/{id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A child's messages
+         * @description The text messages the school sent to this phone about the child, newest first.
+         */
+        get: operations["portal.messages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portal/children/{id}/attendance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A child's attendance this term
+         * @description The mornings of the term and the totals, for a parent whose link to the
+         *     child is active.
+         */
+        get: operations["portal.attendance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portal/children/{id}/card": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A child's report card
+         * @description The newest report card published for the child, exactly as published,
+         *     for a parent whose link to the child is active. `card` is null when no
+         *     card has been published.
+         */
+        get: operations["portal.card"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/grids/{grid}/views": {
         parameters: {
             query?: never;
@@ -1706,6 +1853,48 @@ export interface paths {
         put?: never;
         /** Sends the person a link to set a new password */
         post: operations["people.password-reset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/phone/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a sign-in code
+         * @description Sends a six-digit code by SMS when the school keeps this number. The
+         *     answer is the same either way. `language` is `en` or `ny`.
+         */
+        post: operations["auth.phone.code"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/phone/sign-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sign in with a code
+         * @description Starts a session for the account of this number. The phone stays
+         *     signed in for 90 days. The response is the same as GET /me.
+         */
+        post: operations["auth.phone.sign-in"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4725,6 +4914,362 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "families.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        families: {
+                            phone: string | null;
+                            names: string[];
+                            children: {
+                                id: string;
+                                name: string;
+                                class: string;
+                                relationship: string;
+                                link: {
+                                    id: string;
+                                    state: string;
+                                    label: string;
+                                } | null;
+                            }[];
+                            portal: {
+                                signed_in: boolean;
+                                last_signed_in_at: string | null;
+                            };
+                            checks: {
+                                /** @enum {string} */
+                                kind: "not_their_child" | "names_differ";
+                                learner: string | null;
+                            }[];
+                        }[];
+                        totals: {
+                            families: number;
+                            in_portal: number;
+                            to_check: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "families.link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    action: "suspend" | "reinstate" | "recheck" | "revoke";
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        families: {
+                            phone: string | null;
+                            names: string[];
+                            children: {
+                                id: string;
+                                name: string;
+                                class: string;
+                                relationship: string;
+                                link: {
+                                    id: string;
+                                    state: string;
+                                    label: string;
+                                } | null;
+                            }[];
+                            portal: {
+                                signed_in: boolean;
+                                last_signed_in_at: string | null;
+                            };
+                            checks: {
+                                /** @enum {string} */
+                                kind: "not_their_child" | "names_differ";
+                                learner: string | null;
+                            }[];
+                        }[];
+                        totals: {
+                            families: number;
+                            in_portal: number;
+                            to_check: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "portal.family": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        school: {
+                            name: string;
+                            phone: string | null;
+                        };
+                        parent: {
+                            name: string;
+                        };
+                        children: {
+                            id: string;
+                            first_name: string;
+                            name: string;
+                            class_id: string | null;
+                            class: string;
+                            state: string;
+                            lines: {
+                                key: string;
+                                word: string;
+                                label: string | null;
+                                /** @enum {string} */
+                                tone: "done" | "attention" | "wrong" | "plain";
+                            }[];
+                        }[];
+                        to_confirm: {
+                            id: string;
+                            name: string;
+                            class: string;
+                            relationship: string;
+                            contact_id: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "portal.confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    mine: string[];
+                    not_mine: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        school: {
+                            name: string;
+                            phone: string | null;
+                        };
+                        parent: {
+                            name: string;
+                        };
+                        children: {
+                            id: string;
+                            first_name: string;
+                            name: string;
+                            class_id: string | null;
+                            class: string;
+                            state: string;
+                            lines: {
+                                key: string;
+                                word: string;
+                                label: string | null;
+                                /** @enum {string} */
+                                tone: "done" | "attention" | "wrong" | "plain";
+                            }[];
+                        }[];
+                        to_confirm: {
+                            id: string;
+                            name: string;
+                            class: string;
+                            relationship: string;
+                            contact_id: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "portal.messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        child: {
+                            id: string;
+                            first_name: string;
+                            name: string;
+                            class_id: string | null;
+                            class: string;
+                        };
+                        messages: {
+                            id: string;
+                            at: string;
+                            notice: string;
+                            text: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "portal.attendance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        child: {
+                            id: string;
+                            first_name: string;
+                            name: string;
+                            class_id: string | null;
+                            class: string;
+                        };
+                        attendance: {
+                            term: {
+                                name: string;
+                                starts_on: string;
+                                ends_on: string;
+                            } | null;
+                            today: string;
+                            totals: {
+                                marked: number;
+                                present: number;
+                                absent: number;
+                                late: number;
+                                share: number | null;
+                                last_absent: string | null;
+                            };
+                            weeks: {
+                                week: string;
+                                days: {
+                                    day: string;
+                                    mark: string | null;
+                                    school_day: boolean;
+                                    future: boolean;
+                                }[];
+                            }[];
+                        } | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "portal.card": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        child: {
+                            id: string;
+                            first_name: string;
+                            name: string;
+                            class_id: string | null;
+                            class: string;
+                        };
+                        card: {
+                            school: {
+                                name: string;
+                                has_logo: boolean;
+                            };
+                            published_at: string;
+                            version: number;
+                            reference: string;
+                            card: {
+                                [key: string]: unknown;
+                            };
+                        } | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
     "grids.views.store": {
         parameters: {
             query?: never;
@@ -6963,7 +7508,8 @@ export interface operations {
                         user: {
                             id: string;
                             name: string;
-                            email: string;
+                            email: string | null;
+                            phone: string | null;
                         };
                         grants: {
                             permission: string;
@@ -8051,7 +8597,7 @@ export interface operations {
                         person: {
                             id: string;
                             name: string;
-                            email: string;
+                            email: string | null;
                             /** @enum {string} */
                             state: "active" | "no_role" | "expired" | "invited" | "ready" | "disabled";
                             last_signed_in_at: string | null;
@@ -8368,7 +8914,7 @@ export interface operations {
                         person: {
                             id: string;
                             name: string;
-                            email: string;
+                            email: string | null;
                             /** @enum {string} */
                             state: "active" | "no_role" | "expired" | "invited" | "ready" | "disabled";
                             last_signed_in_at: string | null;
@@ -8434,7 +8980,7 @@ export interface operations {
                         person: {
                             id: string;
                             name: string;
-                            email: string;
+                            email: string | null;
                             /** @enum {string} */
                             state: "active" | "no_role" | "expired" | "invited" | "ready" | "disabled";
                             last_signed_in_at: string | null;
@@ -8491,7 +9037,7 @@ export interface operations {
                         person: {
                             id: string;
                             name: string;
-                            email: string;
+                            email: string | null;
                             /** @enum {string} */
                             state: "active" | "no_role" | "expired" | "invited" | "ready" | "disabled";
                             last_signed_in_at: string | null;
@@ -8546,7 +9092,7 @@ export interface operations {
                         person: {
                             id: string;
                             name: string;
-                            email: string;
+                            email: string | null;
                             /** @enum {string} */
                             state: "active" | "no_role" | "expired" | "invited" | "ready" | "disabled";
                             last_signed_in_at: string | null;
@@ -8603,6 +9149,79 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "auth.phone.code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    phone: string;
+                    /** @enum {string|null} */
+                    language?: "en" | "ny" | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        sent: boolean;
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "auth.phone.sign-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    phone: string;
+                    code: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        view_as: {
+                            available: boolean;
+                            by: {
+                                id: string;
+                                name: string;
+                            } | null;
+                            ends_at: null;
+                        };
+                        user: {
+                            id: string;
+                            name: string;
+                            email: string | null;
+                            phone: string | null;
+                        };
+                        grants: unknown[];
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
         };
     };
     "assessment.publishing": {
@@ -10810,7 +11429,8 @@ export interface operations {
                         user: {
                             id: string;
                             name: string;
-                            email: string;
+                            email: string | null;
+                            phone: string | null;
                         };
                         grants: unknown[];
                     };

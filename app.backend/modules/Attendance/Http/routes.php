@@ -2,9 +2,13 @@
 
 declare(strict_types=1);
 
+use Acadly\Modules\Attendance\Http\FamilyAttendanceController;
 use Acadly\Modules\Attendance\Http\LessonsController;
 use Acadly\Modules\Attendance\Http\RegistersController;
 use Illuminate\Support\Facades\Route;
+
+// The parent portal: a parent's own child. No permission: the active link is the rule.
+Route::middleware(['auth:sanctum', 'module:attendance'])->get('/portal/children/{id}/attendance', FamilyAttendanceController::class)->whereUuid('id')->name('portal.attendance');
 
 Route::middleware(['auth:sanctum', 'module:attendance'])->prefix('registers')->name('registers.')->group(function (): void {
     Route::get('/', [RegistersController::class, 'index'])->name('index');

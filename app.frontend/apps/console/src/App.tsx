@@ -29,6 +29,7 @@ import { SheetScreen } from './assessment/SheetScreen'
 import { AssessmentSettingsScreen } from './settings/AssessmentSettingsScreen'
 import { LearnerImportScreen } from './learners/LearnerImportScreen'
 import { LearnerScreen } from './learners/LearnerScreen'
+import { FamiliesScreen } from './learners/FamiliesScreen'
 import { LearnersScreen } from './learners/LearnersScreen'
 import { RegisterScreen } from './registers/RegisterScreen'
 import { RegistersScreen } from './registers/RegistersScreen'
@@ -88,6 +89,7 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (lesson !== undefined && registers) page = <LessonRegisterScreen key={lesson} slot={lesson} />
   else if (register !== undefined && registers) page = <RegisterScreen key={register} classId={register} />
   else if (path === '/learners' && seesLearners) page = <LearnersScreen />
+  else if (path === '/learners/families' && holdsAnywhere(context, 'enrolment.families')) page = <FamiliesScreen />
   else if (path === '/learners/admit' && holdsAnywhere(context, 'enrolment.admit')) page = <AdmitScreen />
   else if (path === '/learners/import' && holdsAnywhere(context, 'enrolment.admit')) page = <LearnerImportScreen />
   else if (learner !== undefined && seesLearners) page = <LearnerScreen key={learner} id={learner} />

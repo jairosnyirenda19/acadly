@@ -3,10 +3,14 @@
 declare(strict_types=1);
 
 use Acadly\Modules\Assessment\Http\AssessmentController;
+use Acadly\Modules\Assessment\Http\FamilyCardController;
 use Acadly\Modules\Assessment\Http\PublishController;
 use Acadly\Modules\Assessment\Http\ResultsController;
 use Acadly\Modules\Assessment\Http\SettingsController;
 use Illuminate\Support\Facades\Route;
+
+// The parent portal: a parent's own child. No permission: the active link is the rule.
+Route::middleware(['auth:sanctum', 'module:assessment'])->get('/portal/children/{id}/card', FamilyCardController::class)->whereUuid('id')->name('portal.card');
 
 Route::middleware(['auth:sanctum', 'module:assessment'])->prefix('assessment')->name('assessment.')->group(function (): void {
     Route::get('/scales', [SettingsController::class, 'scales'])->name('scales.index');

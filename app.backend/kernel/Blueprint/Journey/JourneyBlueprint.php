@@ -212,6 +212,7 @@ final class JourneyBlueprint
             $step->permission()?->key(),
             $fourEyes !== null ? self::value($fourEyes) : null,
             $outcomes,
+            $step->takenByHolder(),
         );
     }
 

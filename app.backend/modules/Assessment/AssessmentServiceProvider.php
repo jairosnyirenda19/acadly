@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Acadly\Modules\Assessment;
 
+use Acadly\Core\Enrolment\Contracts\FamilyLine;
 use Acadly\Core\Enrolment\Contracts\LearnerRecordPart;
 use Acadly\Kernel\Approvals\ApprovalTopic;
 use Acadly\Kernel\Console\SyncStep;
 use Acadly\Kernel\Grid\Grids;
 use Acadly\Modules\Assessment\Application\AssessmentsGrid;
+use Acadly\Modules\Assessment\Application\FamilyCards;
 use Acadly\Modules\Assessment\Application\LearnerResults;
 use Acadly\Modules\Assessment\Application\LockApproval;
 use Acadly\Modules\Assessment\Application\MarkApproval;
@@ -34,6 +36,7 @@ final class AssessmentServiceProvider extends ServiceProvider
         $this->app->scoped(Publishing::class);
         $this->app->scoped(LearnerResults::class);
         $this->app->tag([LearnerResults::class], LearnerRecordPart::TAG);
+        $this->app->tag([FamilyCards::class], FamilyLine::TAG);
         $this->app->tag([AssessmentsGrid::class], Grids::TAG);
         $this->app->tag([LockApproval::class, PublishApproval::class, MarkApproval::class, PlanApproval::class], ApprovalTopic::TAG);
         $this->app->scoped(Requests::class);

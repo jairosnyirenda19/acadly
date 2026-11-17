@@ -26,6 +26,8 @@ final class Step
 
     private ?BackedEnum $fourEyes = null;
 
+    private bool $holder = false;
+
     /** @var list<Outcome> */
     private array $outcomes = [];
 
@@ -66,6 +68,17 @@ final class Step
         return $this;
     }
 
+    /**
+     * Taken by the account the record belongs to, with no permission
+     * (`HeldRecord`). Nobody else may take it.
+     */
+    public function byHolder(): self
+    {
+        $this->holder = true;
+
+        return $this;
+    }
+
     /** Four eyes: the person who performed that step on this record may not perform this one. */
     public function fourEyes(BackedEnum $otherStep): self
     {
@@ -101,6 +114,11 @@ final class Step
     public function permission(): ?Permission
     {
         return $this->capability;
+    }
+
+    public function takenByHolder(): bool
+    {
+        return $this->holder;
     }
 
     public function fourEyesStep(): ?BackedEnum

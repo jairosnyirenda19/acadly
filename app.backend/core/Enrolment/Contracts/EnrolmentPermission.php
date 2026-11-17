@@ -12,6 +12,7 @@ enum EnrolmentPermission: string implements Permission
     case Admit = 'enrolment.admit';
     case Manage = 'enrolment.manage';
     case Export = 'enrolment.export';
+    case Families = 'enrolment.families';
 
     public function key(): string
     {
@@ -25,6 +26,7 @@ enum EnrolmentPermission: string implements Permission
             self::Admit => 'Admit learners',
             self::Manage => 'Keep learner records',
             self::Export => 'Export learner lists',
+            self::Families => 'Keep parent access',
         };
     }
 
@@ -35,11 +37,12 @@ enum EnrolmentPermission: string implements Permission
             self::Admit => 'Admit a learner into a class where the role is given.',
             self::Manage => 'Correct a learner\'s details, change their class, and keep their contacts and photo up to date.',
             self::Export => 'Download a spreadsheet of the learners in the classes where the role is given, with their main contact.',
+            self::Families => 'SEES EVERY FAMILY in the school by phone number: which children each parent sees in the parent portal. Suspend or end the access of a parent. Grant to the school office only.',
         };
     }
 
     public function isSight(): bool
     {
-        return $this === self::View;
+        return $this === self::View || $this === self::Families;
     }
 }

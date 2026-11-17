@@ -90,6 +90,46 @@ final class LearnerAttendance implements LearnerRecordPart
             throw new NotFoundHttpException;
         }
 
+        return $this->known[$viewer->id.':'.$learnerId] = $this->build($learnerId, $place);
+    }
+
+    /**
+     * What a parent sees of the term (the parent portal): the totals and the
+     * mornings. Nothing about staff, follow-ups or corrections. The caller
+     * checks that the parent sees the learner.
+     *
+     * @return array{term: array{name: string, starts_on: string, ends_on: string}|null, today: string, totals: array{marked: int, present: int, absent: int, late: int, share: int|null, last_absent: string|null}, weeks: list<array{week: string, days: list<array{day: string, mark: string|null, school_day: bool, future: bool}>}>}|null
+     */
+    public function forFamily(string $learnerId): ?array
+    {
+        $place = $this->learners->placeOf($learnerId);
+
+        if ($place === null) {
+            return null;
+        }
+
+        $all = $this->build($learnerId, $place);
+        /** @var array{marked: int, present: int, absent: int, late: int, share: int|null, last_absent: string|null} $t */
+        $t = $all['totals'];
+        /** @var array{name: string, starts_on: string, ends_on: string}|null $term */
+        $term = $all['term'];
+        /** @var list<array{week: string, days: list<array{day: string, mark: string|null, school_day: bool, future: bool}>}> $weeks */
+        $weeks = $all['weeks'];
+
+        return [
+            'term' => $term,
+            'today' => $this->clock->today(),
+            'totals' => ['marked' => $t['marked'], 'present' => $t['present'], 'absent' => $t['absent'], 'late' => $t['late'], 'share' => $t['share'], 'last_absent' => $t['last_absent']],
+            'weeks' => $weeks,
+        ];
+    }
+
+    /**
+     * @param  array{class_id: string, division_id: string}  $place
+     * @return array<string, mixed>
+     */
+    private function build(string $learnerId, array $place): array
+    {
         $today = $this->clock->today();
         $term = $this->termOf($place['division_id'], $today);
         $from = $term['starts_on'] ?? $today;
@@ -176,7 +216,7 @@ final class LearnerAttendance implements LearnerRecordPart
             'corrections' => $this->corrections($learnerId, $from, $to, $subjectNames),
         ];
 
-        return $this->known[$viewer->id.':'.$learnerId] = $out;
+        return $out;
     }
 
     /** @return array{name: string, starts_on: string, ends_on: string}|null the term that holds the day, or the last one before it */

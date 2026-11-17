@@ -22,6 +22,7 @@ final readonly class CompiledStep
         public ?string $capability,
         public ?string $fourEyes,
         public array $outcomes,
+        public bool $holder = false,
     ) {}
 
     public function outcome(string $id): CompiledOutcome
@@ -53,12 +54,14 @@ final readonly class CompiledStep
             Shape::nullableString($data, 'capability'),
             Shape::nullableString($data, 'four_eyes'),
             $outcomes,
+            array_key_exists('holder', $data) && Shape::bool($data, 'holder'),
         );
     }
 
     /** @return array<string, mixed> */
     public function toArray(): array
     {
+        // `holder` is written only when true, so blueprints released before it keep their hash.
         return [
             'id' => $this->id,
             'title' => $this->title,
@@ -68,6 +71,6 @@ final readonly class CompiledStep
             'capability' => $this->capability,
             'four_eyes' => $this->fourEyes,
             'outcomes' => array_values(array_map(fn (CompiledOutcome $outcome): array => $outcome->toArray(), $this->outcomes)),
-        ];
+        ] + ($this->holder ? ['holder' => true] : []);
     }
 }

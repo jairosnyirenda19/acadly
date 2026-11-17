@@ -12,6 +12,7 @@ use Acadly\Kernel\Http\SchoolController;
 use Acadly\Kernel\Identity\Http\MeController;
 use Acadly\Kernel\Identity\Http\PasswordResetController;
 use Acadly\Kernel\Identity\Http\PeopleController;
+use Acadly\Kernel\Identity\Http\PhoneSignInController;
 use Acadly\Kernel\Identity\Http\SignInController;
 use Acadly\Kernel\Identity\Http\SignOutController;
 use Acadly\Kernel\Identity\Http\ViewAsController;
@@ -28,6 +29,8 @@ Route::get('/school', SchoolController::class)->name('kernel.school');
 
 Route::prefix('auth')->name('auth.')->group(function (): void {
     Route::post('/sign-in', SignInController::class)->name('sign-in');
+    Route::post('/phone/code', [PhoneSignInController::class, 'code'])->middleware('throttle:10,1')->name('phone.code');
+    Route::post('/phone/sign-in', [PhoneSignInController::class, 'signIn'])->middleware('throttle:20,1')->name('phone.sign-in');
     Route::post('/sign-out', SignOutController::class)->middleware('auth:sanctum')->name('sign-out');
     Route::post('/forgot-password', [PasswordResetController::class, 'requestLink'])->middleware('throttle:6,1')->name('forgot-password');
     Route::post('/reset-password', [PasswordResetController::class, 'reset'])->middleware('throttle:6,1')->name('reset-password');

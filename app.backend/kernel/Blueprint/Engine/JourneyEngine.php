@@ -24,6 +24,7 @@ use Acadly\Kernel\Blueprint\Journey\EffectResult;
 use Acadly\Kernel\Blueprint\Journey\Gate;
 use Acadly\Kernel\Blueprint\Journey\GateArgs;
 use Acadly\Kernel\Blueprint\Journey\GateResult;
+use Acadly\Kernel\Blueprint\Journey\HeldRecord;
 use Acadly\Kernel\Blueprint\Journey\JourneyColumns;
 use Acadly\Kernel\Blueprint\Journey\JourneyContext;
 use Acadly\Kernel\Blueprint\Journey\JourneyEvent;
@@ -34,6 +35,7 @@ use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
 use BackedEnum;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -80,7 +82,7 @@ final class JourneyEngine
             $context = $this->context($subject, $who, $journey->ref, $step->id, null, []);
             $blocked = $this->firstClosedGate($step, $context);
             $permitted = $who !== null
-                && $this->access->allows($who, $this->permission($step), $subject->journeyScope())
+                && ($step->holder ? self::holds($subject, $who) : $this->access->allows($who, $this->permission($step), $subject->journeyScope()))
                 && ! $this->fourEyesRefuses($subject, $step, $who);
 
             $out[] = new StepAvailability(
@@ -134,7 +136,17 @@ final class JourneyEngine
 
         // 2. Authority. A refusal is audited by Access, outside the step's transaction.
         $scope = $subject->journeyScope();
-        $this->access->check($who, $this->permission($compiledStep), $scope);
+
+        if ($compiledStep->holder) {
+            if (! self::holds($subject, $who)) {
+                $this->audit->record(KernelAudit::Refused, subject: $subject, outcome: AuditOutcome::Refused,
+                    refusal: 'not_holder', actor: $this->audit->actorFor($who), at: $scope, meta: ['step' => $stepId]);
+
+                throw new AuthorizationException('Access is refused.');
+            }
+        } else {
+            $this->access->check($who, $this->permission($compiledStep), $scope);
+        }
 
         if ($this->fourEyesRefuses($subject, $compiledStep, $who)) {
             $this->audit->record(KernelAudit::Refused, subject: $subject, outcome: AuditOutcome::Refused,
@@ -312,6 +324,12 @@ final class JourneyEngine
         if ($closed !== null) {
             throw Problem::stepNotAdmissible($closed->reason ?? '', $closed->remedy ?? '');
         }
+    }
+
+    /** The record belongs to this account (`HeldRecord`). */
+    private static function holds(JourneySubject $subject, User $who): bool
+    {
+        return $subject instanceof HeldRecord && $subject->heldBy() === $who->id;
     }
 
     private function permission(CompiledStep $step): Permission

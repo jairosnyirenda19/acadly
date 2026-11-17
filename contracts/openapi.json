@@ -8270,6 +8270,1165 @@
                 }
             }
         },
+        "/v1/families": {
+            "get": {
+                "operationId": "families.index",
+                "description": "Learners grouped by contact phone number, which children each parent\nsees in the portal, and what needs checking.",
+                "summary": "Every family (the office)",
+                "tags": [
+                    "Families"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "families": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "phone": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "names": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "children": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                },
+                                                                "class": {
+                                                                    "type": "string"
+                                                                },
+                                                                "relationship": {
+                                                                    "type": "string"
+                                                                },
+                                                                "link": {
+                                                                    "type": [
+                                                                        "object",
+                                                                        "null"
+                                                                    ],
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "state": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "label": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "id",
+                                                                        "state",
+                                                                        "label"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name",
+                                                                "class",
+                                                                "relationship",
+                                                                "link"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "portal": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "signed_in": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "last_signed_in_at": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "signed_in",
+                                                            "last_signed_in_at"
+                                                        ]
+                                                    },
+                                                    "checks": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "kind": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "not_their_child",
+                                                                        "names_differ"
+                                                                    ]
+                                                                },
+                                                                "learner": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "kind",
+                                                                "learner"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "phone",
+                                                    "names",
+                                                    "children",
+                                                    "portal",
+                                                    "checks"
+                                                ]
+                                            }
+                                        },
+                                        "totals": {
+                                            "type": "object",
+                                            "properties": {
+                                                "families": {
+                                                    "type": "integer"
+                                                },
+                                                "in_portal": {
+                                                    "type": "integer"
+                                                },
+                                                "to_check": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "families",
+                                                "in_portal",
+                                                "to_check"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "families",
+                                        "totals"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/families/links/{id}": {
+            "post": {
+                "operationId": "families.link",
+                "description": "`{action: suspend|reinstate|recheck|revoke, reason}`. The answer is\nevery family as it is now.",
+                "summary": "Act on a parent link",
+                "tags": [
+                    "Families"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "action": {
+                                        "type": "string",
+                                        "enum": [
+                                            "suspend",
+                                            "reinstate",
+                                            "recheck",
+                                            "revoke"
+                                        ]
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    }
+                                },
+                                "required": [
+                                    "action",
+                                    "reason"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "families": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "phone": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "names": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "children": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                },
+                                                                "class": {
+                                                                    "type": "string"
+                                                                },
+                                                                "relationship": {
+                                                                    "type": "string"
+                                                                },
+                                                                "link": {
+                                                                    "type": [
+                                                                        "object",
+                                                                        "null"
+                                                                    ],
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "state": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "label": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "id",
+                                                                        "state",
+                                                                        "label"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name",
+                                                                "class",
+                                                                "relationship",
+                                                                "link"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "portal": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "signed_in": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "last_signed_in_at": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "signed_in",
+                                                            "last_signed_in_at"
+                                                        ]
+                                                    },
+                                                    "checks": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "kind": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "not_their_child",
+                                                                        "names_differ"
+                                                                    ]
+                                                                },
+                                                                "learner": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "kind",
+                                                                "learner"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "phone",
+                                                    "names",
+                                                    "children",
+                                                    "portal",
+                                                    "checks"
+                                                ]
+                                            }
+                                        },
+                                        "totals": {
+                                            "type": "object",
+                                            "properties": {
+                                                "families": {
+                                                    "type": "integer"
+                                                },
+                                                "in_portal": {
+                                                    "type": "integer"
+                                                },
+                                                "to_check": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "families",
+                                                "in_portal",
+                                                "to_check"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "families",
+                                        "totals"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/portal/family": {
+            "get": {
+                "operationId": "portal.family",
+                "description": "The children this parent sees, each with its lines for today, and the\nchildren the school's contact list proposes for the parent to confirm.",
+                "summary": "The parent's family",
+                "tags": [
+                    "Families"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "school": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "phone"
+                                            ]
+                                        },
+                                        "parent": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "name"
+                                            ]
+                                        },
+                                        "children": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "first_name": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "class_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "lines": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "key": {
+                                                                    "type": "string"
+                                                                },
+                                                                "word": {
+                                                                    "type": "string"
+                                                                },
+                                                                "label": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "tone": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "done",
+                                                                        "attention",
+                                                                        "wrong",
+                                                                        "plain"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "key",
+                                                                "word",
+                                                                "label",
+                                                                "tone"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "first_name",
+                                                    "name",
+                                                    "class_id",
+                                                    "class",
+                                                    "state",
+                                                    "lines"
+                                                ]
+                                            }
+                                        },
+                                        "to_confirm": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "relationship": {
+                                                        "type": "string"
+                                                    },
+                                                    "contact_id": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "class",
+                                                    "relationship",
+                                                    "contact_id"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "school",
+                                        "parent",
+                                        "children",
+                                        "to_confirm"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/portal/family/confirm": {
+            "post": {
+                "operationId": "portal.confirm",
+                "description": "`{mine: [learner ids], not_mine: [learner ids]}`. A child left out stays\nto confirm. The answer is the family as it is now.",
+                "summary": "Confirm the children",
+                "tags": [
+                    "Families"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "mine": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "maxItems": 20
+                                    },
+                                    "not_mine": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "maxItems": 20
+                                    }
+                                },
+                                "required": [
+                                    "mine",
+                                    "not_mine"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "school": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "phone"
+                                            ]
+                                        },
+                                        "parent": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "name"
+                                            ]
+                                        },
+                                        "children": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "first_name": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "class_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "lines": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "key": {
+                                                                    "type": "string"
+                                                                },
+                                                                "word": {
+                                                                    "type": "string"
+                                                                },
+                                                                "label": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "tone": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "done",
+                                                                        "attention",
+                                                                        "wrong",
+                                                                        "plain"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "key",
+                                                                "word",
+                                                                "label",
+                                                                "tone"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "first_name",
+                                                    "name",
+                                                    "class_id",
+                                                    "class",
+                                                    "state",
+                                                    "lines"
+                                                ]
+                                            }
+                                        },
+                                        "to_confirm": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "relationship": {
+                                                        "type": "string"
+                                                    },
+                                                    "contact_id": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "class",
+                                                    "relationship",
+                                                    "contact_id"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "school",
+                                        "parent",
+                                        "children",
+                                        "to_confirm"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/portal/children/{id}/messages": {
+            "get": {
+                "operationId": "portal.messages",
+                "description": "The text messages the school sent to this phone about the child, newest first.",
+                "summary": "A child's messages",
+                "tags": [
+                    "Families"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "child": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "first_name": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "class_id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "class": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "first_name",
+                                                "name",
+                                                "class_id",
+                                                "class"
+                                            ]
+                                        },
+                                        "messages": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "notice": {
+                                                        "type": "string"
+                                                    },
+                                                    "text": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "at",
+                                                    "notice",
+                                                    "text"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "child",
+                                        "messages"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/portal/children/{id}/attendance": {
+            "get": {
+                "operationId": "portal.attendance",
+                "description": "The mornings of the term and the totals, for a parent whose link to the\nchild is active.",
+                "summary": "A child's attendance this term",
+                "tags": [
+                    "FamilyAttendance"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "child": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "first_name": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "class_id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "class": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "first_name",
+                                                "name",
+                                                "class_id",
+                                                "class"
+                                            ]
+                                        },
+                                        "attendance": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "term": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "starts_on": {
+                                                            "type": "string"
+                                                        },
+                                                        "ends_on": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "name",
+                                                        "starts_on",
+                                                        "ends_on"
+                                                    ]
+                                                },
+                                                "today": {
+                                                    "type": "string"
+                                                },
+                                                "totals": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "marked": {
+                                                            "type": "integer"
+                                                        },
+                                                        "present": {
+                                                            "type": "integer"
+                                                        },
+                                                        "absent": {
+                                                            "type": "integer"
+                                                        },
+                                                        "late": {
+                                                            "type": "integer"
+                                                        },
+                                                        "share": {
+                                                            "type": [
+                                                                "integer",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "last_absent": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "marked",
+                                                        "present",
+                                                        "absent",
+                                                        "late",
+                                                        "share",
+                                                        "last_absent"
+                                                    ]
+                                                },
+                                                "weeks": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "week": {
+                                                                "type": "string"
+                                                            },
+                                                            "days": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "day": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "mark": {
+                                                                            "type": [
+                                                                                "string",
+                                                                                "null"
+                                                                            ]
+                                                                        },
+                                                                        "school_day": {
+                                                                            "type": "boolean"
+                                                                        },
+                                                                        "future": {
+                                                                            "type": "boolean"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "day",
+                                                                        "mark",
+                                                                        "school_day",
+                                                                        "future"
+                                                                    ]
+                                                                }
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "week",
+                                                            "days"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "term",
+                                                "today",
+                                                "totals",
+                                                "weeks"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "child",
+                                        "attendance"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    }
+                }
+            }
+        },
+        "/v1/portal/children/{id}/card": {
+            "get": {
+                "operationId": "portal.card",
+                "description": "The newest report card published for the child, exactly as published,\nfor a parent whose link to the child is active. `card` is null when no\ncard has been published.",
+                "summary": "A child's report card",
+                "tags": [
+                    "FamilyCard"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "child": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "first_name": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "class_id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "class": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "first_name",
+                                                "name",
+                                                "class_id",
+                                                "class"
+                                            ]
+                                        },
+                                        "card": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "school": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "has_logo": {
+                                                            "type": "boolean"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "name",
+                                                        "has_logo"
+                                                    ]
+                                                },
+                                                "published_at": {
+                                                    "type": "string"
+                                                },
+                                                "version": {
+                                                    "type": "integer"
+                                                },
+                                                "reference": {
+                                                    "type": "string"
+                                                },
+                                                "card": {
+                                                    "type": "object",
+                                                    "additionalProperties": {}
+                                                }
+                                            },
+                                            "required": [
+                                                "school",
+                                                "published_at",
+                                                "version",
+                                                "reference",
+                                                "card"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "child",
+                                        "card"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    }
+                }
+            }
+        },
         "/v1/grids/{grid}/views": {
             "post": {
                 "operationId": "grids.views.store",
@@ -15527,13 +16686,23 @@
                                                     "type": "string"
                                                 },
                                                 "email": {
-                                                    "type": "string"
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
                                                 }
                                             },
                                             "required": [
                                                 "id",
                                                 "name",
-                                                "email"
+                                                "email",
+                                                "phone"
                                             ]
                                         },
                                         "grants": {
@@ -19085,7 +20254,10 @@
                                                     "type": "string"
                                                 },
                                                 "email": {
-                                                    "type": "string"
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
                                                 },
                                                 "state": {
                                                     "type": "string",
@@ -20154,7 +21326,10 @@
                                                     "type": "string"
                                                 },
                                                 "email": {
-                                                    "type": "string"
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
                                                 },
                                                 "state": {
                                                     "type": "string",
@@ -20384,7 +21559,10 @@
                                                     "type": "string"
                                                 },
                                                 "email": {
-                                                    "type": "string"
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
                                                 },
                                                 "state": {
                                                     "type": "string",
@@ -20590,7 +21768,10 @@
                                                     "type": "string"
                                                 },
                                                 "email": {
-                                                    "type": "string"
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
                                                 },
                                                 "state": {
                                                     "type": "string",
@@ -20785,7 +21966,10 @@
                                                     "type": "string"
                                                 },
                                                 "email": {
-                                                    "type": "string"
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
                                                 },
                                                 "state": {
                                                     "type": "string",
@@ -20981,6 +22165,192 @@
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/phone/code": {
+            "post": {
+                "operationId": "auth.phone.code",
+                "description": "Sends a six-digit code by SMS when the school keeps this number. The\nanswer is the same either way. `language` is `en` or `ny`.",
+                "summary": "Send a sign-in code",
+                "tags": [
+                    "PhoneSignIn"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "phone": {
+                                        "type": "string",
+                                        "maxLength": 30
+                                    },
+                                    "language": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "enum": [
+                                            "en",
+                                            "ny",
+                                            null
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "phone"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sent": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "sent"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/phone/sign-in": {
+            "post": {
+                "operationId": "auth.phone.sign-in",
+                "description": "Starts a session for the account of this number. The phone stays\nsigned in for 90 days. The response is the same as GET /me.",
+                "summary": "Sign in with a code",
+                "tags": [
+                    "PhoneSignIn"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "phone": {
+                                        "type": "string",
+                                        "maxLength": 30
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "maxLength": 12
+                                    }
+                                },
+                                "required": [
+                                    "phone",
+                                    "code"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "view_as": {
+                                            "type": "object",
+                                            "properties": {
+                                                "available": {
+                                                    "type": "boolean"
+                                                },
+                                                "by": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name"
+                                                    ]
+                                                },
+                                                "ends_at": {
+                                                    "type": "null"
+                                                }
+                                            },
+                                            "required": [
+                                                "available",
+                                                "by",
+                                                "ends_at"
+                                            ]
+                                        },
+                                        "user": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "email",
+                                                "phone"
+                                            ]
+                                        },
+                                        "grants": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "view_as",
+                                        "user",
+                                        "grants"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
                     }
                 }
             }
@@ -28839,13 +30209,23 @@
                                                     "type": "string"
                                                 },
                                                 "email": {
-                                                    "type": "string"
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
                                                 }
                                             },
                                             "required": [
                                                 "id",
                                                 "name",
-                                                "email"
+                                                "email",
+                                                "phone"
                                             ]
                                         },
                                         "grants": {

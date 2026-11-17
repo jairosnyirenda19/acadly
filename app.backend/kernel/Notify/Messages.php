@@ -260,6 +260,27 @@ final class Messages
         return $out;
     }
 
+    /**
+     * The messages sent to one phone number about one record, newest first,
+     * as the person who received them reads them (the parent portal).
+     *
+     * @return list<array{id: string, at: string, notice: string, text: string}>
+     */
+    public function toPhone(string $phone, string $field, string $value): array
+    {
+        $rows = DB::table('notification_deliveries as d')->join('notification_requests as r', 'r.id', '=', 'd.request_id')
+            ->where('d.channel', Channel::Sms->value)->where('d.recipient_phone', $phone)->where('d.audience', '!=', 'test')
+            ->whereRaw('r.payload->>? = ?', [$field, $value])
+            ->orderByDesc('d.queued_at')->limit(100)->get(['d.id', 'd.queued_at', 'd.topic_key', 'd.short', 'd.subject']);
+
+        return array_values(array_map(fn (stdClass $row): array => [
+            'id' => Row::text($row, 'id'),
+            'at' => Row::text($row, 'queued_at'),
+            'notice' => $this->catalogue->has(Row::text($row, 'topic_key')) ? $this->catalogue->notice(Row::text($row, 'topic_key'))->name() : '',
+            'text' => Row::maybeText($row, 'short') ?? Row::text($row, 'subject'),
+        ], $rows->all()));
+    }
+
     /** @return array<string, mixed> one delivery as the Sent messages page shows it */
     public function item(stdClass $row): array
     {

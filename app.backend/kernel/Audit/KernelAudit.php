@@ -10,6 +10,8 @@ enum KernelAudit: string implements AuditAction
     case SignedIn = 'identity.signed_in';
     case SignInFailed = 'identity.sign_in_failed';
     case SignInPaused = 'identity.sign_in_paused';
+    case SignInCodeSent = 'identity.sign_in_code_sent';
+    case SignInCodeRefused = 'identity.sign_in_code_refused';
     case SignedOut = 'identity.signed_out';
     case ResetRequested = 'identity.reset_requested';
     case PasswordReset = 'identity.password_reset';
@@ -71,8 +73,10 @@ enum KernelAudit: string implements AuditAction
     {
         return match ($this) {
             self::SignedIn => 'Signed in.',
-            self::SignInFailed => 'Attempted to sign in with an incorrect email address or password.',
+            self::SignInFailed => 'Attempted to sign in with an incorrect email address, password or code.',
             self::SignInPaused => 'Attempted to sign in while sign-in was paused after repeated failures.',
+            self::SignInCodeSent => 'Asked for a sign-in code by SMS.',
+            self::SignInCodeRefused => 'Asked for a sign-in code for a phone number the school does not keep.',
             self::SignedOut => 'Signed out.',
             self::ResetRequested => 'Requested a password reset link.',
             self::PasswordReset => 'Set a new password with a reset link.',

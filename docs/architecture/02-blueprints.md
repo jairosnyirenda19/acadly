@@ -141,7 +141,7 @@ Use a journey when a record has **three or more states and a rule about who or w
 | `learner.progression` | Year-end decision per learner | proposed → decided → awaiting_intake → effective (see 09) |
 | `learner.campus_transfer` | Transfer request | requested → approved_by_sending → accepted_by_receiving → effective / declined |
 | `learner.exit` | Enrolment | active → withdrawn / transferred_out / completed |
-| `guardian.link` | Learner–guardian relationship | requested → verified → active ⇄ suspended → revoked |
+| `enrolment.guardian_link` | Learner–guardian relationship | requested → active ⇄ suspended → revoked; requested → disputed (D-082) |
 | `attendance.correction` | Correction request | requested → approved / declined |
 | `results.*` | Result set for class × subject × period | draft → submitted → reviewed → published → correction_open → republished |
 | `library.resource` | Library resource | draft → published → withdrawn → archived |

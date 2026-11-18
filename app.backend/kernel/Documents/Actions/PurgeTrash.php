@@ -41,14 +41,19 @@ final class PurgeTrash
                 $this->audit->record(KernelAudit::DocumentPurged, subject: $document, meta: ['batch' => $document->trash_batch]);
             });
 
-            $shas = DB::table('document_files')->where('document_id', $document->id)->distinct()->pluck('blob_sha256');
+            $files = DB::table('document_files')->where('document_id', $document->id)->pluck('id');
+            $shas = DB::table('document_files')->where('document_id', $document->id)->distinct()->pluck('blob_sha256')
+                ->merge(DB::table('document_thumbnails')->whereIn('file_id', $files)->pluck('blob_sha256'))->unique();
+            // A purged document's pictures go with it; they are not history.
+            DB::table('document_thumbnails')->whereIn('file_id', $files)->delete();
 
             foreach ($shas as $sha) {
                 $stillUsed = DB::table('document_files as f')
                     ->join('documents as d', 'd.id', '=', 'f.document_id')
                     ->where('f.blob_sha256', $sha)
                     ->whereNull('d.purged_at')
-                    ->exists();
+                    ->exists()
+                    || DB::table('document_thumbnails')->where('blob_sha256', $sha)->exists();
 
                 if (! $stillUsed && is_string($sha)) {
                     $this->blobs->release($sha);

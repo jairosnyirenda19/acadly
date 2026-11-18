@@ -9,7 +9,9 @@ use Acadly\Kernel\Audit\KernelAudit;
 use Acadly\Kernel\Documents\Document;
 use Acadly\Kernel\Documents\DocumentAccess;
 use Acadly\Kernel\Documents\DocumentKind;
+use Acadly\Kernel\Documents\Jobs\MakeThumbnail;
 use Acadly\Kernel\Documents\Storage\BlobStore;
+use Acadly\Kernel\Documents\Thumbnails;
 use Acadly\Kernel\Documents\UploadGuard;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
@@ -68,6 +70,10 @@ final class StoreDocument
             ]);
 
             $document->forceFill(['current_file_id' => $fileId])->save();
+
+            if (in_array($checked['mime'], Thumbnails::IMAGES, true)) {
+                MakeThumbnail::dispatch($fileId)->afterCommit();
+            }
 
             $this->audit->record(KernelAudit::DocumentStored, subject: $document, actor: $this->audit->actorFor($by), at: $scope,
                 meta: ['kind' => $kind->key(), 'owner_type' => $kind->ownerType(), 'owner_id' => $ownerId, 'sha256' => $sha]);

@@ -13,6 +13,7 @@ enum EnrolmentPermission: string implements Permission
     case Manage = 'enrolment.manage';
     case Export = 'enrolment.export';
     case Families = 'enrolment.families';
+    case Confidential = 'enrolment.documents.confidential';
 
     public function key(): string
     {
@@ -27,6 +28,7 @@ enum EnrolmentPermission: string implements Permission
             self::Manage => 'Keep learner records',
             self::Export => 'Export learner lists',
             self::Families => 'Keep parent access',
+            self::Confidential => 'Open confidential learner documents',
         };
     }
 
@@ -38,11 +40,12 @@ enum EnrolmentPermission: string implements Permission
             self::Manage => 'Correct a learner\'s details, change their class, and keep their contacts and photo up to date.',
             self::Export => 'Download a spreadsheet of the learners in the classes where the role is given, with their main contact.',
             self::Families => 'SEES EVERY FAMILY in the school by phone number: which children each parent sees in the parent portal. Suspend or end the access of a parent. Grant to the school office only.',
+            self::Confidential => 'Open and add the learner documents whose type is confidential, such as medical and safeguarding records, for the learners in the classes where the role is given. Each opening is recorded.',
         };
     }
 
     public function isSight(): bool
     {
-        return $this === self::View || $this === self::Families;
+        return $this === self::View || $this === self::Families || $this === self::Confidential;
     }
 }

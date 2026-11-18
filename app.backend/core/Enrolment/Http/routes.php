@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Acadly\Core\Enrolment\Http\FamiliesController;
+use Acadly\Core\Enrolment\Http\LearnerDocumentsController;
 use Acadly\Core\Enrolment\Http\LearnerImportController;
 use Acadly\Core\Enrolment\Http\LearnersController;
 use Acadly\Core\Enrolment\Http\ProgressionController;
@@ -46,4 +47,14 @@ Route::middleware('auth:sanctum')->prefix('learners')->name('learners.')->group(
     Route::post('/{id}/contacts/{contact}/remove', [LearnersController::class, 'removeContact'])->whereUuid(['id', 'contact'])->name('contacts.remove');
     Route::post('/{id}/photo', [LearnersController::class, 'photo'])->whereUuid('id')->name('photo.store');
     Route::get('/{id}/photo', [LearnersController::class, 'openPhoto'])->whereUuid('id')->name('photo.show');
+    Route::get('/{id}/documents', [LearnerDocumentsController::class, 'index'])->whereUuid('id')->name('documents.index');
+    Route::post('/{id}/documents', [LearnerDocumentsController::class, 'store'])->whereUuid('id')->middleware('throttle:60,1')->name('documents.store');
+});
+
+// The school's learner document types (D-090).
+Route::middleware('auth:sanctum')->prefix('learner-document-types')->name('learner-document-types.')->group(function (): void {
+    Route::get('/', [LearnerDocumentsController::class, 'types'])->name('index');
+    Route::post('/', [LearnerDocumentsController::class, 'addType'])->name('store');
+    Route::put('/{id}', [LearnerDocumentsController::class, 'changeType'])->whereUuid('id')->name('update');
+    Route::post('/{id}/retire', [LearnerDocumentsController::class, 'retireType'])->whereUuid('id')->name('retire');
 });

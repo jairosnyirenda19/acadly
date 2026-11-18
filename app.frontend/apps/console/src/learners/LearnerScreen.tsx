@@ -13,6 +13,7 @@ import { PhotoPicker } from './PhotoPicker'
 import { WaitingFor } from '../approvals/WaitingFor'
 import { PART_VIEWS } from './record/registry'
 import { Activity, HistoryTab, MessagesTab, Placements, useFamilyMessages } from './record/tabs'
+import { DocumentsTab } from './documents/DocumentsTab'
 import { Column, Columns, InLink, SectionTitle, follow, tabHref } from './record/ui'
 
 const t = copy.learners
@@ -75,6 +76,7 @@ export function LearnerScreen({ id }: { id: string }) {
   const tabs = [
     { key: 'overview', label: r.tabs.overview, short: r.tabs.overview, attention: 0 },
     ...parts.map((p) => ({ key: p.key, label: p.title, short: p.title, attention: p.attention })),
+    { key: 'documents', label: r.tabs.documents, short: r.tabs.documents, attention: 0 },
     { key: 'messages', label: r.tabs.messages, short: r.shortTabs.messages, attention: 0 },
     { key: 'history', label: r.tabs.history, short: r.tabs.history, attention: 0 },
   ]
@@ -237,6 +239,7 @@ export function LearnerScreen({ id }: { id: string }) {
       <div className="flex-1 bg-sheet">
         {tab === 'overview' && <Overview record={record} panel={panel} toggle={toggle} done={done} close={() => setPanel('none')} ageOn={ageOn} />}
         {PartTab !== undefined && <PartTab learner={record} />}
+        {tab === 'documents' && <DocumentsTab learner={record} />}
         {tab === 'messages' && <MessagesTab learner={record} />}
         {tab === 'history' && <HistoryTab learner={record} />}
       </div>

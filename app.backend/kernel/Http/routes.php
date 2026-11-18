@@ -75,6 +75,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/documents', [DocumentsController::class, 'store'])->name('documents.store');
     Route::get('/documents/{id}', [DocumentsController::class, 'show'])->whereUuid('id')->name('documents.show');
     Route::get('/documents/{id}/content', [DocumentsController::class, 'content'])->whereUuid('id')->name('documents.content');
+    Route::get('/documents/{id}/thumbnail', [DocumentsController::class, 'thumbnail'])->whereUuid('id')->name('documents.thumbnail');
     Route::post('/documents/{id}/versions', [DocumentsController::class, 'addVersion'])->whereUuid('id')->name('documents.versions.store');
     Route::delete('/documents/{id}', [DocumentsController::class, 'trash'])->whereUuid('id')->name('documents.trash');
     Route::post('/documents/trash/{batch}/restore', [DocumentsController::class, 'restore'])->whereUuid('batch')->name('documents.restore');

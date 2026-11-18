@@ -40,6 +40,7 @@ import { MyDayScreen } from './registers/MyDayScreen'
 import { AccountScreen } from './account/AccountScreen'
 import { SearchScreen } from './search/SearchScreen'
 import { NextYearScreen } from './settings/NextYearScreen'
+import { DocumentTypesScreen } from './settings/DocumentTypesScreen'
 import { YearEndScreen } from './learners/YearEndScreen'
 import { PasswordNeeded } from './account/PasswordNeeded'
 import { TimetableScreen } from './settings/TimetableScreen'
@@ -91,6 +92,7 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/account') page = <AccountScreen />
   else if (path === '/search') page = <SearchScreen />
   else if (path === '/settings/next-year' && can(context, 'academics.manage')) page = <NextYearScreen />
+  else if (path === '/settings/learner-documents' && can(context, 'enrolment.manage')) page = <DocumentTypesScreen />
   else if (path === '/learners/year-end' && holdsAnywhere(context, 'enrolment.manage')) page = <YearEndScreen />
   else if (path === '/registers' && registers) page = <RegistersScreen />
   else if (path === '/registers/lessons' && registers) page = <LessonsScreen />

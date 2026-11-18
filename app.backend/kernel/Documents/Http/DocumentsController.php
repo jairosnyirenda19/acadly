@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Acadly\Kernel\Documents\Http;
 
+use Acadly\Kernel\Audit\FieldClass;
 use Acadly\Kernel\Documents\Actions\AddVersion;
 use Acadly\Kernel\Documents\Actions\RestoreTrash;
 use Acadly\Kernel\Documents\Actions\StoreDocument;
@@ -12,6 +13,8 @@ use Acadly\Kernel\Documents\Document;
 use Acadly\Kernel\Documents\DocumentCatalogue;
 use Acadly\Kernel\Documents\DocumentFile;
 use Acadly\Kernel\Documents\DocumentReader;
+use Acadly\Kernel\Documents\Storage\BlobStore;
+use Acadly\Kernel\Documents\Thumbnails;
 use Acadly\Kernel\Identity\User;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -119,14 +122,40 @@ final class DocumentsController
      *
      * @response 201 array{id: string, version: int}
      */
-    public function addVersion(Request $request, string $id, AddVersion $add): JsonResponse
+    public function addVersion(Request $request, string $id, AddVersion $add, Thumbnails $thumbnails): JsonResponse
     {
-        $request->validate(['file' => ['required', 'file'], 'note' => ['nullable', 'string', 'max:1000']]);
+        $request->validate(['file' => ['required', 'file'], 'note' => ['nullable', 'string', 'max:1000'], 'preview' => ['nullable', 'file']]);
         $who = self::user($request);
         $note = $request->string('note')->toString();
         $document = $add->handle($who, $this->reader->find($who, $id), self::upload($request), $note !== '' ? $note : null);
+        $preview = $request->file('preview');
+
+        // A PDF's first page, drawn by the browser; the server draws it again (D-090).
+        if ($preview instanceof UploadedFile && $document->current_file_id !== null) {
+            $thumbnails->fromPreview($document->current_file_id, $preview);
+        }
 
         return response()->json(['id' => $document->id, 'version' => count($this->reader->versions($document))], 201);
+    }
+
+    /**
+     * The picture of the first page of the current version (D-090). A secret
+     * document has none: its look is its content, and opening it is recorded.
+     */
+    public function thumbnail(Request $request, string $id, Thumbnails $thumbnails, BlobStore $blobs): StreamedResponse
+    {
+        $document = $this->reader->find(self::user($request), $id);
+        $sha = $document->classification === FieldClass::Secret->value ? null : $thumbnails->of($document->current_file_id);
+
+        if ($sha === null) {
+            throw (new ModelNotFoundException)->setModel(Document::class);
+        }
+
+        return new StreamedResponse(function () use ($blobs, $sha): void {
+            foreach ($blobs->read($sha) as $piece) {
+                echo $piece;
+            }
+        }, 200, ['Content-Type' => 'image/jpeg', 'Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
     }
 
     /**

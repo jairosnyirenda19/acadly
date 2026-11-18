@@ -22,6 +22,9 @@ enum EnrolmentAudit: string implements AuditAction
     case ProgressionOpened = 'enrolment.progression_opened';
     case ProgressionChanged = 'enrolment.progression_changed';
     case ProgressionCommitted = 'enrolment.progression_committed';
+    case DocumentAdded = 'enrolment.document_added';
+    case DocumentTypeSaved = 'enrolment.document_type_saved';
+    case DocumentTypeRetired = 'enrolment.document_type_retired';
 
     public function key(): string
     {
@@ -45,6 +48,9 @@ enum EnrolmentAudit: string implements AuditAction
             self::ProgressionOpened => 'Opened the year-end run of a level group.',
             self::ProgressionChanged => 'Changed the year-end outcome of a learner.',
             self::ProgressionCommitted => 'Committed the year-end run of a level group.',
+            self::DocumentAdded => 'Added a document to the record of a learner.',
+            self::DocumentTypeSaved => 'Saved a learner document type.',
+            self::DocumentTypeRetired => 'Retired a learner document type.',
         };
     }
 

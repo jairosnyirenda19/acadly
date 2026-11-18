@@ -669,6 +669,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/documents/{id}/thumbnail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The picture of the first page of the current version (D-090). A secret
+         *     document has none: its look is its content, and opening it is recorded
+         */
+        get: operations["documents.thumbnail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/documents/{id}/versions": {
         parameters: {
             query?: never;
@@ -1152,6 +1172,76 @@ export interface paths {
         /** Says whether a level is taught at a campus: `{division_id, campus_id, taught}` */
         put: operations["institution.offerings"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learners/{id}/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The documents on a learner's record that the person may open */
+        get: operations["learners.documents.index"];
+        put?: never;
+        /** Adds a document: one file, or the photos of a paper document as its pages */
+        post: operations["learners.documents.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learner-document-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The school's learner document types, with how many documents each has */
+        get: operations["learner-document-types.index"];
+        put?: never;
+        /** Adds a learner document type */
+        post: operations["learner-document-types.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learner-document-types/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Changes a learner document type */
+        put: operations["learner-document-types.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learner-document-types/{id}/retire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retires a learner document type */
+        post: operations["learner-document-types.retire"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5765,6 +5855,28 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "documents.thumbnail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "documents.versions.store": {
         parameters: {
             query?: never;
@@ -5780,6 +5892,8 @@ export interface operations {
                     /** Format: binary */
                     file: string;
                     note?: string | null;
+                    /** Format: binary */
+                    preview?: string | null;
                 };
             };
         };
@@ -6974,6 +7088,188 @@ export interface operations {
             403: components["responses"]["AuthorizationException"];
             404: components["responses"]["NotFoundHttpException"];
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "learners.documents.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        types: {
+                            id: string;
+                            name: string;
+                            access: string;
+                            expected: boolean;
+                            retired: boolean;
+                        }[];
+                        documents: {
+                            id: string;
+                            title: string;
+                            type_id: string;
+                            access: string;
+                            date: string | null;
+                            file_type: string;
+                            size: number;
+                            versions: number;
+                            added_at: string;
+                            added_by: string | null;
+                            thumbnail: boolean;
+                        }[];
+                        missing: {
+                            type_id: string;
+                            name: string;
+                        }[];
+                        can_add: string[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "learners.documents.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: uuid */
+                    type_id: string;
+                    title?: string | null;
+                    /** Format: date */
+                    date?: string | null;
+                    files: string[];
+                    /** Format: binary */
+                    preview?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "learner-document-types.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        types: {
+                            id: string;
+                            name: string;
+                            access: string;
+                            expected: boolean;
+                            retired: boolean;
+                            on_file: number;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "learner-document-types.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "learner-document-types.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "learner-document-types.retire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "learners.import.template": {

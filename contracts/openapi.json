@@ -20771,6 +20771,358 @@
                 }
             }
         },
+        "/v1/academics/next-year": {
+            "get": {
+                "operationId": "academics.next-year",
+                "description": "This year, and the next as saved, or as proposed from this one: its\ndates, the terms of each level, and the classes of each level at each\ncampus, beside this year's.",
+                "summary": "The next school year",
+                "tags": [
+                    "NextYear"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "current": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "starts_on": {
+                                                    "type": "string"
+                                                },
+                                                "ends_on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "starts_on",
+                                                "ends_on"
+                                            ]
+                                        },
+                                        "next": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "saved": {
+                                                    "type": "boolean"
+                                                },
+                                                "id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "starts_on": {
+                                                    "type": "string"
+                                                },
+                                                "ends_on": {
+                                                    "type": "string"
+                                                },
+                                                "terms": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "division_id": {
+                                                                "type": "string"
+                                                            },
+                                                            "division": {
+                                                                "type": "string"
+                                                            },
+                                                            "terms": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "name": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "starts_on": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "ends_on": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "name",
+                                                                        "starts_on",
+                                                                        "ends_on"
+                                                                    ]
+                                                                }
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "division_id",
+                                                            "division",
+                                                            "terms"
+                                                        ]
+                                                    }
+                                                },
+                                                "classes": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "division_id": {
+                                                                "type": "string"
+                                                            },
+                                                            "division": {
+                                                                "type": "string"
+                                                            },
+                                                            "campus_id": {
+                                                                "type": "string"
+                                                            },
+                                                            "campus": {
+                                                                "type": "string"
+                                                            },
+                                                            "levels": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "code": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "label": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "now": {
+                                                                            "type": "array",
+                                                                            "items": {
+                                                                                "type": "string"
+                                                                            }
+                                                                        },
+                                                                        "next": {
+                                                                            "type": "array",
+                                                                            "items": {
+                                                                                "type": "string"
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "code",
+                                                                        "label",
+                                                                        "now",
+                                                                        "next"
+                                                                    ]
+                                                                }
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "division_id",
+                                                            "division",
+                                                            "campus_id",
+                                                            "campus",
+                                                            "levels"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "saved",
+                                                "id",
+                                                "name",
+                                                "starts_on",
+                                                "ends_on",
+                                                "terms",
+                                                "classes"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "current",
+                                        "next"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "academics.next-year.save",
+                "description": "`{name, starts_on, ends_on, terms: [{division_id, terms: [{name, starts_on, ends_on}]}], classes: [{division_id, campus_id, streams: {LEVEL: [names]}}]}`.\nIt may be saved again until it starts. The response is the same as GET.",
+                "summary": "Save the next school year",
+                "tags": [
+                    "NextYear"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "current": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "starts_on": {
+                                                            "type": "string"
+                                                        },
+                                                        "ends_on": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name",
+                                                        "starts_on",
+                                                        "ends_on"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "saved": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "id": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "starts_on": {
+                                                            "type": "string"
+                                                        },
+                                                        "ends_on": {
+                                                            "type": "string"
+                                                        },
+                                                        "terms": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "division_id": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "division": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "terms": {
+                                                                        "type": "array",
+                                                                        "items": {}
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "division_id",
+                                                                    "division",
+                                                                    "terms"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "classes": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "division_id": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "division": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "campus_id": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "campus": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "levels": {
+                                                                        "type": "array",
+                                                                        "items": {}
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "division_id",
+                                                                    "division",
+                                                                    "campus_id",
+                                                                    "campus",
+                                                                    "levels"
+                                                                ]
+                                                            }
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "saved",
+                                                        "id",
+                                                        "name",
+                                                        "starts_on",
+                                                        "ends_on",
+                                                        "terms",
+                                                        "classes"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "current",
+                                                "next"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "current": {
+                                                    "type": "null"
+                                                },
+                                                "next": {
+                                                    "type": "null"
+                                                }
+                                            },
+                                            "required": [
+                                                "current",
+                                                "next"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/me/notifications": {
             "get": {
                 "operationId": "me.notifications",
@@ -23416,6 +23768,1483 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/year-end": {
+            "get": {
+                "operationId": "year-end.index",
+                "description": "Each level group the viewer may run, with its run's state and the\nlearners another group hands on, waiting for its intake.",
+                "summary": "The year-end runs",
+                "tags": [
+                    "Progression"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "from_year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "to_year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "starts_on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "starts_on"
+                                            ]
+                                        },
+                                        "groups": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ],
+                                                        "enum": [
+                                                            "open",
+                                                            "committed",
+                                                            null
+                                                        ]
+                                                    },
+                                                    "intake": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "state",
+                                                    "intake"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "from_year",
+                                        "to_year",
+                                        "groups"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/year-end/{division}": {
+            "get": {
+                "operationId": "year-end.show",
+                "summary": "One level group's year-end run",
+                "tags": [
+                    "Progression"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "division": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "levels": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "code": {
+                                                                "type": "string"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "code",
+                                                            "label"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "levels"
+                                            ]
+                                        },
+                                        "from_year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "ends_on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "ends_on"
+                                            ]
+                                        },
+                                        "to_year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "starts_on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "starts_on"
+                                            ]
+                                        },
+                                        "run": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "open",
+                                                        "committed"
+                                                    ]
+                                                },
+                                                "committed_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "committed_by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "state",
+                                                "committed_at",
+                                                "committed_by"
+                                            ]
+                                        },
+                                        "decisions": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "learner": {
+                                                        "type": "string"
+                                                    },
+                                                    "class_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "level": {
+                                                        "type": "string"
+                                                    },
+                                                    "outcome": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "promoted",
+                                                            "repeated",
+                                                            "progressed",
+                                                            "completed",
+                                                            "left"
+                                                        ]
+                                                    },
+                                                    "to_class_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "to_class": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "changed": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "proposed",
+                                                            "decided",
+                                                            "awaiting_intake",
+                                                            "effective",
+                                                            "cancelled"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "learner_id",
+                                                    "learner",
+                                                    "class_id",
+                                                    "class",
+                                                    "level",
+                                                    "outcome",
+                                                    "to_class_id",
+                                                    "to_class",
+                                                    "reason",
+                                                    "changed",
+                                                    "state"
+                                                ]
+                                            }
+                                        },
+                                        "columns": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "values": {
+                                                        "type": "object",
+                                                        "additionalProperties": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "label",
+                                                    "values"
+                                                ]
+                                            }
+                                        },
+                                        "targets": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "division_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "level_code": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "division_id",
+                                                    "campus_id",
+                                                    "level_code"
+                                                ]
+                                            }
+                                        },
+                                        "checks": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "totals": {
+                                            "type": "object",
+                                            "properties": {
+                                                "learners": {
+                                                    "type": "integer"
+                                                },
+                                                "promoted": {
+                                                    "type": "integer"
+                                                },
+                                                "repeated": {
+                                                    "type": "integer"
+                                                },
+                                                "progressed": {
+                                                    "type": "integer"
+                                                },
+                                                "completed": {
+                                                    "type": "integer"
+                                                },
+                                                "left": {
+                                                    "type": "integer"
+                                                },
+                                                "to_decide": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "learners",
+                                                "promoted",
+                                                "repeated",
+                                                "progressed",
+                                                "completed",
+                                                "left",
+                                                "to_decide"
+                                            ]
+                                        },
+                                        "intake": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "learner": {
+                                                        "type": "string"
+                                                    },
+                                                    "class_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "level": {
+                                                        "type": "string"
+                                                    },
+                                                    "outcome": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "promoted",
+                                                            "repeated",
+                                                            "progressed",
+                                                            "completed",
+                                                            "left"
+                                                        ]
+                                                    },
+                                                    "to_class_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "to_class": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "changed": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "proposed",
+                                                            "decided",
+                                                            "awaiting_intake",
+                                                            "effective",
+                                                            "cancelled"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "learner_id",
+                                                    "learner",
+                                                    "class_id",
+                                                    "class",
+                                                    "level",
+                                                    "outcome",
+                                                    "to_class_id",
+                                                    "to_class",
+                                                    "reason",
+                                                    "changed",
+                                                    "state"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "division",
+                                        "from_year",
+                                        "to_year",
+                                        "run",
+                                        "decisions",
+                                        "columns",
+                                        "targets",
+                                        "checks",
+                                        "totals",
+                                        "intake"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/year-end/{division}/open": {
+            "post": {
+                "operationId": "year-end.open",
+                "summary": "Opens the run of a level group, with an outcome proposed for every learner. The response is the same as GET",
+                "tags": [
+                    "Progression"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "division": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "levels": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "code": {
+                                                                "type": "string"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "code",
+                                                            "label"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "levels"
+                                            ]
+                                        },
+                                        "from_year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "ends_on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "ends_on"
+                                            ]
+                                        },
+                                        "to_year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "starts_on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "starts_on"
+                                            ]
+                                        },
+                                        "run": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string"
+                                                },
+                                                "committed_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "committed_by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "state",
+                                                "committed_at",
+                                                "committed_by"
+                                            ]
+                                        },
+                                        "decisions": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "columns": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "targets": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "checks": {
+                                            "type": "array",
+                                            "items": {
+                                                "anyOf": [
+                                                    {
+                                                        "type": "string"
+                                                    },
+                                                    {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "One learner has no class for next year."
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "totals": {
+                                            "type": "object",
+                                            "properties": {
+                                                "learners": {
+                                                    "type": "integer"
+                                                },
+                                                "promoted": {
+                                                    "type": "integer"
+                                                },
+                                                "repeated": {
+                                                    "type": "integer"
+                                                },
+                                                "progressed": {
+                                                    "type": "integer"
+                                                },
+                                                "completed": {
+                                                    "type": "integer"
+                                                },
+                                                "left": {
+                                                    "type": "integer"
+                                                },
+                                                "to_decide": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "learners",
+                                                "promoted",
+                                                "repeated",
+                                                "progressed",
+                                                "completed",
+                                                "left",
+                                                "to_decide"
+                                            ]
+                                        },
+                                        "intake": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "division",
+                                        "from_year",
+                                        "to_year",
+                                        "run",
+                                        "decisions",
+                                        "columns",
+                                        "targets",
+                                        "checks",
+                                        "totals",
+                                        "intake"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/year-end/{division}/commit": {
+            "post": {
+                "operationId": "year-end.commit",
+                "summary": "Commits the run: every proposed outcome is decided, once the checks pass. The response is the run",
+                "tags": [
+                    "Progression"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "division": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "levels": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "code": {
+                                                                "type": "string"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "code",
+                                                            "label"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "levels"
+                                            ]
+                                        },
+                                        "from_year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "ends_on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "ends_on"
+                                            ]
+                                        },
+                                        "to_year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "starts_on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "starts_on"
+                                            ]
+                                        },
+                                        "run": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string"
+                                                },
+                                                "committed_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "committed_by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "state",
+                                                "committed_at",
+                                                "committed_by"
+                                            ]
+                                        },
+                                        "decisions": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "columns": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "targets": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "checks": {
+                                            "type": "array",
+                                            "items": {
+                                                "anyOf": [
+                                                    {
+                                                        "type": "string"
+                                                    },
+                                                    {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "One learner has no class for next year."
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "totals": {
+                                            "type": "object",
+                                            "properties": {
+                                                "learners": {
+                                                    "type": "integer"
+                                                },
+                                                "promoted": {
+                                                    "type": "integer"
+                                                },
+                                                "repeated": {
+                                                    "type": "integer"
+                                                },
+                                                "progressed": {
+                                                    "type": "integer"
+                                                },
+                                                "completed": {
+                                                    "type": "integer"
+                                                },
+                                                "left": {
+                                                    "type": "integer"
+                                                },
+                                                "to_decide": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "learners",
+                                                "promoted",
+                                                "repeated",
+                                                "progressed",
+                                                "completed",
+                                                "left",
+                                                "to_decide"
+                                            ]
+                                        },
+                                        "intake": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "division",
+                                        "from_year",
+                                        "to_year",
+                                        "run",
+                                        "decisions",
+                                        "columns",
+                                        "targets",
+                                        "checks",
+                                        "totals",
+                                        "intake"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/year-end/decisions/{id}": {
+            "put": {
+                "operationId": "year-end.change",
+                "summary": "Changes a proposed outcome: `{outcome, to_class_id, reason}`. The response is the run",
+                "tags": [
+                    "Progression"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "outcome": {
+                                        "type": "string"
+                                    },
+                                    "to_class_id": {
+                                        "type": "string"
+                                    },
+                                    "reason": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "division": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "levels": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "code": {
+                                                                "type": "string"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "code",
+                                                            "label"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "levels"
+                                            ]
+                                        },
+                                        "from_year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "ends_on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "ends_on"
+                                            ]
+                                        },
+                                        "to_year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "starts_on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "starts_on"
+                                            ]
+                                        },
+                                        "run": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string"
+                                                },
+                                                "committed_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "committed_by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "state",
+                                                "committed_at",
+                                                "committed_by"
+                                            ]
+                                        },
+                                        "decisions": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "columns": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "targets": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "checks": {
+                                            "type": "array",
+                                            "items": {
+                                                "anyOf": [
+                                                    {
+                                                        "type": "string"
+                                                    },
+                                                    {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "One learner has no class for next year."
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "totals": {
+                                            "type": "object",
+                                            "properties": {
+                                                "learners": {
+                                                    "type": "integer"
+                                                },
+                                                "promoted": {
+                                                    "type": "integer"
+                                                },
+                                                "repeated": {
+                                                    "type": "integer"
+                                                },
+                                                "progressed": {
+                                                    "type": "integer"
+                                                },
+                                                "completed": {
+                                                    "type": "integer"
+                                                },
+                                                "left": {
+                                                    "type": "integer"
+                                                },
+                                                "to_decide": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "learners",
+                                                "promoted",
+                                                "repeated",
+                                                "progressed",
+                                                "completed",
+                                                "left",
+                                                "to_decide"
+                                            ]
+                                        },
+                                        "intake": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "division",
+                                        "from_year",
+                                        "to_year",
+                                        "run",
+                                        "decisions",
+                                        "columns",
+                                        "targets",
+                                        "checks",
+                                        "totals",
+                                        "intake"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/year-end/decisions/{id}/intake": {
+            "post": {
+                "operationId": "year-end.intake",
+                "summary": "The receiving level group confirms a learner, or turns them back: `{accept, to_class_id, reason}`. The response is that group's run",
+                "tags": [
+                    "Progression"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "to_class_id": {
+                                        "type": "string"
+                                    },
+                                    "reason": {
+                                        "type": "string"
+                                    },
+                                    "accept": {
+                                        "type": "boolean",
+                                        "default": false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "division": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "levels": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "code": {
+                                                                "type": "string"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "code",
+                                                            "label"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "levels"
+                                            ]
+                                        },
+                                        "from_year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "ends_on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "ends_on"
+                                            ]
+                                        },
+                                        "to_year": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "starts_on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "starts_on"
+                                            ]
+                                        },
+                                        "run": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string"
+                                                },
+                                                "committed_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "committed_by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "state",
+                                                "committed_at",
+                                                "committed_by"
+                                            ]
+                                        },
+                                        "decisions": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "columns": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "targets": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "checks": {
+                                            "type": "array",
+                                            "items": {
+                                                "anyOf": [
+                                                    {
+                                                        "type": "string"
+                                                    },
+                                                    {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "One learner has no class for next year."
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "totals": {
+                                            "type": "object",
+                                            "properties": {
+                                                "learners": {
+                                                    "type": "integer"
+                                                },
+                                                "promoted": {
+                                                    "type": "integer"
+                                                },
+                                                "repeated": {
+                                                    "type": "integer"
+                                                },
+                                                "progressed": {
+                                                    "type": "integer"
+                                                },
+                                                "completed": {
+                                                    "type": "integer"
+                                                },
+                                                "left": {
+                                                    "type": "integer"
+                                                },
+                                                "to_decide": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "learners",
+                                                "promoted",
+                                                "repeated",
+                                                "progressed",
+                                                "completed",
+                                                "left",
+                                                "to_decide"
+                                            ]
+                                        },
+                                        "intake": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "division",
+                                        "from_year",
+                                        "to_year",
+                                        "run",
+                                        "decisions",
+                                        "columns",
+                                        "targets",
+                                        "checks",
+                                        "totals",
+                                        "intake"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }

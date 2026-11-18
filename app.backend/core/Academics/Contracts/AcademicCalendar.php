@@ -16,6 +16,13 @@ interface AcademicCalendar
     public function currentYear(?string $day = null): ?array;
 
     /** Classes in force in a year, across the school. */
+    /**
+     * The school year that starts after the current one ends, once it is set up (D-088).
+     *
+     * @return array{id: string, name: string, starts_on: string, ends_on: string}|null
+     */
+    public function nextYear(): ?array;
+
     public function classCount(string $yearId): int;
 
     /** Whether every offering of the school has at least one class in the year. */

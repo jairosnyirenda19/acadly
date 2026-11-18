@@ -71,6 +71,7 @@ const card = (row: LearnerGridRow) => ({
 /** The list of learners on the data grid (the approved design). */
 export function LearnersScreen() {
   const keepsFamilies = holdsAnywhere(useAppContext(), 'enrolment.families')
+  const runsYearEnd = holdsAnywhere(useAppContext(), 'enrolment.manage')
   const { place } = useWorkIn()
   const inPlace = place !== null && place.key !== 'institution:' ? place.key : null
   const loaded = useLoad(`learners:${inPlace ?? ''}`, () => learnersApi.list(inPlace))
@@ -125,8 +126,13 @@ export function LearnersScreen() {
         title={plural}
         intro={t.intro(word)}
         actions={
-          state.can_admit || keepsFamilies ? (
+          state.can_admit || keepsFamilies || runsYearEnd ? (
             <>
+              {runsYearEnd && (
+                <Button variant="secondary" onClick={() => navigate('/learners/year-end')}>
+                  {copy.yearEnd.button}
+                </Button>
+              )}
               {keepsFamilies && (
                 <Button variant="secondary" onClick={() => navigate('/learners/families')}>
                   {copy.families.open}

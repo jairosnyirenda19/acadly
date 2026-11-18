@@ -19,6 +19,9 @@ enum EnrolmentAudit: string implements AuditAction
     case LearnersImported = 'enrolment.learners_imported';
     case ParentLinkAsked = 'enrolment.parent_link_asked';
     case FamiliesInvited = 'enrolment.families_invited';
+    case ProgressionOpened = 'enrolment.progression_opened';
+    case ProgressionChanged = 'enrolment.progression_changed';
+    case ProgressionCommitted = 'enrolment.progression_committed';
 
     public function key(): string
     {
@@ -39,6 +42,9 @@ enum EnrolmentAudit: string implements AuditAction
             self::LearnersImported => 'Admitted learners from a spreadsheet.',
             self::ParentLinkAsked => 'Was asked by the parent portal to confirm a child.',
             self::FamiliesInvited => 'Invited families to the parent portal by text message.',
+            self::ProgressionOpened => 'Opened the year-end run of a level group.',
+            self::ProgressionChanged => 'Changed the year-end outcome of a learner.',
+            self::ProgressionCommitted => 'Committed the year-end run of a level group.',
         };
     }
 

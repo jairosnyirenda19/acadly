@@ -1692,6 +1692,33 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/academics/next-year": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The next school year
+         * @description This year, and the next as saved, or as proposed from this one: its
+         *     dates, the terms of each level, and the classes of each level at each
+         *     campus, beside this year's.
+         */
+        get: operations["academics.next-year"];
+        /**
+         * Save the next school year
+         * @description `{name, starts_on, ends_on, terms: [{division_id, terms: [{name, starts_on, ends_on}]}], classes: [{division_id, campus_id, streams: {LEVEL: [names]}}]}`.
+         *     It may be saved again until it starts. The response is the same as GET.
+         */
+        put: operations["academics.next-year.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/me/notifications": {
         parameters: {
             query?: never;
@@ -1991,6 +2018,112 @@ export interface paths {
          *     signed in for 90 days. The response is the same as GET /me.
          */
         post: operations["auth.phone.sign-in"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/year-end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The year-end runs
+         * @description Each level group the viewer may run, with its run's state and the
+         *     learners another group hands on, waiting for its intake.
+         */
+        get: operations["year-end.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/year-end/{division}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One level group's year-end run */
+        get: operations["year-end.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/year-end/{division}/open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Opens the run of a level group, with an outcome proposed for every learner. The response is the same as GET */
+        post: operations["year-end.open"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/year-end/{division}/commit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Commits the run: every proposed outcome is decided, once the checks pass. The response is the run */
+        post: operations["year-end.commit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/year-end/decisions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Changes a proposed outcome: `{outcome, to_class_id, reason}`. The response is the run */
+        put: operations["year-end.change"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/year-end/decisions/{id}/intake": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The receiving level group confirms a learner, or turns them back: `{accept, to_class_id, reason}`. The response is that group's run */
+        post: operations["year-end.intake"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8811,6 +8944,111 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
+    "academics.next-year": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        current: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                        } | null;
+                        next: {
+                            saved: boolean;
+                            id: string | null;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                            terms: {
+                                division_id: string;
+                                division: string;
+                                terms: {
+                                    name: string;
+                                    starts_on: string;
+                                    ends_on: string;
+                                }[];
+                            }[];
+                            classes: {
+                                division_id: string;
+                                division: string;
+                                campus_id: string;
+                                campus: string;
+                                levels: {
+                                    code: string;
+                                    label: string;
+                                    now: string[];
+                                    next: string[];
+                                }[];
+                            }[];
+                        } | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "academics.next-year.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        current: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                        };
+                        next: {
+                            saved: boolean;
+                            id: string | null;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                            terms: {
+                                division_id: string;
+                                division: string;
+                                terms: unknown[];
+                            }[];
+                            classes: {
+                                division_id: string;
+                                division: string;
+                                campus_id: string;
+                                campus: string;
+                                levels: unknown[];
+                            }[];
+                        };
+                    } | {
+                        current: null;
+                        next: null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "me.notifications": {
         parameters: {
             query?: never;
@@ -9647,6 +9885,409 @@ export interface operations {
                 };
             };
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "year-end.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        from_year: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        to_year: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                        } | null;
+                        groups: {
+                            id: string;
+                            name: string;
+                            /** @enum {string|null} */
+                            state: "open" | "committed" | null;
+                            intake: number;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "year-end.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        division: {
+                            id: string;
+                            name: string;
+                            levels: {
+                                code: string;
+                                label: string;
+                            }[];
+                        };
+                        from_year: {
+                            id: string;
+                            name: string;
+                            ends_on: string;
+                        } | null;
+                        to_year: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                        } | null;
+                        run: {
+                            id: string;
+                            /** @enum {string} */
+                            state: "open" | "committed";
+                            committed_at: string | null;
+                            committed_by: string | null;
+                        } | null;
+                        decisions: {
+                            id: string;
+                            learner_id: string;
+                            learner: string;
+                            class_id: string;
+                            class: string;
+                            level: string;
+                            /** @enum {string} */
+                            outcome: "promoted" | "repeated" | "progressed" | "completed" | "left";
+                            to_class_id: string | null;
+                            to_class: string | null;
+                            reason: string | null;
+                            changed: boolean;
+                            /** @enum {string} */
+                            state: "proposed" | "decided" | "awaiting_intake" | "effective" | "cancelled";
+                        }[];
+                        columns: {
+                            label: string;
+                            values: {
+                                [key: string]: string;
+                            };
+                        }[];
+                        targets: {
+                            id: string;
+                            name: string;
+                            division_id: string;
+                            campus_id: string;
+                            level_code: string;
+                        }[];
+                        checks: string[];
+                        totals: {
+                            learners: number;
+                            promoted: number;
+                            repeated: number;
+                            progressed: number;
+                            completed: number;
+                            left: number;
+                            to_decide: number;
+                        };
+                        intake: {
+                            id: string;
+                            learner_id: string;
+                            learner: string;
+                            class_id: string;
+                            class: string;
+                            level: string;
+                            /** @enum {string} */
+                            outcome: "promoted" | "repeated" | "progressed" | "completed" | "left";
+                            to_class_id: string | null;
+                            to_class: string | null;
+                            reason: string | null;
+                            changed: boolean;
+                            /** @enum {string} */
+                            state: "proposed" | "decided" | "awaiting_intake" | "effective" | "cancelled";
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "year-end.open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        division: {
+                            id: string;
+                            name: string;
+                            levels: {
+                                code: string;
+                                label: string;
+                            }[];
+                        };
+                        from_year: {
+                            id: string;
+                            name: string;
+                            ends_on: string;
+                        } | null;
+                        to_year: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                        } | null;
+                        run: {
+                            id: string;
+                            state: string;
+                            committed_at: string | null;
+                            committed_by: string | null;
+                        } | null;
+                        decisions: unknown[];
+                        columns: string[];
+                        targets: unknown[];
+                        checks: (string | "One learner has no class for next year.")[];
+                        totals: {
+                            learners: number;
+                            promoted: number;
+                            repeated: number;
+                            progressed: number;
+                            completed: number;
+                            left: number;
+                            to_decide: number;
+                        };
+                        intake: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "year-end.commit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        division: {
+                            id: string;
+                            name: string;
+                            levels: {
+                                code: string;
+                                label: string;
+                            }[];
+                        };
+                        from_year: {
+                            id: string;
+                            name: string;
+                            ends_on: string;
+                        } | null;
+                        to_year: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                        } | null;
+                        run: {
+                            id: string;
+                            state: string;
+                            committed_at: string | null;
+                            committed_by: string | null;
+                        } | null;
+                        decisions: unknown[];
+                        columns: string[];
+                        targets: unknown[];
+                        checks: (string | "One learner has no class for next year.")[];
+                        totals: {
+                            learners: number;
+                            promoted: number;
+                            repeated: number;
+                            progressed: number;
+                            completed: number;
+                            left: number;
+                            to_decide: number;
+                        };
+                        intake: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "year-end.change": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    outcome?: string;
+                    to_class_id?: string;
+                    reason?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        division: {
+                            id: string;
+                            name: string;
+                            levels: {
+                                code: string;
+                                label: string;
+                            }[];
+                        };
+                        from_year: {
+                            id: string;
+                            name: string;
+                            ends_on: string;
+                        } | null;
+                        to_year: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                        } | null;
+                        run: {
+                            id: string;
+                            state: string;
+                            committed_at: string | null;
+                            committed_by: string | null;
+                        } | null;
+                        decisions: unknown[];
+                        columns: string[];
+                        targets: unknown[];
+                        checks: (string | "One learner has no class for next year.")[];
+                        totals: {
+                            learners: number;
+                            promoted: number;
+                            repeated: number;
+                            progressed: number;
+                            completed: number;
+                            left: number;
+                            to_decide: number;
+                        };
+                        intake: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "year-end.intake": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    to_class_id?: string;
+                    reason?: string;
+                    /** @default false */
+                    accept?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        division: {
+                            id: string;
+                            name: string;
+                            levels: {
+                                code: string;
+                                label: string;
+                            }[];
+                        };
+                        from_year: {
+                            id: string;
+                            name: string;
+                            ends_on: string;
+                        } | null;
+                        to_year: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                        } | null;
+                        run: {
+                            id: string;
+                            state: string;
+                            committed_at: string | null;
+                            committed_by: string | null;
+                        } | null;
+                        decisions: unknown[];
+                        columns: string[];
+                        targets: unknown[];
+                        checks: (string | "One learner has no class for next year.")[];
+                        totals: {
+                            learners: number;
+                            promoted: number;
+                            repeated: number;
+                            progressed: number;
+                            completed: number;
+                            left: number;
+                            to_decide: number;
+                        };
+                        intake: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
         };
     };
     "assessment.publishing": {

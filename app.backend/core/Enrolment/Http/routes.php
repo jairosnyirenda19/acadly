@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Acadly\Core\Enrolment\Http\FamiliesController;
 use Acadly\Core\Enrolment\Http\LearnerImportController;
 use Acadly\Core\Enrolment\Http\LearnersController;
+use Acadly\Core\Enrolment\Http\ProgressionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function (): void {
@@ -16,6 +17,16 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/portal/family', [FamiliesController::class, 'family'])->name('portal.family');
     Route::post('/portal/family/confirm', [FamiliesController::class, 'confirm'])->name('portal.confirm');
     Route::get('/portal/children/{id}/messages', [FamiliesController::class, 'messages'])->whereUuid('id')->name('portal.messages');
+});
+
+// The year-end run (D-088).
+Route::middleware('auth:sanctum')->prefix('year-end')->name('year-end.')->group(function (): void {
+    Route::get('/', [ProgressionController::class, 'index'])->name('index');
+    Route::get('/{division}', [ProgressionController::class, 'show'])->whereUuid('division')->name('show');
+    Route::post('/{division}/open', [ProgressionController::class, 'open'])->whereUuid('division')->name('open');
+    Route::post('/{division}/commit', [ProgressionController::class, 'commit'])->whereUuid('division')->name('commit');
+    Route::put('/decisions/{id}', [ProgressionController::class, 'change'])->whereUuid('id')->name('change');
+    Route::post('/decisions/{id}/intake', [ProgressionController::class, 'intake'])->whereUuid('id')->name('intake');
 });
 
 Route::middleware('auth:sanctum')->prefix('learners')->name('learners.')->group(function (): void {

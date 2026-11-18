@@ -57,6 +57,20 @@ final class Calendar implements AcademicCalendar
         return $terms;
     }
 
+    public function nextYear(): ?array
+    {
+        $current = $this->currentYear();
+
+        if ($current === null) {
+            return null;
+        }
+
+        $row = DB::table('academic_years')->where('starts_on', '>', $current['ends_on'])->orderBy('starts_on')->first();
+
+        return $row === null ? null : ['id' => Row::text($row, 'id'), 'name' => Row::text($row, 'name'),
+            'starts_on' => self::day(Row::text($row, 'starts_on')), 'ends_on' => self::day(Row::text($row, 'ends_on'))];
+    }
+
     public function classCount(string $yearId): int
     {
         return DB::table('academic_classes')->where('year_id', $yearId)->whereNull('ended_at')->count();

@@ -7,9 +7,11 @@ namespace Acadly\Modules\Attendance;
 use Acadly\Core\Enrolment\Contracts\FamilyLine;
 use Acadly\Core\Enrolment\Contracts\LearnerRecordPart;
 use Acadly\Core\Enrolment\Contracts\ReportCardLine;
+use Acadly\Core\Enrolment\Contracts\YearEndCheck;
 use Acadly\Kernel\Approvals\ApprovalTopic;
 use Acadly\Modules\Attendance\Application\AttendanceFamilyLine;
 use Acadly\Modules\Attendance\Application\AttendanceReportLine;
+use Acadly\Modules\Attendance\Application\AttendanceYearEnd;
 use Acadly\Modules\Attendance\Application\CorrectionApproval;
 use Acadly\Modules\Attendance\Application\LateRegisterApproval;
 use Acadly\Modules\Attendance\Application\LearnerAttendance;
@@ -26,6 +28,7 @@ final class AttendanceServiceProvider extends ServiceProvider
         $this->app->tag([CorrectionApproval::class, LateRegisterApproval::class], ApprovalTopic::TAG);
         $this->app->tag([AttendanceReportLine::class], ReportCardLine::TAG);
         $this->app->tag([AttendanceFamilyLine::class], FamilyLine::TAG);
+        $this->app->tag([AttendanceYearEnd::class], YearEndCheck::TAG);
     }
 
     public function boot(): void

@@ -67,7 +67,7 @@ final class EnrolmentCore implements Module
 
     public function journeys(): array
     {
-        return ['enrolment.guardian_link'];
+        return ['enrolment.guardian_link', 'enrolment.progression'];
     }
 
     public function topics(): array

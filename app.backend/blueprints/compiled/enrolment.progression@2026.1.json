@@ -1,0 +1,198 @@
+{
+    "initial": "proposed",
+    "kind": "journey",
+    "milestones": [],
+    "ref": "enrolment.progression@2026.1",
+    "stages": [
+        {
+            "key": "run",
+            "steps": [
+                "decide"
+            ],
+            "title": "Year-end run"
+        },
+        {
+            "key": "intake",
+            "steps": [
+                "confirm_intake"
+            ],
+            "title": "Intake"
+        },
+        {
+            "key": "effect",
+            "steps": [
+                "take_effect",
+                "cancel"
+            ],
+            "title": "Next year"
+        }
+    ],
+    "states": [
+        {
+            "id": "proposed",
+            "label": "Proposed"
+        },
+        {
+            "id": "decided",
+            "label": "Decided"
+        },
+        {
+            "id": "awaiting_intake",
+            "label": "Awaiting intake"
+        },
+        {
+            "id": "effective",
+            "label": "In effect"
+        },
+        {
+            "id": "cancelled",
+            "label": "Cancelled"
+        }
+    ],
+    "steps": [
+        {
+            "capability": "enrolment.manage",
+            "four_eyes": null,
+            "from": [
+                "proposed"
+            ],
+            "gates": [],
+            "id": "decide",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "promoted",
+                    "requires_reason": false,
+                    "title": "Promoted",
+                    "to": "decided"
+                },
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "repeated",
+                    "requires_reason": true,
+                    "title": "Repeat",
+                    "to": "decided"
+                },
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "completed",
+                    "requires_reason": false,
+                    "title": "Completed",
+                    "to": "decided"
+                },
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "left",
+                    "requires_reason": true,
+                    "title": "Leave",
+                    "to": "decided"
+                },
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "progressed",
+                    "requires_reason": false,
+                    "title": "To the next level group",
+                    "to": "awaiting_intake"
+                }
+            ],
+            "stage": "run",
+            "title": "Decide the outcome"
+        },
+        {
+            "capability": "enrolment.manage",
+            "four_eyes": null,
+            "from": [
+                "awaiting_intake"
+            ],
+            "gates": [],
+            "id": "confirm_intake",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "accepted",
+                    "requires_reason": false,
+                    "title": "Confirm",
+                    "to": "decided"
+                },
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "turned_back",
+                    "requires_reason": true,
+                    "title": "Turn back",
+                    "to": "proposed"
+                }
+            ],
+            "stage": "intake",
+            "title": "Confirm the intake"
+        },
+        {
+            "capability": "enrolment.manage",
+            "four_eyes": null,
+            "from": [
+                "decided"
+            ],
+            "gates": [
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Core\\Enrolment\\Journeys\\Progression\\NextYearStarted"
+                }
+            ],
+            "id": "take_effect",
+            "outcomes": [
+                {
+                    "effects": [
+                        {
+                            "args": [],
+                            "args_class": null,
+                            "class": "Acadly\\Core\\Enrolment\\Journeys\\Progression\\ApplyOutcome"
+                        }
+                    ],
+                    "emits": [],
+                    "id": "applied",
+                    "requires_reason": false,
+                    "title": "In effect",
+                    "to": "effective"
+                }
+            ],
+            "stage": "effect",
+            "title": "Take effect"
+        },
+        {
+            "capability": "enrolment.manage",
+            "four_eyes": null,
+            "from": [
+                "proposed",
+                "decided",
+                "awaiting_intake"
+            ],
+            "gates": [],
+            "id": "cancel",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "cancelled",
+                    "requires_reason": true,
+                    "title": "Cancel",
+                    "to": "cancelled"
+                }
+            ],
+            "stage": "effect",
+            "title": "Cancel the outcome"
+        }
+    ],
+    "subject": "Acadly\\Core\\Enrolment\\Domain\\ProgressionDecision",
+    "terminal": [
+        "effective",
+        "cancelled"
+    ],
+    "title": "Year-end outcome"
+}

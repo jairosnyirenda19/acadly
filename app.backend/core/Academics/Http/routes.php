@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Acadly\Core\Academics\Http\AcademicsController;
+use Acadly\Core\Academics\Http\NextYearController;
 use Acadly\Core\Academics\Http\SubjectsController;
 use Acadly\Core\Academics\Http\TeachingController;
 use Acadly\Core\Academics\Http\TimetableController;
@@ -13,6 +14,8 @@ Route::middleware('auth:sanctum')->prefix('academics')->name('academics.')->grou
     Route::put('/year', [AcademicsController::class, 'year'])->name('year');
     Route::put('/terms', [AcademicsController::class, 'terms'])->name('terms');
     Route::put('/classes', [AcademicsController::class, 'classes'])->name('classes');
+    Route::get('/next-year', [NextYearController::class, 'show'])->name('next-year');
+    Route::put('/next-year', [NextYearController::class, 'save'])->name('next-year.save');
 
     Route::get('/subjects', [SubjectsController::class, 'index'])->name('subjects.index');
     Route::post('/subjects/start', [SubjectsController::class, 'start'])->name('subjects.start');

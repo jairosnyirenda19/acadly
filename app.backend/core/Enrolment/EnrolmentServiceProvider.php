@@ -10,13 +10,17 @@ use Acadly\Core\Enrolment\Application\Directory;
 use Acadly\Core\Enrolment\Application\Families;
 use Acadly\Core\Enrolment\Application\LearnerPlaces;
 use Acadly\Core\Enrolment\Application\LearnersGrid;
+use Acadly\Core\Enrolment\Application\Progression;
+use Acadly\Core\Enrolment\Console\YearStartCommand;
 use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
 use Acadly\Core\Enrolment\Contracts\FamilyLine;
 use Acadly\Core\Enrolment\Contracts\Guardianship;
+use Acadly\Core\Enrolment\Contracts\YearEndCheck;
 use Acadly\Kernel\Approvals\ApprovalTopic;
 use Acadly\Kernel\Grid\Grids;
 use Acadly\Kernel\Identity\FamilyAccounts;
 use Acadly\Kernel\Identity\PhoneHolders;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -34,6 +38,7 @@ final class EnrolmentServiceProvider extends ServiceProvider
         $this->app->bind(FamilyAccounts::class, FamilyActions::class);
         $this->app->tag([LearnersGrid::class], Grids::TAG);
         $this->app->tag([DetailsApproval::class], ApprovalTopic::TAG);
+        $this->app->when(Progression::class)->needs('$checks')->giveTagged(YearEndCheck::TAG);
     }
 
     public function boot(): void
@@ -41,5 +46,14 @@ final class EnrolmentServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/Database/migrations');
 
         Route::middleware('api')->prefix('api/v1')->group(__DIR__.'/Http/routes.php');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([YearStartCommand::class]);
+        }
+
+        // Each morning, the year-end outcomes whose school year has started take effect (D-088).
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule): void {
+            $schedule->command('learners:year-start')->dailyAt('00:30')->withoutOverlapping()->onOneServer();
+        });
     }
 }

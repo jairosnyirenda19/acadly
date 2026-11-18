@@ -12,6 +12,8 @@ enum KernelAudit: string implements AuditAction
     case SignInPaused = 'identity.sign_in_paused';
     case SignInCodeSent = 'identity.sign_in_code_sent';
     case SignInCodeRefused = 'identity.sign_in_code_refused';
+    case AccountPhoneAdded = 'identity.account_phone_added';
+    case AccountPhoneRemoved = 'identity.account_phone_removed';
     case SignedOut = 'identity.signed_out';
     case ResetRequested = 'identity.reset_requested';
     case PasswordReset = 'identity.password_reset';
@@ -77,6 +79,8 @@ enum KernelAudit: string implements AuditAction
             self::SignInPaused => 'Attempted to sign in while sign-in was paused after repeated failures.',
             self::SignInCodeSent => 'Asked for a sign-in code by SMS.',
             self::SignInCodeRefused => 'Asked for a sign-in code for a phone number the school does not keep.',
+            self::AccountPhoneAdded => 'Added a phone number to their own account, so the parent portal opens it.',
+            self::AccountPhoneRemoved => 'Removed the phone number from their own account.',
             self::SignedOut => 'Signed out.',
             self::ResetRequested => 'Requested a password reset link.',
             self::PasswordReset => 'Set a new password with a reset link.',

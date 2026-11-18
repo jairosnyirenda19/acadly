@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Acadly\Core\Enrolment;
 
+use Acadly\Core\Enrolment\Application\Actions\FamilyActions;
 use Acadly\Core\Enrolment\Application\DetailsApproval;
 use Acadly\Core\Enrolment\Application\Directory;
 use Acadly\Core\Enrolment\Application\Families;
@@ -14,6 +15,7 @@ use Acadly\Core\Enrolment\Contracts\FamilyLine;
 use Acadly\Core\Enrolment\Contracts\Guardianship;
 use Acadly\Kernel\Approvals\ApprovalTopic;
 use Acadly\Kernel\Grid\Grids;
+use Acadly\Kernel\Identity\FamilyAccounts;
 use Acadly\Kernel\Identity\PhoneHolders;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -29,6 +31,7 @@ final class EnrolmentServiceProvider extends ServiceProvider
         $this->app->when(Families::class)->needs('$lines')->giveTagged(FamilyLine::TAG);
         $this->app->bind(Guardianship::class, Families::class);
         $this->app->bind(PhoneHolders::class, Families::class);
+        $this->app->bind(FamilyAccounts::class, FamilyActions::class);
         $this->app->tag([LearnersGrid::class], Grids::TAG);
         $this->app->tag([DetailsApproval::class], ApprovalTopic::TAG);
     }

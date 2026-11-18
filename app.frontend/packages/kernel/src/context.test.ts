@@ -3,7 +3,7 @@ import { can, moduleOn, type AppContext } from './context'
 
 function context(overrides: Partial<AppContext> = {}): AppContext {
   return {
-    user: { id: 'u1', name: 'Agnes Banda', email: 'a.banda@sunrise.example' },
+    user: { id: 'u1', name: 'Agnes Banda', email: 'a.banda@sunrise.example', phone: null },
     school: { name: 'Sunrise Academy', short_name: 'Sunrise', has_logo: false, open: true },
     setup_required: false,
     licence: { status: 'valid', read_only: false },

@@ -7,6 +7,8 @@ export interface Account {
   /** Staff sign in by email; parents and guardians by phone. An account has one or both. */
   email: string | null
   phone: string | null
+  /** A sign-in by code by SMS reaches the parent portal only; the console needs the password (D-087). */
+  signed_in_by: 'password' | 'code'
 }
 
 /** What a sign-in attempt came to. Named outcomes, never a boolean. */
@@ -48,7 +50,18 @@ export async function getAccount(): Promise<Account | null> {
   try {
     const { data } = await api.GET('/v1/me')
 
-    return data?.user ?? null
+    return data !== undefined ? { ...data.user, signed_in_by: data.signed_in_by } : null
+  } catch {
+    return null
+  }
+}
+
+/** The address of the school's parent portal, or null when it has none. */
+export async function getPortalAddress(): Promise<string | null> {
+  try {
+    const { data } = await api.GET('/v1/school')
+
+    return data?.portal ?? null
   } catch {
     return null
   }
@@ -60,7 +73,7 @@ export async function signIn(email: string, password: string): Promise<SignInOut
     const { data, response } = await api.POST('/v1/auth/sign-in', { body: { email, password } })
 
     if (data !== undefined) {
-      return { kind: 'signed_in', account: data.user }
+      return { kind: 'signed_in', account: { ...data.user, signed_in_by: data.signed_in_by } }
     }
 
     return signInFailure(response.status)
@@ -95,7 +108,7 @@ export async function signInWithCode(phone: string, code: string): Promise<SignI
     const { data, response } = await api.POST('/v1/auth/phone/sign-in', { body: { phone, code } })
 
     if (data !== undefined) {
-      return { kind: 'signed_in', account: data.user }
+      return { kind: 'signed_in', account: { ...data.user, signed_in_by: data.signed_in_by } }
     }
 
     return signInFailure(response.status)

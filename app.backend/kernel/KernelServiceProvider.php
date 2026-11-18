@@ -42,6 +42,8 @@ use Acadly\Kernel\Events\Outbox;
 use Acadly\Kernel\Grid\GridDefinition;
 use Acadly\Kernel\Grid\Grids;
 use Acadly\Kernel\Grid\PurgeExportsCommand;
+use Acadly\Kernel\Identity\FamilyAccounts;
+use Acadly\Kernel\Identity\NoFamilyAccounts;
 use Acadly\Kernel\Identity\NoPhoneHolders;
 use Acadly\Kernel\Identity\PeopleGrid;
 use Acadly\Kernel\Identity\PhoneHolders;
@@ -139,6 +141,7 @@ final class KernelServiceProvider extends ServiceProvider
         );
         $this->app->singleton(Notifier::class);
         $this->app->bindIf(PhoneHolders::class, NoPhoneHolders::class);
+        $this->app->bindIf(FamilyAccounts::class, NoFamilyAccounts::class);
         $this->app->bind(SmsProvider::class, fn (Application $app): SmsProvider => $app->make(MessageSettings::class)->smsProvider());
         $this->app->bind(
             ChannelAdapters::class,

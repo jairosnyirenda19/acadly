@@ -6,6 +6,7 @@ namespace Acadly\Kernel\Identity\Http;
 
 use Acadly\Kernel\Identity\Actions\SendSignInCode;
 use Acadly\Kernel\Identity\Actions\SignInWithCode;
+use Acadly\Kernel\Identity\SignInMethod;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -45,9 +46,11 @@ final class PhoneSignInController
             'code' => ['required', 'string', 'max:12'],
         ]);
 
-        $signIn->handle($request->string('phone')->toString(), $request->string('code')->toString(), (string) $request->ip());
+        $user = $signIn->handle($request->string('phone')->toString(), $request->string('code')->toString(), (string) $request->ip());
 
         $request->session()->regenerate();
+        // A code opens the parent portal only (D-087).
+        SignInMethod::markCode($request, $user);
 
         return $me($request);
     }

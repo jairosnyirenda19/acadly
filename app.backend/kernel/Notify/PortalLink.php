@@ -24,6 +24,20 @@ final class PortalLink
         return rtrim((string) preg_replace('#^https?://#i', '', trim($url)), '/');
     }
 
+    /** The address to open, with its scheme, or null when the school has none (D-087). */
+    public static function url(): ?string
+    {
+        $url = config('acadly.portal_url');
+
+        if (! is_string($url) || trim($url) === '') {
+            return null;
+        }
+
+        $url = rtrim(trim($url), '/');
+
+        return preg_match('#^https?://#i', $url) === 1 ? $url : 'https://'.$url;
+    }
+
     /** The sentence added to the message, or null when the school has no portal address. */
     public static function sentence(): ?string
     {

@@ -44,6 +44,12 @@ final class Problem extends RuntimeException
         return new self(403, 'another_person_required', 'This step must be performed by a different person.');
     }
 
+    /** A session signed in with a code by SMS asked for more than the parent portal (D-087). */
+    public static function passwordRequired(): self
+    {
+        return new self(403, 'password_required', 'Sign in with your email address and password to use the staff console.');
+    }
+
     public static function stateChanged(): self
     {
         return new self(409, 'state_changed', 'The record changed while the request was in progress. Reload the record and try again.');

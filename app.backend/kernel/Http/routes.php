@@ -9,6 +9,7 @@ use Acadly\Kernel\Grid\GridsController;
 use Acadly\Kernel\Http\HealthController;
 use Acadly\Kernel\Http\ReadinessController;
 use Acadly\Kernel\Http\SchoolController;
+use Acadly\Kernel\Identity\Http\AccountPhoneController;
 use Acadly\Kernel\Identity\Http\MeController;
 use Acadly\Kernel\Identity\Http\PasswordResetController;
 use Acadly\Kernel\Identity\Http\PeopleController;
@@ -39,6 +40,9 @@ Route::prefix('auth')->name('auth.')->group(function (): void {
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/me', MeController::class)->name('me');
     Route::get('/me/context', ContextController::class)->name('me.context');
+    Route::post('/me/phone/code', [AccountPhoneController::class, 'code'])->middleware('throttle:10,1')->name('me.phone.code');
+    Route::post('/me/phone', [AccountPhoneController::class, 'confirm'])->middleware('throttle:20,1')->name('me.phone.confirm');
+    Route::delete('/me/phone', [AccountPhoneController::class, 'remove'])->name('me.phone.remove');
 
     Route::prefix('approvals')->name('approvals.')->group(function (): void {
         Route::get('/waiting', [ApprovalsController::class, 'waiting'])->name('waiting');

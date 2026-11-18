@@ -1,5 +1,6 @@
 <?php
 
+use Acadly\Kernel\Http\Middleware\CodeSignInReachesPortalOnly;
 use Acadly\Kernel\Http\Middleware\EndViewAsWhenDue;
 use Acadly\Kernel\Http\Middleware\RemoveServerSignature;
 use Acadly\Kernel\Http\ProblemRenderer;
@@ -20,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi();
 
         // View as (development only) ends on time, before the request is handled.
-        $middleware->api(append: [EndViewAsWhenDue::class]);
+        $middleware->api(append: [EndViewAsWhenDue::class, CodeSignInReachesPortalOnly::class]);
 
         // An API has no sign-in page: a guest gets 401, never a redirect.
         $middleware->redirectGuestsTo(fn (): ?string => null);

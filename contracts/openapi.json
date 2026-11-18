@@ -594,6 +594,300 @@
                 }
             }
         },
+        "/v1/me/phone/code": {
+            "post": {
+                "operationId": "me.phone.code",
+                "description": "Sends a six-digit code by SMS to a number the school keeps for a\nlearner's contact. Needs a sign-in with the email address and password.",
+                "summary": "Send a code to add a phone number",
+                "tags": [
+                    "AccountPhone"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "phone": {
+                                        "type": "string",
+                                        "maxLength": 30
+                                    }
+                                },
+                                "required": [
+                                    "phone"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sent": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "sent"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/me/phone": {
+            "post": {
+                "operationId": "me.phone.confirm",
+                "description": "The parent portal then opens this account. A parent account already on\nthe number is closed and its children move here. The response is the\nsame as GET /me.",
+                "summary": "Add the phone number with its code",
+                "tags": [
+                    "AccountPhone"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "phone": {
+                                        "type": "string",
+                                        "maxLength": 30
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "maxLength": 12
+                                    }
+                                },
+                                "required": [
+                                    "phone",
+                                    "code"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "view_as": {
+                                            "type": "object",
+                                            "properties": {
+                                                "available": {
+                                                    "type": "boolean"
+                                                },
+                                                "by": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name"
+                                                    ]
+                                                },
+                                                "ends_at": {
+                                                    "type": "null"
+                                                }
+                                            },
+                                            "required": [
+                                                "available",
+                                                "by",
+                                                "ends_at"
+                                            ]
+                                        },
+                                        "user": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "email",
+                                                "phone"
+                                            ]
+                                        },
+                                        "signed_in_by": {
+                                            "type": "string",
+                                            "enum": [
+                                                "code",
+                                                "password"
+                                            ]
+                                        },
+                                        "grants": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "view_as",
+                                        "user",
+                                        "signed_in_by",
+                                        "grants"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "me.phone.remove",
+                "description": "The parent portal no longer opens this account; the number signs in to\nan account of its own. The response is the same as GET /me.",
+                "summary": "Remove the phone number",
+                "tags": [
+                    "AccountPhone"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "view_as": {
+                                            "type": "object",
+                                            "properties": {
+                                                "available": {
+                                                    "type": "boolean"
+                                                },
+                                                "by": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name"
+                                                    ]
+                                                },
+                                                "ends_at": {
+                                                    "type": "null"
+                                                }
+                                            },
+                                            "required": [
+                                                "available",
+                                                "by",
+                                                "ends_at"
+                                            ]
+                                        },
+                                        "user": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "email",
+                                                "phone"
+                                            ]
+                                        },
+                                        "signed_in_by": {
+                                            "type": "string",
+                                            "enum": [
+                                                "code",
+                                                "password"
+                                            ]
+                                        },
+                                        "grants": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "view_as",
+                                        "user",
+                                        "signed_in_by",
+                                        "grants"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/approvals/waiting": {
             "get": {
                 "operationId": "approvals.waiting",
@@ -7583,12 +7877,19 @@
                                                 },
                                                 "email": {
                                                     "type": "string"
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
                                                 }
                                             },
                                             "required": [
                                                 "id",
                                                 "name",
-                                                "email"
+                                                "email",
+                                                "phone"
                                             ]
                                         },
                                         "school": {
@@ -17379,7 +17680,7 @@
         "/v1/me": {
             "get": {
                 "operationId": "me",
-                "description": "Grants list each permission with the scope it is held at. The screens\nuse them to decide what to offer; the server checks every request again.\n\n`view_as` says whether this account may view as others (development\nonly), and, while it does, who is really signed in and when it ends.",
+                "description": "Grants list each permission with the scope it is held at. The screens\nuse them to decide what to offer; the server checks every request again.\n\n`view_as` says whether this account may view as others (development\nonly), and, while it does, who is really signed in and when it ends.\n\n`signed_in_by` is `code` when the session was signed in with a code by\nSMS: it reaches the parent portal only, and holds no grants (D-087).",
                 "summary": "The signed-in account and its access",
                 "tags": [
                     "Me"
@@ -17419,6 +17720,13 @@
                                                 "name",
                                                 "email",
                                                 "phone"
+                                            ]
+                                        },
+                                        "signed_in_by": {
+                                            "type": "string",
+                                            "enum": [
+                                                "password",
+                                                "code"
                                             ]
                                         },
                                         "grants": {
@@ -17492,6 +17800,7 @@
                                     },
                                     "required": [
                                         "user",
+                                        "signed_in_by",
                                         "grants",
                                         "view_as"
                                     ]
@@ -23072,6 +23381,13 @@
                                                 "phone"
                                             ]
                                         },
+                                        "signed_in_by": {
+                                            "type": "string",
+                                            "enum": [
+                                                "code",
+                                                "password"
+                                            ]
+                                        },
                                         "grants": {
                                             "type": "array",
                                             "items": {}
@@ -23080,6 +23396,7 @@
                                     "required": [
                                         "view_as",
                                         "user",
+                                        "signed_in_by",
                                         "grants"
                                     ]
                                 }
@@ -28779,7 +29096,7 @@
         "/v1/school": {
             "get": {
                 "operationId": "kernel.school",
-                "description": "The sign-in screens show the school's name and, when there is one, its\nlogo. It requires no authentication and discloses nothing else.",
+                "description": "The sign-in screens show the school's name and, when there is one, its\nlogo, and `portal` is the address of its parent portal, or null. It\nrequires no authentication and discloses nothing else.",
                 "summary": "The school this deployment serves",
                 "tags": [
                     "School"
@@ -28797,11 +29114,18 @@
                                         },
                                         "has_logo": {
                                             "type": "boolean"
+                                        },
+                                        "portal": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
                                         }
                                     },
                                     "required": [
                                         "name",
-                                        "has_logo"
+                                        "has_logo",
+                                        "portal"
                                     ]
                                 }
                             }
@@ -31404,6 +31728,13 @@
                                                 "phone"
                                             ]
                                         },
+                                        "signed_in_by": {
+                                            "type": "string",
+                                            "enum": [
+                                                "code",
+                                                "password"
+                                            ]
+                                        },
                                         "grants": {
                                             "type": "array",
                                             "items": {}
@@ -31412,6 +31743,7 @@
                                     "required": [
                                         "view_as",
                                         "user",
+                                        "signed_in_by",
                                         "grants"
                                     ]
                                 }

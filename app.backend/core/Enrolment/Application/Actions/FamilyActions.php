@@ -16,6 +16,7 @@ use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Blueprint\Blueprints;
 use Acadly\Kernel\Blueprint\Engine\JourneyEngine;
+use Acadly\Kernel\Identity\FamilyAccounts;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Notify\Notifier;
 use Acadly\Kernel\Support\Clock;
@@ -31,7 +32,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * the school's contact list proposes; the office suspends, restores, asks
  * again or ends a link. Every state change goes through the journey engine.
  */
-final class FamilyActions
+final class FamilyActions implements FamilyAccounts
 {
     private const array OFFICE = [
         'suspend' => [StepId::Suspend, OutcomeId::Suspended],
@@ -148,6 +149,34 @@ final class FamilyActions
         });
 
         return $invited;
+    }
+
+    public function holds(string $userId): bool
+    {
+        return DB::table('guardians')->where('user_id', $userId)->exists() || DB::table('learner_guardian_relationships')->where('held_by', $userId)->exists();
+    }
+
+    /**
+     * A member of staff added the family's number to their own account, or
+     * removed it (D-087): the parent role and the links to children move to
+     * the other account, as they stand. The account change itself is audited
+     * where it is made.
+     */
+    public function moveAccount(string $fromUserId, string $toUserId): void
+    {
+        DB::transaction(function () use ($fromUserId, $toUserId): void {
+            $source = DB::table('guardians')->where('user_id', $fromUserId)->value('id');
+            $target = DB::table('guardians')->where('user_id', $toUserId)->value('id');
+
+            if (is_string($source) && is_string($target)) {
+                DB::table('learner_guardian_relationships')->where('guardian_id', $source)->update(['guardian_id' => $target]);
+                DB::table('guardians')->where('id', $source)->update(['user_id' => null]);
+            } elseif (is_string($source)) {
+                DB::table('guardians')->where('id', $source)->update(['user_id' => $toUserId]);
+            }
+
+            DB::table('learner_guardian_relationships')->where('held_by', $fromUserId)->update(['held_by' => $toUserId]);
+        });
     }
 
     /** The role record of this parent; made at the first answer. */

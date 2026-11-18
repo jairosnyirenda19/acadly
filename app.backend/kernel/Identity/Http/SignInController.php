@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acadly\Kernel\Identity\Http;
 
 use Acadly\Kernel\Identity\Actions\SignIn;
+use Acadly\Kernel\Identity\SignInMethod;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -29,6 +30,7 @@ final class SignInController
         );
 
         $request->session()->regenerate();
+        SignInMethod::markPassword($request);
 
         return $me($request);
     }

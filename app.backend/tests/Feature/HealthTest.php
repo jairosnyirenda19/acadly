@@ -8,6 +8,7 @@ use Acadly\Core\Institution\InstitutionCore;
 use Acadly\Kernel\Module\Module;
 use Acadly\Kernel\Module\ModuleRegistry;
 use Acadly\Kernel\Module\Tier;
+use Acadly\Kernel\Notify\PortalLink;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Modules\Attendance\AttendanceModule;
 
@@ -20,7 +21,7 @@ it('reports service status and nothing else', function (): void {
 it('names the school without authentication', function (): void {
     $this->getJson('/api/v1/school')
         ->assertOk()
-        ->assertExactJson(['name' => 'Sunrise Academy', 'has_logo' => false]);
+        ->assertExactJson(['name' => 'Sunrise Academy', 'has_logo' => false, 'portal' => PortalLink::url()]);
 });
 
 it('does not disclose the technology in use', function (): void {

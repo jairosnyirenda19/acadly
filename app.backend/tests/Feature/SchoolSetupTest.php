@@ -7,6 +7,7 @@ use Acadly\Kernel\Access\RoleAssignment;
 use Acadly\Kernel\Identity\AccountStatus;
 use Acadly\Kernel\Identity\InvitationMail;
 use Acadly\Kernel\Identity\User;
+use Acadly\Kernel\Notify\PortalLink;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -110,7 +111,7 @@ describe('the school', function (): void {
         $this->actingAs($admin)->putJson('/api/v1/institution', schoolDetails(['name' => 'Sunrise Academy Lilongwe']))
             ->assertOk()->assertJsonPath('school.details_complete', true);
 
-        $this->getJson('/api/v1/school')->assertExactJson(['name' => 'Sunrise Academy Lilongwe', 'has_logo' => false]);
+        $this->getJson('/api/v1/school')->assertExactJson(['name' => 'Sunrise Academy Lilongwe', 'has_logo' => false, 'portal' => PortalLink::url()]);
         expect(DB::table('audit_events')->where('action', 'institution.details_saved')->exists())->toBeTrue();
     });
 

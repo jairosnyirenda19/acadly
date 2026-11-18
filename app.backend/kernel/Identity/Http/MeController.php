@@ -6,6 +6,7 @@ namespace Acadly\Kernel\Identity\Http;
 
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\Grant;
+use Acadly\Kernel\Identity\SignInMethod;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Identity\ViewAs;
 use Illuminate\Auth\AuthenticationException;
@@ -28,7 +29,10 @@ final class MeController
      * `view_as` says whether this account may view as others (development
      * only), and, while it does, who is really signed in and when it ends.
      *
-     * @response array{user: array{id: string, name: string, email: string|null, phone: string|null}, grants: list<array{permission: string, scope_type: 'institution'|'division'|'campus'|'class', scope_id: string|null}>, view_as: array{available: bool, by: array{id: string, name: string}|null, ends_at: string|null}}
+     * `signed_in_by` is `code` when the session was signed in with a code by
+     * SMS: it reaches the parent portal only, and holds no grants (D-087).
+     *
+     * @response array{user: array{id: string, name: string, email: string|null, phone: string|null}, signed_in_by: 'password'|'code', grants: list<array{permission: string, scope_type: 'institution'|'division'|'campus'|'class', scope_id: string|null}>, view_as: array{available: bool, by: array{id: string, name: string}|null, ends_at: string|null}}
      */
     public function __invoke(Request $request): JsonResponse
     {
@@ -39,6 +43,7 @@ final class MeController
         }
 
         $by = $this->viewAs->by($request);
+        $code = SignInMethod::byCode($request, $user);
 
         return response()->json([
             'view_as' => [
@@ -52,7 +57,8 @@ final class MeController
                 'email' => $user->email,
                 'phone' => $user->phone,
             ],
-            'grants' => array_map(
+            'signed_in_by' => $code ? 'code' : 'password',
+            'grants' => $code ? [] : array_map(
                 fn (Grant $grant): array => [
                     'permission' => $grant->permission,
                     'scope_type' => $grant->scope->type->value,

@@ -72,6 +72,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/me/phone/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a code to add a phone number
+         * @description Sends a six-digit code by SMS to a number the school keeps for a
+         *     learner's contact. Needs a sign-in with the email address and password.
+         */
+        post: operations["me.phone.code"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/phone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add the phone number with its code
+         * @description The parent portal then opens this account. A parent account already on
+         *     the number is closed and its children move here. The response is the
+         *     same as GET /me.
+         */
+        post: operations["me.phone.confirm"];
+        /**
+         * Remove the phone number
+         * @description The parent portal no longer opens this account; the number signs in to
+         *     an account of its own. The response is the same as GET /me.
+         */
+        delete: operations["me.phone.remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/approvals/waiting": {
         parameters: {
             query?: never;
@@ -1374,6 +1422,9 @@ export interface paths {
          *
          *     `view_as` says whether this account may view as others (development
          *     only), and, while it does, who is really signed in and when it ends.
+         *
+         *     `signed_in_by` is `code` when the session was signed in with a code by
+         *     SMS: it reaches the parent portal only, and holds no grants (D-087).
          */
         get: operations["me"];
         put?: never;
@@ -2253,7 +2304,8 @@ export interface paths {
         /**
          * The school this deployment serves
          * @description The sign-in screens show the school's name and, when there is one, its
-         *     logo. It requires no authentication and discloses nothing else.
+         *     logo, and `portal` is the address of its parent portal, or null. It
+         *     requires no authentication and discloses nothing else.
          */
         get: operations["kernel.school"];
         put?: never;
@@ -2923,6 +2975,119 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "me.phone.code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    phone: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        sent: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "me.phone.confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    phone: string;
+                    code: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        view_as: {
+                            available: boolean;
+                            by: {
+                                id: string;
+                                name: string;
+                            } | null;
+                            ends_at: null;
+                        };
+                        user: {
+                            id: string;
+                            name: string;
+                            email: string | null;
+                            phone: string | null;
+                        };
+                        /** @enum {string} */
+                        signed_in_by: "code" | "password";
+                        grants: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "me.phone.remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        view_as: {
+                            available: boolean;
+                            by: {
+                                id: string;
+                                name: string;
+                            } | null;
+                            ends_at: null;
+                        };
+                        user: {
+                            id: string;
+                            name: string;
+                            email: string | null;
+                            phone: string | null;
+                        };
+                        /** @enum {string} */
+                        signed_in_by: "code" | "password";
+                        grants: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "approvals.waiting": {
@@ -4709,6 +4874,7 @@ export interface operations {
                             id: string;
                             name: string;
                             email: string;
+                            phone: string | null;
                         };
                         school: {
                             name: string;
@@ -7760,6 +7926,8 @@ export interface operations {
                             email: string | null;
                             phone: string | null;
                         };
+                        /** @enum {string} */
+                        signed_in_by: "password" | "code";
                         grants: {
                             permission: string;
                             /** @enum {string} */
@@ -9469,6 +9637,8 @@ export interface operations {
                             email: string | null;
                             phone: string | null;
                         };
+                        /** @enum {string} */
+                        signed_in_by: "code" | "password";
                         grants: unknown[];
                     };
                 };
@@ -11089,6 +11259,7 @@ export interface operations {
                     "application/json": {
                         name: string;
                         has_logo: boolean;
+                        portal: string | null;
                     };
                 };
             };
@@ -11798,6 +11969,8 @@ export interface operations {
                             email: string | null;
                             phone: string | null;
                         };
+                        /** @enum {string} */
+                        signed_in_by: "code" | "password";
                         grants: unknown[];
                     };
                 };

@@ -37,6 +37,8 @@ import { LessonRegisterScreen } from './registers/LessonRegisterScreen'
 import { LessonsScreen } from './registers/LessonsScreen'
 import { MissedScreen } from './registers/MissedScreen'
 import { MyDayScreen } from './registers/MyDayScreen'
+import { AccountScreen } from './account/AccountScreen'
+import { PasswordNeeded } from './account/PasswordNeeded'
 import { TimetableScreen } from './settings/TimetableScreen'
 import { PeopleImportScreen } from './settings/PeopleImportScreen'
 import { PeopleScreen } from './settings/PeopleScreen'
@@ -83,6 +85,7 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
 
   let page
   if (path === '/my-day' && takesRegisters(context)) page = <MyDayScreen />
+  else if (path === '/account') page = <AccountScreen />
   else if (path === '/registers' && registers) page = <RegistersScreen />
   else if (path === '/registers/lessons' && registers) page = <LessonsScreen />
   else if (path === '/registers/missed' && registers) page = <MissedScreen />
@@ -195,6 +198,15 @@ export function App() {
     setContext(undefined)
     setAccount(null)
     navigate('/', true)
+  }
+
+  // A sign-in by code opens the parent portal only (D-087).
+  if (account !== null && account.signed_in_by === 'code') {
+    return (
+      <AuthLayout school={school}>
+        <PasswordNeeded onSignedOut={signedOut} />
+      </AuthLayout>
+    )
   }
 
   // Until the school is opened, the administrator works through setup; others wait.

@@ -60,7 +60,7 @@ final class SignInWithCode
         $now = $this->clock->now();
 
         $user = DB::transaction(function () use ($phone, $code, $now, $pause): ?User {
-            $row = DB::table('sign_in_codes')->where('phone', $phone)->whereNull('used_at')->where('expires_at', '>', $now)
+            $row = DB::table('sign_in_codes')->where('phone', $phone)->where('purpose', 'sign_in')->whereNull('used_at')->where('expires_at', '>', $now)
                 ->orderByDesc('created_at')->lockForUpdate()->first(['id', 'code_hash', 'attempts']);
 
             if ($row === null || Row::int($row, 'attempts') >= self::MAX_TRIES) {

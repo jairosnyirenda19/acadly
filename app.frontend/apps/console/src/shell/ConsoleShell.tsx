@@ -1,4 +1,4 @@
-import { navigate, signOut, useAppContext, useLoading, useLocation, type AppContext } from '@acadly/kernel'
+import { getPortalAddress, navigate, signOut, useAppContext, useLoading, useLocation, type AppContext } from '@acadly/kernel'
 import { LoadingRule } from '@acadly/ui'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { copy } from '../copy'
@@ -107,6 +107,7 @@ function Rail({
   bottom?: ReactNode
 }) {
   const { place, choice } = useWorkIn()
+  const portal = usePortalLink()
 
   return (
     <>
@@ -169,7 +170,15 @@ function Rail({
         })}
       </nav>
       {bottom ?? (
-        <div className="mt-auto border-t border-ink-rule px-5 py-3.5 text-[13px]">
+        <div className="mt-auto flex flex-wrap gap-x-4 gap-y-1.5 border-t border-ink-rule px-5 py-3.5 text-[13px]">
+          <a href="/account" onClick={(e) => { e.preventDefault(); navigate('/account') }} className="font-bold text-sheet no-underline hover:underline">
+            {copy.account.menu}
+          </a>
+          {portal !== null && (
+            <a href={portal} className="font-bold text-sheet no-underline hover:underline">
+              {copy.account.portal}
+            </a>
+          )}
           <button type="button" onClick={() => void signOut().then(onSignedOut)} className="font-bold text-sheet">
             {t.signOut}
           </button>
@@ -177,6 +186,27 @@ function Rail({
       )}
     </>
   )
+}
+
+/** The parent portal's address, for an account with a phone number on it (D-087). */
+function usePortalLink(): string | null {
+  const { user } = useAppContext()
+  const [address, setAddress] = useState<string | null>(null)
+  const phone = user.phone ?? null
+
+  useEffect(() => {
+    if (phone === null) return
+    let live = true
+    void getPortalAddress().then((found) => {
+      if (live) setAddress(found)
+    })
+
+    return () => {
+      live = false
+    }
+  }, [phone])
+
+  return phone !== null ? address : null
 }
 
 /**
@@ -357,7 +387,7 @@ export function ConsoleShell({ children, onSignedOut }: { children: ReactNode; o
           <div className="ml-auto">
             <ViewAsKey />
           </div>
-          <div className="flex items-center gap-2.5" title={context.user.name}>
+          <a href="/account" onClick={(e) => { e.preventDefault(); navigate('/account') }} aria-label={copy.account.menu} className="flex items-center gap-2.5 text-ink no-underline" title={context.user.name}>
             <span className="hidden w-[176px] text-right leading-tight sm:block">
               <span className="block truncate text-sm font-extrabold">{context.user.name}</span>
               <span className="block truncate text-xs text-text-muted">{context.user.email}</span>
@@ -365,7 +395,7 @@ export function ConsoleShell({ children, onSignedOut }: { children: ReactNode; o
             <span aria-hidden="true" className="type-display grid size-11 place-items-center bg-ink text-[22px] text-sheet">
               {initials(context.user.name)}
             </span>
-          </div>
+          </a>
         </header>
         </div>
         <main className="settle-in flex min-w-0 flex-1 flex-col">{children}</main>

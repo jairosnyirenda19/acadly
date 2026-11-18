@@ -3475,6 +3475,143 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/support": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Learners to watch, across the modules that are on */
+        get: operations["support.watch"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/support/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The signal rules with the school's values, and the plan defaults */
+        get: operations["support.rules"];
+        /** Saves the rules */
+        put: operations["support.rules.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/support/learners/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A learner's support: trends by term, signals now, plans */
+        get: operations["support.learner"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/support/learners/{id}/opening": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What opening a plan for a learner needs */
+        get: operations["support.learner.opening"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/support/learners/{id}/set-aside": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sets a learner's signals aside until a day, with a reason */
+        post: operations["support.learner.set-aside"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/support/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Opens a support plan */
+        post: operations["support.plans.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/support/plans/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A support plan */
+        get: operations["support.plans.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/support/plans/{id}/{what}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adds a goal or an action, agrees, reviews or closes a plan */
+        post: operations["support.plans.change"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/academics/teaching": {
         parameters: {
             query?: never;
@@ -15529,6 +15666,383 @@ export interface operations {
                 content: {
                     "application/json": {
                         levels: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "support.watch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        learners: {
+                            learner_id: string;
+                            name: string;
+                            class: string;
+                            reasons: {
+                                source: string;
+                                label: string;
+                                text: string;
+                            }[];
+                            plan: {
+                                id: string;
+                                state_label: string;
+                                lead: string;
+                                next_review_on: string;
+                            } | null;
+                            set_aside: {
+                                until: string;
+                                reason: string;
+                            } | null;
+                            can_lead: boolean;
+                        }[];
+                        totals: {
+                            watch: number;
+                            with_plan: number;
+                            without_plan: number;
+                            reviews_due: number;
+                        };
+                        sources: {
+                            key: string;
+                            label: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "support.rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        rules: {
+                            source: string;
+                            label: string;
+                            key: string;
+                            text: string;
+                            value: number;
+                            default: number;
+                        }[];
+                        review_days: number;
+                        tell_family: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "support.rules.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    values: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "support.learner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        trends: {
+                            terms: {
+                                key: string;
+                                name: string;
+                                current: boolean;
+                            }[];
+                            rows: {
+                                source: string;
+                                key: string;
+                                label: string;
+                                unit: string;
+                                values: {
+                                    [key: string]: number | null;
+                                };
+                                worse: string;
+                                change: string | null;
+                            }[];
+                        };
+                        signals: {
+                            source: string;
+                            label: string;
+                            text: string;
+                        }[];
+                        plans: {
+                            id: string;
+                            title: string;
+                            state: string;
+                            state_label: string;
+                            lead: string;
+                            confidential: boolean;
+                            tell_family: boolean;
+                            next_review_on: string;
+                            opened_on: string;
+                            outcome: string | null;
+                            outcome_label: string | null;
+                        }[];
+                        can: {
+                            lead: boolean;
+                            confidential: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "support.learner.opening": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        learner: {
+                            id: string;
+                            name: string;
+                            class: string;
+                        };
+                        signals: {
+                            source: string;
+                            label: string;
+                            text: string;
+                        }[];
+                        leads: {
+                            id: string;
+                            name: string;
+                        }[];
+                        lead: string;
+                        first_review: string;
+                        tell_family: boolean;
+                        can_confidential: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "support.learner.set-aside": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        set_aside: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "support.plans.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    title: string;
+                    concern: string;
+                    /** Format: uuid */
+                    lead_id?: string | null;
+                    confidential?: boolean;
+                    tell_family?: boolean;
+                    /** Format: date */
+                    first_review?: string | null;
+                    goals?: {
+                        text: string;
+                        measure?: string | null;
+                        by_when?: string | null;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "support.plans.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        title: string;
+                        state: string;
+                        state_label: string;
+                        lead: string;
+                        confidential: boolean;
+                        tell_family: boolean;
+                        next_review_on: string;
+                        opened_on: string;
+                        outcome: string | null;
+                        outcome_label: string | null;
+                        concern: string;
+                        signals: string[];
+                        learner: {
+                            id: string;
+                            name: string;
+                            class: string;
+                        };
+                        opened_by: string;
+                        goals: {
+                            id: string;
+                            text: string;
+                            measure: string | null;
+                            by_when: string | null;
+                            state: string | null;
+                        }[];
+                        actions: {
+                            id: string;
+                            who: string;
+                            what: string;
+                            when: string | null;
+                        }[];
+                        reviews: {
+                            id: string;
+                            notes: string | null;
+                            at: string;
+                            by: string | null;
+                            met: number;
+                            of: number;
+                        }[];
+                        closing_note: string | null;
+                        can: {
+                            lead: boolean;
+                            agree: boolean;
+                            review: boolean;
+                            close: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "support.plans.change": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                what: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
                     };
                 };
             };

@@ -64,7 +64,7 @@ const RECORD_ROUTES = [
  * For these the test checks that nothing of campus B is in the answer.
  */
 const LIST_ROUTES = ['people.index', 'academics.teaching.index', 'academics.timetable.index', 'learners.index', 'learners.grid', 'people.grid', 'registers.index',
-    'registers.lessons', 'registers.missed', 'registers.levels', 'assessment.mine', 'assessment.options', 'assessment.grid', 'assessment.publishing', 'fees.shop.index', 'conduct.kinds.index'];
+    'registers.lessons', 'registers.missed', 'registers.levels', 'assessment.mine', 'assessment.options', 'assessment.grid', 'assessment.publishing', 'fees.shop.index', 'conduct.kinds.index', 'support.watch'];
 
 uses(DatabaseTransactions::class);
 
@@ -93,6 +93,7 @@ it('refuses every place-bound route to an account that holds everything, but onl
     DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'assessment', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
     DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'fees', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
     DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'conduct', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
+    DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'support', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
     $school = TwoCampusSchool::make();
 
     $everything = Role::query()->create(['key' => 'everything_at_a', 'name' => 'Everything at campus A']);
@@ -156,6 +157,7 @@ it('refuses every place-bound route to an account that holds everything, but onl
         'portal.' => ['id' => $learner, 'day' => '2026-10-01'],
         'year-end.' => ['division' => $school->id('secondary'), 'id' => $learner],
         'conduct.' => ['id' => $learner, 'step' => 'take-up'],
+        'support.' => ['id' => $learner, 'what' => 'agree'],
         'fees.' => ['id' => $learner, 'period' => $term, 'division' => $school->id('secondary'), 'day' => '2026-10-01'],
     ];
     $b = [

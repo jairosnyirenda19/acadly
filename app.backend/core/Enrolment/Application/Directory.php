@@ -70,6 +70,20 @@ final class Directory implements EnrolmentDirectory
         return $ids;
     }
 
+    public function classOn(string $learnerId, string $day): ?string
+    {
+        $class = DB::table('placements')->where('learner_id', $learnerId)->where('starts_on', '<=', $day)
+            ->where(fn (Builder $q) => $q->whereNull('ends_on')->orWhere('ends_on', '>=', $day))
+            ->orderByDesc('starts_on')->value('class_id');
+
+        return is_string($class) ? $class : null;
+    }
+
+    public function placedNow(): array
+    {
+        return array_values(array_filter(DB::table('placements')->whereNull('ends_on')->distinct()->pluck('learner_id')->all(), 'is_string'));
+    }
+
     public function placeOf(string $learnerId): ?array
     {
         $place = app(LearnerPlaces::class)->current($learnerId);

@@ -55,7 +55,7 @@ it('does not disclose internals when debug mode is on', function (): void {
 it('registers the modules listed in the configuration', function (): void {
     $keys = array_map(fn (Module $module): string => $module->key(), app(ModuleRegistry::class)->all());
 
-    expect($keys)->toBe(['institution', 'academics', 'enrolment', 'setup', 'attendance', 'assessment', 'fees', 'conduct']);
+    expect($keys)->toBe(['institution', 'academics', 'enrolment', 'setup', 'attendance', 'assessment', 'fees', 'conduct', 'support']);
 });
 
 it('passes the structural lint', function (): void {

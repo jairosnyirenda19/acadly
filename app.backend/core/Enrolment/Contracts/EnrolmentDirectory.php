@@ -44,4 +44,14 @@ interface EnrolmentDirectory
      * @return list<string> learner ids
      */
     public function siblingsOf(string $learnerId): array;
+
+    /** The class a learner was placed in on a day, or null. */
+    public function classOn(string $learnerId, string $day): ?string;
+
+    /**
+     * Every learner with an open placement now.
+     *
+     * @return list<string> learner ids
+     */
+    public function placedNow(): array;
 }

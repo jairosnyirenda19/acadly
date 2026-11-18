@@ -44,6 +44,10 @@ import { NextYearScreen } from './settings/NextYearScreen'
 import { DocumentTypesScreen } from './settings/DocumentTypesScreen'
 import { FeesSettingsScreen } from './settings/FeesSettingsScreen'
 import { ConductSettingsScreen } from './settings/ConductSettingsScreen'
+import { SupportSettingsScreen } from './settings/SupportSettingsScreen'
+import { WatchScreen } from './support/WatchScreen'
+import { OpenPlanScreen } from './support/OpenPlanScreen'
+import { PlanScreen } from './support/PlanScreen'
 import { OverviewScreen as ConductOverviewScreen } from './conduct/OverviewScreen'
 import { RecordConductScreen } from './conduct/RecordConductScreen'
 import { IncidentScreen } from './conduct/IncidentScreen'
@@ -87,6 +91,8 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const receipt = /^\/fees\/receipts\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const fees = moduleOn(context, 'fees')
   const conduct = moduleOn(context, 'conduct')
+  const support = moduleOn(context, 'support')
+  const plan = /^\/support\/plans\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const incident = /^\/conduct\/incidents\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const registers = seesRegisters(context)
   const register = /^\/registers\/([0-9a-f-]{36})$/.exec(path)?.[1]
@@ -109,6 +115,10 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/settings/learner-documents' && can(context, 'enrolment.manage')) page = <DocumentTypesScreen />
   else if (path === '/settings/fees' && fees && can(context, 'fees.manage')) page = <FeesSettingsScreen />
   else if (path === '/settings/conduct' && conduct && can(context, 'conduct.manage')) page = <ConductSettingsScreen />
+  else if (path === '/settings/support' && support && can(context, 'support.manage')) page = <SupportSettingsScreen />
+  else if (path === '/support' && support && (holdsAnywhere(context, 'support.view') || holdsAnywhere(context, 'support.lead'))) page = <WatchScreen />
+  else if (path === '/support/plans/new' && support && holdsAnywhere(context, 'support.lead')) page = <OpenPlanScreen />
+  else if (plan !== undefined && support) page = <PlanScreen key={plan} id={plan} />
   else if (path === '/conduct' && conduct && (can(context, 'conduct.view') || can(context, 'conduct.follow_up'))) page = <ConductOverviewScreen />
   else if (path === '/conduct/record' && conduct && holdsAnywhere(context, 'conduct.record')) page = <RecordConductScreen />
   else if (incident !== undefined && conduct) page = <IncidentScreen key={incident} id={incident} />

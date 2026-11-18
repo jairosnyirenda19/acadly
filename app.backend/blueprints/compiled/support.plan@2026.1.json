@@ -1,0 +1,110 @@
+{
+    "initial": "raised",
+    "kind": "journey",
+    "milestones": [],
+    "ref": "support.plan@2026.1",
+    "stages": [
+        {
+            "key": "plan",
+            "steps": [
+                "agree",
+                "close"
+            ],
+            "title": "Plan"
+        }
+    ],
+    "states": [
+        {
+            "id": "raised",
+            "label": "Concern raised"
+        },
+        {
+            "id": "reviewing",
+            "label": "Reviewing"
+        },
+        {
+            "id": "closed",
+            "label": "Closed"
+        }
+    ],
+    "steps": [
+        {
+            "capability": "support.lead",
+            "four_eyes": null,
+            "from": [
+                "raised"
+            ],
+            "gates": [
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Modules\\Support\\Journeys\\Plan\\HasAGoal"
+                }
+            ],
+            "id": "agree",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "agreed",
+                    "requires_reason": false,
+                    "title": "Plan agreed",
+                    "to": "reviewing"
+                }
+            ],
+            "stage": "plan",
+            "title": "Agree the plan"
+        },
+        {
+            "capability": "support.lead",
+            "four_eyes": null,
+            "from": [
+                "raised",
+                "reviewing"
+            ],
+            "gates": [],
+            "id": "close",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "goals_met",
+                    "requires_reason": false,
+                    "title": "Goals met",
+                    "to": "closed"
+                },
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "partly_met",
+                    "requires_reason": false,
+                    "title": "Partly met",
+                    "to": "closed"
+                },
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "referred",
+                    "requires_reason": true,
+                    "title": "Referred on",
+                    "to": "closed"
+                },
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "left",
+                    "requires_reason": true,
+                    "title": "Left the school",
+                    "to": "closed"
+                }
+            ],
+            "stage": "plan",
+            "title": "Close the plan"
+        }
+    ],
+    "subject": "Acadly\\Modules\\Support\\Domain\\SupportPlan",
+    "terminal": [
+        "closed"
+    ],
+    "title": "Support plan"
+}

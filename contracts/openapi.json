@@ -39404,6 +39404,1100 @@
                 }
             }
         },
+        "/v1/support": {
+            "get": {
+                "operationId": "support.watch",
+                "summary": "Learners to watch, across the modules that are on",
+                "tags": [
+                    "Support"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "learners": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "reasons": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "source": {
+                                                                    "type": "string"
+                                                                },
+                                                                "label": {
+                                                                    "type": "string"
+                                                                },
+                                                                "text": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "source",
+                                                                "label",
+                                                                "text"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "plan": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "state_label": {
+                                                                "type": "string"
+                                                            },
+                                                            "lead": {
+                                                                "type": "string"
+                                                            },
+                                                            "next_review_on": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "state_label",
+                                                            "lead",
+                                                            "next_review_on"
+                                                        ]
+                                                    },
+                                                    "set_aside": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "until": {
+                                                                "type": "string"
+                                                            },
+                                                            "reason": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "until",
+                                                            "reason"
+                                                        ]
+                                                    },
+                                                    "can_lead": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "learner_id",
+                                                    "name",
+                                                    "class",
+                                                    "reasons",
+                                                    "plan",
+                                                    "set_aside",
+                                                    "can_lead"
+                                                ]
+                                            }
+                                        },
+                                        "totals": {
+                                            "type": "object",
+                                            "properties": {
+                                                "watch": {
+                                                    "type": "integer"
+                                                },
+                                                "with_plan": {
+                                                    "type": "integer"
+                                                },
+                                                "without_plan": {
+                                                    "type": "integer"
+                                                },
+                                                "reviews_due": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "watch",
+                                                "with_plan",
+                                                "without_plan",
+                                                "reviews_due"
+                                            ]
+                                        },
+                                        "sources": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "learners",
+                                        "totals",
+                                        "sources"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/support/rules": {
+            "get": {
+                "operationId": "support.rules",
+                "summary": "The signal rules with the school's values, and the plan defaults",
+                "tags": [
+                    "Support"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "rules": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "source": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "text": {
+                                                        "type": "string"
+                                                    },
+                                                    "value": {
+                                                        "type": "integer"
+                                                    },
+                                                    "default": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "source",
+                                                    "label",
+                                                    "key",
+                                                    "text",
+                                                    "value",
+                                                    "default"
+                                                ]
+                                            }
+                                        },
+                                        "review_days": {
+                                            "type": "integer"
+                                        },
+                                        "tell_family": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "rules",
+                                        "review_days",
+                                        "tell_family"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "support.rules.save",
+                "summary": "Saves the rules",
+                "tags": [
+                    "Support"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "values": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "minItems": 1
+                                    }
+                                },
+                                "required": [
+                                    "values"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/support/learners/{id}": {
+            "get": {
+                "operationId": "support.learner",
+                "summary": "A learner's support: trends by term, signals now, plans",
+                "tags": [
+                    "Support"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "trends": {
+                                            "type": "object",
+                                            "properties": {
+                                                "terms": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "key": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "current": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "key",
+                                                            "name",
+                                                            "current"
+                                                        ]
+                                                    }
+                                                },
+                                                "rows": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "source": {
+                                                                "type": "string"
+                                                            },
+                                                            "key": {
+                                                                "type": "string"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "unit": {
+                                                                "type": "string"
+                                                            },
+                                                            "values": {
+                                                                "type": "object",
+                                                                "additionalProperties": {
+                                                                    "type": [
+                                                                        "number",
+                                                                        "null"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "worse": {
+                                                                "type": "string"
+                                                            },
+                                                            "change": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "source",
+                                                            "key",
+                                                            "label",
+                                                            "unit",
+                                                            "values",
+                                                            "worse",
+                                                            "change"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "terms",
+                                                "rows"
+                                            ]
+                                        },
+                                        "signals": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "source": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "text": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "source",
+                                                    "label",
+                                                    "text"
+                                                ]
+                                            }
+                                        },
+                                        "plans": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "state_label": {
+                                                        "type": "string"
+                                                    },
+                                                    "lead": {
+                                                        "type": "string"
+                                                    },
+                                                    "confidential": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "tell_family": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "next_review_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "opened_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "outcome": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "outcome_label": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "title",
+                                                    "state",
+                                                    "state_label",
+                                                    "lead",
+                                                    "confidential",
+                                                    "tell_family",
+                                                    "next_review_on",
+                                                    "opened_on",
+                                                    "outcome",
+                                                    "outcome_label"
+                                                ]
+                                            }
+                                        },
+                                        "can": {
+                                            "type": "object",
+                                            "properties": {
+                                                "lead": {
+                                                    "type": "boolean"
+                                                },
+                                                "confidential": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "lead",
+                                                "confidential"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "trends",
+                                        "signals",
+                                        "plans",
+                                        "can"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/support/learners/{id}/opening": {
+            "get": {
+                "operationId": "support.learner.opening",
+                "summary": "What opening a plan for a learner needs",
+                "tags": [
+                    "Support"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "learner": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "class": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "class"
+                                            ]
+                                        },
+                                        "signals": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "source": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "text": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "source",
+                                                    "label",
+                                                    "text"
+                                                ]
+                                            }
+                                        },
+                                        "leads": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name"
+                                                ]
+                                            }
+                                        },
+                                        "lead": {
+                                            "type": "string"
+                                        },
+                                        "first_review": {
+                                            "type": "string"
+                                        },
+                                        "tell_family": {
+                                            "type": "boolean"
+                                        },
+                                        "can_confidential": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "learner",
+                                        "signals",
+                                        "leads",
+                                        "lead",
+                                        "first_review",
+                                        "tell_family",
+                                        "can_confidential"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/support/learners/{id}/set-aside": {
+            "post": {
+                "operationId": "support.learner.set-aside",
+                "summary": "Sets a learner's signals aside until a day, with a reason",
+                "tags": [
+                    "Support"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "set_aside": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "set_aside"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/support/plans": {
+            "post": {
+                "operationId": "support.plans.store",
+                "summary": "Opens a support plan",
+                "tags": [
+                    "Support"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "maxLength": 120
+                                    },
+                                    "concern": {
+                                        "type": "string",
+                                        "maxLength": 4000
+                                    },
+                                    "lead_id": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "uuid"
+                                    },
+                                    "confidential": {
+                                        "type": "boolean"
+                                    },
+                                    "tell_family": {
+                                        "type": "boolean"
+                                    },
+                                    "first_review": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date"
+                                    },
+                                    "goals": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "text": {
+                                                    "type": "string",
+                                                    "maxLength": 255
+                                                },
+                                                "measure": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "maxLength": 255
+                                                },
+                                                "by_when": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "maxLength": 60
+                                                }
+                                            },
+                                            "required": [
+                                                "text"
+                                            ]
+                                        },
+                                        "maxItems": 12
+                                    }
+                                },
+                                "required": [
+                                    "title",
+                                    "concern"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/support/plans/{id}": {
+            "get": {
+                "operationId": "support.plans.show",
+                "summary": "A support plan",
+                "tags": [
+                    "Support"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "title": {
+                                            "type": "string"
+                                        },
+                                        "state": {
+                                            "type": "string"
+                                        },
+                                        "state_label": {
+                                            "type": "string"
+                                        },
+                                        "lead": {
+                                            "type": "string"
+                                        },
+                                        "confidential": {
+                                            "type": "boolean"
+                                        },
+                                        "tell_family": {
+                                            "type": "boolean"
+                                        },
+                                        "next_review_on": {
+                                            "type": "string"
+                                        },
+                                        "opened_on": {
+                                            "type": "string"
+                                        },
+                                        "outcome": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "outcome_label": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "concern": {
+                                            "type": "string"
+                                        },
+                                        "signals": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "learner": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "class": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "class"
+                                            ]
+                                        },
+                                        "opened_by": {
+                                            "type": "string"
+                                        },
+                                        "goals": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "text": {
+                                                        "type": "string"
+                                                    },
+                                                    "measure": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "by_when": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "state": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "text",
+                                                    "measure",
+                                                    "by_when",
+                                                    "state"
+                                                ]
+                                            }
+                                        },
+                                        "actions": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "who": {
+                                                        "type": "string"
+                                                    },
+                                                    "what": {
+                                                        "type": "string"
+                                                    },
+                                                    "when": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "who",
+                                                    "what",
+                                                    "when"
+                                                ]
+                                            }
+                                        },
+                                        "reviews": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "notes": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "by": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "met": {
+                                                        "type": "integer"
+                                                    },
+                                                    "of": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "notes",
+                                                    "at",
+                                                    "by",
+                                                    "met",
+                                                    "of"
+                                                ]
+                                            }
+                                        },
+                                        "closing_note": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "can": {
+                                            "type": "object",
+                                            "properties": {
+                                                "lead": {
+                                                    "type": "boolean"
+                                                },
+                                                "agree": {
+                                                    "type": "boolean"
+                                                },
+                                                "review": {
+                                                    "type": "boolean"
+                                                },
+                                                "close": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "lead",
+                                                "agree",
+                                                "review",
+                                                "close"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "title",
+                                        "state",
+                                        "state_label",
+                                        "lead",
+                                        "confidential",
+                                        "tell_family",
+                                        "next_review_on",
+                                        "opened_on",
+                                        "outcome",
+                                        "outcome_label",
+                                        "concern",
+                                        "signals",
+                                        "learner",
+                                        "opened_by",
+                                        "goals",
+                                        "actions",
+                                        "reviews",
+                                        "closing_note",
+                                        "can"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/support/plans/{id}/{what}": {
+            "post": {
+                "operationId": "support.plans.change",
+                "summary": "Adds a goal or an action, agrees, reviews or closes a plan",
+                "tags": [
+                    "Support"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "what",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/academics/teaching": {
             "get": {
                 "operationId": "academics.teaching.index",

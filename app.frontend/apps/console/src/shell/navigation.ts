@@ -49,6 +49,7 @@ export const GROUPS: NavGroup[] = [
     label: t.groups.learners,
     items: [
       { key: 'learners', label: t.nav.learners, path: '/learners', icon: 'learners', show: (c) => holdsAnywhere(c, 'enrolment.learners.view'), lights: under('/learners') },
+      { key: 'support', label: t.nav.support, path: '/support', icon: 'support', show: (c) => moduleOn(c, 'support') && (holdsAnywhere(c, 'support.view') || holdsAnywhere(c, 'support.lead')), lights: under('/support') },
       { key: 'conduct', label: t.nav.conduct, path: '/conduct', icon: 'conduct', show: (c) => moduleOn(c, 'conduct') && (can(c, 'conduct.view') || can(c, 'conduct.follow_up')), lights: under('/conduct') },
     ],
   },
@@ -71,6 +72,7 @@ export const GROUPS: NavGroup[] = [
       { key: 'teaching', label: t.nav.teaching, path: '/settings/teaching', icon: 'teaching', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/teaching') },
       { key: 'timetable', label: t.nav.timetable, path: '/settings/timetable', icon: 'timetable', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/timetable') },
       { key: 'next-year', label: t.nav.nextYear, path: '/settings/next-year', icon: 'timetable', show: (c) => can(c, 'academics.manage'), lights: under('/settings/next-year') },
+      { key: 'support-settings', label: t.nav.supportSettings, path: '/settings/support', icon: 'support', show: (c) => moduleOn(c, 'support') && can(c, 'support.manage'), lights: under('/settings/support') },
       { key: 'conduct-settings', label: t.nav.conductSettings, path: '/settings/conduct', icon: 'conduct', show: (c) => moduleOn(c, 'conduct') && can(c, 'conduct.manage'), lights: under('/settings/conduct') },
       { key: 'fee-settings', label: t.nav.feeSettings, path: '/settings/fees', icon: 'fees', show: (c) => moduleOn(c, 'fees') && can(c, 'fees.manage'), lights: under('/settings/fees') },
       { key: 'document-types', label: t.nav.documentTypes, path: '/settings/learner-documents', icon: 'learners', show: (c) => can(c, 'enrolment.manage'), lights: under('/settings/learner-documents') },

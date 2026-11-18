@@ -7139,6 +7139,15 @@ export interface operations {
                             school_day: boolean;
                             submitted_at: string | null;
                         }[];
+                        reasons: {
+                            register_id: string;
+                            class_id: string;
+                            day: string;
+                            learner_id: string;
+                            learner: string;
+                            /** @enum {string} */
+                            kind: "sick" | "family" | "travel" | "other";
+                        }[];
                         bells: {
                             number: number | null;
                             name: string;
@@ -10076,6 +10085,7 @@ export interface operations {
                             waiting_for: string[];
                         } | null;
                         can_request: boolean;
+                        approves: string[];
                     };
                 };
             };
@@ -10133,6 +10143,8 @@ export interface operations {
                             waiting_for: string[];
                         } | null;
                         can_request: boolean;
+                        /** @description Who approves a register correction, by the school's rule (D-086): "The class teacher", "Head teacher". */
+                        approves: unknown[];
                     };
                 };
             };
@@ -10184,6 +10196,8 @@ export interface operations {
                             waiting_for: string[];
                         } | null;
                         can_request: boolean;
+                        /** @description Who approves a register correction, by the school's rule (D-086): "The class teacher", "Head teacher". */
+                        approves: unknown[];
                     } | {
                         class: {
                             id: string;
@@ -10278,6 +10292,8 @@ export interface operations {
                             waiting_for: string[];
                         } | null;
                         can_request: boolean;
+                        /** @description Who approves a register correction, by the school's rule (D-086): "The class teacher", "Head teacher". */
+                        approves: unknown[];
                     } | {
                         class: {
                             id: string;
@@ -10372,6 +10388,8 @@ export interface operations {
                             waiting_for: string[];
                         } | null;
                         can_request: boolean;
+                        /** @description Who approves a register correction, by the school's rule (D-086): "The class teacher", "Head teacher". */
+                        approves: unknown[];
                     } | {
                         class: {
                             id: string;
@@ -10472,6 +10490,8 @@ export interface operations {
                             waiting_for: string[];
                         } | null;
                         can_request: boolean;
+                        /** @description Who approves a register correction, by the school's rule (D-086): "The class teacher", "Head teacher". */
+                        approves: unknown[];
                     } | {
                         class: {
                             id: string;
@@ -10572,6 +10592,8 @@ export interface operations {
                             waiting_for: string[];
                         } | null;
                         can_request: boolean;
+                        /** @description Who approves a register correction, by the school's rule (D-086): "The class teacher", "Head teacher". */
+                        approves: unknown[];
                     } | {
                         class: {
                             id: string;

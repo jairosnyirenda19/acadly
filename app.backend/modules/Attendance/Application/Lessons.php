@@ -56,6 +56,7 @@ final class Lessons
         private readonly Reach $reach,
         private readonly Deliveries $deliveries,
         private readonly MessageSettings $messages,
+        private readonly AbsenceReasons $reasons,
         private readonly Clock $clock,
     ) {}
 
@@ -153,6 +154,8 @@ final class Lessons
             'now' => self::clock($this->clock),
             'away' => $away !== null && $away['away'] ? ['reason' => $away['reason']] : null,
             'morning' => $morning,
+            // Absences in the viewer's own classes that a family explained, to accept (D-086).
+            'reasons' => $this->reasons->toAccept(array_column($morning, 'class_id'), $this->clock->today()),
             'bells' => $place !== null ? $this->timetable->bells($place['division_id'], $place['campus_id'], $day) : [],
             'lessons' => array_map(fn (array $l): array => [
                 ...$this->lessonRow($l, $rows[$l['slot_id']], $classes[$l['class_id']]['name'] ?? ''),

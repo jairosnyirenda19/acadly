@@ -4,7 +4,7 @@ import { useState, type ReactNode } from 'react'
 import { copy } from '../copy'
 import { Attention, Input } from '../setup/parts'
 import { ActivityTag, STRIPE, Tag } from '../settings/parts'
-import { clock, lessonsApi, longDay, type MyDayState, type MyLesson } from './api'
+import { clock, lessonsApi, longDay, shortDay, type MyDayState, type MyLesson } from './api'
 
 const t = copy.registers
 const d = copy.registers.myDay
@@ -95,6 +95,36 @@ export function MyDayScreen() {
               )}
             </a>
           ))}
+
+          {state.reasons.length > 0 && (
+            <section aria-label={d.reasonsTitle} className="border-2 border-ink bg-marigold-wash px-3 pt-2.5 pb-1">
+              <div className="mb-1.5 flex flex-wrap items-center gap-2">
+                <Tag tone="attention">! {d.toAccept(state.reasons.length)}</Tag>
+                <span className="text-[15px] font-extrabold">{d.reasonsTitle}</span>
+              </div>
+              {state.reasons.map((r) => {
+                const href = `/registers/${r.class_id}?day=${r.day}`
+
+                return (
+                  <a
+                    key={`${r.register_id}:${r.learner_id}`}
+                    href={href}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      navigate(href)
+                    }}
+                    className="flex min-h-12 items-center gap-2.5 border-t border-rule py-1.5 text-ink no-underline"
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[15px] font-extrabold">{r.learner}</span>
+                      <span className="block text-[13px]">{d.reasonLine(shortDay(r.day), t.absenceReasons[r.kind] ?? r.kind)}</span>
+                    </span>
+                    <span className="text-sm font-extrabold whitespace-nowrap">{d.openReason} ›</span>
+                  </a>
+                )
+              })}
+            </section>
+          )}
 
           {now !== null && (
             <section aria-label={now.state === 'now' ? d.now : d.next} className={`p-3 ${now.kind === 'activity' ? STRIPE : 'bg-sheet'} ${now.state === 'now' ? 'border-[3px] border-teal' : 'border-2 border-ink'}`}>

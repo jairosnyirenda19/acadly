@@ -182,7 +182,25 @@ final class Registers
             'late' => $register === null && $day < $this->today() && $this->chains->needed(LateRegisterApproval::KEY),
             'late_request' => $late,
             'can_request' => $mayTake && $register !== null,
+            // Who approves a register correction, by the school's rule (D-086): "The class teacher", "Head teacher".
+            'approves' => $this->approvers(),
         ];
+    }
+
+    /** @return list<string> who approves accepting a family's reason (absent to excused), by the steps of the school's chain for register corrections */
+    private function approvers(): array
+    {
+        $topic = $this->chains->topic(CorrectionApproval::KEY);
+
+        if ($topic === null) {
+            return [];
+        }
+
+        // Only the steps that apply to accepting a reason: a change from absent to excused.
+        $facts = CorrectionApproval::factsOf(Mark::Absent->value, Mark::Excused->value);
+        $steps = array_filter($this->chains->chain($topic)['steps'], fn (array $spec): bool => $spec['when'] === null || ($facts[$spec['when']] ?? false));
+
+        return array_values(array_map(fn (array $spec): string => $this->chains->label($topic, $spec), $steps));
     }
 
     /**

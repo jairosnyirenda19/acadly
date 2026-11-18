@@ -369,6 +369,7 @@ function SubmittedRegister({ state, onChange }: { state: RegisterState; onChange
                   {l.absence !== null && <Told absence={l.absence} />}
                   {l.absence?.from_family != null && l.mark?.status === 'absent' && !pending && state.can_request && state.register !== null && (
                     <AcceptReason
+                      approves={state.approves}
                       registerId={state.register.id}
                       learner={l}
                       day={state.day}
@@ -472,7 +473,7 @@ function Told({ absence }: { absence: Absence }) {
 }
 
 /** Accept the family's reason (the approved design, D-085): ask for a correction from absent to excused. */
-function AcceptReason({ registerId, learner, day, onDone }: { registerId: string; learner: RegisterLearner; day: string; onDone: (next: RegisterState) => void }) {
+function AcceptReason({ approves, registerId, learner, day, onDone }: { approves: string[]; registerId: string; learner: RegisterLearner; day: string; onDone: (next: RegisterState) => void }) {
   const [open, setOpen] = useState(false)
   const save = useSave<RegisterState>()
 
@@ -494,7 +495,16 @@ function AcceptReason({ registerId, learner, day, onDone }: { registerId: string
         <span className="flex items-center gap-1.5"><Glyph mark="excused" /> {t.marks.excused}</span>
       </div>
       <p className="mb-1.5 text-sm leading-normal">{t.acceptNote}</p>
-      <p className="mb-3.5 border-l-4 border-marigold bg-marigold-wash px-2.5 py-2 text-sm leading-snug">{t.acceptApproval}</p>
+      <div className="mb-3.5 border-l-4 border-marigold bg-marigold-wash px-2.5 py-2 text-sm leading-snug">
+        {approves.length > 0 ? (
+          <>
+            <strong className="block">{t.approvedBy(approves.join(' → '))}</strong>
+            {t.approvedByNote}
+          </>
+        ) : (
+          t.acceptApproval
+        )}
+      </div>
       {(save.failed !== null || Object.keys(save.errors).length > 0) && (
         <div className="mb-3">
           <Notice tone="wrong" title={save.failed ?? Object.values(save.errors)[0]?.[0] ?? ''} />

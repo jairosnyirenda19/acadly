@@ -76,6 +76,16 @@ final class CorrectionApproval implements ApprovalTopic
         return ['to_present' => 'the change is from absent to present or late'];
     }
 
+    /**
+     * The facts a step's condition reads, for a change from one mark to another.
+     *
+     * @return array<string, bool>
+     */
+    public static function factsOf(string $from, string $to): array
+    {
+        return ['to_present' => $from === Mark::Absent->value && in_array($to, [Mark::Present->value, Mark::Late->value], true)];
+    }
+
     public function case(string $subjectId): ?ApprovalCase
     {
         $c = Correction::query()->find($subjectId);
@@ -100,7 +110,7 @@ final class CorrectionApproval implements ApprovalTopic
             reason: $c->reason,
             link: $lesson !== null ? '/registers/lesson/'.Row::text($lesson, 'slot_id').'?day='.$day : '/registers/'.$c->class_id.'?day='.$day,
             related: ['class_teacher' => $teacher !== null ? [$teacher] : []],
-            facts: ['to_present' => $c->from_status === Mark::Absent->value && in_array($c->to_status, [Mark::Present->value, Mark::Late->value], true)],
+            facts: self::factsOf($c->from_status, $c->to_status),
         );
     }
 

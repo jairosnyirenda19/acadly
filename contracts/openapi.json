@@ -15183,6 +15183,46 @@
                                                 ]
                                             }
                                         },
+                                        "reasons": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "register_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "class_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "day": {
+                                                        "type": "string"
+                                                    },
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "learner": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "sick",
+                                                            "family",
+                                                            "travel",
+                                                            "other"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "register_id",
+                                                    "class_id",
+                                                    "day",
+                                                    "learner_id",
+                                                    "learner",
+                                                    "kind"
+                                                ]
+                                            }
+                                        },
                                         "bells": {
                                             "type": "array",
                                             "items": {
@@ -15348,6 +15388,7 @@
                                         "now",
                                         "away",
                                         "morning",
+                                        "reasons",
                                         "bells",
                                         "lessons"
                                     ]
@@ -25190,6 +25231,12 @@
                                         },
                                         "can_request": {
                                             "type": "boolean"
+                                        },
+                                        "approves": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
                                         }
                                     },
                                     "required": [
@@ -25204,7 +25251,8 @@
                                         "can_take",
                                         "late",
                                         "late_request",
-                                        "can_request"
+                                        "can_request",
+                                        "approves"
                                     ]
                                 }
                             }
@@ -25363,6 +25411,11 @@
                                         },
                                         "can_request": {
                                             "type": "boolean"
+                                        },
+                                        "approves": {
+                                            "type": "array",
+                                            "description": "Who approves a register correction, by the school's rule (D-086): \"The class teacher\", \"Head teacher\".",
+                                            "items": {}
                                         }
                                     },
                                     "required": [
@@ -25377,7 +25430,8 @@
                                         "can_take",
                                         "late",
                                         "late_request",
-                                        "can_request"
+                                        "can_request",
+                                        "approves"
                                     ]
                                 }
                             }
@@ -25526,6 +25580,11 @@
                                                 },
                                                 "can_request": {
                                                     "type": "boolean"
+                                                },
+                                                "approves": {
+                                                    "type": "array",
+                                                    "description": "Who approves a register correction, by the school's rule (D-086): \"The class teacher\", \"Head teacher\".",
+                                                    "items": {}
                                                 }
                                             },
                                             "required": [
@@ -25540,7 +25599,8 @@
                                                 "can_take",
                                                 "late",
                                                 "late_request",
-                                                "can_request"
+                                                "can_request",
+                                                "approves"
                                             ]
                                         },
                                         {
@@ -25886,6 +25946,11 @@
                                                 },
                                                 "can_request": {
                                                     "type": "boolean"
+                                                },
+                                                "approves": {
+                                                    "type": "array",
+                                                    "description": "Who approves a register correction, by the school's rule (D-086): \"The class teacher\", \"Head teacher\".",
+                                                    "items": {}
                                                 }
                                             },
                                             "required": [
@@ -25900,7 +25965,8 @@
                                                 "can_take",
                                                 "late",
                                                 "late_request",
-                                                "can_request"
+                                                "can_request",
+                                                "approves"
                                             ]
                                         },
                                         {
@@ -26246,6 +26312,11 @@
                                                 },
                                                 "can_request": {
                                                     "type": "boolean"
+                                                },
+                                                "approves": {
+                                                    "type": "array",
+                                                    "description": "Who approves a register correction, by the school's rule (D-086): \"The class teacher\", \"Head teacher\".",
+                                                    "items": {}
                                                 }
                                             },
                                             "required": [
@@ -26260,7 +26331,8 @@
                                                 "can_take",
                                                 "late",
                                                 "late_request",
-                                                "can_request"
+                                                "can_request",
+                                                "approves"
                                             ]
                                         },
                                         {
@@ -26620,6 +26692,11 @@
                                                 },
                                                 "can_request": {
                                                     "type": "boolean"
+                                                },
+                                                "approves": {
+                                                    "type": "array",
+                                                    "description": "Who approves a register correction, by the school's rule (D-086): \"The class teacher\", \"Head teacher\".",
+                                                    "items": {}
                                                 }
                                             },
                                             "required": [
@@ -26634,7 +26711,8 @@
                                                 "can_take",
                                                 "late",
                                                 "late_request",
-                                                "can_request"
+                                                "can_request",
+                                                "approves"
                                             ]
                                         },
                                         {
@@ -26987,6 +27065,11 @@
                                                 },
                                                 "can_request": {
                                                     "type": "boolean"
+                                                },
+                                                "approves": {
+                                                    "type": "array",
+                                                    "description": "Who approves a register correction, by the school's rule (D-086): \"The class teacher\", \"Head teacher\".",
+                                                    "items": {}
                                                 }
                                             },
                                             "required": [
@@ -27001,7 +27084,8 @@
                                                 "can_take",
                                                 "late",
                                                 "late_request",
-                                                "can_request"
+                                                "can_request",
+                                                "approves"
                                             ]
                                         },
                                         {

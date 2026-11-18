@@ -178,3 +178,30 @@ it('lets staff accept the reason: a correction to excused that the family sees o
     // The reason cannot change once the day is excused.
     $this->actingAs($parent)->postJson("/api/v1/portal/children/{$this->chikondi}/absences/2026-11-17/reason", ['kind' => 'family'])->assertUnprocessable();
 });
+
+it('lists the reasons to accept on the class teacher\'s My day, and names who approves by the school\'s rule', function (): void {
+    DB::table('academic_teaching')->insert(['id' => Ids::next(), 'class_id' => $this->class, 'subject_id' => null, 'user_id' => $this->admin->id, 'given_at' => now()->subDay()]);
+    $parent = familySignsIn($this, '0884 771 900');
+    $myDay = fn (): array => $this->actingAs($this->admin)->getJson('/api/v1/registers/my-day')->assertOk()->json('reasons');
+
+    expect($myDay())->toBe([]);
+
+    $this->actingAs($parent)->postJson("/api/v1/portal/children/{$this->chikondi}/absences/2026-11-17/reason", ['kind' => 'travel'])->assertOk();
+
+    expect($myDay())->toHaveCount(1)
+        ->and($myDay()[0])->toMatchArray(['day' => '2026-11-17', 'learner_id' => $this->chikondi, 'learner' => 'Chikondi Banda', 'kind' => 'travel', 'class_id' => $this->class]);
+
+    $register = $this->actingAs($this->admin)->getJson("/api/v1/registers/class/{$this->class}?day=2026-11-17")->assertOk();
+    expect($register->json('approves'))->toBe(['Anyone who may decide']);
+
+    $this->actingAs($this->admin)->putJson('/api/v1/approvals/topics/attendance.correction', ['steps' => [
+        ['kind' => 'relation', 'target' => 'class_teacher', 'needs' => 1, 'when' => null],
+        // A step only for a change to present does not apply to accepting a reason.
+        ['kind' => 'role', 'target' => Role::query()->where('is_system', true)->value('id'), 'needs' => 1, 'when' => 'to_present'],
+    ]])->assertOk();
+    expect($this->actingAs($this->admin)->getJson("/api/v1/registers/class/{$this->class}?day=2026-11-17")->json('approves'))->toBe(['The class teacher']);
+
+    // Once someone accepts it, the day leaves the list.
+    $this->actingAs($this->admin)->postJson("/api/v1/registers/{$register->json('register.id')}/absences/{$this->chikondi}/accept")->assertOk();
+    expect($myDay())->toBe([]);
+});

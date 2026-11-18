@@ -199,7 +199,14 @@ it('lists the reasons to accept on the class teacher\'s My day, and names who ap
         // A step only for a change to present does not apply to accepting a reason.
         ['kind' => 'role', 'target' => Role::query()->where('is_system', true)->value('id'), 'needs' => 1, 'when' => 'to_present'],
     ]])->assertOk();
-    expect($this->actingAs($this->admin)->getJson("/api/v1/registers/class/{$this->class}?day=2026-11-17")->json('approves'))->toBe(['The class teacher']);
+    // The viewer is the class teacher here: nobody approves their own request, so the step goes to anyone who may decide.
+    $asTeacher = $this->actingAs($this->admin)->getJson("/api/v1/registers/class/{$this->class}?day=2026-11-17");
+    expect($asTeacher->json('approves'))->toBe(['Anyone who may decide'])->and($asTeacher->json('approves_own'))->toBeTrue();
+    $office = User::factory()->create();
+    RoleAssignment::query()->create(['user_id' => $office->id, 'role_id' => Role::query()->where('is_system', true)->value('id'),
+        'scope_type' => ScopeType::Institution, 'scope_id' => null, 'starts_at' => now()->subMinute()]);
+    $asOffice = $this->actingAs($office)->getJson("/api/v1/registers/class/{$this->class}?day=2026-11-17");
+    expect($asOffice->json('approves'))->toBe(['The class teacher'])->and($asOffice->json('approves_own'))->toBeFalse();
 
     // Once someone accepts it, the day leaves the list.
     $this->actingAs($this->admin)->postJson("/api/v1/registers/{$register->json('register.id')}/absences/{$this->chikondi}/accept")->assertOk();

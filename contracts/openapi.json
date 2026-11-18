@@ -597,7 +597,7 @@
         "/v1/me/phone/code": {
             "post": {
                 "operationId": "me.phone.code",
-                "description": "Sends a six-digit code by SMS to a number the school keeps for a\nlearner's contact. Needs a sign-in with the email address and password.",
+                "description": "Sends a six-digit code by SMS to a number the school keeps for a\nlearner's contact, in English or Chichewa (`language`: `en` or `ny`).\nNeeds a sign-in with the email address and password.",
                 "summary": "Send a code to add a phone number",
                 "tags": [
                     "AccountPhone"
@@ -612,6 +612,17 @@
                                     "phone": {
                                         "type": "string",
                                         "maxLength": 30
+                                    },
+                                    "language": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "enum": [
+                                            "en",
+                                            "ny",
+                                            null
+                                        ]
                                     }
                                 },
                                 "required": [
@@ -25554,6 +25565,9 @@
                                             "items": {
                                                 "type": "string"
                                             }
+                                        },
+                                        "approves_own": {
+                                            "type": "boolean"
                                         }
                                     },
                                     "required": [
@@ -25569,7 +25583,8 @@
                                         "late",
                                         "late_request",
                                         "can_request",
-                                        "approves"
+                                        "approves",
+                                        "approves_own"
                                     ]
                                 }
                             }
@@ -25619,120 +25634,174 @@
                                     "type": "object",
                                     "properties": {
                                         "class": {
-                                            "type": "object",
-                                            "properties": {
-                                                "id": {
-                                                    "type": "string"
+                                            "anyOf": [
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name"
+                                                    ]
                                                 },
-                                                "name": {
-                                                    "type": "string"
-                                                }
-                                            },
-                                            "required": [
-                                                "id",
-                                                "name"
+                                                {}
                                             ]
                                         },
                                         "day": {
-                                            "type": "string"
-                                        },
-                                        "today": {
-                                            "type": "string"
-                                        },
-                                        "school_day": {
-                                            "type": "boolean"
-                                        },
-                                        "teacher": {
-                                            "type": [
-                                                "string",
-                                                "null"
+                                            "anyOf": [
+                                                {
+                                                    "type": "string"
+                                                },
+                                                {}
                                             ]
                                         },
-                                        "register": {
-                                            "type": [
-                                                "object",
-                                                "null"
-                                            ],
-                                            "properties": {
-                                                "id": {
+                                        "today": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "string"
+                                                },
+                                                {}
+                                            ]
+                                        },
+                                        "school_day": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "boolean"
+                                                },
+                                                {}
+                                            ]
+                                        },
+                                        "teacher": {
+                                            "anyOf": [
+                                                {
                                                     "type": [
                                                         "string",
                                                         "null"
                                                     ]
                                                 },
-                                                "submitted_at": {
-                                                    "type": "string"
+                                                {}
+                                            ]
+                                        },
+                                        "register": {
+                                            "anyOf": [
+                                                {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "submitted_at": {
+                                                            "type": "string"
+                                                        },
+                                                        "submitted_by": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "submitted_at",
+                                                        "submitted_by"
+                                                    ]
                                                 },
-                                                "submitted_by": {
-                                                    "type": "string"
-                                                }
-                                            },
-                                            "required": [
-                                                "id",
-                                                "submitted_at",
-                                                "submitted_by"
+                                                {}
                                             ]
                                         },
                                         "days_before": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "learners": {
-                                            "type": "array",
-                                            "items": {}
-                                        },
-                                        "can_take": {
-                                            "type": "boolean"
-                                        },
-                                        "late": {
-                                            "type": "boolean",
-                                            "description": "A register for an earlier day asks first, when the school has steps for it (D-081)."
-                                        },
-                                        "late_request": {
-                                            "type": [
-                                                "object",
-                                                "null"
-                                            ],
-                                            "properties": {
-                                                "id": {
-                                                    "type": "string"
-                                                },
-                                                "reason": {
-                                                    "type": "string"
-                                                },
-                                                "marks": {
-                                                    "type": "object",
-                                                    "additionalProperties": {
-                                                        "type": "string"
-                                                    }
-                                                },
-                                                "asked_by": {
-                                                    "type": "string"
-                                                },
-                                                "waiting_for": {
+                                            "anyOf": [
+                                                {
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string"
                                                     }
-                                                }
-                                            },
-                                            "required": [
-                                                "id",
-                                                "reason",
-                                                "marks",
-                                                "asked_by",
-                                                "waiting_for"
+                                                },
+                                                {}
+                                            ]
+                                        },
+                                        "learners": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "array"
+                                                },
+                                                {}
+                                            ]
+                                        },
+                                        "can_take": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "boolean"
+                                                },
+                                                {}
+                                            ]
+                                        },
+                                        "late": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "boolean",
+                                                    "description": "A register for an earlier day asks first, when the school has steps for it (D-081)."
+                                                },
+                                                {}
+                                            ]
+                                        },
+                                        "late_request": {
+                                            "anyOf": [
+                                                {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "reason": {
+                                                            "type": "string"
+                                                        },
+                                                        "marks": {
+                                                            "type": "object",
+                                                            "additionalProperties": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "asked_by": {
+                                                            "type": "string"
+                                                        },
+                                                        "waiting_for": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "reason",
+                                                        "marks",
+                                                        "asked_by",
+                                                        "waiting_for"
+                                                    ]
+                                                },
+                                                {}
                                             ]
                                         },
                                         "can_request": {
-                                            "type": "boolean"
-                                        },
-                                        "approves": {
-                                            "type": "array",
-                                            "description": "Who approves a register correction, by the school's rule (D-086): \"The class teacher\", \"Head teacher\".",
-                                            "items": {}
+                                            "anyOf": [
+                                                {
+                                                    "type": "boolean"
+                                                },
+                                                {}
+                                            ]
                                         }
                                     },
                                     "required": [
@@ -25747,9 +25816,9 @@
                                         "can_take",
                                         "late",
                                         "late_request",
-                                        "can_request",
-                                        "approves"
-                                    ]
+                                        "can_request"
+                                    ],
+                                    "additionalProperties": {}
                                 }
                             }
                         }
@@ -25788,120 +25857,174 @@
                                             "type": "object",
                                             "properties": {
                                                 "class": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string"
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
                                                         },
-                                                        "name": {
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "id",
-                                                        "name"
+                                                        {}
                                                     ]
                                                 },
                                                 "day": {
-                                                    "type": "string"
-                                                },
-                                                "today": {
-                                                    "type": "string"
-                                                },
-                                                "school_day": {
-                                                    "type": "boolean"
-                                                },
-                                                "teacher": {
-                                                    "type": [
-                                                        "string",
-                                                        "null"
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {}
                                                     ]
                                                 },
-                                                "register": {
-                                                    "type": [
-                                                        "object",
-                                                        "null"
-                                                    ],
-                                                    "properties": {
-                                                        "id": {
+                                                "today": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "school_day": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "teacher": {
+                                                    "anyOf": [
+                                                        {
                                                             "type": [
                                                                 "string",
                                                                 "null"
                                                             ]
                                                         },
-                                                        "submitted_at": {
-                                                            "type": "string"
+                                                        {}
+                                                    ]
+                                                },
+                                                "register": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": [
+                                                                "object",
+                                                                "null"
+                                                            ],
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "submitted_at": {
+                                                                    "type": "string"
+                                                                },
+                                                                "submitted_by": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "submitted_at",
+                                                                "submitted_by"
+                                                            ]
                                                         },
-                                                        "submitted_by": {
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "id",
-                                                        "submitted_at",
-                                                        "submitted_by"
+                                                        {}
                                                     ]
                                                 },
                                                 "days_before": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string"
-                                                    }
-                                                },
-                                                "learners": {
-                                                    "type": "array",
-                                                    "items": {}
-                                                },
-                                                "can_take": {
-                                                    "type": "boolean"
-                                                },
-                                                "late": {
-                                                    "type": "boolean",
-                                                    "description": "A register for an earlier day asks first, when the school has steps for it (D-081)."
-                                                },
-                                                "late_request": {
-                                                    "type": [
-                                                        "object",
-                                                        "null"
-                                                    ],
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string"
-                                                        },
-                                                        "reason": {
-                                                            "type": "string"
-                                                        },
-                                                        "marks": {
-                                                            "type": "object",
-                                                            "additionalProperties": {
-                                                                "type": "string"
-                                                            }
-                                                        },
-                                                        "asked_by": {
-                                                            "type": "string"
-                                                        },
-                                                        "waiting_for": {
+                                                    "anyOf": [
+                                                        {
                                                             "type": "array",
                                                             "items": {
                                                                 "type": "string"
                                                             }
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "id",
-                                                        "reason",
-                                                        "marks",
-                                                        "asked_by",
-                                                        "waiting_for"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "learners": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "array"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "can_take": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "late": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean",
+                                                            "description": "A register for an earlier day asks first, when the school has steps for it (D-081)."
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "late_request": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": [
+                                                                "object",
+                                                                "null"
+                                                            ],
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "reason": {
+                                                                    "type": "string"
+                                                                },
+                                                                "marks": {
+                                                                    "type": "object",
+                                                                    "additionalProperties": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "asked_by": {
+                                                                    "type": "string"
+                                                                },
+                                                                "waiting_for": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "reason",
+                                                                "marks",
+                                                                "asked_by",
+                                                                "waiting_for"
+                                                            ]
+                                                        },
+                                                        {}
                                                     ]
                                                 },
                                                 "can_request": {
-                                                    "type": "boolean"
-                                                },
-                                                "approves": {
-                                                    "type": "array",
-                                                    "description": "Who approves a register correction, by the school's rule (D-086): \"The class teacher\", \"Head teacher\".",
-                                                    "items": {}
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {}
+                                                    ]
                                                 }
                                             },
                                             "required": [
@@ -25916,9 +26039,9 @@
                                                 "can_take",
                                                 "late",
                                                 "late_request",
-                                                "can_request",
-                                                "approves"
-                                            ]
+                                                "can_request"
+                                            ],
+                                            "additionalProperties": {}
                                         },
                                         {
                                             "type": "object",
@@ -26154,120 +26277,174 @@
                                             "type": "object",
                                             "properties": {
                                                 "class": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string"
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
                                                         },
-                                                        "name": {
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "id",
-                                                        "name"
+                                                        {}
                                                     ]
                                                 },
                                                 "day": {
-                                                    "type": "string"
-                                                },
-                                                "today": {
-                                                    "type": "string"
-                                                },
-                                                "school_day": {
-                                                    "type": "boolean"
-                                                },
-                                                "teacher": {
-                                                    "type": [
-                                                        "string",
-                                                        "null"
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {}
                                                     ]
                                                 },
-                                                "register": {
-                                                    "type": [
-                                                        "object",
-                                                        "null"
-                                                    ],
-                                                    "properties": {
-                                                        "id": {
+                                                "today": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "school_day": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "teacher": {
+                                                    "anyOf": [
+                                                        {
                                                             "type": [
                                                                 "string",
                                                                 "null"
                                                             ]
                                                         },
-                                                        "submitted_at": {
-                                                            "type": "string"
+                                                        {}
+                                                    ]
+                                                },
+                                                "register": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": [
+                                                                "object",
+                                                                "null"
+                                                            ],
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "submitted_at": {
+                                                                    "type": "string"
+                                                                },
+                                                                "submitted_by": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "submitted_at",
+                                                                "submitted_by"
+                                                            ]
                                                         },
-                                                        "submitted_by": {
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "id",
-                                                        "submitted_at",
-                                                        "submitted_by"
+                                                        {}
                                                     ]
                                                 },
                                                 "days_before": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string"
-                                                    }
-                                                },
-                                                "learners": {
-                                                    "type": "array",
-                                                    "items": {}
-                                                },
-                                                "can_take": {
-                                                    "type": "boolean"
-                                                },
-                                                "late": {
-                                                    "type": "boolean",
-                                                    "description": "A register for an earlier day asks first, when the school has steps for it (D-081)."
-                                                },
-                                                "late_request": {
-                                                    "type": [
-                                                        "object",
-                                                        "null"
-                                                    ],
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string"
-                                                        },
-                                                        "reason": {
-                                                            "type": "string"
-                                                        },
-                                                        "marks": {
-                                                            "type": "object",
-                                                            "additionalProperties": {
-                                                                "type": "string"
-                                                            }
-                                                        },
-                                                        "asked_by": {
-                                                            "type": "string"
-                                                        },
-                                                        "waiting_for": {
+                                                    "anyOf": [
+                                                        {
                                                             "type": "array",
                                                             "items": {
                                                                 "type": "string"
                                                             }
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "id",
-                                                        "reason",
-                                                        "marks",
-                                                        "asked_by",
-                                                        "waiting_for"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "learners": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "array"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "can_take": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "late": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean",
+                                                            "description": "A register for an earlier day asks first, when the school has steps for it (D-081)."
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "late_request": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": [
+                                                                "object",
+                                                                "null"
+                                                            ],
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "reason": {
+                                                                    "type": "string"
+                                                                },
+                                                                "marks": {
+                                                                    "type": "object",
+                                                                    "additionalProperties": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "asked_by": {
+                                                                    "type": "string"
+                                                                },
+                                                                "waiting_for": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "reason",
+                                                                "marks",
+                                                                "asked_by",
+                                                                "waiting_for"
+                                                            ]
+                                                        },
+                                                        {}
                                                     ]
                                                 },
                                                 "can_request": {
-                                                    "type": "boolean"
-                                                },
-                                                "approves": {
-                                                    "type": "array",
-                                                    "description": "Who approves a register correction, by the school's rule (D-086): \"The class teacher\", \"Head teacher\".",
-                                                    "items": {}
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {}
+                                                    ]
                                                 }
                                             },
                                             "required": [
@@ -26282,9 +26459,9 @@
                                                 "can_take",
                                                 "late",
                                                 "late_request",
-                                                "can_request",
-                                                "approves"
-                                            ]
+                                                "can_request"
+                                            ],
+                                            "additionalProperties": {}
                                         },
                                         {
                                             "type": "object",
@@ -26520,120 +26697,174 @@
                                             "type": "object",
                                             "properties": {
                                                 "class": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string"
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
                                                         },
-                                                        "name": {
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "id",
-                                                        "name"
+                                                        {}
                                                     ]
                                                 },
                                                 "day": {
-                                                    "type": "string"
-                                                },
-                                                "today": {
-                                                    "type": "string"
-                                                },
-                                                "school_day": {
-                                                    "type": "boolean"
-                                                },
-                                                "teacher": {
-                                                    "type": [
-                                                        "string",
-                                                        "null"
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {}
                                                     ]
                                                 },
-                                                "register": {
-                                                    "type": [
-                                                        "object",
-                                                        "null"
-                                                    ],
-                                                    "properties": {
-                                                        "id": {
+                                                "today": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "school_day": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "teacher": {
+                                                    "anyOf": [
+                                                        {
                                                             "type": [
                                                                 "string",
                                                                 "null"
                                                             ]
                                                         },
-                                                        "submitted_at": {
-                                                            "type": "string"
+                                                        {}
+                                                    ]
+                                                },
+                                                "register": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": [
+                                                                "object",
+                                                                "null"
+                                                            ],
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "submitted_at": {
+                                                                    "type": "string"
+                                                                },
+                                                                "submitted_by": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "submitted_at",
+                                                                "submitted_by"
+                                                            ]
                                                         },
-                                                        "submitted_by": {
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "id",
-                                                        "submitted_at",
-                                                        "submitted_by"
+                                                        {}
                                                     ]
                                                 },
                                                 "days_before": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string"
-                                                    }
-                                                },
-                                                "learners": {
-                                                    "type": "array",
-                                                    "items": {}
-                                                },
-                                                "can_take": {
-                                                    "type": "boolean"
-                                                },
-                                                "late": {
-                                                    "type": "boolean",
-                                                    "description": "A register for an earlier day asks first, when the school has steps for it (D-081)."
-                                                },
-                                                "late_request": {
-                                                    "type": [
-                                                        "object",
-                                                        "null"
-                                                    ],
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string"
-                                                        },
-                                                        "reason": {
-                                                            "type": "string"
-                                                        },
-                                                        "marks": {
-                                                            "type": "object",
-                                                            "additionalProperties": {
-                                                                "type": "string"
-                                                            }
-                                                        },
-                                                        "asked_by": {
-                                                            "type": "string"
-                                                        },
-                                                        "waiting_for": {
+                                                    "anyOf": [
+                                                        {
                                                             "type": "array",
                                                             "items": {
                                                                 "type": "string"
                                                             }
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "id",
-                                                        "reason",
-                                                        "marks",
-                                                        "asked_by",
-                                                        "waiting_for"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "learners": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "array"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "can_take": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "late": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean",
+                                                            "description": "A register for an earlier day asks first, when the school has steps for it (D-081)."
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "late_request": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": [
+                                                                "object",
+                                                                "null"
+                                                            ],
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "reason": {
+                                                                    "type": "string"
+                                                                },
+                                                                "marks": {
+                                                                    "type": "object",
+                                                                    "additionalProperties": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "asked_by": {
+                                                                    "type": "string"
+                                                                },
+                                                                "waiting_for": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "reason",
+                                                                "marks",
+                                                                "asked_by",
+                                                                "waiting_for"
+                                                            ]
+                                                        },
+                                                        {}
                                                     ]
                                                 },
                                                 "can_request": {
-                                                    "type": "boolean"
-                                                },
-                                                "approves": {
-                                                    "type": "array",
-                                                    "description": "Who approves a register correction, by the school's rule (D-086): \"The class teacher\", \"Head teacher\".",
-                                                    "items": {}
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {}
+                                                    ]
                                                 }
                                             },
                                             "required": [
@@ -26648,9 +26879,9 @@
                                                 "can_take",
                                                 "late",
                                                 "late_request",
-                                                "can_request",
-                                                "approves"
-                                            ]
+                                                "can_request"
+                                            ],
+                                            "additionalProperties": {}
                                         },
                                         {
                                             "type": "object",
@@ -26900,120 +27131,174 @@
                                             "type": "object",
                                             "properties": {
                                                 "class": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string"
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
                                                         },
-                                                        "name": {
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "id",
-                                                        "name"
+                                                        {}
                                                     ]
                                                 },
                                                 "day": {
-                                                    "type": "string"
-                                                },
-                                                "today": {
-                                                    "type": "string"
-                                                },
-                                                "school_day": {
-                                                    "type": "boolean"
-                                                },
-                                                "teacher": {
-                                                    "type": [
-                                                        "string",
-                                                        "null"
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {}
                                                     ]
                                                 },
-                                                "register": {
-                                                    "type": [
-                                                        "object",
-                                                        "null"
-                                                    ],
-                                                    "properties": {
-                                                        "id": {
+                                                "today": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "school_day": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "teacher": {
+                                                    "anyOf": [
+                                                        {
                                                             "type": [
                                                                 "string",
                                                                 "null"
                                                             ]
                                                         },
-                                                        "submitted_at": {
-                                                            "type": "string"
+                                                        {}
+                                                    ]
+                                                },
+                                                "register": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": [
+                                                                "object",
+                                                                "null"
+                                                            ],
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "submitted_at": {
+                                                                    "type": "string"
+                                                                },
+                                                                "submitted_by": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "submitted_at",
+                                                                "submitted_by"
+                                                            ]
                                                         },
-                                                        "submitted_by": {
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "id",
-                                                        "submitted_at",
-                                                        "submitted_by"
+                                                        {}
                                                     ]
                                                 },
                                                 "days_before": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string"
-                                                    }
-                                                },
-                                                "learners": {
-                                                    "type": "array",
-                                                    "items": {}
-                                                },
-                                                "can_take": {
-                                                    "type": "boolean"
-                                                },
-                                                "late": {
-                                                    "type": "boolean",
-                                                    "description": "A register for an earlier day asks first, when the school has steps for it (D-081)."
-                                                },
-                                                "late_request": {
-                                                    "type": [
-                                                        "object",
-                                                        "null"
-                                                    ],
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string"
-                                                        },
-                                                        "reason": {
-                                                            "type": "string"
-                                                        },
-                                                        "marks": {
-                                                            "type": "object",
-                                                            "additionalProperties": {
-                                                                "type": "string"
-                                                            }
-                                                        },
-                                                        "asked_by": {
-                                                            "type": "string"
-                                                        },
-                                                        "waiting_for": {
+                                                    "anyOf": [
+                                                        {
                                                             "type": "array",
                                                             "items": {
                                                                 "type": "string"
                                                             }
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "id",
-                                                        "reason",
-                                                        "marks",
-                                                        "asked_by",
-                                                        "waiting_for"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "learners": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "array"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "can_take": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "late": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean",
+                                                            "description": "A register for an earlier day asks first, when the school has steps for it (D-081)."
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "late_request": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": [
+                                                                "object",
+                                                                "null"
+                                                            ],
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "reason": {
+                                                                    "type": "string"
+                                                                },
+                                                                "marks": {
+                                                                    "type": "object",
+                                                                    "additionalProperties": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "asked_by": {
+                                                                    "type": "string"
+                                                                },
+                                                                "waiting_for": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "reason",
+                                                                "marks",
+                                                                "asked_by",
+                                                                "waiting_for"
+                                                            ]
+                                                        },
+                                                        {}
                                                     ]
                                                 },
                                                 "can_request": {
-                                                    "type": "boolean"
-                                                },
-                                                "approves": {
-                                                    "type": "array",
-                                                    "description": "Who approves a register correction, by the school's rule (D-086): \"The class teacher\", \"Head teacher\".",
-                                                    "items": {}
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {}
+                                                    ]
                                                 }
                                             },
                                             "required": [
@@ -27028,9 +27313,9 @@
                                                 "can_take",
                                                 "late",
                                                 "late_request",
-                                                "can_request",
-                                                "approves"
-                                            ]
+                                                "can_request"
+                                            ],
+                                            "additionalProperties": {}
                                         },
                                         {
                                             "type": "object",
@@ -27273,120 +27558,174 @@
                                             "type": "object",
                                             "properties": {
                                                 "class": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string"
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
                                                         },
-                                                        "name": {
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "id",
-                                                        "name"
+                                                        {}
                                                     ]
                                                 },
                                                 "day": {
-                                                    "type": "string"
-                                                },
-                                                "today": {
-                                                    "type": "string"
-                                                },
-                                                "school_day": {
-                                                    "type": "boolean"
-                                                },
-                                                "teacher": {
-                                                    "type": [
-                                                        "string",
-                                                        "null"
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {}
                                                     ]
                                                 },
-                                                "register": {
-                                                    "type": [
-                                                        "object",
-                                                        "null"
-                                                    ],
-                                                    "properties": {
-                                                        "id": {
+                                                "today": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "school_day": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "teacher": {
+                                                    "anyOf": [
+                                                        {
                                                             "type": [
                                                                 "string",
                                                                 "null"
                                                             ]
                                                         },
-                                                        "submitted_at": {
-                                                            "type": "string"
+                                                        {}
+                                                    ]
+                                                },
+                                                "register": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": [
+                                                                "object",
+                                                                "null"
+                                                            ],
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "submitted_at": {
+                                                                    "type": "string"
+                                                                },
+                                                                "submitted_by": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "submitted_at",
+                                                                "submitted_by"
+                                                            ]
                                                         },
-                                                        "submitted_by": {
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "id",
-                                                        "submitted_at",
-                                                        "submitted_by"
+                                                        {}
                                                     ]
                                                 },
                                                 "days_before": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string"
-                                                    }
-                                                },
-                                                "learners": {
-                                                    "type": "array",
-                                                    "items": {}
-                                                },
-                                                "can_take": {
-                                                    "type": "boolean"
-                                                },
-                                                "late": {
-                                                    "type": "boolean",
-                                                    "description": "A register for an earlier day asks first, when the school has steps for it (D-081)."
-                                                },
-                                                "late_request": {
-                                                    "type": [
-                                                        "object",
-                                                        "null"
-                                                    ],
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string"
-                                                        },
-                                                        "reason": {
-                                                            "type": "string"
-                                                        },
-                                                        "marks": {
-                                                            "type": "object",
-                                                            "additionalProperties": {
-                                                                "type": "string"
-                                                            }
-                                                        },
-                                                        "asked_by": {
-                                                            "type": "string"
-                                                        },
-                                                        "waiting_for": {
+                                                    "anyOf": [
+                                                        {
                                                             "type": "array",
                                                             "items": {
                                                                 "type": "string"
                                                             }
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "id",
-                                                        "reason",
-                                                        "marks",
-                                                        "asked_by",
-                                                        "waiting_for"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "learners": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "array"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "can_take": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "late": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean",
+                                                            "description": "A register for an earlier day asks first, when the school has steps for it (D-081)."
+                                                        },
+                                                        {}
+                                                    ]
+                                                },
+                                                "late_request": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": [
+                                                                "object",
+                                                                "null"
+                                                            ],
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "reason": {
+                                                                    "type": "string"
+                                                                },
+                                                                "marks": {
+                                                                    "type": "object",
+                                                                    "additionalProperties": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "asked_by": {
+                                                                    "type": "string"
+                                                                },
+                                                                "waiting_for": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "reason",
+                                                                "marks",
+                                                                "asked_by",
+                                                                "waiting_for"
+                                                            ]
+                                                        },
+                                                        {}
                                                     ]
                                                 },
                                                 "can_request": {
-                                                    "type": "boolean"
-                                                },
-                                                "approves": {
-                                                    "type": "array",
-                                                    "description": "Who approves a register correction, by the school's rule (D-086): \"The class teacher\", \"Head teacher\".",
-                                                    "items": {}
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {}
+                                                    ]
                                                 }
                                             },
                                             "required": [
@@ -27401,9 +27740,9 @@
                                                 "can_take",
                                                 "late",
                                                 "late_request",
-                                                "can_request",
-                                                "approves"
-                                            ]
+                                                "can_request"
+                                            ],
+                                            "additionalProperties": {}
                                         },
                                         {
                                             "type": "object",

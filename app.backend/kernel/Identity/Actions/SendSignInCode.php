@@ -92,10 +92,24 @@ final class SendSignInCode
 
     private function text(string $code, string $language): string
     {
-        $school = $this->school->name();
+        return self::words($this->school->name(), $code, $language, false);
+    }
+
+    /**
+     * The text message with a code: to sign in, or to add the number to an
+     * account (D-087). The Chichewa wording is a draft until the school
+     * checks it (D-082).
+     */
+    public static function words(string $school, string $code, string $language, bool $toAdd): string
+    {
         $minutes = self::EXPIRES_MINUTES;
 
-        // The Chichewa wording is a draft until the school checks it (D-082).
+        if ($toAdd) {
+            return $language === 'ny'
+                ? "{$school}: nambala yowonjezera nambalayi ku akaunti yanu ndi {$code}. Igwira ntchito kwa mphindi {$minutes}. Musapereke nambalayi kwa wina aliyense."
+                : "{$school}: your code to add this number to your account is {$code}. It expires in {$minutes} minutes. Do not share this code.";
+        }
+
         return $language === 'ny'
             ? "{$school}: nambala yanu yolowera ndi {$code}. Igwira ntchito kwa mphindi {$minutes}. Musapereke nambalayi kwa wina aliyense."
             : "{$school}: your sign-in code is {$code}. It expires in {$minutes} minutes. Do not share this code.";

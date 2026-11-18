@@ -3,7 +3,7 @@ import { Button, Notice, slips } from '@acadly/ui'
 import { useEffect, useState } from 'react'
 import { copy } from '../copy'
 import { errorFor, read, settle } from '../setup/api'
-import { Input } from '../setup/parts'
+import { Input, Select } from '../setup/parts'
 import { PageHead } from '../settings/parts'
 
 const t = copy.account
@@ -46,6 +46,7 @@ export function AccountScreen() {
 
 function AddPhone() {
   const [phone, setPhone] = useState('')
+  const [language, setLanguage] = useState<'en' | 'ny'>('en')
   const [code, setCode] = useState('')
   const [sent, setSent] = useState(false)
   const [errors, setErrors] = useState<Record<string, string[]>>({})
@@ -65,7 +66,7 @@ function AddPhone() {
     else setFailed(true)
   }
 
-  const send = () => run(settle(api.POST('/v1/me/phone/code', { body: { phone } as never })), () => setSent(true))
+  const send = () => run(settle(api.POST('/v1/me/phone/code', { body: { phone, language } as never })), () => setSent(true))
   const confirm = () =>
     run(settle(api.POST('/v1/me/phone', { body: { phone, code } as never })), () => {
       slips.done({ word: copy.slips.saved, title: t.confirmedTitle })
@@ -89,6 +90,10 @@ function AddPhone() {
         }}
       >
         <Input label={t.phone} hint={t.phoneHint} type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} error={errorFor(errors, 'phone')} required />
+        <Select label={t.language} value={language} onChange={(e) => setLanguage(e.target.value === 'ny' ? 'ny' : 'en')}>
+          <option value="en">{t.english}</option>
+          <option value="ny">{t.chichewa}</option>
+        </Select>
         {sent && (
           <Input
             label={t.code}

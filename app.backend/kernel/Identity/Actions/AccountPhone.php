@@ -47,7 +47,7 @@ final class AccountPhone
         private readonly SchoolProfile $school,
     ) {}
 
-    public function sendCode(User $by, string $written, string $ip): void
+    public function sendCode(User $by, string $written, string $ip, string $language = 'en'): void
     {
         $phone = $this->number($by, $written);
 
@@ -64,10 +64,10 @@ final class AccountPhone
         $id = Ids::next();
         $school = $this->school->name();
 
-        DB::transaction(function () use ($id, $phone, $code, $now, $ip, $by, $school): void {
+        DB::transaction(function () use ($id, $phone, $code, $now, $ip, $by, $school, $language): void {
             DB::table('sign_in_codes')->insert(['id' => $id, 'phone' => $phone, 'code_hash' => SendSignInCode::hash($phone, $code), 'ip' => $ip,
                 'created_at' => $now, 'expires_at' => $now->addMinutes(SendSignInCode::EXPIRES_MINUTES), 'purpose' => self::PURPOSE.$by->id]);
-            SendSignInCodeText::dispatch($id, $phone, "{$school}: your code to add this number to your account is {$code}. It expires in ".SendSignInCode::EXPIRES_MINUTES.' minutes. Do not share this code.');
+            SendSignInCodeText::dispatch($id, $phone, SendSignInCode::words($school, $code, $language, true));
             $this->audit->record(KernelAudit::SignInCodeSent, subject: $by, actor: $this->audit->actorFor($by), personal: ['phone' => $phone]);
         });
     }

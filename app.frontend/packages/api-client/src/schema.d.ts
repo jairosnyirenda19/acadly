@@ -84,7 +84,8 @@ export interface paths {
         /**
          * Send a code to add a phone number
          * @description Sends a six-digit code by SMS to a number the school keeps for a
-         *     learner's contact. Needs a sign-in with the email address and password.
+         *     learner's contact, in English or Chichewa (`language`: `en` or `ny`).
+         *     Needs a sign-in with the email address and password.
          */
         post: operations["me.phone.code"];
         delete?: never;
@@ -2988,6 +2989,8 @@ export interface operations {
             content: {
                 "application/json": {
                     phone: string;
+                    /** @enum {string|null} */
+                    language?: "en" | "ny" | null;
                 };
             };
         };
@@ -10256,6 +10259,7 @@ export interface operations {
                         } | null;
                         can_request: boolean;
                         approves: string[];
+                        approves_own: boolean;
                     };
                 };
             };
@@ -10288,22 +10292,21 @@ export interface operations {
                         class: {
                             id: string;
                             name: string;
-                        };
-                        day: string;
-                        today: string;
-                        school_day: boolean;
-                        teacher: string | null;
-                        register: {
+                        } | unknown;
+                        day: string | unknown;
+                        today: string | unknown;
+                        school_day: boolean | unknown;
+                        teacher: (string | null) | unknown;
+                        register: ({
                             id: string | null;
                             submitted_at: string;
                             submitted_by: string;
-                        } | null;
-                        days_before: string[];
-                        learners: unknown[];
-                        can_take: boolean;
-                        /** @description A register for an earlier day asks first, when the school has steps for it (D-081). */
-                        late: boolean;
-                        late_request: {
+                        } | null) | unknown;
+                        days_before: string[] | unknown;
+                        learners: unknown[] | unknown;
+                        can_take: boolean | unknown;
+                        late: boolean | unknown;
+                        late_request: ({
                             id: string;
                             reason: string;
                             marks: {
@@ -10311,10 +10314,10 @@ export interface operations {
                             };
                             asked_by: string;
                             waiting_for: string[];
-                        } | null;
-                        can_request: boolean;
-                        /** @description Who approves a register correction, by the school's rule (D-086): "The class teacher", "Head teacher". */
-                        approves: unknown[];
+                        } | null) | unknown;
+                        can_request: boolean | unknown;
+                    } & {
+                        [key: string]: unknown;
                     };
                 };
             };
@@ -10337,26 +10340,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
+                    "application/json": ({
                         class: {
                             id: string;
                             name: string;
-                        };
-                        day: string;
-                        today: string;
-                        school_day: boolean;
-                        teacher: string | null;
-                        register: {
+                        } | unknown;
+                        day: string | unknown;
+                        today: string | unknown;
+                        school_day: boolean | unknown;
+                        teacher: (string | null) | unknown;
+                        register: ({
                             id: string | null;
                             submitted_at: string;
                             submitted_by: string;
-                        } | null;
-                        days_before: string[];
-                        learners: unknown[];
-                        can_take: boolean;
-                        /** @description A register for an earlier day asks first, when the school has steps for it (D-081). */
-                        late: boolean;
-                        late_request: {
+                        } | null) | unknown;
+                        days_before: string[] | unknown;
+                        learners: unknown[] | unknown;
+                        can_take: boolean | unknown;
+                        late: boolean | unknown;
+                        late_request: ({
                             id: string;
                             reason: string;
                             marks: {
@@ -10364,11 +10366,11 @@ export interface operations {
                             };
                             asked_by: string;
                             waiting_for: string[];
-                        } | null;
-                        can_request: boolean;
-                        /** @description Who approves a register correction, by the school's rule (D-086): "The class teacher", "Head teacher". */
-                        approves: unknown[];
-                    } | {
+                        } | null) | unknown;
+                        can_request: boolean | unknown;
+                    } & {
+                        [key: string]: unknown;
+                    }) | {
                         class: {
                             id: string;
                             name: string;
@@ -10433,26 +10435,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
+                    "application/json": ({
                         class: {
                             id: string;
                             name: string;
-                        };
-                        day: string;
-                        today: string;
-                        school_day: boolean;
-                        teacher: string | null;
-                        register: {
+                        } | unknown;
+                        day: string | unknown;
+                        today: string | unknown;
+                        school_day: boolean | unknown;
+                        teacher: (string | null) | unknown;
+                        register: ({
                             id: string | null;
                             submitted_at: string;
                             submitted_by: string;
-                        } | null;
-                        days_before: string[];
-                        learners: unknown[];
-                        can_take: boolean;
-                        /** @description A register for an earlier day asks first, when the school has steps for it (D-081). */
-                        late: boolean;
-                        late_request: {
+                        } | null) | unknown;
+                        days_before: string[] | unknown;
+                        learners: unknown[] | unknown;
+                        can_take: boolean | unknown;
+                        late: boolean | unknown;
+                        late_request: ({
                             id: string;
                             reason: string;
                             marks: {
@@ -10460,11 +10461,11 @@ export interface operations {
                             };
                             asked_by: string;
                             waiting_for: string[];
-                        } | null;
-                        can_request: boolean;
-                        /** @description Who approves a register correction, by the school's rule (D-086): "The class teacher", "Head teacher". */
-                        approves: unknown[];
-                    } | {
+                        } | null) | unknown;
+                        can_request: boolean | unknown;
+                    } & {
+                        [key: string]: unknown;
+                    }) | {
                         class: {
                             id: string;
                             name: string;
@@ -10529,26 +10530,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
+                    "application/json": ({
                         class: {
                             id: string;
                             name: string;
-                        };
-                        day: string;
-                        today: string;
-                        school_day: boolean;
-                        teacher: string | null;
-                        register: {
+                        } | unknown;
+                        day: string | unknown;
+                        today: string | unknown;
+                        school_day: boolean | unknown;
+                        teacher: (string | null) | unknown;
+                        register: ({
                             id: string | null;
                             submitted_at: string;
                             submitted_by: string;
-                        } | null;
-                        days_before: string[];
-                        learners: unknown[];
-                        can_take: boolean;
-                        /** @description A register for an earlier day asks first, when the school has steps for it (D-081). */
-                        late: boolean;
-                        late_request: {
+                        } | null) | unknown;
+                        days_before: string[] | unknown;
+                        learners: unknown[] | unknown;
+                        can_take: boolean | unknown;
+                        late: boolean | unknown;
+                        late_request: ({
                             id: string;
                             reason: string;
                             marks: {
@@ -10556,11 +10556,11 @@ export interface operations {
                             };
                             asked_by: string;
                             waiting_for: string[];
-                        } | null;
-                        can_request: boolean;
-                        /** @description Who approves a register correction, by the school's rule (D-086): "The class teacher", "Head teacher". */
-                        approves: unknown[];
-                    } | {
+                        } | null) | unknown;
+                        can_request: boolean | unknown;
+                    } & {
+                        [key: string]: unknown;
+                    }) | {
                         class: {
                             id: string;
                             name: string;
@@ -10631,26 +10631,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
+                    "application/json": ({
                         class: {
                             id: string;
                             name: string;
-                        };
-                        day: string;
-                        today: string;
-                        school_day: boolean;
-                        teacher: string | null;
-                        register: {
+                        } | unknown;
+                        day: string | unknown;
+                        today: string | unknown;
+                        school_day: boolean | unknown;
+                        teacher: (string | null) | unknown;
+                        register: ({
                             id: string | null;
                             submitted_at: string;
                             submitted_by: string;
-                        } | null;
-                        days_before: string[];
-                        learners: unknown[];
-                        can_take: boolean;
-                        /** @description A register for an earlier day asks first, when the school has steps for it (D-081). */
-                        late: boolean;
-                        late_request: {
+                        } | null) | unknown;
+                        days_before: string[] | unknown;
+                        learners: unknown[] | unknown;
+                        can_take: boolean | unknown;
+                        late: boolean | unknown;
+                        late_request: ({
                             id: string;
                             reason: string;
                             marks: {
@@ -10658,11 +10657,11 @@ export interface operations {
                             };
                             asked_by: string;
                             waiting_for: string[];
-                        } | null;
-                        can_request: boolean;
-                        /** @description Who approves a register correction, by the school's rule (D-086): "The class teacher", "Head teacher". */
-                        approves: unknown[];
-                    } | {
+                        } | null) | unknown;
+                        can_request: boolean | unknown;
+                    } & {
+                        [key: string]: unknown;
+                    }) | {
                         class: {
                             id: string;
                             name: string;
@@ -10733,26 +10732,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
+                    "application/json": ({
                         class: {
                             id: string;
                             name: string;
-                        };
-                        day: string;
-                        today: string;
-                        school_day: boolean;
-                        teacher: string | null;
-                        register: {
+                        } | unknown;
+                        day: string | unknown;
+                        today: string | unknown;
+                        school_day: boolean | unknown;
+                        teacher: (string | null) | unknown;
+                        register: ({
                             id: string | null;
                             submitted_at: string;
                             submitted_by: string;
-                        } | null;
-                        days_before: string[];
-                        learners: unknown[];
-                        can_take: boolean;
-                        /** @description A register for an earlier day asks first, when the school has steps for it (D-081). */
-                        late: boolean;
-                        late_request: {
+                        } | null) | unknown;
+                        days_before: string[] | unknown;
+                        learners: unknown[] | unknown;
+                        can_take: boolean | unknown;
+                        late: boolean | unknown;
+                        late_request: ({
                             id: string;
                             reason: string;
                             marks: {
@@ -10760,11 +10758,11 @@ export interface operations {
                             };
                             asked_by: string;
                             waiting_for: string[];
-                        } | null;
-                        can_request: boolean;
-                        /** @description Who approves a register correction, by the school's rule (D-086): "The class teacher", "Head teacher". */
-                        approves: unknown[];
-                    } | {
+                        } | null) | unknown;
+                        can_request: boolean | unknown;
+                    } & {
+                        [key: string]: unknown;
+                    }) | {
                         class: {
                             id: string;
                             name: string;

@@ -17,14 +17,15 @@ final class AccountPhoneController
      * Send a code to add a phone number.
      *
      * Sends a six-digit code by SMS to a number the school keeps for a
-     * learner's contact. Needs a sign-in with the email address and password.
+     * learner's contact, in English or Chichewa (`language`: `en` or `ny`).
+     * Needs a sign-in with the email address and password.
      *
      * @response array{sent: true}
      */
     public function code(Request $request, AccountPhone $phone): JsonResponse
     {
-        $request->validate(['phone' => ['required', 'string', 'max:30']]);
-        $phone->sendCode(self::user($request), $request->string('phone')->toString(), (string) $request->ip());
+        $request->validate(['phone' => ['required', 'string', 'max:30'], 'language' => ['nullable', 'string', 'in:en,ny']]);
+        $phone->sendCode(self::user($request), $request->string('phone')->toString(), (string) $request->ip(), $request->string('language', 'en')->toString());
 
         return response()->json(['sent' => true]);
     }

@@ -9,6 +9,7 @@ use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
 use Acadly\Core\Enrolment\Contracts\LearnerContacts;
 use Acadly\Core\Institution\Contracts\SchoolDirectory;
 use Acadly\Kernel\Access\Access;
+use Acadly\Kernel\Access\Role;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Approvals\ApprovalRequests;
@@ -183,24 +184,47 @@ final class Registers
             'late_request' => $late,
             'can_request' => $mayTake && $register !== null,
             // Who approves a register correction, by the school's rule (D-086): "The class teacher", "Head teacher".
-            'approves' => $this->approvers(),
+            ...$this->approvers($viewer, $teacher),
         ];
     }
 
-    /** @return list<string> who approves accepting a family's reason (absent to excused), by the steps of the school's chain for register corrections */
-    private function approvers(): array
+    /**
+     * Who approves accepting a family's reason (absent to excused), by the
+     * steps of the school's chain for register corrections. Nobody approves
+     * their own request: where the viewer is the class teacher the chain
+     * names, that step goes to the chain's fallback role, or to anyone who
+     * may decide, and `approves_own` says so.
+     *
+     * @return array{approves: list<string>, approves_own: bool}
+     */
+    private function approvers(User $viewer, ?string $teacher): array
     {
         $topic = $this->chains->topic(CorrectionApproval::KEY);
 
         if ($topic === null) {
-            return [];
+            return ['approves' => [], 'approves_own' => false];
         }
 
+        $chain = $this->chains->chain($topic);
         // Only the steps that apply to accepting a reason: a change from absent to excused.
         $facts = CorrectionApproval::factsOf(Mark::Absent->value, Mark::Excused->value);
-        $steps = array_filter($this->chains->chain($topic)['steps'], fn (array $spec): bool => $spec['when'] === null || ($facts[$spec['when']] ?? false));
+        $steps = array_filter($chain['steps'], fn (array $spec): bool => $spec['when'] === null || ($facts[$spec['when']] ?? false));
+        $own = false;
+        $labels = [];
 
-        return array_values(array_map(fn (array $spec): string => $this->chains->label($topic, $spec), $steps));
+        foreach ($steps as $spec) {
+            if ($spec['kind'] === 'relation' && $spec['target'] === 'class_teacher' && $teacher === $viewer->id) {
+                $own = true;
+                $fallback = $chain['fallback_role_id'] !== null ? Role::query()->whereKey($chain['fallback_role_id'])->value('name') : null;
+                $labels[] = is_string($fallback) ? $fallback : 'Anyone who may decide';
+
+                continue;
+            }
+
+            $labels[] = $this->chains->label($topic, $spec);
+        }
+
+        return ['approves' => $labels, 'approves_own' => $own];
     }
 
     /**

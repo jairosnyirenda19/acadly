@@ -370,6 +370,7 @@ function SubmittedRegister({ state, onChange }: { state: RegisterState; onChange
                   {l.absence?.from_family != null && l.mark?.status === 'absent' && !pending && state.can_request && state.register !== null && (
                     <AcceptReason
                       approves={state.approves}
+                      own={state.approves_own}
                       registerId={state.register.id}
                       learner={l}
                       day={state.day}
@@ -473,7 +474,7 @@ function Told({ absence }: { absence: Absence }) {
 }
 
 /** Accept the family's reason (the approved design, D-085): ask for a correction from absent to excused. */
-function AcceptReason({ approves, registerId, learner, day, onDone }: { approves: string[]; registerId: string; learner: RegisterLearner; day: string; onDone: (next: RegisterState) => void }) {
+function AcceptReason({ approves, own, registerId, learner, day, onDone }: { approves: string[]; own: boolean; registerId: string; learner: RegisterLearner; day: string; onDone: (next: RegisterState) => void }) {
   const [open, setOpen] = useState(false)
   const save = useSave<RegisterState>()
 
@@ -500,6 +501,7 @@ function AcceptReason({ approves, registerId, learner, day, onDone }: { approves
           <>
             <strong className="block">{t.approvedBy(approves.join(' → '))}</strong>
             {t.approvedByNote}
+            {own && <span className="mt-1 block font-bold">{t.approvedByOwn}</span>}
           </>
         ) : (
           t.acceptApproval

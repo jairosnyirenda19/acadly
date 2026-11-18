@@ -143,3 +143,27 @@ it('gives the children back to an account of the number when the staff member re
     $this->flushSession();
     expect($this->actingAs($own, 'web')->getJson('/api/v1/portal/family')->json('children.0.id'))->toBe($this->alinafe);
 });
+
+it('sends the code to add a number in Chichewa when asked', function (): void {
+    $this->actingAs($this->teacher, 'web')->postJson('/api/v1/me/phone/code', ['phone' => '0884 771 900', 'language' => 'ny'])->assertOk();
+
+    Queue::assertPushed(SendSignInCodeText::class, fn (SendSignInCodeText $job): bool => str_contains($job->text, 'nambala yowonjezera nambalayi ku akaunti yanu'));
+});
+
+it('keeps a phone the remember cookie brings back to the parent portal only', function (): void {
+    $this->postJson('/api/v1/auth/phone/code', ['phone' => '0884 771 900'])->assertOk();
+    $signedIn = $this->postJson('/api/v1/auth/phone/sign-in', ['phone' => '0884 771 900', 'code' => newestCode('+265884771900')])->assertOk();
+    $recaller = Auth::guard('web')->getRecallerName();
+    $cookie = collect($signedIn->headers->getCookies())->first(fn ($c): bool => $c->getName() === $recaller);
+
+    expect($cookie)->not->toBeNull();
+
+    // Days later: the session is gone, only the remember cookie is left.
+    Auth::forgetGuards();
+    $this->flushSession();
+    $this->withCredentials()->withUnencryptedCookie($recaller, (string) $cookie->getValue());
+
+    $this->getJson('/api/v1/me')->assertOk()->assertJsonPath('signed_in_by', 'code')->assertJsonPath('grants', []);
+    $this->getJson('/api/v1/portal/family')->assertOk();
+    $this->getJson('/api/v1/learners')->assertForbidden()->assertJsonPath('code', 'password_required');
+});

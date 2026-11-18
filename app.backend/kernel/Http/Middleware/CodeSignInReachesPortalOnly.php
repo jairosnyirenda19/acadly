@@ -22,7 +22,7 @@ final class CodeSignInReachesPortalOnly
 {
     /** Routes a code session may use besides the parent portal's. */
     private const array ALLOWED = [
-        'me', 'auth.sign-out', 'auth.sign-in', 'auth.phone.code', 'auth.phone.sign-in', 'auth.forgot-password', 'auth.reset-password',
+        'me', 'auth.sign-out', 'auth.sign-in', 'auth.two-step', 'auth.phone.code', 'auth.phone.sign-in', 'auth.forgot-password', 'auth.reset-password',
         'sanctum.csrf-cookie', 'kernel.health', 'kernel.ready', 'kernel.school', 'institution.logo.public', 'notify.reports',
     ];
 

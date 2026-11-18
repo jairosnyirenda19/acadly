@@ -11,6 +11,10 @@ use Acadly\Core\Enrolment\Application\Families;
 use Acadly\Core\Enrolment\Application\LearnerPlaces;
 use Acadly\Core\Enrolment\Application\LearnersGrid;
 use Acadly\Core\Enrolment\Application\Progression;
+use Acadly\Core\Enrolment\Application\Search\ClassesSearch;
+use Acadly\Core\Enrolment\Application\Search\FamiliesSearch;
+use Acadly\Core\Enrolment\Application\Search\LearnersSearch;
+use Acadly\Core\Enrolment\Application\Search\VisibleClasses;
 use Acadly\Core\Enrolment\Console\YearStartCommand;
 use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
 use Acadly\Core\Enrolment\Contracts\FamilyLine;
@@ -20,6 +24,7 @@ use Acadly\Kernel\Approvals\ApprovalTopic;
 use Acadly\Kernel\Grid\Grids;
 use Acadly\Kernel\Identity\FamilyAccounts;
 use Acadly\Kernel\Identity\PhoneHolders;
+use Acadly\Kernel\Search\SearchSource;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -39,6 +44,8 @@ final class EnrolmentServiceProvider extends ServiceProvider
         $this->app->tag([LearnersGrid::class], Grids::TAG);
         $this->app->tag([DetailsApproval::class], ApprovalTopic::TAG);
         $this->app->when(Progression::class)->needs('$checks')->giveTagged(YearEndCheck::TAG);
+        $this->app->scoped(VisibleClasses::class);
+        $this->app->tag([LearnersSearch::class, ClassesSearch::class, FamiliesSearch::class], SearchSource::TAG);
     }
 
     public function boot(): void

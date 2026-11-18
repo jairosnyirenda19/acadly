@@ -18,6 +18,7 @@ use Acadly\Kernel\Identity\Actions\DisableAccount;
 use Acadly\Kernel\Identity\Actions\InviteAccount;
 use Acadly\Kernel\Identity\Actions\SendInvitation;
 use Acadly\Kernel\Identity\Actions\SendPasswordReset;
+use Acadly\Kernel\Identity\Actions\TwoStep;
 use Acadly\Kernel\Identity\People;
 use Acadly\Kernel\Identity\PeopleImport;
 use Acadly\Kernel\Identity\User;
@@ -102,7 +103,7 @@ final class PeopleController
     /**
      * One person: roles held and ended, what they can do, and the means to give.
      *
-     * @response array{person: array{id: string, name: string, email: string, state: 'active'|'ready'|'invited'|'expired'|'no_role'|'disabled', last_signed_in_at: string|null, invitation_sent_at: string|null, disabled: array{at: string|null, reason: string|null}|null}, can_act: bool, held: list<array{id: string, role: string, where: string, scope_type: string, scope_id: string|null, starts_at: string, ends_at: string|null, reason: string|null, given_by: string|null, ended_by: string|null, end_reason: string|null, can_end: bool}>, ended: list<array{id: string, role: string, where: string, scope_type: string, scope_id: string|null, starts_at: string, ends_at: string|null, reason: string|null, given_by: string|null, ended_by: string|null, end_reason: string|null}>, can_do: list<array{group: string, permissions: list<array{key: string, label: string, sight: bool, where: list<string>}>}>, giving: array{roles: list<array{id: string, name: string, permissions: list<string>}>, places: list<array{type: 'institution'|'division'|'campus'|'offering'|'class', id: string|null, label: string, within: list<string>}>, yours: list<array{permission: string, place: string}>, labels: array<string, string>}}
+     * @response array{person: array{id: string, name: string, email: string, state: 'active'|'ready'|'invited'|'expired'|'no_role'|'disabled', last_signed_in_at: string|null, invitation_sent_at: string|null, disabled: array{at: string|null, reason: string|null}|null, two_step: bool}, can_act: bool, held: list<array{id: string, role: string, where: string, scope_type: string, scope_id: string|null, starts_at: string, ends_at: string|null, reason: string|null, given_by: string|null, ended_by: string|null, end_reason: string|null, can_end: bool}>, ended: list<array{id: string, role: string, where: string, scope_type: string, scope_id: string|null, starts_at: string, ends_at: string|null, reason: string|null, given_by: string|null, ended_by: string|null, end_reason: string|null}>, can_do: list<array{group: string, permissions: list<array{key: string, label: string, sight: bool, where: list<string>}>}>, giving: array{roles: list<array{id: string, name: string, permissions: list<string>}>, places: list<array{type: 'institution'|'division'|'campus'|'offering'|'class', id: string|null, label: string, within: list<string>}>, yours: list<array{permission: string, place: string}>, labels: array<string, string>}}
      */
     public function show(Request $request, string $id): JsonResponse
     {
@@ -195,6 +196,16 @@ final class PeopleController
         $send->handle($viewer, $person);
 
         return response()->json(['status' => 'sent']);
+    }
+
+    /** Turns off two-step sign-in for someone who lost their phone (D-089). */
+    public function twoStepOff(Request $request, string $id, TwoStep $twoStep): JsonResponse
+    {
+        $viewer = self::user($request);
+        $person = $this->actable($viewer, $id);
+        $twoStep->turnOff($viewer, $person, null);
+
+        return response()->json(['status' => 'off']);
     }
 
     /** A spreadsheet to fill in: the columns, and the roles and places the viewer can give. */

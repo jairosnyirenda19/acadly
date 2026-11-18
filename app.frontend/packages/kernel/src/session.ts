@@ -14,6 +14,8 @@ export interface Account {
 /** What a sign-in attempt came to. Named outcomes, never a boolean. */
 export type SignInOutcome =
   | { kind: 'signed_in'; account: Account }
+  /** The password was right; two-step sign-in asks for the code (D-089). */
+  | { kind: 'two_step' }
   | { kind: 'incorrect' }
   | { kind: 'paused' }
   | { kind: 'unavailable' }
@@ -71,6 +73,24 @@ export async function signIn(email: string, password: string): Promise<SignInOut
   try {
     await prepare()
     const { data, response } = await api.POST('/v1/auth/sign-in', { body: { email, password } })
+
+    if (response.status === 202) return { kind: 'two_step' }
+
+    if (data !== undefined && 'user' in data) {
+      return { kind: 'signed_in', account: { ...data.user, signed_in_by: data.signed_in_by } }
+    }
+
+    return signInFailure(response.status)
+  } catch {
+    return { kind: 'unavailable' }
+  }
+}
+
+/** The second step of a sign-in: a code from the authenticator app, or a recovery code (D-089). */
+export async function signInWithTwoStep(code: string): Promise<SignInOutcome> {
+  try {
+    await prepare()
+    const { data, response } = await api.POST('/v1/auth/two-step', { body: { code } })
 
     if (data !== undefined) {
       return { kind: 'signed_in', account: { ...data.user, signed_in_by: data.signed_in_by } }

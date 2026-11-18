@@ -594,6 +594,626 @@
                 }
             }
         },
+        "/v1/me/account": {
+            "get": {
+                "operationId": "me.account",
+                "description": "Who you are and your roles, the notices that reach you and on which\nchannels, how you sign in, and the messages sent to you in the last\n90 days.",
+                "summary": "Your account",
+                "tags": [
+                    "Account"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "user": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "email",
+                                                "phone"
+                                            ]
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "role": {
+                                                        "type": "string"
+                                                    },
+                                                    "where": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "role",
+                                                    "where"
+                                                ]
+                                            }
+                                        },
+                                        "notices": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "category": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "locked": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "channels": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "channel": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "in_app",
+                                                                        "email",
+                                                                        "sms"
+                                                                    ]
+                                                                },
+                                                                "on": {
+                                                                    "type": "boolean"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "channel",
+                                                                "on"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "name",
+                                                    "category",
+                                                    "locked",
+                                                    "channels"
+                                                ]
+                                            }
+                                        },
+                                        "security": {
+                                            "type": "object",
+                                            "properties": {
+                                                "password_changed_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "two_step": {
+                                                    "type": "boolean"
+                                                },
+                                                "two_step_since": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "recovery_left": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "password_changed_at",
+                                                "two_step",
+                                                "two_step_since",
+                                                "recovery_left"
+                                            ]
+                                        },
+                                        "messages": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "channel": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "in_app",
+                                                            "email",
+                                                            "sms"
+                                                        ]
+                                                    },
+                                                    "text": {
+                                                        "type": "string"
+                                                    },
+                                                    "status": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "channel",
+                                                    "text",
+                                                    "status",
+                                                    "at"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "user",
+                                        "roles",
+                                        "notices",
+                                        "security",
+                                        "messages"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/me/account/notices": {
+            "put": {
+                "operationId": "me.account.notices",
+                "summary": "Whether a notice reaches you on a channel: `{topic, channel, on}`. The response is your account",
+                "tags": [
+                    "Account"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "on": {
+                                        "type": "boolean",
+                                        "default": false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "user": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "email",
+                                                "phone"
+                                            ]
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "notices": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "category": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "locked": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "channels": {
+                                                        "type": "array",
+                                                        "items": {}
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "name",
+                                                    "category",
+                                                    "locked",
+                                                    "channels"
+                                                ]
+                                            }
+                                        },
+                                        "security": {
+                                            "type": "object",
+                                            "properties": {
+                                                "password_changed_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "two_step": {
+                                                    "type": "boolean"
+                                                },
+                                                "two_step_since": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "recovery_left": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "password_changed_at",
+                                                "two_step",
+                                                "two_step_since",
+                                                "recovery_left"
+                                            ]
+                                        },
+                                        "messages": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "user",
+                                        "roles",
+                                        "notices",
+                                        "security",
+                                        "messages"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/me/account/password": {
+            "post": {
+                "operationId": "me.account.password",
+                "summary": "Changes your password: `{current_password, password, password_confirmation}`",
+                "tags": [
+                    "Account"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "current_password": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "current_password",
+                                    "password",
+                                    "password_confirmation"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "changed": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "changed"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/me/account/two-step": {
+            "post": {
+                "operationId": "me.account.two-step",
+                "summary": "Starts turning on two-step sign-in: the key to add to an authenticator app",
+                "tags": [
+                    "Account"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {
+                                            "type": "string"
+                                        },
+                                        "address": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "key",
+                                        "address"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "me.account.two-step.off",
+                "summary": "Turns off your two-step sign-in, with your password: `{password}`. The response is your account",
+                "tags": [
+                    "Account"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "user": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "email",
+                                                "phone"
+                                            ]
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "notices": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "category": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "locked": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "channels": {
+                                                        "type": "array",
+                                                        "items": {}
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "name",
+                                                    "category",
+                                                    "locked",
+                                                    "channels"
+                                                ]
+                                            }
+                                        },
+                                        "security": {
+                                            "type": "object",
+                                            "properties": {
+                                                "password_changed_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "two_step": {
+                                                    "type": "boolean"
+                                                },
+                                                "two_step_since": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "recovery_left": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "password_changed_at",
+                                                "two_step",
+                                                "two_step_since",
+                                                "recovery_left"
+                                            ]
+                                        },
+                                        "messages": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "user",
+                                        "roles",
+                                        "notices",
+                                        "security",
+                                        "messages"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/me/account/two-step/confirm": {
+            "post": {
+                "operationId": "me.account.two-step.confirm",
+                "summary": "Turns on two-step sign-in with a code from the app: `{code}`. The ten recovery codes are shown once",
+                "tags": [
+                    "Account"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "maxLength": 12
+                                    }
+                                },
+                                "required": [
+                                    "code"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "recovery_codes": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "recovery_codes"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/me/phone/code": {
             "post": {
                 "operationId": "me.phone.code",
@@ -7850,6 +8470,168 @@
                                         "can_correct",
                                         "correction_asks",
                                         "can_add_papers"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/calendar/{token}.ics": {
+            "get": {
+                "operationId": "academics.calendar.feed",
+                "summary": "The feed: no sign-in; the private address is the key",
+                "tags": [
+                    "CalendarFeed"
+                ],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "text/calendar; charset=utf-8": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "private, max-age=900"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    }
+                }
+            }
+        },
+        "/v1/me/calendar": {
+            "get": {
+                "operationId": "me.calendar",
+                "summary": "Whether your lessons feed is on",
+                "tags": [
+                    "CalendarFeed"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "on": {
+                                            "type": "boolean"
+                                        },
+                                        "since": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "last_used_at": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "on",
+                                        "since",
+                                        "last_used_at"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "me.calendar.on",
+                "summary": "Turns the feed on, or makes a new address: the old one stops working. The address is shown once",
+                "tags": [
+                    "CalendarFeed"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "url": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "url"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "me.calendar.off",
+                "summary": "Turns the feed off",
+                "tags": [
+                    "CalendarFeed"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "on": {
+                                            "type": "boolean"
+                                        },
+                                        "since": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "last_used_at": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "on",
+                                        "since",
+                                        "last_used_at"
                                     ]
                                 }
                             }
@@ -20771,6 +21553,64 @@
                 }
             }
         },
+        "/v1/me/teaching": {
+            "get": {
+                "operationId": "me.teaching",
+                "description": "The classes you are class teacher of, and each subject you teach with its classes, this school year.",
+                "summary": "What you teach",
+                "tags": [
+                    "MyTeaching"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "class_teacher": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "subjects": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "subject": {
+                                                        "type": "string"
+                                                    },
+                                                    "classes": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "subject",
+                                                    "classes"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "class_teacher",
+                                        "subjects"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/academics/next-year": {
             "get": {
                 "operationId": "academics.next-year",
@@ -21714,6 +22554,9 @@
                                                         "at",
                                                         "reason"
                                                     ]
+                                                },
+                                                "two_step": {
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "required": [
@@ -21723,7 +22566,8 @@
                                                 "state",
                                                 "last_signed_in_at",
                                                 "invitation_sent_at",
-                                                "disabled"
+                                                "disabled",
+                                                "two_step"
                                             ]
                                         },
                                         "can_act": {
@@ -22375,6 +23219,9 @@
                                                         "at",
                                                         "reason"
                                                     ]
+                                                },
+                                                "two_step": {
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "required": [
@@ -22384,7 +23231,8 @@
                                                 "state",
                                                 "last_signed_in_at",
                                                 "invitation_sent_at",
-                                                "disabled"
+                                                "disabled",
+                                                "two_step"
                                             ]
                                         },
                                         "can_act": {
@@ -22786,6 +23634,9 @@
                                                         "at",
                                                         "reason"
                                                     ]
+                                                },
+                                                "two_step": {
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "required": [
@@ -22795,7 +23646,8 @@
                                                 "state",
                                                 "last_signed_in_at",
                                                 "invitation_sent_at",
-                                                "disabled"
+                                                "disabled",
+                                                "two_step"
                                             ]
                                         },
                                         "can_act": {
@@ -23019,6 +23871,9 @@
                                                         "at",
                                                         "reason"
                                                     ]
+                                                },
+                                                "two_step": {
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "required": [
@@ -23028,7 +23883,8 @@
                                                 "state",
                                                 "last_signed_in_at",
                                                 "invitation_sent_at",
-                                                "disabled"
+                                                "disabled",
+                                                "two_step"
                                             ]
                                         },
                                         "can_act": {
@@ -23228,6 +24084,9 @@
                                                         "at",
                                                         "reason"
                                                     ]
+                                                },
+                                                "two_step": {
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "required": [
@@ -23237,7 +24096,8 @@
                                                 "state",
                                                 "last_signed_in_at",
                                                 "invitation_sent_at",
-                                                "disabled"
+                                                "disabled",
+                                                "two_step"
                                             ]
                                         },
                                         "can_act": {
@@ -23426,6 +24286,9 @@
                                                         "at",
                                                         "reason"
                                                     ]
+                                                },
+                                                "two_step": {
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "required": [
@@ -23435,7 +24298,8 @@
                                                 "state",
                                                 "last_signed_in_at",
                                                 "invitation_sent_at",
-                                                "disabled"
+                                                "disabled",
+                                                "two_step"
                                             ]
                                         },
                                         "can_act": {
@@ -23563,6 +24427,49 @@
                                         "status": {
                                             "type": "string",
                                             "const": "sent"
+                                        }
+                                    },
+                                    "required": [
+                                        "status"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/people/{id}/two-step": {
+            "delete": {
+                "operationId": "people.two-step.off",
+                "summary": "Turns off two-step sign-in for someone who lost their phone (D-089)",
+                "tags": [
+                    "People"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "const": "off"
                                         }
                                     },
                                     "required": [
@@ -31302,6 +32209,197 @@
                 }
             }
         },
+        "/v1/search": {
+            "get": {
+                "operationId": "search",
+                "description": "`?q=` 2 to 80 characters, `in=` one group, `limit=` hits per group\n(5 by default), `offset=` for the next page of one group. Only the\nplaces this reader may search answer; a closed place is absent.",
+                "summary": "Search",
+                "tags": [
+                    "Search"
+                ],
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 5
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "q": {
+                                            "type": "string"
+                                        },
+                                        "groups": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "hits": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "kind": {
+                                                                    "type": "string"
+                                                                },
+                                                                "title": {
+                                                                    "type": "string"
+                                                                },
+                                                                "reference": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "subtitle": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "state": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "parent": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "kind",
+                                                                "title",
+                                                                "reference",
+                                                                "subtitle",
+                                                                "state",
+                                                                "parent"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "more": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label",
+                                                    "hits",
+                                                    "more"
+                                                ]
+                                            }
+                                        },
+                                        "failed": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "q",
+                                        "groups",
+                                        "failed"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/search/places": {
+            "get": {
+                "operationId": "search.places",
+                "summary": "The places this reader may search",
+                "tags": [
+                    "Search"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "places": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "places"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/assessment/scales": {
             "get": {
                 "operationId": "assessment.scales.index",
@@ -33820,6 +34918,150 @@
                                 "required": [
                                     "email",
                                     "password"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "view_as": {
+                                            "type": "object",
+                                            "properties": {
+                                                "available": {
+                                                    "type": "boolean"
+                                                },
+                                                "by": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "name"
+                                                    ]
+                                                },
+                                                "ends_at": {
+                                                    "type": "null"
+                                                }
+                                            },
+                                            "required": [
+                                                "available",
+                                                "by",
+                                                "ends_at"
+                                            ]
+                                        },
+                                        "user": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "email",
+                                                "phone"
+                                            ]
+                                        },
+                                        "signed_in_by": {
+                                            "type": "string",
+                                            "enum": [
+                                                "code",
+                                                "password"
+                                            ]
+                                        },
+                                        "grants": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "view_as",
+                                        "user",
+                                        "signed_in_by",
+                                        "grants"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "202": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "two_step": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "two_step"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/auth/two-step": {
+            "post": {
+                "operationId": "auth.two-step",
+                "description": "The response is the same as GET /me.",
+                "summary": "The second step of a sign-in: a code from the authenticator app, or a recovery code",
+                "tags": [
+                    "SignIn"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "maxLength": 20
+                                    }
+                                },
+                                "required": [
+                                    "code"
                                 ]
                             }
                         }

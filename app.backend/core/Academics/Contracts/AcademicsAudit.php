@@ -18,6 +18,8 @@ enum AcademicsAudit: string implements AuditAction
     case TeachingCopied = 'academics.teaching_copied';
     case BellsSaved = 'academics.bells_saved';
     case TimetableSet = 'academics.timetable_set';
+    case CalendarOn = 'academics.calendar_on';
+    case CalendarOff = 'academics.calendar_off';
 
     public function key(): string
     {
@@ -37,6 +39,8 @@ enum AcademicsAudit: string implements AuditAction
             self::TeachingCopied => 'Copied who teaches what from the year before.',
             self::BellsSaved => 'Set the bell times of a level at a campus.',
             self::TimetableSet => 'Set a period of a class timetable.',
+            self::CalendarOn => 'Turned on the feed of their lessons, or made a new address for it.',
+            self::CalendarOff => 'Turned off the feed of their lessons.',
         };
     }
 

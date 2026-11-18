@@ -27,6 +27,10 @@ use Illuminate\Notifications\Notifiable;
  * @property string $password
  * @property AccountStatus $status
  * @property CarbonImmutable|null $last_signed_in_at
+ * @property string|null $two_step_secret
+ * @property CarbonImmutable|null $two_step_on_at
+ * @property int|null $two_step_last_step
+ * @property CarbonImmutable|null $password_changed_at
  */
 final class User extends Authenticatable implements Auditable
 {
@@ -35,7 +39,7 @@ final class User extends Authenticatable implements Auditable
 
     protected $fillable = ['name', 'email', 'phone', 'password', 'status'];
 
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'remember_token', 'two_step_secret'];
 
     protected $attributes = ['status' => 'active'];
 
@@ -88,6 +92,10 @@ final class User extends Authenticatable implements Auditable
             'last_signed_in_at' => 'immutable_datetime',
             'password' => 'hashed',
             'status' => AccountStatus::class,
+            'two_step_secret' => 'encrypted',
+            'two_step_on_at' => 'immutable_datetime',
+            'two_step_last_step' => 'integer',
+            'password_changed_at' => 'immutable_datetime',
         ];
     }
 }

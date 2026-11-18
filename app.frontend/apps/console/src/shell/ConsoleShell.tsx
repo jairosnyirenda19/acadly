@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { copy } from '../copy'
 import { Icon } from './icons'
 import { ViewAsBar, ViewAsKey } from './ViewAs'
+import { SearchBar } from '../search/SearchBar'
 import { holdsAnywhere, settingsHome, visibleGroups, type NavGroup } from './navigation'
 import { WorkInButton, WorkInPanel, useWorkIn } from './WorkIn'
 
@@ -384,7 +385,9 @@ export function ConsoleShell({ children, onSignedOut }: { children: ReactNode; o
               </span>
             </>
           )}
-          <div className="ml-auto">
+          {width !== 'phone' && <SearchBar phone={false} />}
+          <div className="ml-auto flex items-center gap-2">
+            {width === 'phone' && <SearchBar phone />}
             <ViewAsKey />
           </div>
           <a href="/account" onClick={(e) => { e.preventDefault(); navigate('/account') }} aria-label={copy.account.menu} className="flex items-center gap-2.5 text-ink no-underline" title={context.user.name}>

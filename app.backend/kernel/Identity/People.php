@@ -121,6 +121,7 @@ final class People
                 'last_signed_in_at' => $person->last_signed_in_at?->toIso8601String(),
                 'invitation_sent_at' => self::time(DB::table('users')->where('id', $person->id)->value('invitation_sent_at')),
                 'disabled' => $person->status === AccountStatus::Disabled ? $this->disabled($person) : null,
+                'two_step' => $person->two_step_on_at !== null,
             ],
             'can_act' => $canAct,
             'held' => array_map(fn (array $r): array => [...array_diff_key($r, ['scope' => true]), 'can_end' => $this->access->allows($viewer, AccessPermission::AssignRoles, $r['scope'])], $open),

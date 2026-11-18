@@ -40,7 +40,8 @@ export function SignIn({ school, onSignedIn }: { school: string; onSignedIn: (ac
     setWorking(false)
 
     if (outcome.kind === 'signed_in') onSignedIn(outcome.account)
-    else setProblem(outcome.kind === 'incorrect' ? 'wrong_code' : outcome.kind)
+    // A code by text message never asks for a second step; treat it as unavailable.
+    else setProblem(outcome.kind === 'incorrect' ? 'wrong_code' : outcome.kind === 'two_step' ? 'unavailable' : outcome.kind)
   }
 
   const submit = (event: FormEvent) => {

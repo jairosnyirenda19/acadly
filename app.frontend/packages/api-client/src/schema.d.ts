@@ -72,6 +72,97 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/me/account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your account
+         * @description Who you are and your roles, the notices that reach you and on which
+         *     channels, how you sign in, and the messages sent to you in the last
+         *     90 days.
+         */
+        get: operations["me.account"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/account/notices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Whether a notice reaches you on a channel: `{topic, channel, on}`. The response is your account */
+        put: operations["me.account.notices"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/account/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Changes your password: `{current_password, password, password_confirmation}` */
+        post: operations["me.account.password"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/account/two-step": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Starts turning on two-step sign-in: the key to add to an authenticator app */
+        post: operations["me.account.two-step"];
+        /** Turns off your two-step sign-in, with your password: `{password}`. The response is your account */
+        delete: operations["me.account.two-step.off"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/account/two-step/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Turns on two-step sign-in with a code from the app: `{code}`. The ten recovery codes are shown once */
+        post: operations["me.account.two-step.confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/me/phone/code": {
         parameters: {
             query?: never;
@@ -440,6 +531,42 @@ export interface paths {
         post?: never;
         /** Removes a page of a paper. It stays recorded. The response is the marks sheet */
         delete: operations["assessment.papers.remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/calendar/{token}.ics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The feed: no sign-in; the private address is the key */
+        get: operations["academics.calendar.feed"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/me/calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Whether your lessons feed is on */
+        get: operations["me.calendar"];
+        put?: never;
+        /** Turns the feed on, or makes a new address: the old one stops working. The address is shown once */
+        post: operations["me.calendar.on"];
+        /** Turns the feed off */
+        delete: operations["me.calendar.off"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1692,6 +1819,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/me/teaching": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What you teach
+         * @description The classes you are class teacher of, and each subject you teach with its classes, this school year.
+         */
+        get: operations["me.teaching"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/academics/next-year": {
         parameters: {
             query?: never;
@@ -1977,6 +2124,23 @@ export interface paths {
         /** Sends the person a link to set a new password */
         post: operations["people.password-reset"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/people/{id}/two-step": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Turns off two-step sign-in for someone who lost their phone (D-089) */
+        delete: operations["people.two-step.off"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2450,6 +2614,45 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search
+         * @description `?q=` 2 to 80 characters, `in=` one group, `limit=` hits per group
+         *     (5 by default), `offset=` for the next page of one group. Only the
+         *     places this reader may search answer; a closed place is absent.
+         */
+        get: operations["search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/search/places": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The places this reader may search */
+        get: operations["search.places"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/assessment/scales": {
         parameters: {
             query?: never;
@@ -2605,6 +2808,26 @@ export interface paths {
          * @description Starts a session for the account. The response is the same as GET /me.
          */
         post: operations["auth.sign-in"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/two-step": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * The second step of a sign-in: a code from the authenticator app, or a recovery code
+         * @description The response is the same as GET /me.
+         */
+        post: operations["auth.two-step"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3108,6 +3331,233 @@ export interface operations {
             };
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "me.account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        user: {
+                            name: string;
+                            email: string | null;
+                            phone: string | null;
+                        };
+                        roles: {
+                            role: string;
+                            where: string;
+                        }[];
+                        notices: {
+                            key: string;
+                            name: string;
+                            category: string | null;
+                            locked: boolean;
+                            channels: {
+                                /** @enum {string} */
+                                channel: "in_app" | "email" | "sms";
+                                on: boolean;
+                            }[];
+                        }[];
+                        security: {
+                            password_changed_at: string | null;
+                            two_step: boolean;
+                            two_step_since: string | null;
+                            recovery_left: number;
+                        };
+                        messages: {
+                            id: string;
+                            /** @enum {string} */
+                            channel: "in_app" | "email" | "sms";
+                            text: string;
+                            status: string;
+                            at: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "me.account.notices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @default false */
+                    on?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        user: {
+                            name: string;
+                            email: string | null;
+                            phone: string | null;
+                        };
+                        roles: unknown[];
+                        notices: {
+                            key: string;
+                            name: string;
+                            category: string | null;
+                            locked: boolean;
+                            channels: unknown[];
+                        }[];
+                        security: {
+                            password_changed_at: string | null;
+                            two_step: boolean;
+                            two_step_since: string | null;
+                            recovery_left: number;
+                        };
+                        messages: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "me.account.password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    current_password: string;
+                    password: string;
+                    password_confirmation: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        changed: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "me.account.two-step": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        key: string;
+                        address: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "me.account.two-step.off": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        user: {
+                            name: string;
+                            email: string | null;
+                            phone: string | null;
+                        };
+                        roles: unknown[];
+                        notices: {
+                            key: string;
+                            name: string;
+                            category: string | null;
+                            locked: boolean;
+                            channels: unknown[];
+                        }[];
+                        security: {
+                            password_changed_at: string | null;
+                            two_step: boolean;
+                            two_step_since: string | null;
+                            recovery_left: number;
+                        };
+                        messages: unknown[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "me.account.two-step.confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    code: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        recovery_codes: string[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
             422: components["responses"]["ValidationException"];
         };
     };
@@ -4985,6 +5435,99 @@ export interface operations {
                         can_correct: boolean;
                         correction_asks: boolean;
                         can_add_papers: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "academics.calendar.feed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, max-age=900";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/calendar; charset=utf-8": string;
+                };
+            };
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "me.calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        on: boolean;
+                        since: string | null;
+                        last_used_at: string | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "me.calendar.on": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        url: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "me.calendar.off": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        on: boolean;
+                        since: string | null;
+                        last_used_at: string | null;
                     };
                 };
             };
@@ -8944,6 +9487,32 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
+    "me.teaching": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class_teacher: string[];
+                        subjects: {
+                            subject: string;
+                            classes: string[];
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "academics.next-year": {
         parameters: {
             query?: never;
@@ -9267,6 +9836,7 @@ export interface operations {
                                 at: string | null;
                                 reason: string | null;
                             } | null;
+                            two_step: boolean;
                         };
                         can_act: boolean;
                         held: unknown[];
@@ -9490,6 +10060,7 @@ export interface operations {
                                 at: string | null;
                                 reason: string | null;
                             } | null;
+                            two_step: boolean;
                         };
                         can_act: boolean;
                         held: {
@@ -9584,6 +10155,7 @@ export interface operations {
                                 at: string | null;
                                 reason: string | null;
                             } | null;
+                            two_step: boolean;
                         };
                         can_act: boolean;
                         held: unknown[];
@@ -9650,6 +10222,7 @@ export interface operations {
                                 at: string | null;
                                 reason: string | null;
                             } | null;
+                            two_step: boolean;
                         };
                         can_act: boolean;
                         held: unknown[];
@@ -9707,6 +10280,7 @@ export interface operations {
                                 at: string | null;
                                 reason: string | null;
                             } | null;
+                            two_step: boolean;
                         };
                         can_act: boolean;
                         held: unknown[];
@@ -9762,6 +10336,7 @@ export interface operations {
                                 at: string | null;
                                 reason: string | null;
                             } | null;
+                            two_step: boolean;
                         };
                         can_act: boolean;
                         held: unknown[];
@@ -9806,6 +10381,31 @@ export interface operations {
                     "application/json": {
                         /** @constant */
                         status: "sent";
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "people.two-step.off": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        status: "off";
                     };
                 };
             };
@@ -11904,6 +12504,74 @@ export interface operations {
             };
         };
     };
+    search: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        q: string;
+                        groups: {
+                            key: string;
+                            label: string;
+                            hits: {
+                                id: string;
+                                kind: string;
+                                title: string;
+                                reference: string | null;
+                                subtitle: string | null;
+                                state: string | null;
+                                parent: string | null;
+                            }[];
+                            more: boolean;
+                        }[];
+                        failed: {
+                            key: string;
+                            label: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "search.places": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        places: {
+                            key: string;
+                            label: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "assessment.scales.index": {
         parameters: {
             query?: never;
@@ -12584,6 +13252,60 @@ export interface operations {
                     /** Format: email */
                     email: string;
                     password: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        view_as: {
+                            available: boolean;
+                            by: {
+                                id: string;
+                                name: string;
+                            } | null;
+                            ends_at: null;
+                        };
+                        user: {
+                            id: string;
+                            name: string;
+                            email: string | null;
+                            phone: string | null;
+                        };
+                        /** @enum {string} */
+                        signed_in_by: "code" | "password";
+                        grants: unknown[];
+                    };
+                };
+            };
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        two_step: boolean;
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "auth.two-step": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    code: string;
                 };
             };
         };

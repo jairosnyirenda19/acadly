@@ -14,6 +14,7 @@ use Acadly\Kernel\Support\Clock;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -49,13 +50,9 @@ final class SignIn
             throw new ThrottleRequestsException('Too many sign-in attempts.');
         }
 
-        $signedIn = Auth::guard('web')->attempt([
-            'email' => $email,
-            'password' => $password,
-            'status' => AccountStatus::Active->value,
-        ]);
-
-        $user = Auth::guard('web')->user();
+        $credentials = ['email' => $email, 'password' => $password, 'status' => AccountStatus::Active->value];
+        $signedIn = Auth::guard('web')->validate($credentials);
+        $user = $signedIn ? User::query()->where('email', $email)->first() : null;
 
         if (! $signedIn || ! $user instanceof User) {
             RateLimiter::hit($key, self::LOCK_SECONDS);
@@ -70,6 +67,15 @@ final class SignIn
 
         RateLimiter::clear($key);
 
+        // Two-step sign-in on: the code finishes the sign-in (D-089).
+        if ($user->two_step_on_at !== null) {
+            Session::put(TwoStep::PENDING, ['user' => $user->id, 'until' => $this->clock->now()->addMinutes(5)->getTimestamp()]);
+            $this->audit->record(KernelAudit::TwoStepAsked, subject: $user, actor: $this->audit->actorFor($user));
+
+            return $user;
+        }
+
+        Auth::guard('web')->login($user);
         $user->forceFill(['last_signed_in_at' => $this->clock->now()])->save();
 
         $this->audit->record(KernelAudit::SignedIn, subject: $user, actor: $this->audit->actorFor($user));

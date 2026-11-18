@@ -17,6 +17,10 @@ enum KernelAudit: string implements AuditAction
     case SignedOut = 'identity.signed_out';
     case ResetRequested = 'identity.reset_requested';
     case PasswordReset = 'identity.password_reset';
+    case PasswordChanged = 'identity.password_changed';
+    case TwoStepOn = 'identity.two_step_on';
+    case TwoStepOff = 'identity.two_step_off';
+    case TwoStepAsked = 'identity.two_step_asked';
     case AccountInvited = 'identity.account_invited';
     case InvitationSent = 'identity.invitation_sent';
     case InvitationAccepted = 'identity.invitation_accepted';
@@ -84,6 +88,10 @@ enum KernelAudit: string implements AuditAction
             self::SignedOut => 'Signed out.',
             self::ResetRequested => 'Requested a password reset link.',
             self::PasswordReset => 'Set a new password with a reset link.',
+            self::PasswordChanged => 'Changed their own password.',
+            self::TwoStepOn => 'Turned on two-step sign-in.',
+            self::TwoStepOff => 'Turned off two-step sign-in.',
+            self::TwoStepAsked => 'Gave the right password and was asked for the second step.',
             self::AccountInvited => 'Made an account for a member of staff.',
             self::InvitationSent => 'Sent an invitation to set a password.',
             self::InvitationAccepted => 'Set a first password with an invitation link.',

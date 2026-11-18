@@ -1,8 +1,8 @@
-import { navigate, useLoad } from '@acadly/kernel'
+import { api, navigate, useLoad } from '@acadly/kernel'
 import { Button, Notice, slips, Waiting } from '@acadly/ui'
 import { useState } from 'react'
 import { copy } from '../copy'
-import { errorFor } from '../setup/api'
+import { errorFor, settle } from '../setup/api'
 import { Input, SectionTitle, nn } from '../setup/parts'
 import { day, daysUntil, missingAt, settingsApi, type PersonState } from './api'
 import { PageHead, SettingsTabs, SmallButton, Tag, stateTone } from './parts'
@@ -334,6 +334,21 @@ function AccountActions({ state, onDone }: { state: PersonState; onDone: Done })
         ) : (
           <Button variant="secondary" busy={working} onClick={() => void run(() => settingsApi.resend(person.id), t.resent)}>
             {t.resend}
+          </Button>
+        )}
+        {person.two_step && (
+          <Button
+            variant="secondary"
+            busy={working}
+            onClick={() =>
+              void run(async () => {
+                const r = await settle(api.DELETE('/v1/people/{id}/two-step', { params: { path: { id: person.id } } }))
+
+                return r.kind === 'saved' ? { kind: 'saved', data: { ...state, person: { ...person, two_step: false } } } : r
+              }, t.twoStepTurnedOff)
+            }
+          >
+            {t.twoStepOff}
           </Button>
         )}
         {!disabling && (

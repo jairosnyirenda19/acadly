@@ -9,6 +9,7 @@ use Acadly\Kernel\Grid\GridsController;
 use Acadly\Kernel\Http\HealthController;
 use Acadly\Kernel\Http\ReadinessController;
 use Acadly\Kernel\Http\SchoolController;
+use Acadly\Kernel\Identity\Http\AccountController;
 use Acadly\Kernel\Identity\Http\AccountPhoneController;
 use Acadly\Kernel\Identity\Http\MeController;
 use Acadly\Kernel\Identity\Http\PasswordResetController;
@@ -21,6 +22,7 @@ use Acadly\Kernel\Module\Http\ContextController;
 use Acadly\Kernel\Module\Http\ModulesController;
 use Acadly\Kernel\Notify\Http\MessagesController;
 use Acadly\Kernel\Notify\Http\NotificationsController;
+use Acadly\Kernel\Search\Http\SearchController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', HealthController::class)->name('kernel.health');
@@ -30,6 +32,7 @@ Route::get('/school', SchoolController::class)->name('kernel.school');
 
 Route::prefix('auth')->name('auth.')->group(function (): void {
     Route::post('/sign-in', SignInController::class)->name('sign-in');
+    Route::post('/two-step', [SignInController::class, 'twoStep'])->middleware('throttle:20,1')->name('two-step');
     Route::post('/phone/code', [PhoneSignInController::class, 'code'])->middleware('throttle:10,1')->name('phone.code');
     Route::post('/phone/sign-in', [PhoneSignInController::class, 'signIn'])->middleware('throttle:20,1')->name('phone.sign-in');
     Route::post('/sign-out', SignOutController::class)->middleware('auth:sanctum')->name('sign-out');
@@ -40,6 +43,14 @@ Route::prefix('auth')->name('auth.')->group(function (): void {
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/me', MeController::class)->name('me');
     Route::get('/me/context', ContextController::class)->name('me.context');
+    Route::get('/me/account', [AccountController::class, 'show'])->name('me.account');
+    Route::put('/me/account/notices', [AccountController::class, 'notice'])->name('me.account.notices');
+    Route::post('/me/account/password', [AccountController::class, 'password'])->middleware('throttle:10,1')->name('me.account.password');
+    Route::post('/me/account/two-step', [AccountController::class, 'twoStepBegin'])->name('me.account.two-step');
+    Route::post('/me/account/two-step/confirm', [AccountController::class, 'twoStepConfirm'])->middleware('throttle:10,1')->name('me.account.two-step.confirm');
+    Route::delete('/me/account/two-step', [AccountController::class, 'twoStepOff'])->middleware('throttle:10,1')->name('me.account.two-step.off');
+    Route::get('/search', [SearchController::class, 'search'])->middleware('throttle:120,1')->name('search');
+    Route::get('/search/places', [SearchController::class, 'places'])->name('search.places');
     Route::post('/me/phone/code', [AccountPhoneController::class, 'code'])->middleware('throttle:10,1')->name('me.phone.code');
     Route::post('/me/phone', [AccountPhoneController::class, 'confirm'])->middleware('throttle:20,1')->name('me.phone.confirm');
     Route::delete('/me/phone', [AccountPhoneController::class, 'remove'])->name('me.phone.remove');
@@ -110,6 +121,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('/{id}/roles/{assignment}/end', [PeopleController::class, 'end'])->whereUuid(['id', 'assignment'])->name('end');
         Route::post('/{id}/disable', [PeopleController::class, 'disable'])->whereUuid('id')->name('disable');
         Route::post('/{id}/password-reset', [PeopleController::class, 'passwordReset'])->whereUuid('id')->name('password-reset');
+        Route::delete('/{id}/two-step', [PeopleController::class, 'twoStepOff'])->whereUuid('id')->name('two-step.off');
     });
 
     Route::get('/roles', [RolesController::class, 'index'])->name('roles.index');

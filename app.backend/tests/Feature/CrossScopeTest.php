@@ -26,12 +26,12 @@ use Tests\Fixtures\TwoCampusSchool;
 
 /** Routes open to anyone: they reveal nothing about a place. */
 const OPEN_ROUTES = [
-    'sanctum.csrf-cookie', 'auth.sign-in', 'auth.forgot-password', 'auth.reset-password', 'auth.phone.code', 'auth.phone.sign-in',
+    'sanctum.csrf-cookie', 'auth.sign-in', 'auth.two-step', 'academics.calendar.feed', 'auth.forgot-password', 'auth.reset-password', 'auth.phone.code', 'auth.phone.sign-in',
     'kernel.health', 'kernel.ready', 'kernel.school', 'institution.logo.public', 'notify.reports',
 ];
 
 /** Routes about the account itself, not about a place. */
-const OWN_ROUTES = ['auth.sign-out', 'me', 'me.context', 'me.phone.code', 'me.phone.confirm', 'me.phone.remove', 'me.notifications', 'me.notifications.read', 'view-as.leave', 'approvals.waiting', 'portal.family', 'portal.confirm'];
+const OWN_ROUTES = ['auth.sign-out', 'me', 'me.context', 'me.account', 'me.account.notices', 'me.account.password', 'me.account.two-step', 'me.account.two-step.confirm', 'me.account.two-step.off', 'me.calendar', 'me.calendar.on', 'me.calendar.off', 'me.teaching', 'search', 'search.places', 'me.phone.code', 'me.phone.confirm', 'me.phone.remove', 'me.notifications', 'me.notifications.read', 'view-as.leave', 'approvals.waiting', 'portal.family', 'portal.confirm'];
 
 /** Routes decided per record by the owning domain, and proved in its own tests. */
 const RECORD_ROUTES = [

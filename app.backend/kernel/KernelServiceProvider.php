@@ -66,6 +66,9 @@ use Acadly\Kernel\Notify\NoticeDispatcher;
 use Acadly\Kernel\Notify\Notifier;
 use Acadly\Kernel\School\ConfiguredSchool;
 use Acadly\Kernel\School\SchoolProfile;
+use Acadly\Kernel\Search\Search;
+use Acadly\Kernel\Search\SearchSource;
+use Acadly\Kernel\Search\StaffSearch;
 use Acadly\Kernel\Support\Clock;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Console\Scheduling\Schedule;
@@ -142,6 +145,9 @@ final class KernelServiceProvider extends ServiceProvider
         $this->app->singleton(Notifier::class);
         $this->app->bindIf(PhoneHolders::class, NoPhoneHolders::class);
         $this->app->bindIf(FamilyAccounts::class, NoFamilyAccounts::class);
+        // Search everything (12-search, D-089): every place a module registers.
+        $this->app->when(Search::class)->needs('$sources')->giveTagged(SearchSource::TAG);
+        $this->app->tag([StaffSearch::class], SearchSource::TAG);
         $this->app->bind(SmsProvider::class, fn (Application $app): SmsProvider => $app->make(MessageSettings::class)->smsProvider());
         $this->app->bind(
             ChannelAdapters::class,

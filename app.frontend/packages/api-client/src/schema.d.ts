@@ -914,6 +914,298 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/fees/learners/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A learner's fees: the standing, the statement, the charges and the family */
+        get: operations["fees.learner"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/learners/{id}/optional": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** The optional items a learner takes, such as boarding */
+        put: operations["fees.learner.optional"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Records a payment for one or more children of a family, and gives a receipt */
+        post: operations["fees.payments.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/payments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A receipt: who paid, how, and what each child's share paid */
+        get: operations["fees.payments.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/payments/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancels a receipt, with a reason */
+        post: operations["fees.payments.cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/charges/{id}/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A different instalment plan agreed with the family, with a reason */
+        post: operations["fees.charges.plan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/charges/{id}/adjust": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A discount, bursary, waiver or write-off on one charge, with a reason */
+        post: operations["fees.charges.adjust"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/shop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The shop price list */
+        get: operations["fees.shop.index"];
+        /** Saves the school shop price list */
+        put: operations["fees.shop.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/shop/sale": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A sale from the school shop for one learner: paid now, or added to the statement */
+        post: operations["fees.shop.sale"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/desk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The fees desk: this term's totals, who is behind their plan, and today's takings */
+        get: operations["fees.desk"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/days/{day}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Closes a day: the cash counted against the cash receipts */
+        post: operations["fees.days.close"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/reminders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reminds the families of learners behind their plan, by text message */
+        post: operations["fees.reminders"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What was received and billed between two days, as a spreadsheet for the school's accountant */
+        get: operations["fees.export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The fee items */
+        get: operations["fees.items.index"];
+        /** Saves the fee items */
+        put: operations["fees.items.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The terms of this school year and the next, by division, and whether each is billed */
+        get: operations["fees.terms.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/terms/{period}/{division}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The fees of one term: items, levels, amounts, the plan, and what billing would do */
+        get: operations["fees.terms.show"];
+        /** Saves the fees of a term. Refused once the term is billed */
+        put: operations["fees.terms.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/terms/{period}/{division}/bill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Bills the term to every learner placed in it and not billed yet */
+        post: operations["fees.terms.bill"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/grids/{grid}/views": {
         parameters: {
             query?: never;
@@ -3152,7 +3444,20 @@ export interface paths {
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
+    schemas: {
+        /**
+         * AdjustmentKind
+         * @description Less to pay on one charge. Each needs a reason.
+         * @enum {string}
+         */
+        AdjustmentKind: "discount" | "bursary" | "waiver" | "write_off";
+        /**
+         * PaymentMethod
+         * @description How a payment was made. Every method but cash carries the provider's or bank's reference.
+         * @enum {string}
+         */
+        PaymentMethod: "cash" | "bank" | "airtel_money" | "mpamba" | "cheque";
+    };
     responses: {
         /** @description Validation error */
         ValidationException: {
@@ -6447,6 +6752,791 @@ export interface operations {
             };
             401: components["responses"]["AuthenticationException"];
             404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "fees.learner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        standing: {
+                            instalments: {
+                                id: string;
+                                charge_id: string;
+                                charge: string;
+                                position: number;
+                                label: string;
+                                due_on: string;
+                                amount: number;
+                                covered: number;
+                                state: string;
+                                plan: string;
+                            }[];
+                            charged: number;
+                            reduced: number;
+                            paid: number;
+                            balance: number;
+                            due_now: number;
+                            left: number;
+                            credit: number;
+                            overdue_since: string | null;
+                        };
+                        statement: {
+                            date: string;
+                            kind: string;
+                            detail: string;
+                            note: string | null;
+                            reference: string;
+                            charged: number | null;
+                            paid: number | null;
+                            balance: number;
+                            id: string;
+                            payment_id: string | null;
+                        }[];
+                        charges: {
+                            id: string;
+                            number: string;
+                            label: string;
+                            kind: string;
+                            total: number;
+                            reduced: number;
+                            issued_on: string;
+                            left: number;
+                            agreed: boolean;
+                        }[];
+                        optional: {
+                            id: string;
+                            name: string;
+                            takes: boolean;
+                        }[];
+                        siblings: {
+                            id: string;
+                            name: string;
+                            class: string;
+                            left: number;
+                            due_now: number;
+                        }[];
+                        contact: {
+                            id: string;
+                            name: string;
+                            relationship: string;
+                            phone: string;
+                            email: string | null;
+                            notices_by: string;
+                            main: boolean;
+                        } | null;
+                        can: {
+                            collect: boolean;
+                            adjust: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "fees.learner.optional": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    items: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "fees.payments.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    method: components["schemas"]["PaymentMethod"];
+                    reference?: string | null;
+                    /** Format: date */
+                    received_on: string;
+                    payer_name: string;
+                    payer_phone?: string | null;
+                    amount: number;
+                    shares: {
+                        /** Format: uuid */
+                        learner_id: string;
+                        amount: number;
+                    }[];
+                    tell?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "fees.payments.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        number: string;
+                        received_on: string;
+                        recorded_at: string;
+                        method: string;
+                        method_label: string;
+                        reference: string | null;
+                        payer: string;
+                        amount: number;
+                        received_by: string | null;
+                        void: {
+                            number: string;
+                            reason: string;
+                            on: string;
+                        } | null;
+                        shares: {
+                            learner_id: string;
+                            name: string;
+                            class: string;
+                            amount: number;
+                            applied: {
+                                label: string;
+                                amount: number;
+                            }[];
+                            balance_after: number;
+                        }[];
+                        can_cancel: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "fees.payments.cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        number: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "fees.charges.plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason: string;
+                    instalments: {
+                        label: string;
+                        /** Format: date */
+                        due_on: string;
+                        amount: number;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "fees.charges.adjust": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    kind: components["schemas"]["AdjustmentKind"];
+                    amount: number;
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "fees.shop.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: {
+                            id: string;
+                            name: string;
+                            size: string | null;
+                            price: number;
+                            retired: boolean;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "fees.shop.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    items: {
+                        /** Format: uuid */
+                        id?: string | null;
+                        name: string;
+                        size?: string | null;
+                        price: number;
+                        retired: boolean;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "fees.shop.sale": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    lines: {
+                        /** Format: uuid */
+                        item_id: string;
+                        quantity: number;
+                    }[];
+                    pay_now?: components["schemas"]["PaymentMethod"] | null;
+                    reference?: string | null;
+                    payer_name?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "fees.desk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        today: string;
+                        terms: {
+                            division: string;
+                            name: string;
+                            year: string;
+                        }[];
+                        billed: number;
+                        billed_learners: number;
+                        collected: number;
+                        due_unpaid: number;
+                        behind_count: number;
+                        paid_in_full: number;
+                        credit: number;
+                        credit_learners: number;
+                        behind: {
+                            learner_id: string;
+                            name: string;
+                            class: string;
+                            due_now: number;
+                            since: string;
+                            owed_on: string;
+                            days: number;
+                        }[];
+                        takings: {
+                            method: string;
+                            label: string;
+                            receipts: number;
+                            amount: number;
+                        }[];
+                        cashiers: {
+                            name: string;
+                            receipts: number;
+                        }[];
+                        cancelled_today: number;
+                        expected_cash: number;
+                        closed: {
+                            expected: number;
+                            counted: number;
+                            at: string;
+                        } | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "fees.days.close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                day: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    counted: number;
+                    note?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        difference: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "fees.reminders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    learner_ids: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        sent: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "fees.export": {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "fees.items.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: {
+                            id: string;
+                            name: string;
+                            optional: boolean;
+                            retired: boolean;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "fees.items.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    items: {
+                        /** Format: uuid */
+                        id?: string | null;
+                        name: string;
+                        optional: boolean;
+                        retired: boolean;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: {
+                            id: string;
+                            name: string;
+                            optional: boolean;
+                            retired: boolean;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "fees.terms.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        terms: {
+                            period_id: string;
+                            division_id: string;
+                            division: string;
+                            year: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                            state: string;
+                            learners: number;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "fees.terms.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                period: string;
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        term: {
+                            period_id: string;
+                            division_id: string;
+                            division: string;
+                            year: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                        };
+                        items: {
+                            id: string;
+                            name: string;
+                            optional: boolean;
+                            retired: boolean;
+                        }[];
+                        levels: {
+                            code: string;
+                            label: string;
+                        }[];
+                        amounts: {
+                            item_id: string;
+                            level_code: string;
+                            amount: number;
+                        }[];
+                        plan: {
+                            label: string;
+                            due_on: string;
+                            share_bp: number;
+                        }[];
+                        billed: boolean;
+                        billed_learners: number;
+                        to_bill: {
+                            learners: number;
+                            total: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "fees.terms.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                period: string;
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    amounts: {
+                        /** Format: uuid */
+                        item_id: string;
+                        level_code: string;
+                        amount: number;
+                    }[];
+                    plan: {
+                        label: string;
+                        /** Format: date */
+                        due_on: string;
+                        share_bp: number;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "fees.terms.bill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                period: string;
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        learners: number;
+                        total: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "grids.views.store": {

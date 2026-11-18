@@ -5,6 +5,7 @@ import {
   getAccount,
   getContext,
   getSchoolName,
+  moduleOn,
   navigate,
   signOut,
   useAppContext,
@@ -41,6 +42,11 @@ import { AccountScreen } from './account/AccountScreen'
 import { SearchScreen } from './search/SearchScreen'
 import { NextYearScreen } from './settings/NextYearScreen'
 import { DocumentTypesScreen } from './settings/DocumentTypesScreen'
+import { FeesSettingsScreen } from './settings/FeesSettingsScreen'
+import { DeskScreen } from './fees/DeskScreen'
+import { RecordPaymentScreen } from './fees/RecordPaymentScreen'
+import { ReceiptScreen } from './fees/ReceiptScreen'
+import { ShopScreen } from './fees/ShopScreen'
 import { YearEndScreen } from './learners/YearEndScreen'
 import { PasswordNeeded } from './account/PasswordNeeded'
 import { TimetableScreen } from './settings/TimetableScreen'
@@ -74,6 +80,8 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const person = /^\/settings\/people\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const seesLearners = holdsAnywhere(context, 'enrolment.learners.view')
   const learner = /^\/learners\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const receipt = /^\/fees\/receipts\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const fees = moduleOn(context, 'fees')
   const registers = seesRegisters(context)
   const register = /^\/registers\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const lesson = /^\/registers\/lesson\/([0-9a-f-]{36})$/.exec(path)?.[1]
@@ -93,6 +101,11 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/search') page = <SearchScreen />
   else if (path === '/settings/next-year' && can(context, 'academics.manage')) page = <NextYearScreen />
   else if (path === '/settings/learner-documents' && can(context, 'enrolment.manage')) page = <DocumentTypesScreen />
+  else if (path === '/settings/fees' && fees && can(context, 'fees.manage')) page = <FeesSettingsScreen />
+  else if (path === '/fees' && fees && can(context, 'fees.collect')) page = <DeskScreen />
+  else if (path === '/fees/pay' && fees && holdsAnywhere(context, 'fees.collect')) page = <RecordPaymentScreen />
+  else if (path === '/fees/shop' && fees && holdsAnywhere(context, 'fees.collect')) page = <ShopScreen />
+  else if (receipt !== undefined && fees) page = <ReceiptScreen key={receipt} id={receipt} />
   else if (path === '/learners/year-end' && holdsAnywhere(context, 'enrolment.manage')) page = <YearEndScreen />
   else if (path === '/registers' && registers) page = <RegistersScreen />
   else if (path === '/registers/lessons' && registers) page = <LessonsScreen />

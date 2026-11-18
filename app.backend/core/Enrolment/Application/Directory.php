@@ -55,6 +55,21 @@ final class Directory implements EnrolmentDirectory
             'email' => $c['email'], 'notices_by' => $c['notices_by'], 'main' => $c['main']], app(Contacts::class)->of($learnerId));
     }
 
+    public function siblingsOf(string $learnerId): array
+    {
+        $phones = DB::table('learner_contacts')->where('learner_id', $learnerId)->whereNull('removed_at')->pluck('phone');
+        $ids = [];
+
+        foreach (DB::table('learner_contacts')->whereIn('phone', $phones)->whereNull('removed_at')->where('learner_id', '!=', $learnerId)
+            ->distinct()->orderBy('learner_id')->pluck('learner_id') as $id) {
+            if (is_string($id)) {
+                $ids[] = $id;
+            }
+        }
+
+        return $ids;
+    }
+
     public function placeOf(string $learnerId): ?array
     {
         $place = app(LearnerPlaces::class)->current($learnerId);

@@ -56,6 +56,7 @@ const RECORD_ROUTES = [
     'grids.exports.show' => 'GridTest: builds an export in the background (another person: not found)',
     'grids.exports.file' => 'GridTest: builds an export in the background (another person: not found)',
     'grids.bulk' => 'GridTest: changes the class of every learner that matches (rows outside reach are dropped)',
+    'fees.payments.store' => 'FeesTest: takes payments only where they may receive them (a child outside reach is not found)',
 ];
 
 /**
@@ -63,7 +64,7 @@ const RECORD_ROUTES = [
  * For these the test checks that nothing of campus B is in the answer.
  */
 const LIST_ROUTES = ['people.index', 'academics.teaching.index', 'academics.timetable.index', 'learners.index', 'learners.grid', 'people.grid', 'registers.index',
-    'registers.lessons', 'registers.missed', 'registers.levels', 'assessment.mine', 'assessment.options', 'assessment.grid', 'assessment.publishing'];
+    'registers.lessons', 'registers.missed', 'registers.levels', 'assessment.mine', 'assessment.options', 'assessment.grid', 'assessment.publishing', 'fees.shop.index'];
 
 uses(DatabaseTransactions::class);
 
@@ -90,6 +91,7 @@ it('refuses every place-bound route to an account that holds everything, but onl
     $this->artisan('acadly:sync')->assertSuccessful();
     DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'attendance', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
     DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'assessment', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
+    DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'fees', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
     $school = TwoCampusSchool::make();
 
     $everything = Role::query()->create(['key' => 'everything_at_a', 'name' => 'Everything at campus A']);
@@ -152,6 +154,7 @@ it('refuses every place-bound route to an account that holds everything, but onl
         'assessment.learner' => ['id' => $learner],
         'portal.' => ['id' => $learner, 'day' => '2026-10-01'],
         'year-end.' => ['division' => $school->id('secondary'), 'id' => $learner],
+        'fees.' => ['id' => $learner, 'period' => $term, 'division' => $school->id('secondary'), 'day' => '2026-10-01'],
     ];
     $b = [
         'id' => $school->id('campus_b'),

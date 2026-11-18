@@ -8,6 +8,7 @@ use Acadly\Kernel\KernelServiceProvider;
 use Acadly\Kernel\Module\ModuleServiceProvider;
 use Acadly\Modules\Assessment\AssessmentServiceProvider;
 use Acadly\Modules\Attendance\AttendanceServiceProvider;
+use Acadly\Modules\Fees\FeesServiceProvider;
 use App\Providers\AppServiceProvider;
 
 return [
@@ -20,4 +21,5 @@ return [
     SetupServiceProvider::class,
     AttendanceServiceProvider::class,
     AssessmentServiceProvider::class,
+    FeesServiceProvider::class,
 ];

@@ -36,4 +36,12 @@ interface EnrolmentDirectory
      * @return array{class_id: string, division_id: string, campus_id: string, year_id: string, open: bool, since: string}|null
      */
     public function placeOf(string $learnerId): ?array;
+
+    /**
+     * The other learners who share a contact's phone with this learner now:
+     * brothers and sisters, for a family that pays for several children at once.
+     *
+     * @return list<string> learner ids
+     */
+    public function siblingsOf(string $learnerId): array;
 }

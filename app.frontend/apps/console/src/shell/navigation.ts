@@ -50,6 +50,15 @@ export const GROUPS: NavGroup[] = [
     items: [{ key: 'learners', label: t.nav.learners, path: '/learners', icon: 'learners', show: (c) => holdsAnywhere(c, 'enrolment.learners.view'), lights: under('/learners') }],
   },
   {
+    key: 'fees',
+    label: t.groups.fees,
+    items: [
+      { key: 'fees-desk', label: t.nav.feesDesk, path: '/fees', icon: 'fees', show: (c) => moduleOn(c, 'fees') && can(c, 'fees.collect'), lights: (p) => p === '/fees' || p.startsWith('/fees/receipts') },
+      { key: 'fees-pay', label: t.nav.feesPay, path: '/fees/pay', icon: 'pay', show: (c) => moduleOn(c, 'fees') && holdsAnywhere(c, 'fees.collect'), lights: under('/fees/pay') },
+      { key: 'fees-shop', label: t.nav.feesShop, path: '/fees/shop', icon: 'shop', show: (c) => moduleOn(c, 'fees') && holdsAnywhere(c, 'fees.collect'), lights: under('/fees/shop') },
+    ],
+  },
+  {
     key: 'school',
     label: t.groups.school,
     items: [
@@ -59,6 +68,7 @@ export const GROUPS: NavGroup[] = [
       { key: 'teaching', label: t.nav.teaching, path: '/settings/teaching', icon: 'teaching', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/teaching') },
       { key: 'timetable', label: t.nav.timetable, path: '/settings/timetable', icon: 'timetable', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/timetable') },
       { key: 'next-year', label: t.nav.nextYear, path: '/settings/next-year', icon: 'timetable', show: (c) => can(c, 'academics.manage'), lights: under('/settings/next-year') },
+      { key: 'fee-settings', label: t.nav.feeSettings, path: '/settings/fees', icon: 'fees', show: (c) => moduleOn(c, 'fees') && can(c, 'fees.manage'), lights: under('/settings/fees') },
       { key: 'document-types', label: t.nav.documentTypes, path: '/settings/learner-documents', icon: 'learners', show: (c) => can(c, 'enrolment.manage'), lights: under('/settings/learner-documents') },
       { key: 'messages', label: t.nav.messages, path: '/settings/messages', icon: 'messages', show: (c) => can(c, 'notify.manage'), lights: under('/settings/messages') },
       { key: 'assessment', label: t.nav.assessment, path: '/settings/assessment', icon: 'assessment', show: (c) => keepsGrading(c), lights: under('/settings/assessment') },

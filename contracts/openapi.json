@@ -11169,6 +11169,2140 @@
                 }
             }
         },
+        "/v1/fees/learners/{id}": {
+            "get": {
+                "operationId": "fees.learner",
+                "summary": "A learner's fees: the standing, the statement, the charges and the family",
+                "tags": [
+                    "Fees"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "standing": {
+                                            "type": "object",
+                                            "properties": {
+                                                "instalments": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "charge_id": {
+                                                                "type": "string"
+                                                            },
+                                                            "charge": {
+                                                                "type": "string"
+                                                            },
+                                                            "position": {
+                                                                "type": "integer"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "due_on": {
+                                                                "type": "string"
+                                                            },
+                                                            "amount": {
+                                                                "type": "integer"
+                                                            },
+                                                            "covered": {
+                                                                "type": "integer"
+                                                            },
+                                                            "state": {
+                                                                "type": "string"
+                                                            },
+                                                            "plan": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "charge_id",
+                                                            "charge",
+                                                            "position",
+                                                            "label",
+                                                            "due_on",
+                                                            "amount",
+                                                            "covered",
+                                                            "state",
+                                                            "plan"
+                                                        ]
+                                                    }
+                                                },
+                                                "charged": {
+                                                    "type": "integer"
+                                                },
+                                                "reduced": {
+                                                    "type": "integer"
+                                                },
+                                                "paid": {
+                                                    "type": "integer"
+                                                },
+                                                "balance": {
+                                                    "type": "integer"
+                                                },
+                                                "due_now": {
+                                                    "type": "integer"
+                                                },
+                                                "left": {
+                                                    "type": "integer"
+                                                },
+                                                "credit": {
+                                                    "type": "integer"
+                                                },
+                                                "overdue_since": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "instalments",
+                                                "charged",
+                                                "reduced",
+                                                "paid",
+                                                "balance",
+                                                "due_now",
+                                                "left",
+                                                "credit",
+                                                "overdue_since"
+                                            ]
+                                        },
+                                        "statement": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "date": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "detail": {
+                                                        "type": "string"
+                                                    },
+                                                    "note": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reference": {
+                                                        "type": "string"
+                                                    },
+                                                    "charged": {
+                                                        "type": [
+                                                            "integer",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "paid": {
+                                                        "type": [
+                                                            "integer",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "balance": {
+                                                        "type": "integer"
+                                                    },
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "payment_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "date",
+                                                    "kind",
+                                                    "detail",
+                                                    "note",
+                                                    "reference",
+                                                    "charged",
+                                                    "paid",
+                                                    "balance",
+                                                    "id",
+                                                    "payment_id"
+                                                ]
+                                            }
+                                        },
+                                        "charges": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "number": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "total": {
+                                                        "type": "integer"
+                                                    },
+                                                    "reduced": {
+                                                        "type": "integer"
+                                                    },
+                                                    "issued_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "left": {
+                                                        "type": "integer"
+                                                    },
+                                                    "agreed": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "number",
+                                                    "label",
+                                                    "kind",
+                                                    "total",
+                                                    "reduced",
+                                                    "issued_on",
+                                                    "left",
+                                                    "agreed"
+                                                ]
+                                            }
+                                        },
+                                        "optional": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "takes": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "takes"
+                                                ]
+                                            }
+                                        },
+                                        "siblings": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "left": {
+                                                        "type": "integer"
+                                                    },
+                                                    "due_now": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "class",
+                                                    "left",
+                                                    "due_now"
+                                                ]
+                                            }
+                                        },
+                                        "contact": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "relationship": {
+                                                    "type": "string"
+                                                },
+                                                "phone": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "notices_by": {
+                                                    "type": "string"
+                                                },
+                                                "main": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "relationship",
+                                                "phone",
+                                                "email",
+                                                "notices_by",
+                                                "main"
+                                            ]
+                                        },
+                                        "can": {
+                                            "type": "object",
+                                            "properties": {
+                                                "collect": {
+                                                    "type": "boolean"
+                                                },
+                                                "adjust": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "collect",
+                                                "adjust"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "standing",
+                                        "statement",
+                                        "charges",
+                                        "optional",
+                                        "siblings",
+                                        "contact",
+                                        "can"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/learners/{id}/optional": {
+            "put": {
+                "operationId": "fees.learner.optional",
+                "summary": "The optional items a learner takes, such as boarding",
+                "tags": [
+                    "Fees"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "items": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "items"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/payments": {
+            "post": {
+                "operationId": "fees.payments.store",
+                "summary": "Records a payment for one or more children of a family, and gives a receipt",
+                "tags": [
+                    "Fees"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "method": {
+                                        "$ref": "#/components/schemas/PaymentMethod"
+                                    },
+                                    "reference": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 80
+                                    },
+                                    "received_on": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "payer_name": {
+                                        "type": "string",
+                                        "maxLength": 120
+                                    },
+                                    "payer_phone": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 30
+                                    },
+                                    "amount": {
+                                        "type": "integer",
+                                        "minimum": 1
+                                    },
+                                    "shares": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "learner_id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "amount": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                }
+                                            },
+                                            "required": [
+                                                "learner_id",
+                                                "amount"
+                                            ]
+                                        },
+                                        "minItems": 1,
+                                        "maxItems": 12
+                                    },
+                                    "tell": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "method",
+                                    "received_on",
+                                    "payer_name",
+                                    "amount",
+                                    "shares"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/payments/{id}": {
+            "get": {
+                "operationId": "fees.payments.show",
+                "summary": "A receipt: who paid, how, and what each child's share paid",
+                "tags": [
+                    "Fees"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "number": {
+                                            "type": "string"
+                                        },
+                                        "received_on": {
+                                            "type": "string"
+                                        },
+                                        "recorded_at": {
+                                            "type": "string"
+                                        },
+                                        "method": {
+                                            "type": "string"
+                                        },
+                                        "method_label": {
+                                            "type": "string"
+                                        },
+                                        "reference": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "payer": {
+                                            "type": "string"
+                                        },
+                                        "amount": {
+                                            "type": "integer"
+                                        },
+                                        "received_by": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "void": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "number": {
+                                                    "type": "string"
+                                                },
+                                                "reason": {
+                                                    "type": "string"
+                                                },
+                                                "on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "number",
+                                                "reason",
+                                                "on"
+                                            ]
+                                        },
+                                        "shares": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "amount": {
+                                                        "type": "integer"
+                                                    },
+                                                    "applied": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "label": {
+                                                                    "type": "string"
+                                                                },
+                                                                "amount": {
+                                                                    "type": "integer"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "label",
+                                                                "amount"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "balance_after": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "learner_id",
+                                                    "name",
+                                                    "class",
+                                                    "amount",
+                                                    "applied",
+                                                    "balance_after"
+                                                ]
+                                            }
+                                        },
+                                        "can_cancel": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "number",
+                                        "received_on",
+                                        "recorded_at",
+                                        "method",
+                                        "method_label",
+                                        "reference",
+                                        "payer",
+                                        "amount",
+                                        "received_by",
+                                        "void",
+                                        "shares",
+                                        "can_cancel"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/payments/{id}/cancel": {
+            "post": {
+                "operationId": "fees.payments.cancel",
+                "summary": "Cancels a receipt, with a reason",
+                "tags": [
+                    "Fees"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "number": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "number"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/charges/{id}/plan": {
+            "post": {
+                "operationId": "fees.charges.plan",
+                "summary": "A different instalment plan agreed with the family, with a reason",
+                "tags": [
+                    "Fees"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 1000
+                                    },
+                                    "instalments": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "label": {
+                                                    "type": "string",
+                                                    "maxLength": 60
+                                                },
+                                                "due_on": {
+                                                    "type": "string",
+                                                    "format": "date"
+                                                },
+                                                "amount": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                }
+                                            },
+                                            "required": [
+                                                "label",
+                                                "due_on",
+                                                "amount"
+                                            ]
+                                        },
+                                        "minItems": 1,
+                                        "maxItems": 24
+                                    }
+                                },
+                                "required": [
+                                    "reason",
+                                    "instalments"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/charges/{id}/adjust": {
+            "post": {
+                "operationId": "fees.charges.adjust",
+                "summary": "A discount, bursary, waiver or write-off on one charge, with a reason",
+                "tags": [
+                    "Fees"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "$ref": "#/components/schemas/AdjustmentKind"
+                                    },
+                                    "amount": {
+                                        "type": "integer",
+                                        "minimum": 1
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 1000
+                                    }
+                                },
+                                "required": [
+                                    "kind",
+                                    "amount",
+                                    "reason"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/shop": {
+            "get": {
+                "operationId": "fees.shop.index",
+                "summary": "The shop price list",
+                "tags": [
+                    "Fees"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "items": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "size": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "price": {
+                                                        "type": "integer"
+                                                    },
+                                                    "retired": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "size",
+                                                    "price",
+                                                    "retired"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "items"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "fees.shop.save",
+                "summary": "Saves the school shop price list",
+                "tags": [
+                    "FeesSettings"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "items": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "uuid"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "maxLength": 80
+                                                },
+                                                "size": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "maxLength": 30
+                                                },
+                                                "price": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "retired": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "price",
+                                                "retired"
+                                            ]
+                                        },
+                                        "maxItems": 200
+                                    }
+                                },
+                                "required": [
+                                    "items"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/shop/sale": {
+            "post": {
+                "operationId": "fees.shop.sale",
+                "summary": "A sale from the school shop for one learner: paid now, or added to the statement",
+                "tags": [
+                    "Fees"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "lines": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "item_id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "quantity": {
+                                                    "type": "integer",
+                                                    "minimum": 0,
+                                                    "maximum": 99
+                                                }
+                                            },
+                                            "required": [
+                                                "item_id",
+                                                "quantity"
+                                            ]
+                                        },
+                                        "minItems": 1,
+                                        "maxItems": 30
+                                    },
+                                    "pay_now": {
+                                        "anyOf": [
+                                            {
+                                                "$ref": "#/components/schemas/PaymentMethod"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "reference": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 80
+                                    },
+                                    "payer_name": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 120
+                                    }
+                                },
+                                "required": [
+                                    "lines"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/desk": {
+            "get": {
+                "operationId": "fees.desk",
+                "summary": "The fees desk: this term's totals, who is behind their plan, and today's takings",
+                "tags": [
+                    "FeesSettings"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "today": {
+                                            "type": "string"
+                                        },
+                                        "terms": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "division": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "year": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "division",
+                                                    "name",
+                                                    "year"
+                                                ]
+                                            }
+                                        },
+                                        "billed": {
+                                            "type": "integer"
+                                        },
+                                        "billed_learners": {
+                                            "type": "integer"
+                                        },
+                                        "collected": {
+                                            "type": "integer"
+                                        },
+                                        "due_unpaid": {
+                                            "type": "integer"
+                                        },
+                                        "behind_count": {
+                                            "type": "integer"
+                                        },
+                                        "paid_in_full": {
+                                            "type": "integer"
+                                        },
+                                        "credit": {
+                                            "type": "integer"
+                                        },
+                                        "credit_learners": {
+                                            "type": "integer"
+                                        },
+                                        "behind": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "due_now": {
+                                                        "type": "integer"
+                                                    },
+                                                    "since": {
+                                                        "type": "string"
+                                                    },
+                                                    "owed_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "days": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "learner_id",
+                                                    "name",
+                                                    "class",
+                                                    "due_now",
+                                                    "since",
+                                                    "owed_on",
+                                                    "days"
+                                                ]
+                                            }
+                                        },
+                                        "takings": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "method": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "receipts": {
+                                                        "type": "integer"
+                                                    },
+                                                    "amount": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "method",
+                                                    "label",
+                                                    "receipts",
+                                                    "amount"
+                                                ]
+                                            }
+                                        },
+                                        "cashiers": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "receipts": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "name",
+                                                    "receipts"
+                                                ]
+                                            }
+                                        },
+                                        "cancelled_today": {
+                                            "type": "integer"
+                                        },
+                                        "expected_cash": {
+                                            "type": "integer"
+                                        },
+                                        "closed": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "expected": {
+                                                    "type": "integer"
+                                                },
+                                                "counted": {
+                                                    "type": "integer"
+                                                },
+                                                "at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "expected",
+                                                "counted",
+                                                "at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "today",
+                                        "terms",
+                                        "billed",
+                                        "billed_learners",
+                                        "collected",
+                                        "due_unpaid",
+                                        "behind_count",
+                                        "paid_in_full",
+                                        "credit",
+                                        "credit_learners",
+                                        "behind",
+                                        "takings",
+                                        "cashiers",
+                                        "cancelled_today",
+                                        "expected_cash",
+                                        "closed"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/days/{day}/close": {
+            "post": {
+                "operationId": "fees.days.close",
+                "summary": "Closes a day: the cash counted against the cash receipts",
+                "tags": [
+                    "FeesSettings"
+                ],
+                "parameters": [
+                    {
+                        "name": "day",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "counted": {
+                                        "type": "integer",
+                                        "minimum": 0
+                                    },
+                                    "note": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 1000
+                                    }
+                                },
+                                "required": [
+                                    "counted"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "difference": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "difference"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/reminders": {
+            "post": {
+                "operationId": "fees.reminders",
+                "summary": "Reminds the families of learners behind their plan, by text message",
+                "tags": [
+                    "FeesSettings"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "learner_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "minItems": 1,
+                                        "maxItems": 2000
+                                    }
+                                },
+                                "required": [
+                                    "learner_ids"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sent": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "sent"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/export": {
+            "get": {
+                "operationId": "fees.export",
+                "summary": "What was received and billed between two days, as a spreadsheet for the school's accountant",
+                "tags": [
+                    "FeesSettings"
+                ],
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/items": {
+            "get": {
+                "operationId": "fees.items.index",
+                "summary": "The fee items",
+                "tags": [
+                    "FeesSettings"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "items": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "optional": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "retired": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "optional",
+                                                    "retired"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "items"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "fees.items.save",
+                "summary": "Saves the fee items",
+                "tags": [
+                    "FeesSettings"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "items": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "uuid"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "maxLength": 80
+                                                },
+                                                "optional": {
+                                                    "type": "boolean"
+                                                },
+                                                "retired": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "optional",
+                                                "retired"
+                                            ]
+                                        },
+                                        "minItems": 1,
+                                        "maxItems": 40
+                                    }
+                                },
+                                "required": [
+                                    "items"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "items": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "optional": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "retired": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "optional",
+                                                    "retired"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "items"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/terms": {
+            "get": {
+                "operationId": "fees.terms.index",
+                "summary": "The terms of this school year and the next, by division, and whether each is billed",
+                "tags": [
+                    "FeesSettings"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "terms": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "period_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "division_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "division": {
+                                                        "type": "string"
+                                                    },
+                                                    "year": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "starts_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "ends_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "learners": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "period_id",
+                                                    "division_id",
+                                                    "division",
+                                                    "year",
+                                                    "name",
+                                                    "starts_on",
+                                                    "ends_on",
+                                                    "state",
+                                                    "learners"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "terms"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/terms/{period}/{division}": {
+            "get": {
+                "operationId": "fees.terms.show",
+                "summary": "The fees of one term: items, levels, amounts, the plan, and what billing would do",
+                "tags": [
+                    "FeesSettings"
+                ],
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "term": {
+                                            "type": "object",
+                                            "properties": {
+                                                "period_id": {
+                                                    "type": "string"
+                                                },
+                                                "division_id": {
+                                                    "type": "string"
+                                                },
+                                                "division": {
+                                                    "type": "string"
+                                                },
+                                                "year": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "starts_on": {
+                                                    "type": "string"
+                                                },
+                                                "ends_on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "period_id",
+                                                "division_id",
+                                                "division",
+                                                "year",
+                                                "name",
+                                                "starts_on",
+                                                "ends_on"
+                                            ]
+                                        },
+                                        "items": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "optional": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "retired": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "optional",
+                                                    "retired"
+                                                ]
+                                            }
+                                        },
+                                        "levels": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "code",
+                                                    "label"
+                                                ]
+                                            }
+                                        },
+                                        "amounts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "item_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "level_code": {
+                                                        "type": "string"
+                                                    },
+                                                    "amount": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "item_id",
+                                                    "level_code",
+                                                    "amount"
+                                                ]
+                                            }
+                                        },
+                                        "plan": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "due_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "share_bp": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "label",
+                                                    "due_on",
+                                                    "share_bp"
+                                                ]
+                                            }
+                                        },
+                                        "billed": {
+                                            "type": "boolean"
+                                        },
+                                        "billed_learners": {
+                                            "type": "integer"
+                                        },
+                                        "to_bill": {
+                                            "type": "object",
+                                            "properties": {
+                                                "learners": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "learners",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "term",
+                                        "items",
+                                        "levels",
+                                        "amounts",
+                                        "plan",
+                                        "billed",
+                                        "billed_learners",
+                                        "to_bill"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "fees.terms.save",
+                "summary": "Saves the fees of a term. Refused once the term is billed",
+                "tags": [
+                    "FeesSettings"
+                ],
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "amounts": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "item_id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "level_code": {
+                                                    "type": "string",
+                                                    "maxLength": 20
+                                                },
+                                                "amount": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "item_id",
+                                                "level_code",
+                                                "amount"
+                                            ]
+                                        }
+                                    },
+                                    "plan": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "label": {
+                                                    "type": "string",
+                                                    "maxLength": 60
+                                                },
+                                                "due_on": {
+                                                    "type": "string",
+                                                    "format": "date"
+                                                },
+                                                "share_bp": {
+                                                    "type": "integer",
+                                                    "minimum": 1,
+                                                    "maximum": 10000
+                                                }
+                                            },
+                                            "required": [
+                                                "label",
+                                                "due_on",
+                                                "share_bp"
+                                            ]
+                                        },
+                                        "minItems": 1,
+                                        "maxItems": 6
+                                    }
+                                },
+                                "required": [
+                                    "amounts",
+                                    "plan"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/terms/{period}/{division}/bill": {
+            "post": {
+                "operationId": "fees.terms.bill",
+                "summary": "Bills the term to every learner placed in it and not billed yet",
+                "tags": [
+                    "FeesSettings"
+                ],
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "learners": {
+                                            "type": "integer"
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "learners",
+                                        "total"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/grids/{grid}/views": {
             "post": {
                 "operationId": "grids.views.store",
@@ -37550,6 +39684,31 @@
         }
     },
     "components": {
+        "schemas": {
+            "AdjustmentKind": {
+                "type": "string",
+                "description": "Less to pay on one charge. Each needs a reason.\n",
+                "enum": [
+                    "discount",
+                    "bursary",
+                    "waiver",
+                    "write_off"
+                ],
+                "title": "AdjustmentKind"
+            },
+            "PaymentMethod": {
+                "type": "string",
+                "description": "How a payment was made. Every method but cash carries the provider's or bank's reference.\n",
+                "enum": [
+                    "cash",
+                    "bank",
+                    "airtel_money",
+                    "mpamba",
+                    "cheque"
+                ],
+                "title": "PaymentMethod"
+            }
+        },
         "responses": {
             "ValidationException": {
                 "description": "Validation error",

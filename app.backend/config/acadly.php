@@ -10,6 +10,7 @@ use Acadly\Kernel\Notify\Sms\AfricasTalkingProvider;
 use Acadly\Kernel\Notify\Sms\MeTicketProvider;
 use Acadly\Modules\Assessment\AssessmentModule;
 use Acadly\Modules\Attendance\AttendanceModule;
+use Acadly\Modules\Conduct\ConductModule;
 use Acadly\Modules\Fees\FeesModule;
 
 return [
@@ -130,6 +131,7 @@ return [
         AttendanceModule::class,
         AssessmentModule::class,
         FeesModule::class,
+        ConductModule::class,
     ],
 
 ];

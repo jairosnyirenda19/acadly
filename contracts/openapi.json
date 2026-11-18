@@ -8643,6 +8643,1299 @@
                 }
             }
         },
+        "/v1/conduct": {
+            "get": {
+                "operationId": "conduct.overview",
+                "summary": "The school's overview: open serious incidents, learners to watch, by kind",
+                "tags": [
+                    "Conduct"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "commendations": {
+                                            "type": "integer"
+                                        },
+                                        "commendations_before": {
+                                            "type": "integer"
+                                        },
+                                        "incidents": {
+                                            "type": "integer"
+                                        },
+                                        "levels": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "integer"
+                                            }
+                                        },
+                                        "open_cases": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "number": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "state_label": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "happened_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "learners": {
+                                                        "type": "string"
+                                                    },
+                                                    "lead": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "days": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "number",
+                                                    "state",
+                                                    "state_label",
+                                                    "kind",
+                                                    "happened_on",
+                                                    "learners",
+                                                    "lead",
+                                                    "days"
+                                                ]
+                                            }
+                                        },
+                                        "watch": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "reasons": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "class",
+                                                    "reasons"
+                                                ]
+                                            }
+                                        },
+                                        "kinds": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "commendation": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "now": {
+                                                        "type": "integer"
+                                                    },
+                                                    "before": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "name",
+                                                    "commendation",
+                                                    "now",
+                                                    "before"
+                                                ]
+                                            }
+                                        },
+                                        "rules": {
+                                            "type": "object",
+                                            "properties": {
+                                                "incidents": {
+                                                    "type": "integer"
+                                                },
+                                                "days": {
+                                                    "type": "integer"
+                                                },
+                                                "open_serious": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "incidents",
+                                                "days",
+                                                "open_serious"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "commendations",
+                                        "commendations_before",
+                                        "incidents",
+                                        "levels",
+                                        "open_cases",
+                                        "watch",
+                                        "kinds",
+                                        "rules"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/conduct/kinds": {
+            "get": {
+                "operationId": "conduct.kinds.index",
+                "summary": "The kinds of incident and commendation, and the rules for learners to watch",
+                "tags": [
+                    "Conduct"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "kinds": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "commendation": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "level": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "always": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "retired": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "commendation",
+                                                    "level",
+                                                    "always",
+                                                    "retired"
+                                                ]
+                                            }
+                                        },
+                                        "watch": {
+                                            "type": "object",
+                                            "properties": {
+                                                "incidents": {
+                                                    "type": "integer"
+                                                },
+                                                "days": {
+                                                    "type": "integer"
+                                                },
+                                                "open_serious": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "incidents",
+                                                "days",
+                                                "open_serious"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "kinds",
+                                        "watch"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "conduct.kinds.save",
+                "summary": "Saves the kinds",
+                "tags": [
+                    "Conduct"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "kinds": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "uuid"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "maxLength": 80
+                                                },
+                                                "commendation": {
+                                                    "type": "boolean"
+                                                },
+                                                "level": {
+                                                    "anyOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/Level"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "always": {
+                                                    "type": "boolean"
+                                                },
+                                                "retired": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "commendation",
+                                                "always",
+                                                "retired"
+                                            ]
+                                        },
+                                        "minItems": 1,
+                                        "maxItems": 80
+                                    }
+                                },
+                                "required": [
+                                    "kinds"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/conduct/watch": {
+            "put": {
+                "operationId": "conduct.watch.save",
+                "summary": "Saves the rules for learners to watch",
+                "tags": [
+                    "Conduct"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "incidents": {
+                                        "type": "integer"
+                                    },
+                                    "days": {
+                                        "type": "integer"
+                                    },
+                                    "open_serious": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "incidents",
+                                    "days",
+                                    "open_serious"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/conduct/entries": {
+            "post": {
+                "operationId": "conduct.entries.store",
+                "summary": "Records an incident or a commendation for one or more learners",
+                "tags": [
+                    "Conduct"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "kind_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "level": {
+                                        "anyOf": [
+                                            {
+                                                "$ref": "#/components/schemas/Level"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "learners": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "minItems": 1,
+                                        "maxItems": 30
+                                    },
+                                    "happened_on": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "place": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 120
+                                    },
+                                    "what": {
+                                        "type": "string",
+                                        "maxLength": 4000
+                                    },
+                                    "action": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 2000
+                                    },
+                                    "tell": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "kind_id",
+                                    "learners",
+                                    "happened_on",
+                                    "what"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/conduct/entries/{id}/withdraw": {
+            "post": {
+                "operationId": "conduct.entries.withdraw",
+                "summary": "Withdraws an entry, with a reason",
+                "tags": [
+                    "Conduct"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "withdrawn": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "withdrawn"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/conduct/learners/{id}": {
+            "get": {
+                "operationId": "conduct.learner",
+                "summary": "A learner's conduct: the entries, by term, why to watch",
+                "tags": [
+                    "Conduct"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "entries": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "commendation": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "level": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "happened_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "place": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "what": {
+                                                        "type": "string"
+                                                    },
+                                                    "action": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "told_family": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "recorded_by": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "recorded_by_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "withdrawn": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "reason": {
+                                                                "type": "string"
+                                                            },
+                                                            "by": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "reason",
+                                                            "by"
+                                                        ]
+                                                    },
+                                                    "case": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "number": {
+                                                                "type": "string"
+                                                            },
+                                                            "state": {
+                                                                "type": "string"
+                                                            },
+                                                            "state_label": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "number",
+                                                            "state",
+                                                            "state_label"
+                                                        ]
+                                                    },
+                                                    "others": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "kind",
+                                                    "commendation",
+                                                    "level",
+                                                    "happened_on",
+                                                    "place",
+                                                    "what",
+                                                    "action",
+                                                    "told_family",
+                                                    "recorded_by",
+                                                    "recorded_by_id",
+                                                    "withdrawn",
+                                                    "case",
+                                                    "others"
+                                                ]
+                                            }
+                                        },
+                                        "terms": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "incidents": {
+                                                        "type": "integer"
+                                                    },
+                                                    "commendations": {
+                                                        "type": "integer"
+                                                    },
+                                                    "current": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "name",
+                                                    "incidents",
+                                                    "commendations",
+                                                    "current"
+                                                ]
+                                            }
+                                        },
+                                        "watch": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "can": {
+                                            "type": "object",
+                                            "properties": {
+                                                "record": {
+                                                    "type": "boolean"
+                                                },
+                                                "follow_up": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "record",
+                                                "follow_up"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "entries",
+                                        "terms",
+                                        "watch",
+                                        "can"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/conduct/incidents/{id}": {
+            "get": {
+                "operationId": "conduct.incidents.show",
+                "summary": "A serious incident",
+                "tags": [
+                    "Conduct"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "number": {
+                                            "type": "string"
+                                        },
+                                        "state": {
+                                            "type": "string"
+                                        },
+                                        "state_label": {
+                                            "type": "string"
+                                        },
+                                        "entry": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "commendation": {
+                                                    "type": "boolean"
+                                                },
+                                                "level": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "happened_on": {
+                                                    "type": "string"
+                                                },
+                                                "place": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "what": {
+                                                    "type": "string"
+                                                },
+                                                "action": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "told_family": {
+                                                    "type": "boolean"
+                                                },
+                                                "recorded_by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "recorded_by_id": {
+                                                    "type": "string"
+                                                },
+                                                "withdrawn": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "reason": {
+                                                            "type": "string"
+                                                        },
+                                                        "by": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "reason",
+                                                        "by"
+                                                    ]
+                                                },
+                                                "case": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "number": {
+                                                            "type": "string"
+                                                        },
+                                                        "state": {
+                                                            "type": "string"
+                                                        },
+                                                        "state_label": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "number",
+                                                        "state",
+                                                        "state_label"
+                                                    ]
+                                                },
+                                                "others": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "kind",
+                                                "commendation",
+                                                "level",
+                                                "happened_on",
+                                                "place",
+                                                "what",
+                                                "action",
+                                                "told_family",
+                                                "recorded_by",
+                                                "recorded_by_id",
+                                                "withdrawn",
+                                                "case",
+                                                "others"
+                                            ]
+                                        },
+                                        "lead": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "learners": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "class": {
+                                                        "type": "string"
+                                                    },
+                                                    "outcome": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "outcome": {
+                                                                "type": "string"
+                                                            },
+                                                            "text": {
+                                                                "type": "string"
+                                                            },
+                                                            "reason": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "outcome",
+                                                            "text",
+                                                            "reason"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "class",
+                                                    "outcome"
+                                                ]
+                                            }
+                                        },
+                                        "notes": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "text": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "by": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "text",
+                                                    "at",
+                                                    "by"
+                                                ]
+                                            }
+                                        },
+                                        "documents": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "title"
+                                                ]
+                                            }
+                                        },
+                                        "can": {
+                                            "type": "object",
+                                            "properties": {
+                                                "follow_up": {
+                                                    "type": "boolean"
+                                                },
+                                                "take_up": {
+                                                    "type": "boolean"
+                                                },
+                                                "decide": {
+                                                    "type": "boolean"
+                                                },
+                                                "meet": {
+                                                    "type": "boolean"
+                                                },
+                                                "close": {
+                                                    "type": "boolean"
+                                                },
+                                                "withdraw": {
+                                                    "type": "boolean"
+                                                },
+                                                "reporter": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "follow_up",
+                                                "take_up",
+                                                "decide",
+                                                "meet",
+                                                "close",
+                                                "withdraw",
+                                                "reporter"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "number",
+                                        "state",
+                                        "state_label",
+                                        "entry",
+                                        "lead",
+                                        "learners",
+                                        "notes",
+                                        "documents",
+                                        "can"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/conduct/incidents/{id}/notes": {
+            "post": {
+                "operationId": "conduct.incidents.notes",
+                "summary": "Adds a note to a serious incident",
+                "tags": [
+                    "Conduct"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "text": {
+                                        "type": "string",
+                                        "maxLength": 4000
+                                    }
+                                },
+                                "required": [
+                                    "text"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/conduct/incidents/{id}/outcomes": {
+            "post": {
+                "operationId": "conduct.incidents.outcomes",
+                "summary": "Gives one learner's outcome of a serious incident",
+                "tags": [
+                    "Conduct"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "learner_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "outcome": {
+                                        "$ref": "#/components/schemas/Sanction"
+                                    },
+                                    "starts_on": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date"
+                                    },
+                                    "days": {
+                                        "type": [
+                                            "integer",
+                                            "null"
+                                        ]
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 2000
+                                    }
+                                },
+                                "required": [
+                                    "learner_id",
+                                    "outcome",
+                                    "reason"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/conduct/incidents/{id}/{step}": {
+            "post": {
+                "operationId": "conduct.incidents.step",
+                "summary": "Moves a serious incident on: take it up, decide, the family met or told, close, withdraw",
+                "tags": [
+                    "Conduct"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "step",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/me/context": {
             "get": {
                 "operationId": "me.context",
@@ -39696,6 +40989,16 @@
                 ],
                 "title": "AdjustmentKind"
             },
+            "Level": {
+                "type": "string",
+                "description": "How serious an incident is. A serious one opens a case the office follows up.\n",
+                "enum": [
+                    "minor",
+                    "moderate",
+                    "serious"
+                ],
+                "title": "Level"
+            },
             "PaymentMethod": {
                 "type": "string",
                 "description": "How a payment was made. Every method but cash carries the provider's or bank's reference.\n",
@@ -39707,6 +41010,18 @@
                     "cheque"
                 ],
                 "title": "PaymentMethod"
+            },
+            "Sanction": {
+                "type": "string",
+                "description": "The named outcome of a serious incident for one learner.\n",
+                "enum": [
+                    "no_action",
+                    "warning",
+                    "detention",
+                    "suspension",
+                    "referred"
+                ],
+                "title": "Sanction"
             }
         },
         "responses": {

@@ -8,6 +8,7 @@ use Acadly\Kernel\KernelServiceProvider;
 use Acadly\Kernel\Module\ModuleServiceProvider;
 use Acadly\Modules\Assessment\AssessmentServiceProvider;
 use Acadly\Modules\Attendance\AttendanceServiceProvider;
+use Acadly\Modules\Conduct\ConductServiceProvider;
 use Acadly\Modules\Fees\FeesServiceProvider;
 use App\Providers\AppServiceProvider;
 
@@ -22,4 +23,5 @@ return [
     AttendanceServiceProvider::class,
     AssessmentServiceProvider::class,
     FeesServiceProvider::class,
+    ConductServiceProvider::class,
 ];

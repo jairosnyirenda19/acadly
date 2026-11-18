@@ -1,0 +1,185 @@
+{
+    "initial": "reported",
+    "kind": "journey",
+    "milestones": [],
+    "ref": "conduct.serious_incident@2026.1",
+    "stages": [
+        {
+            "key": "look",
+            "steps": [
+                "take_up"
+            ],
+            "title": "Looked into"
+        },
+        {
+            "key": "decide",
+            "steps": [
+                "decide"
+            ],
+            "title": "Decided"
+        },
+        {
+            "key": "family",
+            "steps": [
+                "meet_family",
+                "close",
+                "withdraw"
+            ],
+            "title": "Family"
+        }
+    ],
+    "states": [
+        {
+            "id": "reported",
+            "label": "Reported"
+        },
+        {
+            "id": "looked_into",
+            "label": "Being looked into"
+        },
+        {
+            "id": "decided",
+            "label": "Decided"
+        },
+        {
+            "id": "family_met",
+            "label": "Family met"
+        },
+        {
+            "id": "closed",
+            "label": "Closed"
+        },
+        {
+            "id": "withdrawn",
+            "label": "Withdrawn"
+        }
+    ],
+    "steps": [
+        {
+            "capability": "conduct.follow_up",
+            "four_eyes": null,
+            "from": [
+                "reported"
+            ],
+            "gates": [],
+            "id": "take_up",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "taken_up",
+                    "requires_reason": false,
+                    "title": "Take it up",
+                    "to": "looked_into"
+                }
+            ],
+            "stage": "look",
+            "title": "Take it up"
+        },
+        {
+            "capability": "conduct.follow_up",
+            "four_eyes": null,
+            "from": [
+                "looked_into"
+            ],
+            "gates": [
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Modules\\Conduct\\Journeys\\SeriousIncident\\EveryLearnerHasAnOutcome"
+                }
+            ],
+            "id": "decide",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "decided",
+                    "requires_reason": false,
+                    "title": "Decided",
+                    "to": "decided"
+                }
+            ],
+            "stage": "decide",
+            "title": "Decide"
+        },
+        {
+            "capability": "conduct.follow_up",
+            "four_eyes": null,
+            "from": [
+                "decided"
+            ],
+            "gates": [],
+            "id": "meet_family",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "met",
+                    "requires_reason": false,
+                    "title": "Family met",
+                    "to": "family_met"
+                },
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "told",
+                    "requires_reason": true,
+                    "title": "Family told, not met",
+                    "to": "family_met"
+                }
+            ],
+            "stage": "family",
+            "title": "Meet the family"
+        },
+        {
+            "capability": "conduct.follow_up",
+            "four_eyes": null,
+            "from": [
+                "family_met"
+            ],
+            "gates": [],
+            "id": "close",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "closed",
+                    "requires_reason": false,
+                    "title": "Close",
+                    "to": "closed"
+                }
+            ],
+            "stage": "family",
+            "title": "Close"
+        },
+        {
+            "capability": "conduct.follow_up",
+            "four_eyes": null,
+            "from": [
+                "reported",
+                "looked_into"
+            ],
+            "gates": [],
+            "id": "withdraw",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "withdrawn",
+                    "requires_reason": true,
+                    "title": "Withdraw",
+                    "to": "withdrawn"
+                }
+            ],
+            "stage": "family",
+            "title": "Withdraw"
+        }
+    ],
+    "subject": "Acadly\\Modules\\Conduct\\Domain\\ConductCase",
+    "terminal": [
+        "closed",
+        "withdrawn"
+    ],
+    "title": "Serious incident"
+}

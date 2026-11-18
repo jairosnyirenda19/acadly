@@ -2,6 +2,7 @@ import type { ComponentType } from 'react'
 import type { LearnerState } from '../api'
 import { AttendanceSummary, AttendanceTab } from './AttendancePart'
 import { FeesSummary, FeesTab } from './FeesPart'
+import { ConductSummary, ConductTab } from './ConductPart'
 import { ResultsSummary, ResultsTab } from './ResultsPart'
 
 /**
@@ -21,4 +22,5 @@ export const PART_VIEWS: Partial<Record<string, PartView>> = {
   attendance: { Summary: AttendanceSummary, Tab: AttendanceTab },
   assessment: { Summary: ResultsSummary, Tab: ResultsTab },
   fees: { Summary: FeesSummary, Tab: FeesTab },
+  conduct: { Summary: ConductSummary, Tab: ConductTab },
 }

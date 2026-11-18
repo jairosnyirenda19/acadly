@@ -27,6 +27,7 @@ const PATHS = {
   approvals: 'M4 4h16v16H4z M8 12l3 3 5-6 M4 9h3',
   search: 'M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13z M15.5 15.5L21 21',
   fees: 'M3 6h18v13H3z M3 10h18 M7 15h4',
+  conduct: 'M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z M9 12l2 2 4-4',
   pay: 'M12 4v16 M4 12h16',
   shop: 'M4 8h16l-1 12H5z M9 8V6a3 3 0 0 1 6 0v2',
 } as const

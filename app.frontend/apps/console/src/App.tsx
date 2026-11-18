@@ -43,6 +43,10 @@ import { SearchScreen } from './search/SearchScreen'
 import { NextYearScreen } from './settings/NextYearScreen'
 import { DocumentTypesScreen } from './settings/DocumentTypesScreen'
 import { FeesSettingsScreen } from './settings/FeesSettingsScreen'
+import { ConductSettingsScreen } from './settings/ConductSettingsScreen'
+import { OverviewScreen as ConductOverviewScreen } from './conduct/OverviewScreen'
+import { RecordConductScreen } from './conduct/RecordConductScreen'
+import { IncidentScreen } from './conduct/IncidentScreen'
 import { DeskScreen } from './fees/DeskScreen'
 import { RecordPaymentScreen } from './fees/RecordPaymentScreen'
 import { ReceiptScreen } from './fees/ReceiptScreen'
@@ -82,6 +86,8 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const learner = /^\/learners\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const receipt = /^\/fees\/receipts\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const fees = moduleOn(context, 'fees')
+  const conduct = moduleOn(context, 'conduct')
+  const incident = /^\/conduct\/incidents\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const registers = seesRegisters(context)
   const register = /^\/registers\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const lesson = /^\/registers\/lesson\/([0-9a-f-]{36})$/.exec(path)?.[1]
@@ -102,6 +108,10 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/settings/next-year' && can(context, 'academics.manage')) page = <NextYearScreen />
   else if (path === '/settings/learner-documents' && can(context, 'enrolment.manage')) page = <DocumentTypesScreen />
   else if (path === '/settings/fees' && fees && can(context, 'fees.manage')) page = <FeesSettingsScreen />
+  else if (path === '/settings/conduct' && conduct && can(context, 'conduct.manage')) page = <ConductSettingsScreen />
+  else if (path === '/conduct' && conduct && (can(context, 'conduct.view') || can(context, 'conduct.follow_up'))) page = <ConductOverviewScreen />
+  else if (path === '/conduct/record' && conduct && holdsAnywhere(context, 'conduct.record')) page = <RecordConductScreen />
+  else if (incident !== undefined && conduct) page = <IncidentScreen key={incident} id={incident} />
   else if (path === '/fees' && fees && can(context, 'fees.collect')) page = <DeskScreen />
   else if (path === '/fees/pay' && fees && holdsAnywhere(context, 'fees.collect')) page = <RecordPaymentScreen />
   else if (path === '/fees/shop' && fees && holdsAnywhere(context, 'fees.collect')) page = <ShopScreen />

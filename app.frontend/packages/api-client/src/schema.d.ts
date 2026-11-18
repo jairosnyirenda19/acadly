@@ -572,6 +572,177 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/conduct": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The school's overview: open serious incidents, learners to watch, by kind */
+        get: operations["conduct.overview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/conduct/kinds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The kinds of incident and commendation, and the rules for learners to watch */
+        get: operations["conduct.kinds.index"];
+        /** Saves the kinds */
+        put: operations["conduct.kinds.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/conduct/watch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Saves the rules for learners to watch */
+        put: operations["conduct.watch.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/conduct/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Records an incident or a commendation for one or more learners */
+        post: operations["conduct.entries.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/conduct/entries/{id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Withdraws an entry, with a reason */
+        post: operations["conduct.entries.withdraw"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/conduct/learners/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A learner's conduct: the entries, by term, why to watch */
+        get: operations["conduct.learner"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/conduct/incidents/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A serious incident */
+        get: operations["conduct.incidents.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/conduct/incidents/{id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adds a note to a serious incident */
+        post: operations["conduct.incidents.notes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/conduct/incidents/{id}/outcomes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Gives one learner's outcome of a serious incident */
+        post: operations["conduct.incidents.outcomes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/conduct/incidents/{id}/{step}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Moves a serious incident on: take it up, decide, the family met or told, close, withdraw */
+        post: operations["conduct.incidents.step"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/me/context": {
         parameters: {
             query?: never;
@@ -3452,11 +3623,23 @@ export interface components {
          */
         AdjustmentKind: "discount" | "bursary" | "waiver" | "write_off";
         /**
+         * Level
+         * @description How serious an incident is. A serious one opens a case the office follows up.
+         * @enum {string}
+         */
+        Level: "minor" | "moderate" | "serious";
+        /**
          * PaymentMethod
          * @description How a payment was made. Every method but cash carries the provider's or bank's reference.
          * @enum {string}
          */
         PaymentMethod: "cash" | "bank" | "airtel_money" | "mpamba" | "cheque";
+        /**
+         * Sanction
+         * @description The named outcome of a serious incident for one learner.
+         * @enum {string}
+         */
+        Sanction: "no_action" | "warning" | "detention" | "suspension" | "referred";
     };
     responses: {
         /** @description Validation error */
@@ -5923,6 +6106,459 @@ export interface operations {
                         on: boolean;
                         since: string | null;
                         last_used_at: string | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "conduct.overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        commendations: number;
+                        commendations_before: number;
+                        incidents: number;
+                        levels: {
+                            [key: string]: number;
+                        };
+                        open_cases: {
+                            id: string;
+                            number: string;
+                            state: string;
+                            state_label: string;
+                            kind: string;
+                            happened_on: string;
+                            learners: string;
+                            lead: string | null;
+                            days: number;
+                        }[];
+                        watch: {
+                            id: string;
+                            name: string;
+                            class: string;
+                            reasons: string[];
+                        }[];
+                        kinds: {
+                            name: string;
+                            commendation: boolean;
+                            now: number;
+                            before: number;
+                        }[];
+                        rules: {
+                            incidents: number;
+                            days: number;
+                            open_serious: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "conduct.kinds.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        kinds: {
+                            id: string;
+                            name: string;
+                            commendation: boolean;
+                            level: string | null;
+                            always: boolean;
+                            retired: boolean;
+                        }[];
+                        watch: {
+                            incidents: number;
+                            days: number;
+                            open_serious: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "conduct.kinds.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    kinds: {
+                        /** Format: uuid */
+                        id?: string | null;
+                        name: string;
+                        commendation: boolean;
+                        level?: components["schemas"]["Level"] | null;
+                        always: boolean;
+                        retired: boolean;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "conduct.watch.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    incidents: number;
+                    days: number;
+                    open_serious: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "conduct.entries.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    kind_id: string;
+                    level?: components["schemas"]["Level"] | null;
+                    learners: string[];
+                    /** Format: date */
+                    happened_on: string;
+                    place?: string | null;
+                    what: string;
+                    action?: string | null;
+                    tell?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "conduct.entries.withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        withdrawn: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "conduct.learner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: {
+                            id: string;
+                            kind: string;
+                            commendation: boolean;
+                            level: string | null;
+                            happened_on: string;
+                            place: string | null;
+                            what: string;
+                            action: string | null;
+                            told_family: boolean;
+                            recorded_by: string | null;
+                            recorded_by_id: string;
+                            withdrawn: {
+                                reason: string;
+                                by: string | null;
+                            } | null;
+                            case: {
+                                id: string;
+                                number: string;
+                                state: string;
+                                state_label: string;
+                            } | null;
+                            others: {
+                                id: string;
+                                name: string;
+                            }[];
+                        }[];
+                        terms: {
+                            name: string;
+                            incidents: number;
+                            commendations: number;
+                            current: boolean;
+                        }[];
+                        watch: string[];
+                        can: {
+                            record: boolean;
+                            follow_up: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "conduct.incidents.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        number: string;
+                        state: string;
+                        state_label: string;
+                        entry: {
+                            id: string;
+                            kind: string;
+                            commendation: boolean;
+                            level: string | null;
+                            happened_on: string;
+                            place: string | null;
+                            what: string;
+                            action: string | null;
+                            told_family: boolean;
+                            recorded_by: string | null;
+                            recorded_by_id: string;
+                            withdrawn: {
+                                reason: string;
+                                by: string | null;
+                            } | null;
+                            case: {
+                                id: string;
+                                number: string;
+                                state: string;
+                                state_label: string;
+                            } | null;
+                            others: {
+                                id: string;
+                                name: string;
+                            }[];
+                        } | null;
+                        lead: string | null;
+                        learners: {
+                            id: string;
+                            name: string;
+                            class: string;
+                            outcome: {
+                                outcome: string;
+                                text: string;
+                                reason: string;
+                            } | null;
+                        }[];
+                        notes: {
+                            id: string;
+                            text: string;
+                            at: string;
+                            by: string | null;
+                        }[];
+                        documents: {
+                            id: string;
+                            title: string;
+                        }[];
+                        can: {
+                            follow_up: boolean;
+                            take_up: boolean;
+                            decide: boolean;
+                            meet: boolean;
+                            close: boolean;
+                            withdraw: boolean;
+                            reporter: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "conduct.incidents.notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    text: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "conduct.incidents.outcomes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    learner_id: string;
+                    outcome: components["schemas"]["Sanction"];
+                    /** Format: date */
+                    starts_on?: string | null;
+                    days?: number | null;
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "conduct.incidents.step": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                step: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
                     };
                 };
             };

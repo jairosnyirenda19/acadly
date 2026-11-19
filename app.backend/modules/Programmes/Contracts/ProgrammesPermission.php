@@ -12,6 +12,9 @@ enum ProgrammesPermission: string implements Permission
     case View = 'programmes.view';
     case Manage = 'programmes.manage';
     case Offer = 'programmes.offer';
+    case Register = 'programmes.register';
+    case Approve = 'programmes.approve';
+    case AllowFees = 'programmes.allow_fees';
 
     public function key(): string
     {
@@ -24,6 +27,9 @@ enum ProgrammesPermission: string implements Permission
             self::View => 'See programmes and courses',
             self::Manage => 'Set faculties, programmes, curricula and courses',
             self::Offer => 'Set semester offerings and lecturers',
+            self::Register => 'Place students and register them for a semester',
+            self::Approve => 'Approve semester registrations',
+            self::AllowFees => 'Allow registration without the fees needed',
         };
     }
 
@@ -33,6 +39,9 @@ enum ProgrammesPermission: string implements Permission
             self::View => 'See the faculties, departments, programmes, curricula, the course catalogue and the semester offerings.',
             self::Manage => 'Add and change faculties, departments, programmes and courses, and release curriculum versions.',
             self::Offer => 'Prepare each semester\'s offerings, split courses into groups and name their lecturers.',
+            self::Register => 'Place students in programmes, set the registration dates, start a semester, choose courses for a student, complete registrations and change courses in the add and drop period.',
+            self::Approve => 'Approve or return the semester registrations of the division. Usually the head of department.',
+            self::AllowFees => 'Let a student\'s registration complete before the share of fees needed is paid, with a reason. Usually the bursar.',
         };
     }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acadly\Modules\Programmes\Application;
 
 use Acadly\Kernel\Support\Row;
+use Acadly\Modules\Programmes\Application\Registration\RegistrationChecks;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -184,7 +185,7 @@ final class ProgrammesViews
     /**
      * A semester's offerings.
      *
-     * @return list<array{id: string, course: array{id: string, code: string, title: string}, group: string, limit: int|null, lecturers: list<array{id: string, name: string}>, assistants: list<array{id: string, name: string}>, ready: bool}>
+     * @return list<array{id: string, course: array{id: string, code: string, title: string}, group: string, limit: int|null, lecturers: list<array{id: string, name: string}>, assistants: list<array{id: string, name: string}>, ready: bool, taken: int}>
      */
     public static function offerings(string $divisionId, string $periodId): array
     {
@@ -196,6 +197,7 @@ final class ProgrammesViews
         foreach ($rows as $o) {
             $ids[] = Row::text($o, 'id');
         }
+        $taken = RegistrationChecks::taken($ids);
         $people = [];
         foreach (DB::table('programme_offering_staff as s')->join('users as u', 'u.id', '=', 's.user_id')->whereIn('s.offering_id', $ids)
             ->orderBy('u.name')->get(['s.offering_id', 's.role', 'u.id', 'u.name']) as $s) {
@@ -207,7 +209,7 @@ final class ProgrammesViews
             $lecturers = $people[Row::text($o, 'id')]['lecturer'] ?? [];
             $out[] = ['id' => Row::text($o, 'id'), 'course' => ['id' => Row::text($o, 'course_id'), 'code' => Row::text($o, 'code'), 'title' => Row::text($o, 'title')],
                 'group' => Row::text($o, 'group_label'), 'limit' => ($o->size_limit ?? null) !== null ? Row::int($o, 'size_limit') : null, 'lecturers' => $lecturers,
-                'assistants' => $people[Row::text($o, 'id')]['assistant'] ?? [], 'ready' => $lecturers !== []];
+                'assistants' => $people[Row::text($o, 'id')]['assistant'] ?? [], 'ready' => $lecturers !== [], 'taken' => $taken[Row::text($o, 'id')] ?? 0];
         }
 
         return $out;

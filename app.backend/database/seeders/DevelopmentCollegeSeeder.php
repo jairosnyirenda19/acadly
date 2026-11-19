@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use Acadly\Core\Academics\Contracts\AcademicCalendar;
+use Acadly\Core\Enrolment\Application\Actions\AdmitLearner;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
@@ -11,9 +13,13 @@ use Acadly\Kernel\Support\Row;
 use Acadly\Modules\Programmes\Application\Actions\CourseActions;
 use Acadly\Modules\Programmes\Application\Actions\OfferingActions;
 use Acadly\Modules\Programmes\Application\Actions\ProgrammeActions;
+use Acadly\Modules\Programmes\Application\Actions\RegistrationActions;
 use Acadly\Modules\Programmes\Application\Actions\StructureActions;
+use Acadly\Modules\Programmes\Application\Actions\StudentActions;
 use Acadly\Modules\Programmes\Application\ProgrammesViews;
 use Acadly\Modules\Programmes\Contracts\Award;
+use Acadly\Modules\Programmes\Contracts\StudyMode;
+use Acadly\Modules\Programmes\Journeys\Registration\State;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -22,8 +28,11 @@ use RuntimeException;
  * D-097. A college division for the development school, to try Programmes:
  * the division, its semesters, three faculties, a catalogue, a released
  * Diploma in Accounting, a Bachelor of Accountancy still in draft, and the
- * first semester's offerings. The division and its semesters are written
- * straight to the tables, as setup would; the rest goes through the Actions.
+ * first semester's offerings. D-098 adds students: Year 1 and Year 2
+ * classes, twelve students placed in the Diploma, registration dates for
+ * the semester in progress, the semester started and some approved. The
+ * division, its semesters and its classes are written straight to the
+ * tables, as setup would; the rest goes through the Actions.
  *
  * Local only. Run: php artisan db:seed --class=DevelopmentCollegeSeeder
  */
@@ -36,7 +45,8 @@ final class DevelopmentCollegeSeeder extends Seeder
 
     private string $division = '';
 
-    public function run(Clock $clock, StructureActions $structure, CourseActions $courses, ProgrammeActions $programmes, OfferingActions $offerings): void
+    public function run(Clock $clock, StructureActions $structure, CourseActions $courses, ProgrammeActions $programmes, OfferingActions $offerings,
+        AcademicCalendar $calendar, AdmitLearner $admit, StudentActions $students, RegistrationActions $registration): void
     {
         if (! app()->environment(['local'])) {
             throw new RuntimeException('The development college is seeded only in the local environment.');
@@ -45,8 +55,11 @@ final class DevelopmentCollegeSeeder extends Seeder
         $email = mb_strtolower(trim(is_string($e = config('acadly.development.admin_email')) ? $e : ''));
         $this->by = User::query()->where('email', $email)->first() ?? throw new RuntimeException('Seed the development administrator first.');
 
-        if (DB::table('institution_divisions')->where('profile_ref', 'like', 'TERTIARY@%')->whereNull('ended_at')->exists()) {
+        $college = DB::table('institution_divisions')->where('profile_ref', 'like', 'TERTIARY@%')->whereNull('ended_at')->first(['id']);
+        if ($college !== null) {
+            $this->division = Row::text($college, 'id');
             $this->command?->getOutput()->writeln('  The development college is there already.');
+            $this->students($clock, $calendar, $offerings, $admit, $students, $registration);
 
             return;
         }
@@ -115,6 +128,62 @@ final class DevelopmentCollegeSeeder extends Seeder
             }
             $this->command?->getOutput()->writeln("  Development college: {$added} offerings in the first semester.");
         }
+
+        $this->students($clock, $calendar, $offerings, $admit, $students, $registration);
+    }
+
+    /** D-098: students in the Diploma, and the semester in progress started for them. */
+    private function students(Clock $clock, AcademicCalendar $calendar, OfferingActions $offerings, AdmitLearner $admit, StudentActions $students, RegistrationActions $registration): void
+    {
+        if (DB::table('programme_students')->where('division_id', $this->division)->exists()) {
+            return;
+        }
+
+        $year = $calendar->currentYear();
+        $period = $year['terms'][$this->division][0] ?? null;
+        $dac = DB::table('programmes')->where('division_id', $this->division)->where('code', 'DAC')->first(['id']);
+        $campus = DB::table('institution_offerings')->where('division_id', $this->division)->first(['campus_id']);
+        if ($year === null || $period === null || $dac === null || $campus === null) {
+            return;
+        }
+
+        $now = $clock->now();
+        $classes = [];
+        foreach ([1, 2] as $level) {
+            $have = DB::table('academic_classes')->where('year_id', $year['id'])->where('division_id', $this->division)->where('level_code', "Y{$level}")->whereNull('ended_at')->first(['id']);
+            if ($have !== null) {
+                $classes[$level] = Row::text($have, 'id');
+
+                continue;
+            }
+            $classes[$level] = Ids::next();
+            DB::table('academic_classes')->insert(['id' => $classes[$level], 'year_id' => $year['id'], 'division_id' => $this->division, 'campus_id' => Row::text($campus, 'campus_id'),
+                'level_code' => "Y{$level}", 'stream' => null, 'name' => "Year {$level}", 'position' => $level, 'created_at' => $now, 'updated_at' => $now]);
+        }
+
+        $names = [['Chikondi', 'Banda'], ['Thokozani', 'Mwale'], ['Kondwani', 'Phiri'], ['Tiwonge', 'Chirwa'], ['Mphatso', 'Nkhoma'], ['Chimwemwe', 'Kaunda'],
+            ['Limbani', 'Gondwe'], ['Takondwa', 'Msiska'], ['Madalitso', 'Tembo'], ['Yamikani', 'Zulu'], ['Atupele', 'Mvula'], ['Kumbukani', 'Lungu']];
+        $placed = [];
+        foreach ($names as $i => [$first, $surname]) {
+            $level = $i < 8 ? 1 : 2;
+            $learner = $admit->handle($this->by, ['first_name' => $first, 'other_names' => null, 'surname' => $surname, 'sex' => $i % 2 === 0 ? 'female' : 'male',
+                'date_of_birth' => (2004 + $i % 3).'-0'.(1 + $i % 9).'-1'.($i % 9), 'class_id' => $classes[$level], 'admitted_on' => $period['starts_on'], 'admission_number' => null, 'different' => false],
+                [['name' => "Grace {$surname}", 'relationship' => 'mother', 'phone' => '0991 '.(300 + $i).' 100', 'email' => null, 'main' => true],
+                    ['name' => "John {$surname}", 'relationship' => 'father', 'phone' => '0888 '.(300 + $i).' 200', 'email' => null, 'main' => false]]);
+            $students->place($this->by, $this->division, $learner->id, Row::text($dac, 'id'), $level, $i === 7 ? StudyMode::PartTime : StudyMode::FullTime);
+            $placed[] = $learner->id;
+        }
+
+        $offerings->prepare($this->by, $this->division, $period['id']);
+        $today = $clock->now();
+        $registration->saveWindow($this->by, $this->division, $period['id'], ['opens_on' => $today->subDays(18)->toDateString(), 'closes_on' => $today->addDays(11)->toDateString(),
+            'late_until' => $today->addDays(16)->toDateString(), 'add_drop_until' => $today->addDays(21)->toDateString(), 'late_fee' => 2500000, 'fees_share' => 50]);
+        $started = $registration->startSemester($this->by, $this->division, $period['id']);
+
+        // Approve four of the registrations waiting, so each state has someone in it.
+        $waiting = DB::table('programme_registrations')->where('period_id', $period['id'])->where('state', State::Submitted->value)->orderBy('created_at')->limit(4)->pluck('id')->all();
+        $approved = $waiting !== [] ? $registration->approve($this->by, $this->division, array_values(array_map(fn ($id): string => is_string($id) ? $id : '', $waiting))) : ['approved' => 0, 'registered' => 0];
+        $this->command?->getOutput()->writeln('  Development college: '.count($placed)." students; {$started['opened']} registrations opened, {$started['sent']} sent for approval, {$approved['approved']} approved.");
     }
 
     private function makeDivision(Clock $clock): void

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acadly\Modules\Programmes;
 
 use Acadly\Core\Academics\AcademicsCore;
+use Acadly\Core\Enrolment\EnrolmentCore;
 use Acadly\Core\Institution\InstitutionCore;
 use Acadly\Kernel\Module\Module;
 use Acadly\Kernel\Module\Tier;
@@ -40,7 +41,7 @@ final class ProgrammesModule implements Module
 
     public function requires(): array
     {
-        return [InstitutionCore::class, AcademicsCore::class];
+        return [InstitutionCore::class, AcademicsCore::class, EnrolmentCore::class];
     }
 
     public function permissions(): array
@@ -65,7 +66,7 @@ final class ProgrammesModule implements Module
 
     public function journeys(): array
     {
-        return [];
+        return ['programmes.registration'];
     }
 
     public function topics(): array

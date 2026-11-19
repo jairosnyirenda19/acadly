@@ -199,7 +199,7 @@ final class ProgrammesController
     /**
      * A semester's offerings: this year's semesters, the one asked for (else the first), its groups and what is still missing.
      *
-     * @response array{periods: list<array{id: string, name: string, starts_on: string, ends_on: string, position: int}>, period: array{id: string, name: string, starts_on: string, ends_on: string, position: int}|null, offerings: list<array{id: string, course: array{id: string, code: string, title: string}, group: string, limit: int|null, lecturers: list<array{id: string, name: string}>, assistants: list<array{id: string, name: string}>, ready: bool}>, missing: int, staff: list<array{id: string, name: string}>, can: array{offer: bool}}
+     * @response array{periods: list<array{id: string, name: string, starts_on: string, ends_on: string, position: int}>, period: array{id: string, name: string, starts_on: string, ends_on: string, position: int}|null, offerings: list<array{id: string, course: array{id: string, code: string, title: string}, group: string, limit: int|null, lecturers: list<array{id: string, name: string}>, assistants: list<array{id: string, name: string}>, ready: bool, taken: int}>, missing: int, staff: list<array{id: string, name: string}>, can: array{offer: bool}}
      */
     public function offerings(Request $request, string $division, Place $place): JsonResponse
     {

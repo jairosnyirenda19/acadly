@@ -80,6 +80,8 @@ export const GROUPS: NavGroup[] = [
       { key: 'programmes-list', label: t.nav.programmesList, path: '/programmes/list', icon: 'assessment', show: (c) => seesProgrammes(c), lights: (p) => p === '/programmes/list' || p.startsWith('/programmes/p/') },
       { key: 'programmes-catalogue', label: t.nav.programmesCatalogue, path: '/programmes/courses', icon: 'subjects', show: (c) => seesProgrammes(c), lights: under('/programmes/courses') },
       { key: 'programmes-offerings', label: t.nav.programmesOfferings, path: '/programmes/offerings', icon: 'teaching', show: (c) => seesProgrammes(c), lights: under('/programmes/offerings') },
+      { key: 'programmes-students', label: t.nav.programmesStudents, path: '/programmes/students', icon: 'learners', show: (c) => seesProgrammes(c), lights: under('/programmes/students') },
+      { key: 'programmes-registration', label: t.nav.programmesRegistration, path: '/programmes/registration', icon: 'approvals', show: (c) => seesProgrammes(c), lights: (p) => p === '/programmes/registration' || p.startsWith('/programmes/r/') },
     ],
   },
   {

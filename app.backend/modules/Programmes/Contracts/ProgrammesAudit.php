@@ -18,6 +18,12 @@ enum ProgrammesAudit: string implements AuditAction
     case CurriculumReleased = 'programmes.curriculum_released';
     case OfferingsPrepared = 'programmes.offerings_prepared';
     case OfferingSaved = 'programmes.offering_saved';
+    case StudentPlaced = 'programmes.student_placed';
+    case WindowSaved = 'programmes.window_saved';
+    case SemesterStarted = 'programmes.semester_started';
+    case RegistrationOpened = 'programmes.registration_opened';
+    case CoursesChosen = 'programmes.courses_chosen';
+    case FeesAllowed = 'programmes.fees_allowed';
 
     public function key(): string
     {
@@ -36,11 +42,17 @@ enum ProgrammesAudit: string implements AuditAction
             self::CurriculumReleased => 'Released a curriculum version.',
             self::OfferingsPrepared => 'Prepared a semester\'s offerings.',
             self::OfferingSaved => 'Saved an offering and its lecturers.',
+            self::StudentPlaced => 'Placed a student in a programme.',
+            self::WindowSaved => 'Saved the registration dates of a semester.',
+            self::SemesterStarted => 'Started registration for a semester.',
+            self::RegistrationOpened => 'Opened a semester registration for a student.',
+            self::CoursesChosen => 'Chose the courses of a semester registration.',
+            self::FeesAllowed => 'Allowed a registration without the fees needed.',
         };
     }
 
     public function requiresReason(): bool
     {
-        return false;
+        return $this === self::FeesAllowed;
     }
 }

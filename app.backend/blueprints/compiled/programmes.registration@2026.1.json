@@ -1,0 +1,187 @@
+{
+    "initial": "draft",
+    "kind": "journey",
+    "milestones": [],
+    "ref": "programmes.registration@2026.1",
+    "stages": [
+        {
+            "key": "register",
+            "steps": [
+                "submit",
+                "approve",
+                "register",
+                "change",
+                "withdraw"
+            ],
+            "title": "Registration"
+        }
+    ],
+    "states": [
+        {
+            "id": "draft",
+            "label": "Courses being chosen"
+        },
+        {
+            "id": "submitted",
+            "label": "Waiting for approval"
+        },
+        {
+            "id": "approved",
+            "label": "Waiting for fees"
+        },
+        {
+            "id": "registered",
+            "label": "Registered"
+        },
+        {
+            "id": "withdrawn",
+            "label": "Withdrawn"
+        }
+    ],
+    "steps": [
+        {
+            "capability": "programmes.register",
+            "four_eyes": null,
+            "from": [
+                "draft"
+            ],
+            "gates": [
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Modules\\Programmes\\Journeys\\Registration\\InWindow"
+                },
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Modules\\Programmes\\Journeys\\Registration\\CoursesInOrder"
+                }
+            ],
+            "id": "submit",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "submitted",
+                    "requires_reason": false,
+                    "title": "Sent for approval",
+                    "to": "submitted"
+                }
+            ],
+            "stage": "register",
+            "title": "Send for approval"
+        },
+        {
+            "capability": "programmes.approve",
+            "four_eyes": null,
+            "from": [
+                "submitted"
+            ],
+            "gates": [],
+            "id": "approve",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "approved",
+                    "requires_reason": false,
+                    "title": "Approved",
+                    "to": "approved"
+                },
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "returned",
+                    "requires_reason": true,
+                    "title": "Returned",
+                    "to": "draft"
+                }
+            ],
+            "stage": "register",
+            "title": "Approve the courses"
+        },
+        {
+            "capability": "programmes.register",
+            "four_eyes": null,
+            "from": [
+                "approved"
+            ],
+            "gates": [
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Modules\\Programmes\\Journeys\\Registration\\FeesCleared"
+                }
+            ],
+            "id": "register",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "registered",
+                    "requires_reason": false,
+                    "title": "Registered",
+                    "to": "registered"
+                }
+            ],
+            "stage": "register",
+            "title": "Complete registration"
+        },
+        {
+            "capability": "programmes.register",
+            "four_eyes": null,
+            "from": [
+                "registered"
+            ],
+            "gates": [
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Modules\\Programmes\\Journeys\\Registration\\InAddDrop"
+                }
+            ],
+            "id": "change",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "reopened",
+                    "requires_reason": true,
+                    "title": "Reopened for a change of courses",
+                    "to": "draft"
+                }
+            ],
+            "stage": "register",
+            "title": "Change courses"
+        },
+        {
+            "capability": "programmes.register",
+            "four_eyes": null,
+            "from": [
+                "draft",
+                "submitted",
+                "approved",
+                "registered"
+            ],
+            "gates": [],
+            "id": "withdraw",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "withdrawn",
+                    "requires_reason": true,
+                    "title": "Withdrawn",
+                    "to": "withdrawn"
+                }
+            ],
+            "stage": "register",
+            "title": "Withdraw the registration"
+        }
+    ],
+    "subject": "Acadly\\Modules\\Programmes\\Domain\\Registration",
+    "terminal": [
+        "withdrawn"
+    ],
+    "title": "Semester registration"
+}

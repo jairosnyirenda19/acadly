@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 use Acadly\Modules\Programmes\Http\ProgrammesController;
+use Acadly\Modules\Programmes\Http\RegistrationController;
 use Illuminate\Support\Facades\Route;
+
+Route::middleware(['auth:sanctum', 'module:programmes'])->get('programmes/learners/{id}', [RegistrationController::class, 'learner'])->whereUuid('id')->name('programmes.learner');
 
 Route::middleware(['auth:sanctum', 'module:programmes'])->prefix('programmes/{division}')->whereUuid('division')->name('programmes.')->group(function (): void {
     Route::get('/structure', [ProgrammesController::class, 'structure'])->name('structure');
@@ -20,4 +23,17 @@ Route::middleware(['auth:sanctum', 'module:programmes'])->prefix('programmes/{di
     Route::post('/offerings/{period}/prepare', [ProgrammesController::class, 'prepare'])->whereUuid('period')->name('offerings.prepare');
     Route::post('/offerings/{period}/groups', [ProgrammesController::class, 'addGroup'])->whereUuid('period')->name('offerings.group');
     Route::put('/offering/{id}', [ProgrammesController::class, 'saveOffering'])->whereUuid('id')->name('offerings.save');
+    Route::get('/students', [RegistrationController::class, 'students'])->name('students');
+    Route::post('/students', [RegistrationController::class, 'place'])->name('students.place');
+    Route::post('/students/{id}/status', [RegistrationController::class, 'status'])->whereUuid('id')->name('students.status');
+    Route::get('/registration', [RegistrationController::class, 'desk'])->name('registration.desk');
+    Route::put('/registration/{period}/window', [RegistrationController::class, 'saveWindow'])->whereUuid('period')->name('registration.window');
+    Route::post('/registration/{period}/start', [RegistrationController::class, 'start'])->whereUuid('period')->name('registration.start');
+    Route::post('/registration/{period}/open', [RegistrationController::class, 'open'])->whereUuid('period')->name('registration.open');
+    Route::post('/registration/{period}/approve', [RegistrationController::class, 'approve'])->whereUuid('period')->name('registration.approve');
+    Route::post('/registration/{period}/register', [RegistrationController::class, 'register'])->whereUuid('period')->name('registration.register');
+    Route::get('/registrations/{id}', [RegistrationController::class, 'show'])->whereUuid('id')->name('registrations.show');
+    Route::put('/registrations/{id}/courses', [RegistrationController::class, 'saveCourses'])->whereUuid('id')->name('registrations.courses');
+    Route::post('/registrations/{id}/{action}', [RegistrationController::class, 'act'])->whereUuid('id')->whereIn('action', ['submit', 'return', 'allow-fees', 'change', 'withdraw'])->name('registrations.act');
+    Route::get('/registrations/{id}/slip', [RegistrationController::class, 'slip'])->whereUuid('id')->middleware('throttle:30,1')->name('registrations.slip');
 });

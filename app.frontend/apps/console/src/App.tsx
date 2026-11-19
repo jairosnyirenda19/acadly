@@ -48,8 +48,11 @@ import { ConductSettingsScreen } from './settings/ConductSettingsScreen'
 import { CatalogueScreen } from './programmes/CatalogueScreen'
 import { OfferingsScreen } from './programmes/OfferingsScreen'
 import { ProgrammeListScreen } from './programmes/ProgrammeListScreen'
+import { RegistrationDeskScreen } from './programmes/RegistrationDeskScreen'
+import { RegistrationScreen } from './programmes/RegistrationScreen'
 import { ProgrammeScreen } from './programmes/ProgrammeScreen'
 import { StructureScreen } from './programmes/StructureScreen'
+import { StudentsScreen } from './programmes/StudentsScreen'
 import { SupportSettingsScreen } from './settings/SupportSettingsScreen'
 import { LookScreen } from './settings/LookScreen'
 import { DivisionsScreen } from './shell/DivisionsScreen'
@@ -119,6 +122,7 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const approval = /^\/approvals\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const programmes = seesProgrammes(context)
   const programme = /^\/programmes\/p\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const registration = /^\/programmes\/r\/([0-9a-f-]{36})$/.exec(path)?.[1]
 
   useEffect(() => {
     if (path === '/settings' && home !== null) navigate(home, true)
@@ -140,6 +144,9 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (programme !== undefined && programmes) page = <ProgrammeScreen key={programme} id={programme} />
   else if (path === '/programmes/courses' && programmes) page = <CatalogueScreen />
   else if (path === '/programmes/offerings' && programmes) page = <OfferingsScreen />
+  else if (path === '/programmes/students' && programmes) page = <StudentsScreen />
+  else if (path === '/programmes/registration' && programmes) page = <RegistrationDeskScreen />
+  else if (registration !== undefined && programmes) page = <RegistrationScreen key={registration} id={registration} />
   else if (path === '/support' && support && (holdsAnywhere(context, 'support.view') || holdsAnywhere(context, 'support.lead'))) page = <WatchScreen />
   else if (path === '/support/plans/new' && support && holdsAnywhere(context, 'support.lead')) page = <OpenPlanScreen />
   else if (plan !== undefined && support) page = <PlanScreen key={plan} id={plan} />

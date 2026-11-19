@@ -3769,6 +3769,228 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/programmes/learners/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A student's programme and semester registrations, for the learner record. Not found when the student is in no programme */
+        get: operations["programmes.learner"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/students": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The students in programmes, with their registration for a semester of this year */
+        get: operations["programmes.students"];
+        put?: never;
+        /** Places a student in a programme, on its newest released curriculum */
+        post: operations["programmes.students.place"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/students/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A new status for a student: leave of absence, withdrawn, or active again. The earlier row stays */
+        post: operations["programmes.students.status"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/registration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The registration desk of a semester: its dates, every registration and the students not started */
+        get: operations["programmes.registration.desk"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/registration/{period}/window": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Sets a semester's registration dates, its late fee and the share of fees needed */
+        put: operations["programmes.registration.window"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/registration/{period}/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Starts the semester: a registration for every active student, with the curriculum's courses filled in */
+        post: operations["programmes.registration.start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/registration/{period}/open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Opens one student's registration for the semester */
+        post: operations["programmes.registration.open"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/registration/{period}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approves registrations waiting for approval; those whose fees are cleared are registered at once */
+        post: operations["programmes.registration.approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/registration/{period}/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Completes every approved registration of the semester whose fees are now cleared */
+        post: operations["programmes.registration.register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/registrations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One registration: the student, the courses, what can be chosen, the checks, the fees and the steps open now */
+        get: operations["programmes.registrations.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/registrations/{id}/courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Sets the courses of a registration being chosen: one group of each course */
+        put: operations["programmes.registrations.courses"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/registrations/{id}/{action}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A step of the registration: send for approval, return with a reason, allow without the fees needed, change courses in add and drop, or withdraw */
+        post: operations["programmes.registrations.act"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/registrations/{id}/slip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The registration slip as an A4 PDF, with its check code (D-098) */
+        get: operations["programmes.registrations.slip"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/assessment/results": {
         parameters: {
             query?: never;
@@ -4493,6 +4715,12 @@ export interface components {
          * @enum {string}
          */
         Sanction: "no_action" | "warning" | "detention" | "suspension" | "referred";
+        /**
+         * StudyMode
+         * @description How a student studies a programme (D-098). A part-time student may take less than the lowest load.
+         * @enum {string}
+         */
+        StudyMode: "full_time" | "part_time";
     };
     responses: {
         /** @description Not found */
@@ -15059,6 +15287,7 @@ export interface operations {
                                 name: string;
                             }[];
                             ready: boolean;
+                            taken: number;
                         }[];
                         missing: number;
                         staff: {
@@ -16725,6 +16954,659 @@ export interface operations {
                         can_take: boolean;
                         can_request: boolean;
                     };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "programmes.learner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        division_id: string;
+                        programme: {
+                            code: string;
+                            name: string;
+                        };
+                        curriculum: string;
+                        year: number;
+                        mode: string;
+                        status: string;
+                        history: {
+                            year: number;
+                            status: string;
+                            reason: string | null;
+                            at: string;
+                        }[];
+                        registrations: {
+                            id: string;
+                            period: string;
+                            state: string;
+                            year: number;
+                            semester: number;
+                            version: number;
+                            late: boolean;
+                            courses: {
+                                code: string;
+                                title: string;
+                                kind: string;
+                                credits: number;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "programmes.students": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        periods: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                            position: number;
+                        }[];
+                        period: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                            position: number;
+                        } | null;
+                        students: {
+                            id: string;
+                            learner_id: string;
+                            code: string;
+                            name: string;
+                            programme: {
+                                id: string;
+                                code: string;
+                            };
+                            curriculum: string;
+                            year: number;
+                            mode: string;
+                            status: string;
+                            registration: {
+                                id: string;
+                                state: string;
+                            } | null;
+                        }[];
+                        candidates: {
+                            id: string;
+                            code: string;
+                            name: string;
+                        }[];
+                        programmes: {
+                            id: string;
+                            code: string;
+                            name: string;
+                            years: number;
+                            curriculum: string | null;
+                        }[];
+                        can: {
+                            register: boolean;
+                            approve: boolean;
+                            allow_fees: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "programmes.students.place": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    learner_id: string;
+                    /** Format: uuid */
+                    programme_id: string;
+                    entry_year: number;
+                    mode: components["schemas"]["StudyMode"];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "programmes.students.status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    status: "active" | "leave" | "withdrawn";
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "programmes.registration.desk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        periods: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                            position: number;
+                        }[];
+                        period: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                            position: number;
+                        } | null;
+                        window: {
+                            opens_on: string;
+                            closes_on: string;
+                            late_until: string;
+                            add_drop_until: string;
+                            late_fee: number;
+                            fees_share: number;
+                            started_at: string | null;
+                        } | null;
+                        phase: string;
+                        add_drop: boolean;
+                        rows: {
+                            id: string;
+                            learner_id: string;
+                            code: string;
+                            name: string;
+                            programme: string;
+                            year: number;
+                            courses: number;
+                            credits: number;
+                            state: string;
+                            late: boolean;
+                            problems: number;
+                            fees_more: number;
+                        }[];
+                        not_started: {
+                            learner_id: string;
+                            code: string;
+                            name: string;
+                            programme: string;
+                            year: number;
+                        }[];
+                        inactive: number;
+                        can: {
+                            register: boolean;
+                            approve: boolean;
+                            allow_fees: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "programmes.registration.window": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: date */
+                    opens_on: string;
+                    /** Format: date */
+                    closes_on: string;
+                    /** Format: date */
+                    late_until: string;
+                    /** Format: date */
+                    add_drop_until: string;
+                    late_fee: number;
+                    fees_share: number;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "programmes.registration.start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        opened: number;
+                        sent: number;
+                        completed: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "programmes.registration.open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    learner_id: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "programmes.registration.approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    ids: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        approved: number;
+                        registered: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "programmes.registration.register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    ids?: string[] | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        registered: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "programmes.registrations.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        state: string;
+                        late: boolean;
+                        version: number;
+                        period: string;
+                        period_id: string;
+                        student: {
+                            learner_id: string;
+                            code: string;
+                            name: string;
+                            programme: {
+                                id: string;
+                                code: string;
+                                name: string;
+                            };
+                            curriculum: string;
+                            year: number;
+                            semester: number;
+                            mode: string;
+                        };
+                        courses: {
+                            id: string;
+                            offering_id: string;
+                            course: {
+                                id: string;
+                                code: string;
+                                title: string;
+                            };
+                            kind: string;
+                            elective_group_id: string | null;
+                            group: string;
+                            credits: number;
+                            needs: string[];
+                        }[];
+                        core: string[];
+                        groups: {
+                            id: string;
+                            label: string;
+                            choose: number;
+                            courses: string[];
+                        }[];
+                        offerings: {
+                            id: string;
+                            course: {
+                                id: string;
+                                code: string;
+                                title: string;
+                            };
+                            group: string;
+                            credits: number;
+                            seats_left: number | null;
+                        }[];
+                        checks: {
+                            problems: {
+                                kind: string;
+                                text: string;
+                            }[];
+                            load: number;
+                            min: number;
+                            max: number;
+                        };
+                        fees: {
+                            known: boolean;
+                            share: number;
+                            owed: number;
+                            paid: number;
+                            needed: number;
+                            more: number;
+                            cleared: boolean;
+                            allowed: {
+                                by: string;
+                                reason: string;
+                                at: string;
+                            } | null;
+                        };
+                        steps: {
+                            step: string;
+                            title: string;
+                            outcomes: {
+                                outcome: string;
+                                title: string;
+                                requires_reason: boolean;
+                            }[];
+                            permitted: boolean;
+                            blocked_reason: string | null;
+                            remedy: string | null;
+                        }[];
+                        history: {
+                            step: string;
+                            outcome: string;
+                            by: string;
+                            at: string;
+                            reason: string | null;
+                        }[];
+                        phase: string;
+                        add_drop: boolean;
+                        can: {
+                            register: boolean;
+                            approve: boolean;
+                            allow_fees: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "programmes.registrations.courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    offerings: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "programmes.registrations.act": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+                action: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        done: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "programmes.registrations.slip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    "Cache-Control"?: "no-store";
+                    "X-Content-Type-Options"?: "nosniff";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
                 };
             };
             401: components["responses"]["AuthenticationException"];

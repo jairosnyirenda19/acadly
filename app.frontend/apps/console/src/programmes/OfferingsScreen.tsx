@@ -123,6 +123,7 @@ function Loaded({
                     <th className={th}>{o.columns.group}</th>
                     <th className={th}>{o.columns.lecturer}</th>
                     <th className={th}>{o.columns.limit}</th>
+                    <th className={th}>{o.columns.taken}</th>
                     <th className={th}>{o.columns.state}</th>
                     {data.can.offer && <th className={th} />}
                   </tr>
@@ -130,7 +131,7 @@ function Loaded({
                 <tbody>
                   {data.offerings.length === 0 && (
                     <tr>
-                      <td colSpan={6} className={`${td} text-text-muted`}>
+                      <td colSpan={7} className={`${td} text-text-muted`}>
                         {o.noOfferings}
                       </td>
                     </tr>
@@ -138,7 +139,7 @@ function Loaded({
                   {data.offerings.map((x) =>
                     editing === x.id ? (
                       <tr key={x.id}>
-                        <td colSpan={6} className="border-b border-rule p-0">
+                        <td colSpan={7} className="border-b border-rule p-0">
                           <OfferingForm
                             division={division.id}
                             offering={x}
@@ -164,6 +165,7 @@ function Loaded({
                           )}
                         </td>
                         <td className={td}>{x.limit ?? <span className="text-text-muted">{t.none}</span>}</td>
+                        <td className={td}>{x.limit !== null && x.taken > x.limit ? <Tag tone="attention">{`! ${x.taken}`}</Tag> : x.taken}</td>
                         <td className={td}>{x.ready ? <Tag tone="done">{o.readyTag}</Tag> : <Tag tone="attention">{o.noLecturerTag}</Tag>}</td>
                         {data.can.offer && (
                           <td className={`${td} text-right whitespace-nowrap`}>

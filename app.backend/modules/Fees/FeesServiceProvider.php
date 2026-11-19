@@ -8,7 +8,9 @@ use Acadly\Core\Enrolment\Contracts\LearnerRecordPart;
 use Acadly\Kernel\Grid\Grids;
 use Acadly\Modules\Fees\Application\BehindGrid;
 use Acadly\Modules\Fees\Application\FeesRecordPart;
+use Acadly\Modules\Fees\Application\FeesStandingReader;
 use Acadly\Modules\Fees\Application\PaymentsGrid;
+use Acadly\Modules\Fees\Contracts\FeesStanding;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -17,6 +19,7 @@ final class FeesServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(FeesStanding::class, FeesStandingReader::class);
         $this->app->tag([FeesRecordPart::class], LearnerRecordPart::TAG);
         $this->app->tag([PaymentsGrid::class, BehindGrid::class], Grids::TAG);
     }

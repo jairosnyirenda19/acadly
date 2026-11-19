@@ -16,6 +16,7 @@ final class CheckController
     private const array KINDS = [
         'fees.receipt' => 'Receipt',
         'fees.statement' => 'Fee statement',
+        'programmes.registration_slip' => 'Registration slip',
     ];
 
     /**

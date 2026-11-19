@@ -8,6 +8,7 @@ use Acadly\Core\Academics\Contracts\AcademicCalendar;
 use Acadly\Core\Academics\Contracts\Teaching;
 use Acadly\Core\Institution\Contracts\SchoolDirectory;
 use Acadly\Kernel\Access\Access;
+use Acadly\Kernel\Access\Boundary;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Identity\User;
@@ -67,13 +68,13 @@ final class Reach
      */
     public function classes(User $who): array
     {
-        if (! isset($this->classes[$who->id])) {
+        if (! isset($this->classes[Boundary::cacheKey($who)])) {
             $year = $this->calendar->currentYear();
-            $this->classes[$who->id] = $year === null ? [] : array_values(array_filter($this->calendar->classesInYear($year['id']),
+            $this->classes[Boundary::cacheKey($who)] = $year === null ? [] : array_values(array_filter($this->calendar->classesInYear($year['id']),
                 fn (array $c): bool => $this->takesMarks($c['division_id']) && $this->sees($who, $c['id'])));
         }
 
-        return $this->classes[$who->id];
+        return $this->classes[Boundary::cacheKey($who)];
     }
 
     public function model(string $divisionId): AssessmentModel

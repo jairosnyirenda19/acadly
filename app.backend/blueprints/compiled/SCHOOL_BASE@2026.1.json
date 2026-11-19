@@ -3,6 +3,14 @@
     "bindings": {},
     "extends": null,
     "kind": "profile",
+    "modules": [
+        "fees",
+        "conduct",
+        "support",
+        "attendance",
+        "assessment",
+        "saferelease"
+    ],
     "ref": "SCHOOL_BASE@2026.1",
     "structure": {
         "grouping": null,

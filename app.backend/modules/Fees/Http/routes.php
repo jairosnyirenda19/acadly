@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 use Acadly\Modules\Fees\Http\FeesController;
 use Acadly\Modules\Fees\Http\FeesSettingsController;
+use Acadly\Modules\Fees\Http\SchoolLedgerController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'module:fees'])->prefix('fees')->name('fees.')->group(function (): void {
     Route::get('/desk', [FeesSettingsController::class, 'desk'])->name('desk');
+    // The whole-school overview's read-only ledger (D-100): the school view only.
+    Route::get('/ledger', SchoolLedgerController::class)->name('ledger');
     Route::get('/payments/grid', [FeesSettingsController::class, 'payments'])->name('payments.grid');
     Route::get('/behind/grid', [FeesSettingsController::class, 'behind'])->name('behind.grid');
     Route::post('/days/{day}/close', [FeesSettingsController::class, 'close'])->where('day', '\d{4}-\d{2}-\d{2}')->name('days.close');
@@ -29,6 +32,8 @@ Route::middleware(['auth:sanctum', 'module:fees'])->prefix('fees')->name('fees.'
 
     Route::get('/items', [FeesSettingsController::class, 'items'])->name('items.index');
     Route::put('/items', [FeesSettingsController::class, 'saveItems'])->name('items.save');
+    Route::get('/offices', [FeesSettingsController::class, 'offices'])->name('offices');
+    Route::put('/offices', [FeesSettingsController::class, 'saveOffices'])->name('offices.save');
     Route::get('/terms', [FeesSettingsController::class, 'terms'])->name('terms.index');
     Route::get('/terms/{period}/{division}', [FeesSettingsController::class, 'term'])->whereUuid(['period', 'division'])->name('terms.show');
     Route::put('/terms/{period}/{division}', [FeesSettingsController::class, 'saveTerm'])->whereUuid(['period', 'division'])->name('terms.save');

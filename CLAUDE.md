@@ -23,6 +23,10 @@ Education platform (ECD, primary, secondary, tertiary). **One deployment per sch
 
 13. **The learner record holds everything about a learner.** A module that keeps anything about a learner adds its part: implement `LearnerRecordPart` (Enrolment Contracts), tag it, and give the record screen its tab. A test fails the build when a module that tells families about a learner has none.
 
+14. **Divisions and campuses are walls on top of the roles (D-099).** A request works in one place (the `X-Acadly-Place` header); `Access::allows()` refuses anything outside it. A list behind a whole-school check must still keep to the place, record by record. A new route is covered by `BoundaryTest`: it fails the build on any leak. A division has only the parts its profile lists.
+
+15. **Dashboards and Today are built from the modules (D-100).** A module adds its charts through `DashboardPanels` and its to-do items through `TodayItems`, for the scope it is given: counts only, never a learner named, and every division apart. The school view shows records only in the overview's read-only lists. Charts use the chart tokens, never teal, marigold or red as a series.
+
 ## Design
 
 - `PRODUCT.md` says who the product is for and how it speaks. `DESIGN.md` is the visual law ("The Register Book"). Read both before any UI work.

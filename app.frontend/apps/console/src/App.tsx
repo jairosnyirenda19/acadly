@@ -56,6 +56,9 @@ import { StudentsScreen } from './programmes/StudentsScreen'
 import { SupportSettingsScreen } from './settings/SupportSettingsScreen'
 import { LookScreen } from './settings/LookScreen'
 import { DivisionsScreen } from './shell/DivisionsScreen'
+import { HomeScreen } from './dashboard/HomeScreen'
+import { SchoolLearnersScreen } from './dashboard/SchoolLearnersScreen'
+import { SchoolLedgerScreen } from './dashboard/SchoolLedgerScreen'
 import { WatchScreen } from './support/WatchScreen'
 import { OpenPlanScreen } from './support/OpenPlanScreen'
 import { PlanScreen } from './support/PlanScreen'
@@ -139,6 +142,8 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/settings/support' && support && can(context, 'support.manage')) page = <SupportSettingsScreen />
   else if (path === '/settings/branding' && can(context, 'institution.manage')) page = <LookScreen />
   else if (path === '/divisions') page = <DivisionsScreen />
+  else if (path === '/school/learners' && holdsAnywhere(context, 'institution.overview')) page = <SchoolLearnersScreen />
+  else if (path === '/school/ledger' && fees && holdsAnywhere(context, 'institution.overview')) page = <SchoolLedgerScreen />
   else if (path === '/programmes' && programmes) page = <StructureScreen />
   else if (path === '/programmes/list' && programmes) page = <ProgrammeListScreen />
   else if (programme !== undefined && programmes) page = <ProgrammeScreen key={programme} id={programme} />
@@ -214,16 +219,14 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
 
   return (
     <ConsoleShell onSignedOut={onSignedOut}>
-      <div className="flex flex-col gap-4 px-[clamp(16px,3vw,40px)] pt-7 pb-8">
-        <div className="label-caps text-text-muted">{t.kicker}</div>
-        <h1 className="type-display text-[clamp(56px,7vw,96px)]">{context.user.name}</h1>
-        {context.licence.read_only && (
+      {context.licence.read_only && (
+        <div className="px-[clamp(16px,3vw,40px)] pt-6">
           <Notice tone="wrong" title={t.readOnlyTitle}>
             {t.readOnly}
           </Notice>
-        )}
-        <p className="max-w-[70ch] text-text-muted">{t.pending}</p>
-      </div>
+        </div>
+      )}
+      <HomeScreen />
     </ConsoleShell>
   )
 }

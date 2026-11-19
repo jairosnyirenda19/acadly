@@ -50,6 +50,9 @@ final class ProfileBlueprint
     /** @var array<string, string> slot key => bound value */
     private array $bindings = [];
 
+    /** @var list<string>|null the modules the profile offers, by key; null: as its parent */
+    private ?array $modules = null;
+
     private function __construct(
         public readonly BlueprintRef $ref,
         public readonly bool $abstract,
@@ -137,6 +140,20 @@ final class ProfileBlueprint
         return $this;
     }
 
+    /**
+     * The parts a division of this profile has (D-099): the modules it offers, by
+     * key, shared ones included. A module not listed is not offered there: not
+     * in its menu, and refused by the server. A child adds to its parent's list.
+     *
+     * @param  list<string>  $keys
+     */
+    public function modules(array $keys): self
+    {
+        $this->modules = array_values(array_unique($keys));
+
+        return $this;
+    }
+
     /** Binds a value to a slot a module declares (02 §2.4). */
     public function bind(BindingSlot $slot, BackedEnum $value): self
     {
@@ -187,6 +204,7 @@ final class ProfileBlueprint
             $this->grouping ?? $parent?->grouping,
             $subjects,
             [...($parent->bindings ?? []), ...$this->bindings],
+            array_values(array_unique([...($parent->modules ?? []), ...($this->modules ?? [])])),
         );
     }
 

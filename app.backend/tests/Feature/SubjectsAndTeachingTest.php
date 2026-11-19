@@ -21,6 +21,7 @@ beforeEach(function (): void {
     $this->admin = User::factory()->create(['name' => 'Grace Phiri']);
     RoleAssignment::query()->create(['user_id' => $this->admin->id, 'role_id' => Role::query()->where('is_system', true)->value('id'),
         'scope_type' => ScopeType::Institution, 'scope_id' => null, 'starts_at' => now()->subMinute()]);
+    $this->staffWorkIn('division', $this->school->id('primary'));
 });
 
 function teacherAt(ScopeRef $at, string $name): User
@@ -53,6 +54,9 @@ describe('subjects', function (): void {
 
     it('adds, changes and retires a subject of the school\'s own, with a reason', function (): void {
         $secondary = $this->school->id('secondary');
+        // Outside Secondary the subject is refused; inside it, it is checked (D-099).
+        $this->actingAs($this->admin)->postJson('/api/v1/academics/subjects', ['division_id' => $secondary, 'name' => 'French', 'short' => 'fre', 'core' => false, 'levels' => []])->assertForbidden();
+        $this->inPlace('division', $secondary, $this->admin);
 
         $this->actingAs($this->admin)->postJson('/api/v1/academics/subjects', ['division_id' => $secondary, 'name' => 'French', 'short' => 'fr1', 'core' => false, 'levels' => ['F9']])
             ->assertUnprocessable()->assertJsonValidationErrors(['levels']);

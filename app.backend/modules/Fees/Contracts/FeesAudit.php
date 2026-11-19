@@ -21,6 +21,8 @@ enum FeesAudit: string implements AuditAction
     case DayClosed = 'fees.day_closed';
     case RemindersSent = 'fees.reminders_sent';
     case Exported = 'fees.exported';
+    case OfficesSaved = 'fees.offices_saved';
+    case OfficeStaffChanged = 'fees.office_staff_changed';
 
     public function key(): string
     {
@@ -43,6 +45,8 @@ enum FeesAudit: string implements AuditAction
             self::DayClosed => 'Closed a day of fee collection.',
             self::RemindersSent => 'Sent fee reminders to families.',
             self::Exported => 'Downloaded fee payments and bills.',
+            self::OfficesSaved => 'Saved the finance offices.',
+            self::OfficeStaffChanged => 'Changed who works in a finance office.',
         };
     }
 

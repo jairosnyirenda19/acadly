@@ -8,6 +8,7 @@ use Acadly\Core\Academics\Contracts\AcademicCalendar;
 use Acadly\Core\Enrolment\Application\Actions\ChangeClass;
 use Acadly\Core\Enrolment\Contracts\EnrolmentPermission;
 use Acadly\Kernel\Access\Access;
+use Acadly\Kernel\Access\Boundary;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Grid\BulkResult;
@@ -214,11 +215,11 @@ final class LearnersGrid implements GridDefinition
     /** @return list<array{id: string, name: string, division_id: string, level: string, campus: string, can_admit: bool}> */
     private function classesOf(User $viewer): array
     {
-        if (! isset($this->classes[$viewer->id])) {
+        if (! isset($this->classes[Boundary::cacheKey($viewer)])) {
             $year = $this->calendar->currentYear();
-            $this->classes[$viewer->id] = $year === null ? [] : $this->learners->visibleClasses($viewer, $year['id'], null);
+            $this->classes[Boundary::cacheKey($viewer)] = $year === null ? [] : $this->learners->visibleClasses($viewer, $year['id'], null);
         }
 
-        return $this->classes[$viewer->id];
+        return $this->classes[Boundary::cacheKey($viewer)];
     }
 }

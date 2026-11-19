@@ -29,6 +29,18 @@
   --color-marigold-wash: #2e2610;
   --color-red-text: #ff8a7e;
   --color-red-wash: #3a1714;
+  /* Chart colours stepped for the dark sheet, checked again against it. */
+  --color-series-1: #6a8fd8;
+  --color-series-2: #d2649f;
+  --color-series-3: #3e9bd8;
+  --color-series-4: #ae8424;
+  --color-series-other: #3a4c63;
+  --color-seq-1: #1b2b44;
+  --color-seq-2: #24406a;
+  --color-seq-3: #2f5a93;
+  --color-seq-4: #4a7bc0;
+  --color-seq-5: #7ba2db;
+  --color-seq-6: #b5ccee;
 }
 
 :root[data-theme='dark'] .bg-ink {

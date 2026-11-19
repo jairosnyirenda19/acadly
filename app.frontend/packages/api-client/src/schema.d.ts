@@ -810,6 +810,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The dashboard of the place worked in: in the school view the whole-school
+         *     overview, inside a division that division's own. Its views, and the panels
+         *     of the view asked for (the first view when none is asked for)
+         */
+        get: operations["institution.dashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The person's Today, in the place worked in: what is happening now, one
+         *     small chart of their week, and what they must do
+         */
+        get: operations["institution.today"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/divisions/overview": {
         parameters: {
             query?: never;
@@ -1435,6 +1476,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/fees/offices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The finance offices (D-099): one for the whole school, or the levels at each campus split among named offices */
+        get: operations["fees.offices"];
+        /** Saves the named finance offices. None: one office for the whole school */
+        put: operations["fees.offices.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/fees/terms": {
         parameters: {
             query?: never;
@@ -1935,6 +1994,26 @@ export interface paths {
         get: operations["learners.show"];
         /** Corrects the details: `{first_name, other_names, surname, sex, date_of_birth, admission_number, reason}` */
         put: operations["learners.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learners/{id}/place": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The division a learner is in, for someone who may work there but works elsewhere now (D-099):
+         *     the console offers to switch. Only the place, never the learner. Not found to anyone else
+         */
+        get: operations["learners.place"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -4091,6 +4170,40 @@ export interface paths {
          *     requires no authentication and discloses nothing else.
          */
         get: operations["kernel.school"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/school/learners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The learners of each division, grouped by division, with a search across them */
+        get: operations["learners.school"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/ledger": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Money received between two days (the last 30 days unless asked), by office and division */
+        get: operations["fees.ledger"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7733,6 +7846,7 @@ export interface operations {
                             bindings: {
                                 [key: string]: string;
                             };
+                            modules: string[];
                         }[];
                         campuses: {
                             id: string;
@@ -7757,7 +7871,7 @@ export interface operations {
                         places: {
                             key: string;
                             /** @enum {string} */
-                            type: "institution" | "division" | "campus" | "offering" | "class";
+                            type: "institution" | "division" | "campus" | "offering" | "class" | "office";
                             id: string | null;
                             label: string;
                             within: string[];
@@ -7795,6 +7909,109 @@ export interface operations {
                     "application/json": unknown[];
                 };
             };
+        };
+    };
+    "institution.dashboard": {
+        parameters: {
+            query?: {
+                view?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        school: boolean;
+                        views: {
+                            key: string;
+                            label: string;
+                        }[];
+                        view: string | null;
+                        panels: {
+                            id: string;
+                            view: string;
+                            order: number;
+                            /** @enum {string} */
+                            width: "full" | "half" | "quarter";
+                            kind: string;
+                            label: string;
+                            title: string;
+                            finding: string | null;
+                            data: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "institution.today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        now: {
+                            key: string;
+                            order: number;
+                            label: string;
+                            title: string;
+                            sub: string;
+                            state: {
+                                /** @enum {string} */
+                                tone: "plain" | "done" | "attention" | "wrong";
+                                text: string;
+                            } | null;
+                            action: string;
+                            href: string;
+                        }[];
+                        chart: {
+                            /** @enum {string} */
+                            kind: "columns" | "segments";
+                            label: string;
+                            unit: string;
+                            labels: string[];
+                            values: (number | null)[];
+                            parts: {
+                                name: string;
+                                value: number;
+                                /** @enum {string} */
+                                tone: "plain" | "done" | "attention" | "wrong";
+                            }[];
+                        } | null;
+                        items: {
+                            key: string;
+                            order: number;
+                            title: string;
+                            sub: string;
+                            count: string | null;
+                            /** @enum {string} */
+                            tone: "plain" | "done" | "attention" | "wrong";
+                            href: string | null;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "divisions.overview": {
@@ -9072,6 +9289,11 @@ export interface operations {
                         }[];
                         cancelled_today: number;
                         expected_cash: number;
+                        office: string | null;
+                        staffing: {
+                            named: boolean;
+                            works: boolean;
+                        } | null;
                         closed: {
                             expected: number;
                             counted: number;
@@ -9380,6 +9602,81 @@ export interface operations {
                             optional: boolean;
                             retired: boolean;
                         }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "fees.offices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        offices: {
+                            id: string;
+                            name: string;
+                            offerings: string[];
+                            own: boolean;
+                            staff: string[];
+                        }[];
+                        offerings: {
+                            id: string;
+                            division: string;
+                            campus: string;
+                        }[];
+                        people: {
+                            id: string;
+                            name: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "fees.offices.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    offices: {
+                        /** Format: uuid */
+                        id?: string | null;
+                        name: string;
+                        offerings: string[];
+                        staff?: string[];
+                    }[];
+                    own_staff?: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
                     };
                 };
             };
@@ -10866,6 +11163,32 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "learners.place": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        key: string;
+                        label: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
         };
     };
     "learners.messages": {
@@ -18070,6 +18393,103 @@ export interface operations {
                     };
                 };
             };
+        };
+    };
+    "learners.school": {
+        parameters: {
+            query?: {
+                q?: string | null;
+                division?: string | null;
+                campus?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        total: number;
+                        groups: {
+                            division_id: string;
+                            division: string;
+                            count: number;
+                            shown: number;
+                            rows: {
+                                id: string;
+                                code: string;
+                                name: string;
+                                class: string;
+                                campus: string;
+                            }[];
+                        }[];
+                        campuses: {
+                            id: string;
+                            name: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["NotFoundHttpException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "fees.ledger": {
+        parameters: {
+            query?: {
+                from?: string | null;
+                to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        from: string;
+                        to: string;
+                        total: number;
+                        offices: {
+                            office_id: string;
+                            office: string;
+                            total: number;
+                            divisions: {
+                                division_id: string;
+                                division: string;
+                                total: number;
+                                rows: {
+                                    payment_id: string;
+                                    number: string;
+                                    received_on: string;
+                                    payer: string;
+                                    learners: string;
+                                    campus: string;
+                                    method: string;
+                                    amount: number;
+                                    cancelled: boolean;
+                                }[];
+                            }[];
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["NotFoundHttpException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     search: {

@@ -25,4 +25,6 @@ return ProfileBlueprint::make('TERTIARY@2026.1')
     ->periods(PeriodModel::Semesters, 2)
     ->levels(['Y1' => 'Year 1', 'Y2' => 'Year 2', 'Y3' => 'Year 3', 'Y4' => 'Year 4', 'Y5' => 'Year 5'])
     ->grouping(Grouping::Streams)
-    ->bind(ProgrammesSlot::Shape, StudyShape::Programmes);
+    ->bind(ProgrammesSlot::Shape, StudyShape::Programmes)
+    // The parts of a college (D-099): shared ones and its own. Registers, marks and pick-up belong to the school divisions.
+    ->modules(['fees', 'conduct', 'support', 'programmes']);

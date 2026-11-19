@@ -57,6 +57,15 @@ final class WorkPlaces
             $out[] = self::row($place['scope'], $place['label'], $within, $roles[$key] ?? []);
         }
 
+        // A module's places (a finance office): listed for the switcher; not a role held.
+        foreach (app()->tagged(PlaceGroups::TAG) as $groups) {
+            if ($groups instanceof PlaceGroups) {
+                foreach ($groups->groupsFor($user) as $g) {
+                    $out[] = ['key' => $groups->prefix().':'.$g['id'], 'type' => $groups->prefix(), 'id' => $g['id'], 'label' => $g['label'], 'within' => [$groups->prefix().':'.$g['id'], 'institution:'], 'held' => false, 'roles' => []];
+                }
+            }
+        }
+
         // A place held that is not listed (a level taught at one campus only) still belongs.
         foreach ($heldScopes as $key => $scope) {
             if (! isset($listed[$key])) {

@@ -12,6 +12,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route as Router;
+use Tests\Fixtures\RouteRules;
 use Tests\Fixtures\TwoCampusSchool;
 
 /*
@@ -25,47 +26,19 @@ use Tests\Fixtures\TwoCampusSchool;
  */
 
 /** Routes open to anyone: they reveal nothing about a place. */
-const OPEN_ROUTES = [
-    'sanctum.csrf-cookie', 'auth.sign-in', 'auth.two-step', 'academics.calendar.feed', 'auth.forgot-password', 'auth.reset-password', 'auth.phone.code', 'auth.phone.sign-in',
-    'kernel.health', 'kernel.ready', 'kernel.school', 'institution.logo.public', 'notify.reports', 'kernel.check',
-];
+const OPEN_ROUTES = RouteRules::OPEN_ROUTES;
 
 /** Routes about the account itself, not about a place. */
-const OWN_ROUTES = ['auth.sign-out', 'me', 'me.context', 'me.account', 'me.account.notices', 'me.account.password', 'me.account.two-step', 'me.account.two-step.confirm', 'me.account.two-step.off', 'me.calendar', 'me.calendar.on', 'me.calendar.off', 'me.teaching', 'search', 'search.places', 'me.phone.code', 'me.phone.confirm', 'me.phone.remove', 'me.notifications', 'me.notifications.read', 'view-as.leave', 'approvals.waiting', 'portal.family', 'portal.confirm'];
+const OWN_ROUTES = RouteRules::OWN_ROUTES;
 
 /** Routes decided per record by the owning domain, and proved in its own tests. */
-const RECORD_ROUTES = [
-    'documents.store' => 'DocumentsTest: refuses to store for a person without the kind permission',
-    'documents.show' => 'DocumentsTest: answers not found to a person who may not open the document',
-    'documents.content' => 'DocumentsTest: answers not found to a person who may not open the document',
-    'documents.versions.store' => 'DocumentsTest: answers not found to a person who may not open the document',
-    'documents.trash' => 'DocumentsTest: answers not found to a person who may not open the document',
-    'documents.restore' => 'DocumentsTest: trashes with a reason, restores a batch together',
-    'assessment.publishing.publish' => 'AssessmentTest: publishes a ready class; a class outside the reach of the viewer is not found',
-    'people.import.template' => 'PeopleImportTest: the template lists only the roles and places the viewer can give',
-    'people.import.check' => 'PeopleImportTest: a row for a place outside the viewer\'s reach is not imported',
-    'people.import' => 'PeopleImportTest: a row for a place outside the viewer\'s reach is not imported',
-    'learners.import.template' => 'LearnerImportTest: the template lists only the classes the viewer may admit into',
-    'learners.import.check' => 'LearnerImportTest: a row for a class outside the viewer\'s reach is not imported',
-    'learners.import' => 'LearnerImportTest: a row for a class outside the viewer\'s reach is not imported',
-    'grids.views.store' => 'GridTest: keeps a person\'s columns and named views (a person\'s own, over rows within reach)',
-    'grids.views.update' => 'GridTest: keeps a person\'s columns and named views',
-    'grids.views.delete' => 'GridTest: keeps a person\'s columns and named views',
-    'grids.columns' => 'GridTest: keeps a person\'s columns and named views',
-    'grids.exports.store' => 'GridTest: builds an export in the background (only rows within reach)',
-    'grids.exports.show' => 'GridTest: builds an export in the background (another person: not found)',
-    'grids.exports.file' => 'GridTest: builds an export in the background (another person: not found)',
-    'grids.bulk' => 'GridTest: changes the class of every learner that matches (rows outside reach are dropped)',
-    'fees.payments.store' => 'FeesTest: takes payments only where they may receive them (a child outside reach is not found)',
-];
+const RECORD_ROUTES = RouteRules::RECORD_ROUTES;
 
 /**
  * Lists that answer every viewer with only what is inside the viewer's reach.
  * For these the test checks that nothing of campus B is in the answer.
  */
-const LIST_ROUTES = ['people.index', 'academics.teaching.index', 'academics.timetable.index', 'learners.index', 'learners.grid', 'people.grid', 'registers.index',
-    'registers.lessons', 'registers.missed', 'registers.levels', 'assessment.mine', 'assessment.options', 'assessment.grid', 'assessment.publishing', 'fees.shop.index', 'conduct.kinds.index', 'support.watch',
-    'assessment.rooms', 'assessment.reviews', 'assessment.reviews.share', 'pickup.desk', 'divisions.overview'];
+const LIST_ROUTES = RouteRules::LIST_ROUTES;
 
 uses(DatabaseTransactions::class);
 

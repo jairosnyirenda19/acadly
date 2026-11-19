@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 use Acadly\Kernel\Access\Role;
 use Acadly\Kernel\Access\RoleAssignment;
+use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Identity\User;
+use Acadly\Kernel\Module\ModuleActivation;
+use Acadly\Kernel\Module\ModuleState;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Modules\Programmes\Contracts\ProgrammesPermission;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -168,9 +171,29 @@ it('lets a viewer see but not change, and keeps each division apart', function (
     $data = $this->actingAs($viewer)->getJson("{$this->base}/structure")->assertOk()->json();
     expect($data['can'])->toBe(['manage' => false, 'offer' => false])->and($data['staff'])->toBe([]);
     $this->actingAs($viewer)->putJson("{$this->base}/faculties", ['faculties' => []])->assertForbidden();
-    $this->actingAs($viewer)->getJson("/api/v1/programmes/{$this->other}/structure")->assertForbidden();
+    // Programmes is not a part of the other division at all (D-099): not found.
+    $this->actingAs($viewer)->getJson("/api/v1/programmes/{$this->other}/structure")->assertNotFound();
 
     // A division whose profile sets study by classes has no programmes at all.
     $this->actingAs($this->admin)->getJson("/api/v1/programmes/{$this->other}/catalogue")->assertNotFound();
     $this->actingAs($this->admin)->putJson("/api/v1/programmes/{$this->other}/faculties", ['faculties' => []])->assertNotFound();
+});
+
+it('offers each division only the parts its profile lists', function (): void {
+    DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'attendance', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()->subYear()]);
+    app()->forgetScopedInstances();
+    $modules = app(ModuleActivation::class);
+    $college = ScopeRef::of(ScopeType::Division, $this->college);
+    $secondary = ScopeRef::of(ScopeType::Division, $this->other);
+
+    // D-099: registers belong to the school divisions, programmes to the college; fees are shared.
+    expect($modules->isActive('programmes', $college))->toBeTrue()
+        ->and($modules->isActive('attendance', $college))->toBeFalse()
+        ->and($modules->isActive('attendance', $secondary))->toBeTrue()
+        ->and($modules->isActive('programmes', $secondary))->toBeFalse()
+        ->and($modules->state('attendance', $college))->toBe(ModuleState::NotOffered);
+
+    $divisions = collect($this->actingAs($this->admin)->getJson('/api/v1/me/context')->assertOk()->json('divisions'))->keyBy('id');
+    expect($divisions[$this->college]['modules'])->toBe(['fees', 'conduct', 'support', 'programmes'])
+        ->and($divisions[$this->other]['modules'])->toContain('attendance', 'assessment', 'fees');
 });

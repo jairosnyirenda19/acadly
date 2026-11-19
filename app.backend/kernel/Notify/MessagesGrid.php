@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acadly\Kernel\Notify;
 
 use Acadly\Kernel\Access\Access;
+use Acadly\Kernel\Access\Boundary;
 use Acadly\Kernel\Grid\BulkResult;
 use Acadly\Kernel\Grid\GridColumn;
 use Acadly\Kernel\Grid\GridDefinition;
@@ -41,7 +42,7 @@ final class MessagesGrid implements GridDefinition
     {
         $this->access->check($viewer, NotifyPermission::Manage);
 
-        return DB::table('notification_deliveries as d')->where('d.channel', '!=', 'none')->select('d.*');
+        return app(Boundary::class)->keepToPlace(DB::table('notification_deliveries as d')->where('d.channel', '!=', 'none'), 'd.scope_type', 'd.scope_id')->select('d.*');
     }
 
     public function idColumn(): string

@@ -30,7 +30,7 @@ final class ReviewFigures implements DivisionFigures
     public function figures(User $viewer, array $divisionIds, string $day): array
     {
         $seen = array_values(array_filter($divisionIds, fn (string $id): bool => ! $this->reach->takesMarks($id)
-            && $this->access->allows($viewer, AssessmentPermission::Review, ScopeRef::of(ScopeType::Division, $id))));
+            && $this->access->holdsForCount($viewer, AssessmentPermission::Review, ScopeRef::of(ScopeType::Division, $id))));
 
         if ($seen === []) {
             return [];

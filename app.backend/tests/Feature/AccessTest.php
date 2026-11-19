@@ -6,6 +6,7 @@ use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\AccessPermission;
 use Acadly\Kernel\Access\Actions\AssignRole;
 use Acadly\Kernel\Access\Actions\EndRoleAssignment;
+use Acadly\Kernel\Access\Boundary;
 use Acadly\Kernel\Access\FlatScopeHierarchy;
 use Acadly\Kernel\Access\Permission;
 use Acadly\Kernel\Access\PermissionCatalogue;
@@ -248,7 +249,7 @@ describe('the catalogue and sync', function (): void {
 
     it('refuses an unknown permission at check time', function (): void {
         $catalogue = new PermissionCatalogue(new ModuleRegistry([]));
-        $access = new Access($catalogue, new FlatScopeHierarchy, new Clock, app(Audit::class), app(ModuleActivation::class));
+        $access = new Access($catalogue, new FlatScopeHierarchy, new Clock, app(Audit::class), app(ModuleActivation::class), app(Boundary::class));
 
         $access->allows(User::factory()->create(), AttendancePermission::Capture);
     })->throws(LogicException::class, 'not a permission in this build');

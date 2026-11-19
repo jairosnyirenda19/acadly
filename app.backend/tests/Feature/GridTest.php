@@ -29,6 +29,7 @@ beforeEach(function (): void {
     $this->admin = User::factory()->create(['name' => 'Grace Phiri']);
     RoleAssignment::query()->create(['user_id' => $this->admin->id, 'role_id' => Role::query()->where('is_system', true)->value('id'),
         'scope_type' => ScopeType::Institution, 'scope_id' => null, 'starts_at' => now()->subMinute()]);
+    $this->staffWorkIn('division', $this->school->id('secondary'));
     $this->class = $this->school->id('class_secondary_b');
     $this->west = Ids::next();
     DB::table('academic_classes')->insert(['id' => $this->west, 'year_id' => $this->school->id('year'), 'division_id' => $this->school->id('secondary'),
@@ -138,6 +139,8 @@ it('lists people and sent messages on the same grid', function (): void {
     $active = $this->actingAs($this->admin)->getJson('/api/v1/people/grid?filter[state]=active')->assertOk();
     expect(array_column($active->json('rows'), 'state'))->each->toBe('active');
 
+    // A test message is kept for the whole school: it is read in the school view (D-099).
+    $this->inPlace('institution', null, $this->admin);
     $this->actingAs($this->admin)->postJson('/api/v1/messages/test', ['channel' => 'sms', 'address' => '0991 234 567'])->assertSuccessful();
     $sent = $this->actingAs($this->admin)->getJson('/api/v1/messages/sent/grid?filter[channel]=sms&filter[day]=2026-11-17..2026-11-17')->assertOk();
     expect($sent->json('total'))->toBe(1)->and($sent->json('rows.0.notice'))->toBe('Test message')

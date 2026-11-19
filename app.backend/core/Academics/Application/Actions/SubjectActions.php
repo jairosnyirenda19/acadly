@@ -155,7 +155,9 @@ final class SubjectActions
         try {
             $at = ScopeRef::of(ScopeType::Division, $divisionId);
         } catch (\InvalidArgumentException) {
-            $at = ScopeRef::institution();
+            // Not an id: refused, else invalid, before any lookup.
+            $this->access->check($by, AcademicsPermission::Manage, ScopeRef::institution());
+            throw ValidationException::withMessages(['division_id' => ['Choose a division.']]);
         }
 
         $this->access->check($by, AcademicsPermission::Manage, $at);

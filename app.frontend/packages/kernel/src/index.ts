@@ -6,6 +6,7 @@ import { api } from './api'
  */
 export { api }
 export type { paths } from '@acadly/api-client'
+export { setPlace } from '@acadly/api-client'
 export * from './session'
 
 /** Resolves when the service is available. Rejects when it is not. */

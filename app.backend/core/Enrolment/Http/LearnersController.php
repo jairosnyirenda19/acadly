@@ -9,9 +9,11 @@ use Acadly\Core\Enrolment\Application\Actions\ChangeClass;
 use Acadly\Core\Enrolment\Application\Actions\ContactActions;
 use Acadly\Core\Enrolment\Application\Actions\CorrectLearner;
 use Acadly\Core\Enrolment\Application\Actions\ReplacePhoto;
+use Acadly\Core\Enrolment\Application\LearnerPlaces;
 use Acadly\Core\Enrolment\Application\Learners;
 use Acadly\Core\Enrolment\Application\Reach;
 use Acadly\Core\Enrolment\Contracts\EnrolmentPermission;
+use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Access\WorkPlaces;
@@ -83,6 +85,29 @@ final class LearnersController
         ], self::contacts($request->input('contacts')));
 
         return response()->json(['id' => $learner->id], 201);
+    }
+
+    /**
+     * The division a learner is in, for someone who may work there but works elsewhere now (D-099):
+     * the console offers to switch. Only the place, never the learner. Not found to anyone else.
+     *
+     * @response array{key: string, label: string}
+     */
+    public function place(Request $request, string $id, LearnerPlaces $places, Access $access, WorkPlaces $work): JsonResponse
+    {
+        $viewer = self::user($request);
+        $place = $places->current($id);
+
+        if ($place === null || ! $access->holdsForCount($viewer, EnrolmentPermission::View, ScopeRef::of(ScopeType::ClassGroup, $place['class_id']))) {
+            throw new NotFoundHttpException;
+        }
+
+        $division = ScopeRef::of(ScopeType::Division, $place['division_id']);
+        if (! $work->allows($viewer, $division)) {
+            throw new NotFoundHttpException;
+        }
+
+        return response()->json(['key' => WorkPlaces::key($division), 'label' => $access->label($division)]);
     }
 
     /**

@@ -47,6 +47,10 @@ final class CoverActions
         $allowed = array_filter($classes, fn (string $c): bool => $this->access->allows($by, $permission, ScopeRef::of(ScopeType::ClassGroup, $c)));
 
         if ($allowed === []) {
+            // Lessons, all outside the place worked in: this person is not found here (D-099).
+            if ($classes !== [] && ! $self) {
+                throw new NotFoundHttpException;
+            }
             $this->access->check($by, $permission);
         }
 

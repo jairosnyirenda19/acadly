@@ -6,6 +6,7 @@ namespace Acadly\Kernel\Approvals;
 
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\AccessPermission;
+use Acadly\Kernel\Access\Boundary;
 use Acadly\Kernel\Access\Role;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Row;
@@ -45,7 +46,8 @@ final class ApprovalRequests
             $topic = $this->approvals->topic(Row::text($row, 'topic_key'));
             $case = $topic?->case(Row::text($row, 'subject_id'));
 
-            if ($topic === null || $case === null) {
+            // A request about a record outside the place worked in is not listed (D-099).
+            if ($topic === null || $case === null || app(Boundary::class)->refuses($viewer, $case->at, $topic->module(), $topic->permission()->key())) {
                 continue;
             }
 
@@ -75,7 +77,7 @@ final class ApprovalRequests
         $topic = $this->approvals->topic(Row::text($request, 'topic_key'));
         $case = $topic?->case(Row::text($request, 'subject_id'));
 
-        if ($topic === null || $case === null) {
+        if ($topic === null || $case === null || app(Boundary::class)->refuses($viewer, $case->at, $topic->module(), $topic->permission()->key())) {
             throw new NotFoundHttpException;
         }
 

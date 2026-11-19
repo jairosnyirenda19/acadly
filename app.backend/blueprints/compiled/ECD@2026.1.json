@@ -5,6 +5,14 @@
     },
     "extends": "SCHOOL_BASE@2026.1",
     "kind": "profile",
+    "modules": [
+        "fees",
+        "conduct",
+        "support",
+        "attendance",
+        "assessment",
+        "saferelease"
+    ],
     "ref": "ECD@2026.1",
     "structure": {
         "grouping": "rooms",

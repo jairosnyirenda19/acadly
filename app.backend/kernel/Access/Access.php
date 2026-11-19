@@ -11,6 +11,7 @@ use Acadly\Kernel\Http\Problem;
 use Acadly\Kernel\Identity\AccountStatus;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Module\ModuleActivation;
+use Acadly\Kernel\Module\ModuleState;
 use Acadly\Kernel\Support\Clock;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -27,6 +28,8 @@ use LogicException;
  *     declares it is on at the target scope (entitlement, rule D7).
  *  3. The account holds the permission, through an active role assignment,
  *     at the target scope or at a scope that contains it.
+ *  4. The target is inside the place the request works in (D-099): a
+ *     division or campus is a wall on top of the roles. See Boundary.
  *
  * Record-level rules (a teacher's own classes, a guardian's own children) are
  * added by the modules that own those records. Whether a module is licensed
@@ -44,6 +47,7 @@ final class Access
         private readonly Clock $clock,
         private readonly Audit $audit,
         private readonly ModuleActivation $modules,
+        private readonly Boundary $boundary,
     ) {}
 
     public function allows(?Authenticatable $who, Permission $permission, ?ScopeRef $at = null): bool
@@ -59,6 +63,10 @@ final class Access
         $at ??= ScopeRef::institution();
 
         if (! $this->modules->isActive($this->catalogue->ownerOf($permission), $at)) {
+            return false;
+        }
+
+        if ($this->boundary->refuses($who, $at, $this->catalogue->ownerOf($permission), $permission->key())) {
             return false;
         }
 
@@ -80,6 +88,26 @@ final class Access
     }
 
     /**
+     * Whether the account holds the permission at a scope, for a count only:
+     * the number of learners on a division's tile in the school view. The
+     * place does not apply. Never use it to show, open or change a record.
+     */
+    public function holdsForCount(?Authenticatable $who, Permission $permission, ScopeRef $at): bool
+    {
+        if (! $who instanceof User || ! $who->isActive() || ! $this->modules->isActive($this->catalogue->ownerOf($permission), $at)) {
+            return false;
+        }
+
+        foreach ($this->grants($who) as $grant) {
+            if ($grant->permission === $permission->key() && in_array(WorkPlaces::key($grant->scope), array_map(WorkPlaces::key(...), [$at, ...$this->hierarchy->ancestors($at)]), true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Refuses with an exception, rendered as 403 access_refused. A refusal is
      * an audit line: no module writes its own.
      *
@@ -90,13 +118,15 @@ final class Access
         if (! $this->allows($who, $permission, $at)) {
             $owner = $this->catalogue->has($permission->key()) ? $this->catalogue->ownerOf($permission) : '';
             $moduleOff = $owner !== '' && ! $this->modules->isActive($owner, $at);
+            $outside = ! $moduleOff && $who instanceof User && $this->boundary->refuses($who, $at ?? ScopeRef::institution(), $owner, $permission->key());
 
             $this->audit->record(KernelAudit::Refused, outcome: Outcome::Refused,
-                refusal: $moduleOff ? 'module:'.$owner : 'permission:'.$permission->key(),
+                refusal: $moduleOff ? 'module:'.$owner : ($outside ? 'place:'.($this->boundary->key() ?? '') : 'permission:'.$permission->key()),
                 actor: $this->audit->actorFor($who), at: $at, meta: ['permission' => $permission->key()]);
 
             if ($moduleOff) {
-                throw Problem::moduleInactive();
+                // A division whose profile does not have the part (D-099): the part is not here at all.
+                throw $this->modules->state($owner, $at) === ModuleState::NotOffered ? Problem::notPartOfPlace() : Problem::moduleInactive();
             }
 
             throw new AuthorizationException('Access is refused.');

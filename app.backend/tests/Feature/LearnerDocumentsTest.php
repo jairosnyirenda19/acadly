@@ -26,6 +26,7 @@ beforeEach(function (): void {
     $this->admin = User::factory()->create(['name' => 'Grace Phiri']);
     RoleAssignment::query()->create(['user_id' => $this->admin->id, 'role_id' => Role::query()->where('is_system', true)->value('id'),
         'scope_type' => ScopeType::Institution, 'scope_id' => null, 'starts_at' => now()->subMinute()]);
+    $this->staffWorkIn('division', $this->school->id('primary'));
     $this->learner = $this->actingAs($this->admin)->postJson('/api/v1/learners', [
         'first_name' => 'Mphatso', 'other_names' => '', 'surname' => 'Chirwa', 'sex' => 'female', 'date_of_birth' => '2019-05-02',
         'class_id' => $this->school->id('class_primary_a'), 'admitted_on' => '2026-09-08', 'admission_number' => '',

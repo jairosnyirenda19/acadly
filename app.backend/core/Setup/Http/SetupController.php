@@ -11,6 +11,7 @@ use Acadly\Core\Setup\Application\Actions\OpenSchool;
 use Acadly\Core\Setup\Application\SetupProgress;
 use Acadly\Core\Setup\Application\StarterRoles;
 use Acadly\Kernel\Access\Access;
+use Acadly\Kernel\Access\Boundary;
 use Acadly\Kernel\Access\Role;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
@@ -25,6 +26,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class SetupController
 {
@@ -190,6 +192,11 @@ final class SetupController
 
     private static function user(Request $request): User
     {
+        // Setting up the school is done for every division at once, in the school view (D-099).
+        if (app(Boundary::class)->insidePart()) {
+            throw new NotFoundHttpException;
+        }
+
         $user = $request->user();
 
         return $user instanceof User ? $user : throw new AuthenticationException;

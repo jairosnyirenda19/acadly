@@ -10181,6 +10181,12 @@
                                                         "additionalProperties": {
                                                             "type": "string"
                                                         }
+                                                    },
+                                                    "modules": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
                                                     }
                                                 },
                                                 "required": [
@@ -10188,7 +10194,8 @@
                                                     "name",
                                                     "profile",
                                                     "vocabulary",
-                                                    "bindings"
+                                                    "bindings",
+                                                    "modules"
                                                 ]
                                             }
                                         },
@@ -10293,7 +10300,8 @@
                                                             "division",
                                                             "campus",
                                                             "offering",
-                                                            "class"
+                                                            "class",
+                                                            "office"
                                                         ]
                                                     },
                                                     "id": {
@@ -10389,6 +10397,352 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/v1/dashboard": {
+            "get": {
+                "operationId": "institution.dashboard",
+                "summary": "The dashboard of the place worked in: in the school view the whole-school\noverview, inside a division that division's own. Its views, and the panels\nof the view asked for (the first view when none is asked for)",
+                "tags": [
+                    "Dashboard"
+                ],
+                "parameters": [
+                    {
+                        "name": "view",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "school": {
+                                            "type": "boolean"
+                                        },
+                                        "views": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "label"
+                                                ]
+                                            }
+                                        },
+                                        "view": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "panels": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "view": {
+                                                        "type": "string"
+                                                    },
+                                                    "order": {
+                                                        "type": "integer"
+                                                    },
+                                                    "width": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "full",
+                                                            "half",
+                                                            "quarter"
+                                                        ]
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "finding": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "data": {
+                                                        "type": "object",
+                                                        "additionalProperties": {}
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "view",
+                                                    "order",
+                                                    "width",
+                                                    "kind",
+                                                    "label",
+                                                    "title",
+                                                    "finding",
+                                                    "data"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "school",
+                                        "views",
+                                        "view",
+                                        "panels"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/today": {
+            "get": {
+                "operationId": "institution.today",
+                "summary": "The person's Today, in the place worked in: what is happening now, one\nsmall chart of their week, and what they must do",
+                "tags": [
+                    "Dashboard"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "now": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "order": {
+                                                        "type": "integer"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "sub": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "tone": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "plain",
+                                                                    "done",
+                                                                    "attention",
+                                                                    "wrong"
+                                                                ]
+                                                            },
+                                                            "text": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "tone",
+                                                            "text"
+                                                        ]
+                                                    },
+                                                    "action": {
+                                                        "type": "string"
+                                                    },
+                                                    "href": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "order",
+                                                    "label",
+                                                    "title",
+                                                    "sub",
+                                                    "state",
+                                                    "action",
+                                                    "href"
+                                                ]
+                                            }
+                                        },
+                                        "chart": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "kind": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "columns",
+                                                        "segments"
+                                                    ]
+                                                },
+                                                "label": {
+                                                    "type": "string"
+                                                },
+                                                "unit": {
+                                                    "type": "string"
+                                                },
+                                                "labels": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "values": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": [
+                                                            "number",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "parts": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "value": {
+                                                                "type": "integer"
+                                                            },
+                                                            "tone": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "plain",
+                                                                    "done",
+                                                                    "attention",
+                                                                    "wrong"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "name",
+                                                            "value",
+                                                            "tone"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "kind",
+                                                "label",
+                                                "unit",
+                                                "labels",
+                                                "values",
+                                                "parts"
+                                            ]
+                                        },
+                                        "items": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "order": {
+                                                        "type": "integer"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "sub": {
+                                                        "type": "string"
+                                                    },
+                                                    "count": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "tone": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "plain",
+                                                            "done",
+                                                            "attention",
+                                                            "wrong"
+                                                        ]
+                                                    },
+                                                    "href": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "order",
+                                                    "title",
+                                                    "sub",
+                                                    "count",
+                                                    "tone",
+                                                    "href"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "now",
+                                        "chart",
+                                        "items"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -14157,6 +14511,30 @@
                                         "expected_cash": {
                                             "type": "integer"
                                         },
+                                        "office": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "staffing": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "named": {
+                                                    "type": "boolean"
+                                                },
+                                                "works": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "named",
+                                                "works"
+                                            ]
+                                        },
                                         "closed": {
                                             "type": [
                                                 "object",
@@ -14196,6 +14574,8 @@
                                         "cashiers",
                                         "cancelled_today",
                                         "expected_cash",
+                                        "office",
+                                        "staffing",
                                         "closed"
                                     ]
                                 }
@@ -15051,6 +15431,214 @@
                                     },
                                     "required": [
                                         "items"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/offices": {
+            "get": {
+                "operationId": "fees.offices",
+                "summary": "The finance offices (D-099): one for the whole school, or the levels at each campus split among named offices",
+                "tags": [
+                    "FeesSettings"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "offices": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "offerings": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "own": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "staff": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "offerings",
+                                                    "own",
+                                                    "staff"
+                                                ]
+                                            }
+                                        },
+                                        "offerings": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "division": {
+                                                        "type": "string"
+                                                    },
+                                                    "campus": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "division",
+                                                    "campus"
+                                                ]
+                                            }
+                                        },
+                                        "people": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "offices",
+                                        "offerings",
+                                        "people"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "fees.offices.save",
+                "summary": "Saves the named finance offices. None: one office for the whole school",
+                "tags": [
+                    "FeesSettings"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "offices": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "uuid"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "maxLength": 80
+                                                },
+                                                "offerings": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "format": "uuid"
+                                                    }
+                                                },
+                                                "staff": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "format": "uuid"
+                                                    },
+                                                    "maxItems": 50
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "offerings"
+                                            ]
+                                        },
+                                        "maxItems": 20
+                                    },
+                                    "own_staff": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "maxItems": 50
+                                    }
+                                },
+                                "required": [
+                                    "offices"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
                                     ]
                                 }
                             }
@@ -19348,6 +19936,55 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/learners/{id}/place": {
+            "get": {
+                "operationId": "learners.place",
+                "summary": "The division a learner is in, for someone who may work there but works elsewhere now (D-099):\nthe console offers to switch. Only the place, never the learner. Not found to anyone else",
+                "tags": [
+                    "Learners"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {
+                                            "type": "string"
+                                        },
+                                        "label": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "key",
+                                        "label"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -43244,6 +43881,325 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/v1/school/learners": {
+            "get": {
+                "operationId": "learners.school",
+                "summary": "The learners of each division, grouped by division, with a search across them",
+                "tags": [
+                    "SchoolLearners"
+                ],
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 80
+                        }
+                    },
+                    {
+                        "name": "division",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "campus",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "total": {
+                                            "type": "integer"
+                                        },
+                                        "groups": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "division_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "division": {
+                                                        "type": "string"
+                                                    },
+                                                    "count": {
+                                                        "type": "integer"
+                                                    },
+                                                    "shown": {
+                                                        "type": "integer"
+                                                    },
+                                                    "rows": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "code": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                },
+                                                                "class": {
+                                                                    "type": "string"
+                                                                },
+                                                                "campus": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "code",
+                                                                "name",
+                                                                "class",
+                                                                "campus"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "division_id",
+                                                    "division",
+                                                    "count",
+                                                    "shown",
+                                                    "rows"
+                                                ]
+                                            }
+                                        },
+                                        "campuses": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "total",
+                                        "groups",
+                                        "campuses"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/ledger": {
+            "get": {
+                "operationId": "fees.ledger",
+                "summary": "Money received between two days (the last 30 days unless asked), by office and division",
+                "tags": [
+                    "SchoolLedger"
+                ],
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "from": {
+                                            "type": "string"
+                                        },
+                                        "to": {
+                                            "type": "string"
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        },
+                                        "offices": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "office_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "office": {
+                                                        "type": "string"
+                                                    },
+                                                    "total": {
+                                                        "type": "integer"
+                                                    },
+                                                    "divisions": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "division_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "division": {
+                                                                    "type": "string"
+                                                                },
+                                                                "total": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "rows": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "object",
+                                                                        "properties": {
+                                                                            "payment_id": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "number": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "received_on": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "payer": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "learners": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "campus": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "method": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "amount": {
+                                                                                "type": "integer"
+                                                                            },
+                                                                            "cancelled": {
+                                                                                "type": "boolean"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "payment_id",
+                                                                            "number",
+                                                                            "received_on",
+                                                                            "payer",
+                                                                            "learners",
+                                                                            "campus",
+                                                                            "method",
+                                                                            "amount",
+                                                                            "cancelled"
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "division_id",
+                                                                "division",
+                                                                "total",
+                                                                "rows"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "office_id",
+                                                    "office",
+                                                    "total",
+                                                    "divisions"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "from",
+                                        "to",
+                                        "total",
+                                        "offices"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
                     }
                 }
             }

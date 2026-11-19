@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Acadly\Kernel\Notify;
 
+use Acadly\Kernel\Access\Boundary;
 use Acadly\Kernel\Module\ModuleRegistry;
 use Acadly\Kernel\Notify\Channels\SmsProvider;
 use Acadly\Kernel\Notify\Sms\SmsLength;
@@ -158,7 +159,8 @@ final class Messages
     public function sent(string $day, ?string $channel, ?string $state, ?string $search): array
     {
         [$from, $to] = self::dayBounds($day);
-        $base = DB::table('notification_deliveries')->where('channel', '!=', 'none')->where('queued_at', '>=', $from)->where('queued_at', '<', $to);
+        // Only messages kept inside the place worked in (D-099).
+        $base = app(Boundary::class)->keepToPlace(DB::table('notification_deliveries')->where('channel', '!=', 'none')->where('queued_at', '>=', $from)->where('queued_at', '<', $to), 'scope_type', 'scope_id');
         $all = (clone $base)->get(['status', 'reason']);
         $totals = ['sent' => 0, 'delivered' => 0, 'waiting' => 0, 'attention' => 0];
 
@@ -204,7 +206,7 @@ final class Messages
     /** @return array<string, mixed>|null */
     public function message(string $id): ?array
     {
-        $row = DB::table('notification_deliveries')->where('id', $id)->where('channel', '!=', 'none')->first();
+        $row = app(Boundary::class)->keepToPlace(DB::table('notification_deliveries')->where('id', $id)->where('channel', '!=', 'none'), 'scope_type', 'scope_id')->first();
 
         if ($row === null) {
             return null;

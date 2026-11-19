@@ -85,9 +85,10 @@ final class Lessons
      */
     public function levels(User $viewer): array
     {
-        $this->visible($viewer, $this->clock->today());
+        $divisions = array_column($this->visible($viewer, $this->clock->today()), 'division_id');
 
-        return array_map(fn ($d): array => ['division' => $d->name, 'mode' => $this->modes->of($d->id)->value], $this->school->divisionViews());
+        return array_values(array_map(fn ($d): array => ['division' => $d->name, 'mode' => $this->modes->of($d->id)->value],
+            array_filter($this->school->divisionViews(), fn ($d): bool => in_array($d->id, $divisions, true))));
     }
 
     /**

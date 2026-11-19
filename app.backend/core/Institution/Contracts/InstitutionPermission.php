@@ -9,6 +9,7 @@ use Acadly\Kernel\Access\Permission;
 enum InstitutionPermission: string implements Permission
 {
     case Manage = 'institution.manage';
+    case Overview = 'institution.overview';
 
     public function key(): string
     {
@@ -17,16 +18,22 @@ enum InstitutionPermission: string implements Permission
 
     public function label(): string
     {
-        return 'Manage the school';
+        return match ($this) {
+            self::Manage => 'Manage the school',
+            self::Overview => 'See the whole-school overview',
+        };
     }
 
     public function help(): string
     {
-        return 'The school details, logo, levels, campuses, and opening the school.';
+        return match ($this) {
+            self::Manage => 'The school details, logo, levels, campuses, and opening the school.',
+            self::Overview => 'Figures and charts of every division, and read-only lists of the whole school with each row marked by its division.',
+        };
     }
 
     public function isSight(): bool
     {
-        return false;
+        return $this === self::Overview;
     }
 }

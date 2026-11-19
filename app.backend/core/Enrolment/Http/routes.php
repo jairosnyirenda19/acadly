@@ -8,10 +8,13 @@ use Acadly\Core\Enrolment\Http\LearnerDocumentsController;
 use Acadly\Core\Enrolment\Http\LearnerImportController;
 use Acadly\Core\Enrolment\Http\LearnersController;
 use Acadly\Core\Enrolment\Http\ProgressionController;
+use Acadly\Core\Enrolment\Http\SchoolLearnersController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/divisions/overview', DivisionsController::class)->name('divisions.overview');
+    // The whole-school overview's read-only list (D-100): the school view only.
+    Route::get('/school/learners', SchoolLearnersController::class)->name('learners.school');
     Route::get('/families', [FamiliesController::class, 'index'])->name('families.index');
     Route::post('/families/invite', [FamiliesController::class, 'invite'])->middleware('throttle:10,1')->name('families.invite');
     Route::post('/families/links/{id}', [FamiliesController::class, 'link'])->whereUuid('id')->name('families.link');
@@ -40,6 +43,7 @@ Route::middleware('auth:sanctum')->prefix('learners')->name('learners.')->group(
     Route::post('/import/check', [LearnerImportController::class, 'check'])->name('import.check');
     Route::post('/import', [LearnerImportController::class, 'import'])->name('import');
     Route::get('/{id}', [LearnersController::class, 'show'])->whereUuid('id')->name('show');
+    Route::get('/{id}/place', [LearnersController::class, 'place'])->whereUuid('id')->name('place');
     Route::put('/{id}', [LearnersController::class, 'update'])->whereUuid('id')->name('update');
     Route::get('/{id}/messages', [LearnersController::class, 'messages'])->whereUuid('id')->name('messages');
     Route::post('/{id}/class', [LearnersController::class, 'move'])->whereUuid('id')->name('move');

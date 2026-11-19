@@ -145,7 +145,9 @@ final class TeachingActions
         try {
             $at = ScopeRef::of(ScopeType::ClassGroup, $classId);
         } catch (InvalidArgumentException) {
-            $at = ScopeRef::institution();
+            // Not an id: refused, else invalid, before any lookup.
+            $this->access->check($by, AcademicsPermission::Manage, ScopeRef::institution());
+            throw ValidationException::withMessages(['class_id' => ['Choose a class.']]);
         }
 
         $this->access->check($by, AcademicsPermission::Manage, $at);

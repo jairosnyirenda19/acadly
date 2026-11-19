@@ -5,18 +5,24 @@ declare(strict_types=1);
 namespace Acadly\Modules\Fees\Http;
 
 use Acadly\Kernel\Access\Access;
+use Acadly\Kernel\Access\ScopeRef;
+use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Grid\Grids;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Row;
 use Acadly\Modules\Fees\Application\Actions\DeskActions;
+use Acadly\Modules\Fees\Application\Actions\OfficeActions;
 use Acadly\Modules\Fees\Application\Actions\TermFeeActions;
+use Acadly\Modules\Fees\Application\FeeOffices;
+use Acadly\Modules\Fees\Application\FeesReach;
 use Acadly\Modules\Fees\Application\FeesViews;
 use Acadly\Modules\Fees\Application\TermFees;
 use Acadly\Modules\Fees\Contracts\FeesAudit;
 use Acadly\Modules\Fees\Contracts\FeesPermission;
 use Acadly\Modules\Fees\Domain\PaymentMethod;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -32,10 +38,15 @@ final class FeesSettingsController
      */
     public function terms(Request $request, Access $access, TermFees $terms): JsonResponse
     {
-        $access->check(self::user($request), FeesPermission::Manage);
+        $who = self::user($request);
+        $access->check($who, FeesPermission::Manage);
         $out = [];
 
         foreach ($terms->terms() as $t) {
+            // Only the divisions of the place worked in (D-099).
+            if (! $access->allows($who, FeesPermission::Manage, ScopeRef::of(ScopeType::Division, $t['division_id']))) {
+                continue;
+            }
             $schedule = $terms->scheduleId($t['period_id'], $t['division_id']);
             $billed = $schedule !== null && DB::table('fee_schedules')->where('id', $schedule)->whereNotNull('billed_at')->exists();
             $out[] = ['period_id' => $t['period_id'], 'division_id' => $t['division_id'], 'division' => $t['division'], 'year' => $t['year'], 'name' => $t['name'],
@@ -53,7 +64,7 @@ final class FeesSettingsController
      */
     public function term(Request $request, string $period, string $division, Access $access, TermFees $terms): JsonResponse
     {
-        $access->check(self::user($request), FeesPermission::Manage);
+        $access->check(self::user($request), FeesPermission::Manage, ScopeRef::of(ScopeType::Division, $division));
         $term = $terms->term($period, $division);
         $schedule = $terms->scheduleId($period, $division);
         $amounts = [];
@@ -91,7 +102,7 @@ final class FeesSettingsController
      */
     public function saveTerm(Request $request, string $period, string $division, Access $access, TermFeeActions $actions): JsonResponse
     {
-        $access->check(self::user($request), FeesPermission::Manage);
+        $access->check(self::user($request), FeesPermission::Manage, ScopeRef::of(ScopeType::Division, $division));
         $request->validate([
             'amounts' => ['present', 'array'],
             'amounts.*.item_id' => ['required', 'uuid'],
@@ -186,7 +197,7 @@ final class FeesSettingsController
     /**
      * The fees desk: this term's totals, who is behind their plan, and today's takings.
      *
-     * @response array{today: string, terms: list<array{division: string, name: string, year: string}>, billed: int, billed_learners: int, collected: int, due_unpaid: int, behind_count: int, paid_in_full: int, credit: int, credit_learners: int, behind: list<array{learner_id: string, name: string, class: string, due_now: int, since: string, owed_on: string, days: int}>, takings: list<array{method: string, label: string, receipts: int, amount: int}>, cashiers: list<array{name: string, receipts: int}>, cancelled_today: int, expected_cash: int, closed: array{expected: int, counted: int, at: string}|null}
+     * @response array{today: string, terms: list<array{division: string, name: string, year: string}>, billed: int, billed_learners: int, collected: int, due_unpaid: int, behind_count: int, paid_in_full: int, credit: int, credit_learners: int, behind: list<array{learner_id: string, name: string, class: string, due_now: int, since: string, owed_on: string, days: int}>, takings: list<array{method: string, label: string, receipts: int, amount: int}>, cashiers: list<array{name: string, receipts: int}>, cancelled_today: int, expected_cash: int, office: string|null, staffing: array{named: bool, works: bool}|null, closed: array{expected: int, counted: int, at: string}|null}
      */
     public function desk(Request $request, FeesViews $views): JsonResponse
     {
@@ -240,7 +251,7 @@ final class FeesSettingsController
     }
 
     /** What was received and billed between two days, as a spreadsheet for the school's accountant. */
-    public function export(Request $request, Access $access, Audit $audit): StreamedResponse
+    public function export(Request $request, Access $access, Audit $audit, FeesReach $reach): StreamedResponse
     {
         $who = self::user($request);
         $access->check($who, FeesPermission::Manage);
@@ -249,7 +260,7 @@ final class FeesSettingsController
         $to = $request->string('to')->toString();
         $audit->record(FeesAudit::Exported, actor: $audit->actorFor($who), meta: ['from' => $from, 'to' => $to]);
 
-        return new StreamedResponse(function () use ($from, $to): void {
+        return new StreamedResponse(function () use ($from, $to, $reach, $who): void {
             $out = fopen('php://output', 'wb');
 
             if ($out === false) {
@@ -258,18 +269,18 @@ final class FeesSettingsController
 
             fputcsv($out, ['Kind', 'Number', 'Date', 'Learner ID', 'Detail', 'Method', 'Reference', 'Paid by', 'Amount (MWK)', 'Cancelled by']);
 
-            foreach (DB::table('fee_payments as p')->join('fee_payment_shares as s', 's.payment_id', '=', 'p.id')->leftJoin('fee_payment_voids as v', 'v.payment_id', '=', 'p.id')
+            foreach ($reach->keepLearners(DB::table('fee_payments as p')->join('fee_payment_shares as s', 's.payment_id', '=', 'p.id'), 's.learner_id', $who)->leftJoin('fee_payment_voids as v', 'v.payment_id', '=', 'p.id')
                 ->whereBetween('p.received_on', [$from, $to])->orderBy('p.number')
                 ->get(['p.number', 'p.received_on', 's.learner_id', 'p.method', 'p.reference', 'p.payer_name', 's.amount_minor', 'v.number as void']) as $r) {
                 fputcsv($out, ['Payment', Row::text($r, 'number'), Row::text($r, 'received_on'), Row::text($r, 'learner_id'), '', PaymentMethod::from(Row::text($r, 'method'))->label(),
                     Row::maybeText($r, 'reference'), Row::text($r, 'payer_name'), number_format(Row::int($r, 'amount_minor') / 100, 2, '.', ''), Row::maybeText($r, 'void')]);
             }
 
-            foreach (DB::table('fee_charges')->whereBetween('issued_on', [$from, $to])->orderBy('number')->get(['number', 'issued_on', 'learner_id', 'label', 'total_minor']) as $c) {
+            foreach ($reach->keepLearners(DB::table('fee_charges'), 'learner_id', $who)->whereBetween('issued_on', [$from, $to])->orderBy('number')->get(['number', 'issued_on', 'learner_id', 'label', 'total_minor']) as $c) {
                 fputcsv($out, ['Bill', Row::text($c, 'number'), Row::text($c, 'issued_on'), Row::text($c, 'learner_id'), Row::text($c, 'label'), '', '', '', number_format(Row::int($c, 'total_minor') / 100, 2, '.', ''), '']);
             }
 
-            foreach (DB::table('fee_adjustments')->whereBetween('made_on', [$from, $to])->orderBy('number')->get(['number', 'made_on', 'learner_id', 'kind', 'reason', 'amount_minor']) as $a) {
+            foreach ($reach->keepLearners(DB::table('fee_adjustments'), 'learner_id', $who)->whereBetween('made_on', [$from, $to])->orderBy('number')->get(['number', 'made_on', 'learner_id', 'kind', 'reason', 'amount_minor']) as $a) {
                 fputcsv($out, ['Adjustment', Row::text($a, 'number'), Row::text($a, 'made_on'), Row::text($a, 'learner_id'), Row::text($a, 'kind').': '.Row::text($a, 'reason'), '', '', '', number_format(-Row::int($a, 'amount_minor') / 100, 2, '.', ''), '']);
             }
 
@@ -291,6 +302,56 @@ final class FeesSettingsController
         }
 
         return $out;
+    }
+
+    /**
+     * The finance offices (D-099): one for the whole school, or the levels at each campus split among named offices.
+     *
+     * @response array{offices: list<array{id: string, name: string, offerings: list<string>, own: bool, staff: list<string>}>, offerings: list<array{id: string, division: string, campus: string}>, people: list<array{id: string, name: string}>}
+     */
+    public function offices(Request $request, Access $access, FeeOffices $offices): JsonResponse
+    {
+        $access->check(self::user($request), FeesPermission::Manage);
+        $out = [];
+        foreach (DB::table('institution_offerings as o')->join('institution_divisions as d', 'd.id', '=', 'o.division_id')->join('institution_campuses as c', 'c.id', '=', 'o.campus_id')
+            ->whereNull('o.ended_at')->orderBy('d.position')->orderBy('c.position')->get(['o.id', 'd.name as division', 'c.name as campus']) as $o) {
+            $out[] = ['id' => Row::text($o, 'id'), 'division' => Row::text($o, 'division'), 'campus' => Row::text($o, 'campus')];
+        }
+
+        // Who may be named: everyone holding a fees role somewhere in the school.
+        $people = [];
+        foreach (DB::table('access_role_assignments as a')->join('users as u', 'u.id', '=', 'a.user_id')->join('access_role_permissions as p', 'p.role_id', '=', 'a.role_id')
+            ->where('p.permission_key', 'like', 'fees.%')->where('a.starts_at', '<=', now())->where(fn (Builder $q): Builder => $q->whereNull('a.ends_at')->orWhere('a.ends_at', '>', now()))
+            ->distinct()->orderBy('u.name')->get(['u.id', 'u.name']) as $p) {
+            $people[] = ['id' => Row::text($p, 'id'), 'name' => Row::text($p, 'name')];
+        }
+
+        return response()->json(['offices' => $offices->offices(), 'offerings' => $out, 'people' => $people]);
+    }
+
+    /**
+     * Saves the named finance offices. None: one office for the whole school.
+     *
+     * @response array{saved: bool}
+     */
+    public function saveOffices(Request $request, Access $access, OfficeActions $actions): JsonResponse
+    {
+        $who = self::user($request);
+        $access->check($who, FeesPermission::Manage);
+        $request->validate(['offices' => ['present', 'array', 'max:20'], 'offices.*.id' => ['nullable', 'uuid'], 'offices.*.name' => ['required', 'string', 'max:80'],
+            'offices.*.offerings' => ['present', 'array'], 'offices.*.offerings.*' => ['uuid'],
+            'offices.*.staff' => ['sometimes', 'array', 'max:50'], 'offices.*.staff.*' => ['uuid'], 'own_staff' => ['sometimes', 'array', 'max:50'], 'own_staff.*' => ['uuid']]);
+        $list = [];
+        foreach ((array) $request->input('offices') as $o) {
+            $o = is_array($o) ? $o : [];
+            $list[] = ['id' => is_string($o['id'] ?? null) ? $o['id'] : null, 'name' => is_string($o['name'] ?? null) ? $o['name'] : '',
+                'offerings' => array_values(array_filter(is_array($o['offerings'] ?? null) ? $o['offerings'] : [], 'is_string')),
+                'staff' => array_values(array_filter(is_array($o['staff'] ?? null) ? $o['staff'] : [], 'is_string'))];
+        }
+        $own = $request->input('own_staff');
+        $actions->save($who, $list, array_values(array_filter(is_array($own) ? $own : [], 'is_string')));
+
+        return response()->json(['saved' => true]);
     }
 
     private static function user(Request $request): User

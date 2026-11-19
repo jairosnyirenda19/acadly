@@ -6,6 +6,7 @@ namespace Acadly\Kernel\Identity;
 
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\AccessPermission;
+use Acadly\Kernel\Access\Boundary;
 use Acadly\Kernel\Access\Role;
 use Acadly\Kernel\Grid\BulkResult;
 use Acadly\Kernel\Grid\GridColumn;
@@ -172,8 +173,8 @@ final class PeopleGrid implements GridDefinition
     /** @return array<string, string> person id => state, for everyone the viewer may see */
     private function statesFor(User $viewer): array
     {
-        if (isset($this->states[$viewer->id])) {
-            return $this->states[$viewer->id];
+        if (isset($this->states[Boundary::cacheKey($viewer)])) {
+            return $this->states[Boundary::cacheKey($viewer)];
         }
 
         $reach = false;
@@ -194,6 +195,6 @@ final class PeopleGrid implements GridDefinition
             }
         }
 
-        return $this->states[$viewer->id] = $out;
+        return $this->states[Boundary::cacheKey($viewer)] = $out;
     }
 }

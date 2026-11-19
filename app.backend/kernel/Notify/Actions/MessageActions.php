@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acadly\Kernel\Notify\Actions;
 
 use Acadly\Kernel\Access\Access;
+use Acadly\Kernel\Access\Boundary;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Audit\KernelAudit;
 use Acadly\Kernel\Identity\User;
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * The Messages page (the approved design): the SMS provider and its key, the
@@ -248,9 +250,13 @@ final class MessageActions
         $this->access->check($by, NotifyPermission::Manage);
 
         return DB::transaction(function () use ($by, $deliveryId): string {
-            $row = DB::table('notification_deliveries')->where('id', $deliveryId)->lockForUpdate()->first(['status', 'audience']);
+            $row = app(Boundary::class)->keepToPlace(DB::table('notification_deliveries')->where('id', $deliveryId), 'scope_type', 'scope_id')->lockForUpdate()->first(['status', 'audience']);
 
-            if ($row === null || $row->status !== DeliveryStatus::Failed->value || $row->audience === 'test') {
+            if ($row === null) {
+                throw new NotFoundHttpException;
+            }
+
+            if ($row->status !== DeliveryStatus::Failed->value || $row->audience === 'test') {
                 throw ValidationException::withMessages(['delivery' => ['Only a message that was not delivered can be sent again.']]);
             }
 

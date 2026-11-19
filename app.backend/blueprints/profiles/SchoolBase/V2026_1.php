@@ -12,4 +12,6 @@ return ProfileBlueprint::abstract('SCHOOL_BASE@2026.1')
     ->term(Term::Period, 'Term', 'Terms')
     ->term(Term::Group, 'Class', 'Classes')
     ->term(Term::Subject, 'Subject', 'Subjects')
-    ->periods(PeriodModel::Terms, 3);
+    ->periods(PeriodModel::Terms, 3)
+    // The parts of a school division (D-099): shared ones and the school's own.
+    ->modules(['fees', 'conduct', 'support', 'attendance', 'assessment', 'saferelease']);

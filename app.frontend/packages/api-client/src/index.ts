@@ -3,6 +3,19 @@ import type { components, paths } from './schema'
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
 
+/** The place the console works in, sent with every request (D-099). The server checks it and keeps to it. */
+let place: string | null = null
+
+/** Sets the place every request names from now on, or none. */
+export function setPlace(key: string | null): void {
+  place = key
+
+  // The same place for what the browser loads by itself: a receipt opened in a new tab, a photo.
+  if (typeof document !== 'undefined') {
+    document.cookie = key === null ? 'acadly_place=; path=/; max-age=0; SameSite=Strict' : `acadly_place=${encodeURIComponent(key)}; path=/; SameSite=Strict`
+  }
+}
+
 /** The value of one cookie, or null. */
 export function readCookie(source: string, name: string): string | null {
   for (const part of source.split(';')) {
@@ -37,6 +50,10 @@ export function createApi(baseUrl: string, channel?: string) {
 
   client.use({
     onRequest({ request }) {
+      if (place !== null) {
+        request.headers.set('X-Acadly-Place', place)
+      }
+
       if (SAFE_METHODS.has(request.method) || typeof document === 'undefined') {
         return request
       }

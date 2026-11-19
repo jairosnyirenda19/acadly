@@ -12,6 +12,7 @@ use Acadly\Core\Enrolment\Contracts\Guardianship;
 use Acadly\Core\Enrolment\Contracts\Relationship;
 use Acadly\Core\Enrolment\Journeys\GuardianLink\State;
 use Acadly\Kernel\Access\Access;
+use Acadly\Kernel\Access\Boundary;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Identity\PhoneHolders;
@@ -203,8 +204,17 @@ final class Families implements Guardianship, PhoneHolders
 
         $byPhone = [];
 
+        // Only the learners the office may see in the place it works in (D-099). A learner with no class
+        // now belongs to no division: shown only where no place bounds the request.
+        $unbounded = app(Boundary::class)->offerings() === null;
         foreach ($this->contactsInForce() as $c) {
-            $byPhone[$c['phone']][] = $c;
+            $place = $this->places->current($c['learner_id']);
+            $seen = $place !== null && $place['open']
+                ? $this->access->allows($by, EnrolmentPermission::Families, ScopeRef::of(ScopeType::ClassGroup, $place['class_id']))
+                : $unbounded;
+            if ($seen) {
+                $byPhone[$c['phone']][] = $c;
+            }
         }
 
         $guardians = DB::table('guardians as g')->leftJoin('users as u', 'u.id', '=', 'g.user_id')
@@ -362,6 +372,25 @@ final class Families implements Guardianship, PhoneHolders
         }
 
         return $out;
+    }
+
+    /**
+     * Whether a phone number (international form) is a contact of a learner the
+     * office may see in the place it works in (D-099).
+     */
+    public function reachesPhone(User $by, string $phone): bool
+    {
+        foreach ($this->contactsInForce() as $c) {
+            if ($c['phone'] !== $phone) {
+                continue;
+            }
+            $place = $this->places->current($c['learner_id']);
+            if ($place !== null && $place['open'] && $this->access->allows($by, EnrolmentPermission::Families, ScopeRef::of(ScopeType::ClassGroup, $place['class_id']))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

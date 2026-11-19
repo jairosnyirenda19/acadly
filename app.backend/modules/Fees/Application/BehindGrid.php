@@ -39,6 +39,7 @@ final class BehindGrid implements GridDefinition
         private readonly FeesViews $views,
         private readonly DeskActions $desk,
         private readonly Clock $clock,
+        private readonly FeesReach $reach,
     ) {}
 
     public function key(): string
@@ -65,7 +66,8 @@ final class BehindGrid implements GridDefinition
         $source = DB::query()->fromRaw('jsonb_to_recordset(?::jsonb) as b(learner_id uuid, due_now bigint, since date, owed_on text, days int)', [$this->work()])
             ->select(['b.learner_id', 'b.due_now', 'b.since', 'b.owed_on', 'b.days']);
 
-        return DB::query()->fromSub($source, 'b')
+        // Only the learners of the place worked in (D-099).
+        return $this->reach->keepLearners(DB::query()->fromSub($source, 'b'), 'b.learner_id', $viewer)
             ->join('learners as l', 'l.id', '=', 'b.learner_id')
             ->leftJoin('placements as pl', fn (JoinClause $j): JoinClause => $j->on('pl.learner_id', '=', 'b.learner_id')->whereNull('pl.ends_on'))
             ->leftJoin('academic_classes as k', 'k.id', '=', 'pl.class_id')

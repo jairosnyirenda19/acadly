@@ -42,6 +42,7 @@ it('shows a learner\'s attendance, the family\'s messages and the band on the re
 
     $admin = User::factory()->create(['name' => 'Grace Phiri']);
     RoleAssignment::query()->create(['user_id' => $admin->id, 'role_id' => Role::query()->where('is_system', true)->value('id'), 'scope_type' => ScopeType::Institution, 'scope_id' => null, 'starts_at' => now()->subMinute()]);
+    $this->inPlace('division', $school->id('secondary'), $admin);
     $class = $school->id('class_secondary_b');
     $ids = [];
 

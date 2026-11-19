@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Acadly\Core\Enrolment\Domain;
 
 use Acadly\Kernel\Access\ScopeRef;
+use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Audit\FieldClass;
 use Acadly\Kernel\Blueprint\Journey\HeldRecord;
 use Acadly\Kernel\Blueprint\Journey\JourneySubject;
 use Acadly\Kernel\Blueprint\Journey\TravelsJourney;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * One parent's link to one learner (03 §4, D-082). It travels
@@ -39,9 +41,12 @@ final class GuardianLink extends Model implements HeldRecord, JourneySubject
         return $this->held_by;
     }
 
+    /** Where the learner is placed now (D-099): the office acts on a link only where it may see the learner. */
     public function journeyScope(): ScopeRef
     {
-        return ScopeRef::institution();
+        $class = DB::table('placements')->where('learner_id', $this->learner_id)->whereNull('ends_on')->orderByDesc('starts_on')->value('class_id');
+
+        return is_string($class) ? ScopeRef::of(ScopeType::ClassGroup, $class) : ScopeRef::institution();
     }
 
     public function auditType(): string

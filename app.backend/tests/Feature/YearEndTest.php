@@ -8,6 +8,7 @@ use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Ids;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Tests\Fixtures\TwoCampusSchool;
@@ -31,6 +32,7 @@ beforeEach(function (): void {
     $this->admin = User::factory()->create(['name' => 'Grace Phiri']);
     RoleAssignment::query()->create(['user_id' => $this->admin->id, 'role_id' => Role::query()->where('is_system', true)->value('id'),
         'scope_type' => ScopeType::Institution, 'scope_id' => null, 'starts_at' => now()->subMinute()]);
+    $this->staffWorkIn('division', $this->school->id('primary'));
 
     // A Standard 8 class at campus B this year, where Secondary is taught too.
     $this->std8 = Ids::next();
@@ -61,6 +63,7 @@ function nextClass(object $test, string $year, string $level, string $campus): s
 /** Sets up 2027/28 as proposed: a copy of this year, one year on. */
 function setUpNextYear(object $test): string
 {
+    $test->inPlace('institution', null, $test->admin);
     $proposal = $test->actingAs($test->admin)->getJson('/api/v1/academics/next-year')->assertOk()->json('next');
 
     expect($proposal)->toMatchArray(['saved' => false, 'name' => '2027/28', 'starts_on' => '2027-09-07', 'ends_on' => '2028-07-23']);
@@ -73,6 +76,8 @@ function setUpNextYear(object $test): string
         ]]],
         'classes' => array_map(fn (array $o): array => ['division_id' => $o['division_id'], 'campus_id' => $o['campus_id'], 'streams' => []], $proposal['classes']),
     ])->assertOk()->assertJsonPath('next.saved', true);
+
+    $test->inPlace('division', $test->school->id('primary'), $test->admin);
 
     return (string) DB::table('academic_years')->where('name', '2027/28')->value('id');
 }
@@ -121,12 +126,16 @@ it('runs the year end: promoted, repeat with a reason, on to Form 1 with the int
     expect(DB::table('journey_step_completions')->where('subject_id', $row($committed, $this->alinafe)['id'])->count())->toBe(1);
 
     // Secondary confirms its intake.
+    $this->inPlace('division', $this->school->id('secondary'), $this->admin);
     $secondary = $this->actingAs($this->admin)->getJson("/api/v1/year-end/{$this->school->id('secondary')}")->assertOk()->json();
     expect($secondary['intake'])->toHaveCount(1)->and($secondary['intake'][0]['learner_id'])->toBe($this->thoko);
     $this->actingAs($this->admin)->postJson("/api/v1/year-end/decisions/{$secondary['intake'][0]['id']}/intake", ['accept' => true])->assertOk()->assertJsonPath('intake', []);
 
     // The first day of 2027/28.
     $this->travelTo('2027-09-06 06:00:00');
+    // The year starts from the command line: no request, so no place (D-099).
+    app()->instance('request', Request::create('/'));
+    auth()->forgetGuards();
     $this->artisan('learners:year-start')->assertSuccessful();
 
     $now = fn (string $learner): object => DB::table('placements')->where('learner_id', $learner)->whereNull('ends_on')->first();

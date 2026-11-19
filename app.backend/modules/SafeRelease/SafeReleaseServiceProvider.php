@@ -6,8 +6,10 @@ namespace Acadly\Modules\SafeRelease;
 
 use Acadly\Core\Enrolment\Contracts\FamilyLine;
 use Acadly\Core\Enrolment\Contracts\LearnerRecordPart;
+use Acadly\Core\Institution\Contracts\TodayItems;
 use Acadly\Modules\SafeRelease\Application\FamilyPickup;
 use Acadly\Modules\SafeRelease\Application\PickupRecordPart;
+use Acadly\Modules\SafeRelease\Application\PickupToday;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -18,6 +20,7 @@ final class SafeReleaseServiceProvider extends ServiceProvider
     {
         $this->app->tag([PickupRecordPart::class], LearnerRecordPart::TAG);
         $this->app->tag([FamilyPickup::class], FamilyLine::TAG);
+        $this->app->tag([PickupToday::class], TodayItems::TAG);
     }
 
     public function boot(): void

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acadly\Kernel;
 
 use Acadly\Kernel\Access\Access;
+use Acadly\Kernel\Access\Boundary;
 use Acadly\Kernel\Access\PermissionCatalogue;
 use Acadly\Kernel\Access\ScopeHierarchy;
 use Acadly\Kernel\Access\ScopeTree;
@@ -121,6 +122,7 @@ final class KernelServiceProvider extends ServiceProvider
         $this->app->scoped(ScopeHierarchy::class, fn (Application $app): ScopeHierarchy => new ScopeTree($app->tagged(ScopeTree::PARENTS)));
 
         // One instance per request: it remembers the grants it has loaded.
+        $this->app->scoped(Boundary::class);
         $this->app->scoped(Access::class);
 
         // Blueprints: the compiled form is read once per process and checked against the lock.

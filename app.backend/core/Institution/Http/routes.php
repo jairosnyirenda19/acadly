@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Acadly\Core\Institution\Http\DashboardController;
 use Acadly\Core\Institution\Http\InstitutionController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,4 +17,9 @@ Route::middleware('auth:sanctum')->prefix('institution')->name('institution.')->
     Route::post('/campuses', [InstitutionController::class, 'storeCampus'])->name('campuses.store');
     Route::put('/campuses/{id}', [InstitutionController::class, 'updateCampus'])->whereUuid('id')->name('campuses.update');
     Route::put('/offerings', [InstitutionController::class, 'offering'])->name('offerings');
+});
+
+Route::middleware('auth:sanctum')->group(function (): void {
+    Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('institution.dashboard');
+    Route::get('/today', [DashboardController::class, 'today'])->name('institution.today');
 });

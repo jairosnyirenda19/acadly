@@ -7,6 +7,8 @@ namespace Acadly\Modules\Conduct\Application;
 use Acadly\Core\Academics\Contracts\AcademicCalendar;
 use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
 use Acadly\Kernel\Access\Access;
+use Acadly\Kernel\Access\ScopeRef;
+use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Documents\DocumentReader;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
@@ -130,18 +132,21 @@ final class ConductViews
 
         [$now, $before] = $this->schoolTerms();
         $openCases = [];
+        // Only what concerns learners in classes the viewer may see, in the place worked in (D-099).
+        $classes = $this->seenClasses($viewer);
+        $seenEntries = array_values(DB::table('conduct_entry_learners')->whereIn('class_id', $classes ?: ['00000000-0000-0000-0000-000000000000'])->distinct()->pluck('entry_id')->map(fn ($v): string => is_string($v) ? $v : '')->all());
 
-        foreach (ConductCase::query()->whereIn('state', self::OPEN)->orderBy('created_at')->get() as $case) {
+        foreach (ConductCase::query()->whereIn('state', self::OPEN)->whereIn('entry_id', $seenEntries ?: ['00000000-0000-0000-0000-000000000000'])->orderBy('created_at')->get() as $case) {
             $entry = $this->entries(null, $case->entry_id)[0] ?? null;
             $lead = $case->lead_by === null ? null : DB::table('users')->where('id', $case->lead_by)->value('name');
             $openCases[] = ['id' => $case->id, 'number' => $case->number, 'state' => $case->state, 'state_label' => State::from($case->state)->label(),
-                'kind' => $entry['kind'] ?? '', 'happened_on' => $entry['happened_on'] ?? '', 'learners' => implode(', ', array_column($entry['others'] ?? [], 'name')),
+                'kind' => $entry['kind'] ?? '', 'happened_on' => $entry['happened_on'] ?? '', 'learners' => implode(', ', array_column(array_filter($entry['others'] ?? [], fn (array $o): bool => $this->reach->may($viewer, ConductPermission::View, $o['id'])), 'name')),
                 'lead' => is_string($lead) ? $lead : null, 'days' => (int) CarbonImmutable::parse($case->created_at->toDateString())->diffInDays(CarbonImmutable::parse($this->clock->today()))];
         }
 
         $since = CarbonImmutable::parse($this->clock->today())->subDays(120)->toDateString();
         $recent = array_values(array_filter(DB::table('conduct_entry_learners as l')->join('conduct_entries as e', 'e.id', '=', 'l.entry_id')
-            ->where('e.happened_on', '>=', $since)->distinct()->pluck('l.learner_id')->all(), 'is_string'));
+            ->whereIn('l.class_id', $classes ?: ['00000000-0000-0000-0000-000000000000'])->where('e.happened_on', '>=', $since)->distinct()->pluck('l.learner_id')->all(), 'is_string'));
         $watch = [];
         $names = $this->directory->names($recent);
 
@@ -151,11 +156,11 @@ final class ConductViews
             }
         }
 
-        $incidents = ($now === null ? [] : $this->countsByKind($now, false));
-        $commendations = ($now === null ? [] : $this->countsByKind($now, true));
+        $incidents = ($now === null ? [] : $this->countsByKind($now, false, $seenEntries));
+        $commendations = ($now === null ? [] : $this->countsByKind($now, true, $seenEntries));
         $kinds = [];
 
-        foreach ([[...$commendations, ...$incidents], [...($before === null ? [] : $this->countsByKind($before, true)), ...($before === null ? [] : $this->countsByKind($before, false))]] as $i => $rows) {
+        foreach ([[...$commendations, ...$incidents], [...($before === null ? [] : $this->countsByKind($before, true, $seenEntries)), ...($before === null ? [] : $this->countsByKind($before, false, $seenEntries))]] as $i => $rows) {
             foreach ($rows as $name => $row) {
                 $kinds[$name] ??= ['name' => $name, 'commendation' => $row['commendation'], 'now' => 0, 'before' => 0];
                 $kinds[$name][$i === 0 ? 'now' : 'before'] = $row['count'];
@@ -165,13 +170,13 @@ final class ConductViews
         $levels = ['minor' => 0, 'moderate' => 0, 'serious' => 0];
 
         foreach ($now === null ? [] : DB::table('conduct_entries as e')->leftJoin('conduct_withdrawals as w', 'w.entry_id', '=', 'e.id')->whereNull('w.entry_id')
-            ->where('e.commendation', false)->whereBetween('e.happened_on', $now)->get(['e.level']) as $r) {
+            ->where('e.commendation', false)->whereBetween('e.happened_on', $now)->whereIn('e.id', $seenEntries ?: ['00000000-0000-0000-0000-000000000000'])->get(['e.level']) as $r) {
             $levels[Row::text($r, 'level')] = ($levels[Row::text($r, 'level')] ?? 0) + 1;
         }
 
         return [
             'commendations' => array_sum(array_column($commendations, 'count')),
-            'commendations_before' => array_sum(array_column(($before === null ? [] : $this->countsByKind($before, true)), 'count')),
+            'commendations_before' => array_sum(array_column(($before === null ? [] : $this->countsByKind($before, true, $seenEntries)), 'count')),
             'incidents' => array_sum(array_column($incidents, 'count')),
             'levels' => $levels,
             'open_cases' => $openCases,
@@ -350,16 +355,36 @@ final class ConductViews
 
     /**
      * @param  array{0: string, 1: string}  $range
+     * @param  list<string>  $entries  the entries the viewer may count
      * @return array<string, array{count: int, commendation: bool}>
      */
-    private function countsByKind(array $range, bool $commendation): array
+    private function countsByKind(array $range, bool $commendation, array $entries): array
     {
         $out = [];
 
         foreach (DB::table('conduct_entries as e')->leftJoin('conduct_withdrawals as w', 'w.entry_id', '=', 'e.id')->whereNull('w.entry_id')
-            ->where('e.commendation', $commendation)->whereBetween('e.happened_on', $range)->groupBy('e.kind_name')
+            ->where('e.commendation', $commendation)->whereBetween('e.happened_on', $range)->whereIn('e.id', $entries ?: ['00000000-0000-0000-0000-000000000000'])->groupBy('e.kind_name')
             ->get(['e.kind_name', DB::raw('count(*) as n')]) as $r) {
             $out[Row::text($r, 'kind_name')] = ['count' => Row::int($r, 'n'), 'commendation' => $commendation];
+        }
+
+        return $out;
+    }
+
+    /**
+     * The classes of this year the viewer may see conduct in, in the place worked in.
+     *
+     * @return list<string>
+     */
+    private function seenClasses(User $viewer): array
+    {
+        $year = $this->calendar->currentYear();
+        $out = [];
+        foreach ($year === null ? [] : $this->calendar->classesInYear($year['id']) as $c) {
+            if ($this->access->allows($viewer, ConductPermission::View, ScopeRef::of(ScopeType::ClassGroup, $c['id']))
+                || $this->access->allows($viewer, ConductPermission::FollowUp, ScopeRef::of(ScopeType::ClassGroup, $c['id']))) {
+                $out[] = $c['id'];
+            }
         }
 
         return $out;

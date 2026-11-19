@@ -33,6 +33,7 @@ final class FeesViews
         private readonly AcademicCalendar $calendar,
         private readonly TermFees $terms,
         private readonly Clock $clock,
+        private readonly FeeOffices $offices,
     ) {}
 
     /** @return array<string, mixed> */
@@ -233,6 +234,12 @@ final class FeesViews
         $today = $this->clock->today();
         $terms = $this->currentTerms();
         $standings = $this->termStandings($terms);
+        // Only the learners of the place worked in (D-099).
+        $classes = $this->reach->classesInPlace($viewer);
+        if ($classes !== null) {
+            $mine = DB::table('placements')->whereNull('ends_on')->whereIn('class_id', $classes ?: ['00000000-0000-0000-0000-000000000000'])->pluck('learner_id')->map(fn ($v): string => is_string($v) ? $v : '')->all();
+            $standings = array_intersect_key($standings, array_flip($mine));
+        }
         $behind = $this->behindOf($standings, $today);
         $paidInFull = 0;
         $dueUnpaid = 0;
@@ -253,14 +260,14 @@ final class FeesViews
 
         $ranges = array_map(fn (array $t): array => [$t['starts_on'], $t['ends_on']], array_values($terms));
         // Terms of different divisions share their dates: each payment is counted once.
-        $collected = $ranges === [] ? 0 : (int) DB::table('fee_payments as p')->leftJoin('fee_payment_voids as v', 'v.payment_id', '=', 'p.id')->whereNull('v.payment_id')
+        $collected = $ranges === [] ? 0 : (int) $this->reach->keepPayments(DB::table('fee_payments as p'), $viewer)->leftJoin('fee_payment_voids as v', 'v.payment_id', '=', 'p.id')->whereNull('v.payment_id')
             ->where(function (Builder $q) use ($ranges): void {
                 foreach ($ranges as [$from, $to]) {
                     $q->orWhereBetween('p.received_on', [$from, $to]);
                 }
             })->sum('p.amount_minor');
 
-        $todayRows = DB::table('fee_payments as p')->leftJoin('fee_payment_voids as v', 'v.payment_id', '=', 'p.id')->leftJoin('users as u', 'u.id', '=', 'p.received_by')
+        $todayRows = $this->reach->keepPayments(DB::table('fee_payments as p'), $viewer)->leftJoin('fee_payment_voids as v', 'v.payment_id', '=', 'p.id')->leftJoin('users as u', 'u.id', '=', 'p.received_by')
             ->where('p.received_on', $today)->get(['p.method', 'p.amount_minor', 'v.payment_id as voided', 'u.name as by']);
         $methods = [];
         $cashiers = [];
@@ -274,12 +281,13 @@ final class FeesViews
             $cashiers[] = ['name' => (string) $name, 'receipts' => $rows->count()];
         }
 
-        $closed = DB::table('fee_days')->where('day', $today)->first(['expected_cash_minor', 'counted_cash_minor', 'closed_at']);
+        $office = $this->offices->current();
+        $closed = $office === null ? null : DB::table('fee_days')->where('day', $today)->where('office_id', $office)->first(['expected_cash_minor', 'counted_cash_minor', 'closed_at']);
 
         return [
             'today' => $today,
             'terms' => array_map(fn (array $t): array => ['division' => $t['division'], 'name' => $t['name'], 'year' => $t['year']], array_values($terms)),
-            'billed' => (int) DB::table('fee_charges')->whereIn('schedule_id', $this->schedulesOf($terms))->sum('total_minor'),
+            'billed' => (int) $this->reach->keepLearners(DB::table('fee_charges')->whereIn('schedule_id', $this->schedulesOf($terms)), 'learner_id', $viewer)->sum('total_minor'),
             'billed_learners' => count($standings),
             'collected' => $collected,
             'due_unpaid' => $dueUnpaid,
@@ -291,7 +299,10 @@ final class FeesViews
             'takings' => $methods,
             'cashiers' => $cashiers,
             'cancelled_today' => $todayRows->filter(fn (object $r): bool => $r->voided !== null)->count(),
-            'expected_cash' => DeskActions::cashOn($today),
+            'expected_cash' => DeskActions::cashOn($today, $this->reach, $viewer),
+            'office' => $office,
+            // D-100: who may take money here. Null when the place spans offices.
+            'staffing' => $office === null ? null : ['named' => FeeOffices::staffOf($office) !== [], 'works' => FeeOffices::works($viewer, $office)],
             'closed' => $closed === null ? null : ['expected' => Row::int($closed, 'expected_cash_minor'), 'counted' => Row::int($closed, 'counted_cash_minor'), 'at' => Row::text($closed, 'closed_at')],
         ];
     }

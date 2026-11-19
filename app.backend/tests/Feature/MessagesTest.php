@@ -38,6 +38,7 @@ beforeEach(function (): void {
     $this->admin = User::factory()->create(['name' => 'Grace Phiri']);
     RoleAssignment::query()->create(['user_id' => $this->admin->id, 'role_id' => Role::query()->where('is_system', true)->value('id'),
         'scope_type' => ScopeType::Institution, 'scope_id' => null, 'starts_at' => now()->subMinute()]);
+    $this->staffWorkIn('division', $this->school->id('primary'));
     $this->class = $this->school->id('class_primary_a');
 
     // Chikondi's mother reads email; Thoko's mother takes SMS; Madalitso is present.

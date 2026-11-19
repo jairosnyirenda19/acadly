@@ -24,6 +24,7 @@ final readonly class CompiledProfile implements CompiledBlueprint
      * @param  list<array{code: string, label: string}>  $levels  in order, lowest first
      * @param  list<array{short: string, name: string, core: bool, levels: list<string>}>  $subjects  the starter subjects
      * @param  array<string, string>  $bindings  slot key => bound value
+     * @param  list<string>  $modules  the modules offered, by key; empty: every module (D-099)
      */
     public function __construct(
         public BlueprintRef $ref,
@@ -38,6 +39,7 @@ final readonly class CompiledProfile implements CompiledBlueprint
         public ?string $grouping,
         public array $subjects = [],
         public array $bindings = [],
+        public array $modules = [],
     ) {}
 
     /** The value bound to a slot, or the slot's own when the profile binds none. */
@@ -113,6 +115,7 @@ final readonly class CompiledProfile implements CompiledBlueprint
             ],
             'subjects' => $this->subjects,
             'bindings' => $this->bindings === [] ? (object) [] : $this->bindings,
+            'modules' => $this->modules,
         ];
     }
 
@@ -168,6 +171,13 @@ final readonly class CompiledProfile implements CompiledBlueprint
             Shape::nullableString($structure, 'grouping'),
             $subjects,
             $bindings,
+            array_values(array_filter(is_array($data['modules'] ?? null) ? $data['modules'] : [], is_string(...))),
         );
+    }
+
+    /** Whether a division of this profile has a module (D-099). */
+    public function offersModule(string $key): bool
+    {
+        return $this->modules === [] || in_array($key, $this->modules, true);
     }
 }

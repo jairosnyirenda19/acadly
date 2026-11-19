@@ -34,6 +34,7 @@ final class PaymentsGrid implements GridDefinition
     public function __construct(
         private readonly Access $access,
         private readonly ModuleActivation $activation,
+        private readonly FeesReach $reach,
     ) {}
 
     public function key(): string
@@ -56,7 +57,8 @@ final class PaymentsGrid implements GridDefinition
             $this->access->check($viewer, FeesPermission::Collect);
         }
 
-        return DB::table('fee_payments as p')
+        // Only payments for learners of the place worked in (D-099).
+        return $this->reach->keepPayments(DB::table('fee_payments as p'), $viewer)
             ->leftJoin('fee_payment_voids as v', 'v.payment_id', '=', 'p.id')
             ->leftJoin('users as u', 'u.id', '=', 'p.received_by')
             ->select(['p.id', 'p.number', 'p.received_on', 'p.method', 'p.reference', 'p.payer_name', 'p.amount_minor', 'p.created_at', 'v.number as void_number', 'u.name as received_by'])

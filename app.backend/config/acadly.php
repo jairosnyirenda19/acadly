@@ -149,4 +149,14 @@ return [
         ProgrammesModule::class,
     ],
 
+    /*
+    | Divisions and campuses as boundaries (D-099). In the school view no
+    | record of any division is open; only these setup permissions reach
+    | into the divisions there, for the work that is the same for all of
+    | them at once (the next school year's terms and classes, people and
+    | their roles).
+    */
+    'boundary' => [
+        'school_view' => ['academics.manage@division', 'academics.manage@campus', 'institution.manage', 'access.roles.assign', 'access.roles.manage', 'access.approvals.manage', 'fees.manage@division'],
+    ],
 ];

@@ -23,6 +23,17 @@ colors:
   red-text: "#B0231A"
   red-wash: "#FDF1EF"
   disabled: "#D5DDE6"
+  series-1: "#2A4F8F"
+  series-2: "#C2549D"
+  series-3: "#3F86C8"
+  series-4: "#8A6A12"
+  series-other: "#B9C4D2"
+  seq-1: "#E3EAF5"
+  seq-2: "#B9CBE6"
+  seq-3: "#86A6D4"
+  seq-4: "#4F79B8"
+  seq-5: "#2A4F8F"
+  seq-6: "#16325E"
 typography:
   display:
     fontFamily: "Archivo, system-ui, sans-serif"
@@ -187,6 +198,17 @@ Cool paper and navy ink, with three working colours that each mean one thing.
 **The Mark Plus Word Rule.** A state is never shown by colour alone. It has a drawn mark, a letter or a word as well.
 
 **The Red Pen Rule.** Red is the teacher's red pen. It never fills a button, never colours a heading, and is never used for something that is merely unfinished.
+
+## Charts (D-100)
+
+- **Who:** one colour for each division, `series-1` to `series-4`, in the school's order of divisions. A division keeps its colour on every chart; a filter never repaints it. A fifth division, and anything that is not a division, is `series-other` grey. Checked with the colour-blind validator against the sheet, in light and in dark.
+- **How much:** one hue, `seq-1` (less) to `seq-6` (more). Heatmaps, grade bands and shares of a whole. Never a rainbow.
+- **State keeps its job:** teal, marigold and the red pen are never a series. A value below a rule carries the marigold edge and a `!`; below pass is a dashed red-pen edge, never a red fill.
+- **Marks:** square everywhere (radius 0); lines 2px; markers 8px squares with a sheet ring; a 2px sheet gap between segments; faint horizontal grid lines and a 2px ink base line. No pies, no donuts, no shadows, no 3D, one y-axis.
+- **Words:** each chart has a label, a title and one plain sentence that says what it shows. Lines are named at their ends; a legend for two series or more. Every chart has a Table view with the same numbers.
+- **Behaviour:** the tooltip is a sheet with a 2px ink edge; a dashed guide marks the hovered week. Arrow keys move along the points.
+- **Package:** Apache ECharts on its SVG renderer, loaded only on a dashboard, through one theme read from these tokens. Totals, meters, bars and split bars are plain HTML.
+- **Views:** a dashboard is split into views, drawn as tabs; a view shows only when the person may see something in it.
 
 ## Typography
 

@@ -127,6 +127,8 @@ final class FamilyActions implements FamilyAccounts
 
         $now = $this->clock->now();
         $wanted = array_values(array_unique(array_filter(array_map(Phone::international(...), $phones))));
+        // Only the numbers of contacts of learners the office may see in the place worked in (D-099).
+        $wanted = array_values(array_filter($wanted, fn (string $phone): bool => $this->families->reachesPhone($by, $phone)));
         $inPortal = DB::table('users')->whereIn('phone', $wanted ?: ['-'])->whereNotNull('last_signed_in_at')->pluck('phone')->all();
         $recent = DB::table('portal_invitations')->whereIn('phone', $wanted ?: ['-'])->where('invited_at', '>', $now->subDays(self::INVITE_AGAIN_DAYS))->pluck('phone')->all();
         $invited = 0;

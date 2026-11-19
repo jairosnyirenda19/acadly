@@ -10,6 +10,7 @@ use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Audit\KernelAudit;
 use Acadly\Kernel\Identity\AccountStatus;
+use Acadly\Kernel\Identity\People;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Identity\ViewAs;
 use Acadly\Kernel\Support\Clock;
@@ -30,6 +31,7 @@ final class ViewAsActions
         private readonly Access $access,
         private readonly Audit $audit,
         private readonly Clock $clock,
+        private readonly People $people,
     ) {}
 
     /** Steps the administrator's session into another account. */
@@ -41,18 +43,19 @@ final class ViewAsActions
 
         $this->access->check($admin, AccessPermission::AssignRoles, ScopeRef::institution());
 
+        $target = Ids::isValid($targetId) ? User::query()->find($targetId) : null;
+
+        // A person outside the place worked in is not found (D-099), before anything else is said.
+        if ($target === null || $target->status === AccountStatus::Disabled || ! $this->people->sees($admin, $target)) {
+            throw new NotFoundHttpException;
+        }
+
         if (! $request->hasSession()) {
             throw ValidationException::withMessages(['session' => ['View as needs a signed-in session in the console.']]);
         }
 
         if ($this->viewAs->by($request) !== null) {
             throw ValidationException::withMessages(['user' => ['You are already viewing as someone. Leave first.']]);
-        }
-
-        $target = Ids::isValid($targetId) ? User::query()->find($targetId) : null;
-
-        if ($target === null || $target->status === AccountStatus::Disabled) {
-            throw new NotFoundHttpException;
         }
 
         if ($target->is($admin)) {

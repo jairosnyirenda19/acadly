@@ -28,6 +28,12 @@ final class Problem extends RuntimeException
         return new self(403, 'module_inactive', 'This function is not available for the school.');
     }
 
+    /** The part is not one this division has (D-099): its profile does not list it. Answered as not found. */
+    public static function notPartOfPlace(): self
+    {
+        return new self(404, 'not_part_of_place', 'This function is not part of this division.');
+    }
+
     public static function stepNotAvailable(): self
     {
         return new self(409, 'step_not_available', 'This step is not available for the record in its current state.');

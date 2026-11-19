@@ -25,7 +25,7 @@ final class LearnerFigures implements DivisionFigures
 
     public function figures(User $viewer, array $divisionIds, string $day): array
     {
-        $seen = array_values(array_filter($divisionIds, fn (string $id): bool => $this->access->allows($viewer, EnrolmentPermission::View, ScopeRef::of(ScopeType::Division, $id))));
+        $seen = array_values(array_filter($divisionIds, fn (string $id): bool => $this->access->holdsForCount($viewer, EnrolmentPermission::View, ScopeRef::of(ScopeType::Division, $id))));
 
         if ($seen === []) {
             return [];

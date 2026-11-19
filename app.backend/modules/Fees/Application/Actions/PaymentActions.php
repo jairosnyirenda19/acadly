@@ -12,6 +12,7 @@ use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Kernel\Support\Row;
 use Acadly\Modules\Fees\Application\FeeDocuments;
+use Acadly\Modules\Fees\Application\FeeOffices;
 use Acadly\Modules\Fees\Application\FeesReach;
 use Acadly\Modules\Fees\Application\Ledger;
 use Acadly\Modules\Fees\Application\Numbers;
@@ -39,6 +40,7 @@ final class PaymentActions
         private readonly Audit $audit,
         private readonly Notifier $notifier,
         private readonly Clock $clock,
+        private readonly FeeOffices $offices,
     ) {}
 
     /**
@@ -63,7 +65,7 @@ final class PaymentActions
         }
         if ($receivedOn > $this->reach->today()) {
             $errors['received_on'] = ['A payment cannot be received in the future.'];
-        } elseif ($this->reach->dayClosed($receivedOn)) {
+        } elseif ($shares !== [] && $this->reach->dayClosed($receivedOn, $this->offices->ofLearner($shares[0]['learner_id']))) {
             $errors['received_on'] = ['That day is closed. Record the payment on today.'];
         }
         if ($shares === [] || array_sum(array_column($shares, 'amount')) !== $amount) {
@@ -94,6 +96,14 @@ final class PaymentActions
             }
         }
 
+        // Money is taken for an office's learners only by its own staff (D-100).
+        foreach (array_unique(array_map(fn (array $s): string => $this->offices->ofLearner($s['learner_id']), $shares)) as $office) {
+            if (! FeeOffices::works($by, $office)) {
+                throw ValidationException::withMessages(['shares' => [FeeOffices::staffOf($office) === []
+                    ? 'No one is named to work in the finance office for this learner. Name its staff in Settings › Fees › Finance offices.'
+                    : 'You are not named to work in the finance office for this learner.']]);
+            }
+        }
         if ($reference !== null) {
             $used = DB::table('fee_payments')->where('method', $method->value)->whereRaw('lower(reference) = lower(?)', [$reference])->value('number');
 

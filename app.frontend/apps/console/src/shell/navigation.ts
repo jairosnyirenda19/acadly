@@ -21,6 +21,13 @@ export interface NavItem {
   lights: (path: string) => boolean
   /** The school's own word for the page, where its levels name it: "Children" in a nursery. */
   named?: (context: AppContext) => string | undefined
+  /**
+   * Where the page belongs in a school with several divisions (D-099): the school
+   * view (whole-school settings), inside a division (its records), or both.
+   */
+  where?: 'school' | 'division'
+  /** The part (module) the page needs: shown only where the division's profile has it. */
+  module?: string
 }
 
 export interface NavGroup {
@@ -42,15 +49,15 @@ export const GROUPS: NavGroup[] = [
     label: t.groups.daily,
     items: [
       { key: 'divisions', label: t.nav.divisions, path: '/divisions', icon: 'tiles', show: () => false, lights: (p) => p === '/divisions' },
-      { key: 'my-day', label: t.nav.myDay, path: '/my-day', icon: 'myDay', show: (c) => takesRegisters(c), lights: (p) => p === '/my-day' },
+      { key: 'my-day', where: 'division', module: 'attendance', label: t.nav.myDay, path: '/my-day', icon: 'myDay', show: (c) => takesRegisters(c), lights: (p) => p === '/my-day' },
       { key: 'today', label: t.nav.today, path: '/', icon: 'today', show: () => true, lights: (p) => p === '/' },
-      { key: 'registers', label: t.nav.registers, path: '/registers', icon: 'registers', show: (c) => seesRegisters(c), lights: under('/registers') },
-      { key: 'marks', label: t.nav.marks, path: '/marks', icon: 'marks', show: (c) => seesMarks(c), lights: under('/marks') },
-      { key: 'room', label: t.nav.room, path: '/room', icon: 'room', show: (c) => seesObservations(c), lights: under('/room') },
-      { key: 'observations', label: t.nav.observations, path: '/observations', icon: 'observations', show: (c) => observes(c) && holdsAnywhere(c, 'assessment.observe'), lights: under('/observations') },
-      { key: 'reviews', label: t.nav.reviews, path: '/reviews', icon: 'reviews', show: (c) => seesObservations(c), lights: under('/reviews') },
-      { key: 'pickup', label: t.nav.pickup, path: '/pickup', icon: 'pickup', show: (c) => seesPickup(c), lights: under('/pickup') },
-      { key: 'to-approve', label: t.nav.toApprove, path: '/approvals', icon: 'approvals', show: (c) => decides(c), lights: under('/approvals') },
+      { key: 'registers', where: 'division', module: 'attendance', label: t.nav.registers, path: '/registers', icon: 'registers', show: (c) => seesRegisters(c), lights: under('/registers') },
+      { key: 'marks', where: 'division', module: 'assessment', label: t.nav.marks, path: '/marks', icon: 'marks', show: (c) => seesMarks(c), lights: under('/marks') },
+      { key: 'room', where: 'division', module: 'assessment', label: t.nav.room, path: '/room', icon: 'room', show: (c) => seesObservations(c), lights: under('/room') },
+      { key: 'observations', where: 'division', module: 'assessment', label: t.nav.observations, path: '/observations', icon: 'observations', show: (c) => observes(c) && holdsAnywhere(c, 'assessment.observe'), lights: under('/observations') },
+      { key: 'reviews', where: 'division', module: 'assessment', label: t.nav.reviews, path: '/reviews', icon: 'reviews', show: (c) => seesObservations(c), lights: under('/reviews') },
+      { key: 'pickup', where: 'division', module: 'saferelease', label: t.nav.pickup, path: '/pickup', icon: 'pickup', show: (c) => seesPickup(c), lights: under('/pickup') },
+      { key: 'to-approve', where: 'division', label: t.nav.toApprove, path: '/approvals', icon: 'approvals', show: (c) => decides(c), lights: under('/approvals') },
     ],
   },
   {
@@ -58,30 +65,33 @@ export const GROUPS: NavGroup[] = [
     label: t.groups.learners,
     named: (c) => schoolWord(c, 'learner'),
     items: [
-      { key: 'learners', label: t.nav.learners, path: '/learners', icon: 'learners', show: (c) => holdsAnywhere(c, 'enrolment.learners.view'), lights: under('/learners'), named: (c) => schoolWord(c, 'learner') },
-      { key: 'support', label: t.nav.support, path: '/support', icon: 'support', show: (c) => moduleOn(c, 'support') && (holdsAnywhere(c, 'support.view') || holdsAnywhere(c, 'support.lead')), lights: under('/support') },
-      { key: 'conduct', label: t.nav.conduct, path: '/conduct', icon: 'conduct', show: (c) => moduleOn(c, 'conduct') && (can(c, 'conduct.view') || can(c, 'conduct.follow_up')), lights: under('/conduct') },
+      { key: 'learners', where: 'division', label: t.nav.learners, path: '/learners', icon: 'learners', show: (c) => holdsAnywhere(c, 'enrolment.learners.view'), lights: under('/learners'), named: (c) => schoolWord(c, 'learner') },
+      // D-100: the whole-school overview's read-only lists, in the school view.
+      { key: 'all-learners', where: 'school', label: t.nav.allLearners, path: '/school/learners', icon: 'learners', show: (c) => holdsAnywhere(c, 'institution.overview') && holdsAnywhere(c, 'enrolment.learners.view') && c.divisions.length > 1, lights: under('/school/learners') },
+      { key: 'support', where: 'division', module: 'support', label: t.nav.support, path: '/support', icon: 'support', show: (c) => moduleOn(c, 'support') && (holdsAnywhere(c, 'support.view') || holdsAnywhere(c, 'support.lead')), lights: under('/support') },
+      { key: 'conduct', where: 'division', module: 'conduct', label: t.nav.conduct, path: '/conduct', icon: 'conduct', show: (c) => moduleOn(c, 'conduct') && (can(c, 'conduct.view') || can(c, 'conduct.follow_up')), lights: under('/conduct') },
     ],
   },
   {
     key: 'fees',
     label: t.groups.fees,
     items: [
-      { key: 'fees-desk', label: t.nav.feesDesk, path: '/fees', icon: 'fees', show: (c) => moduleOn(c, 'fees') && can(c, 'fees.collect'), lights: (p) => p === '/fees' || p.startsWith('/fees/receipts') },
-      { key: 'fees-pay', label: t.nav.feesPay, path: '/fees/pay', icon: 'pay', show: (c) => moduleOn(c, 'fees') && holdsAnywhere(c, 'fees.collect'), lights: under('/fees/pay') },
-      { key: 'fees-shop', label: t.nav.feesShop, path: '/fees/shop', icon: 'shop', show: (c) => moduleOn(c, 'fees') && holdsAnywhere(c, 'fees.collect'), lights: under('/fees/shop') },
+      { key: 'fees-ledger', where: 'school', module: 'fees', label: t.nav.feesLedger, path: '/school/ledger', icon: 'fees', show: (c) => moduleOn(c, 'fees') && holdsAnywhere(c, 'institution.overview') && holdsAnywhere(c, 'fees.view') && c.divisions.length > 1, lights: under('/school/ledger') },
+      { key: 'fees-desk', where: 'division', module: 'fees', label: t.nav.feesDesk, path: '/fees', icon: 'fees', show: (c) => moduleOn(c, 'fees') && can(c, 'fees.collect'), lights: (p) => p === '/fees' || p.startsWith('/fees/receipts') },
+      { key: 'fees-pay', where: 'division', module: 'fees', label: t.nav.feesPay, path: '/fees/pay', icon: 'pay', show: (c) => moduleOn(c, 'fees') && holdsAnywhere(c, 'fees.collect'), lights: under('/fees/pay') },
+      { key: 'fees-shop', where: 'division', module: 'fees', label: t.nav.feesShop, path: '/fees/shop', icon: 'shop', show: (c) => moduleOn(c, 'fees') && holdsAnywhere(c, 'fees.collect'), lights: under('/fees/shop') },
     ],
   },
   {
     key: 'programmes',
     label: t.groups.programmes,
     items: [
-      { key: 'programmes-structure', label: t.nav.programmesStructure, path: '/programmes', icon: 'subjects', show: (c) => seesProgrammes(c), lights: (p) => p === '/programmes' },
-      { key: 'programmes-list', label: t.nav.programmesList, path: '/programmes/list', icon: 'assessment', show: (c) => seesProgrammes(c), lights: (p) => p === '/programmes/list' || p.startsWith('/programmes/p/') },
-      { key: 'programmes-catalogue', label: t.nav.programmesCatalogue, path: '/programmes/courses', icon: 'subjects', show: (c) => seesProgrammes(c), lights: under('/programmes/courses') },
-      { key: 'programmes-offerings', label: t.nav.programmesOfferings, path: '/programmes/offerings', icon: 'teaching', show: (c) => seesProgrammes(c), lights: under('/programmes/offerings') },
-      { key: 'programmes-students', label: t.nav.programmesStudents, path: '/programmes/students', icon: 'learners', show: (c) => seesProgrammes(c), lights: under('/programmes/students') },
-      { key: 'programmes-registration', label: t.nav.programmesRegistration, path: '/programmes/registration', icon: 'approvals', show: (c) => seesProgrammes(c), lights: (p) => p === '/programmes/registration' || p.startsWith('/programmes/r/') },
+      { key: 'programmes-structure', where: 'division', module: 'programmes', label: t.nav.programmesStructure, path: '/programmes', icon: 'subjects', show: (c) => seesProgrammes(c), lights: (p) => p === '/programmes' },
+      { key: 'programmes-list', where: 'division', module: 'programmes', label: t.nav.programmesList, path: '/programmes/list', icon: 'assessment', show: (c) => seesProgrammes(c), lights: (p) => p === '/programmes/list' || p.startsWith('/programmes/p/') },
+      { key: 'programmes-catalogue', where: 'division', module: 'programmes', label: t.nav.programmesCatalogue, path: '/programmes/courses', icon: 'subjects', show: (c) => seesProgrammes(c), lights: under('/programmes/courses') },
+      { key: 'programmes-offerings', where: 'division', module: 'programmes', label: t.nav.programmesOfferings, path: '/programmes/offerings', icon: 'teaching', show: (c) => seesProgrammes(c), lights: under('/programmes/offerings') },
+      { key: 'programmes-students', where: 'division', module: 'programmes', label: t.nav.programmesStudents, path: '/programmes/students', icon: 'learners', show: (c) => seesProgrammes(c), lights: under('/programmes/students') },
+      { key: 'programmes-registration', where: 'division', module: 'programmes', label: t.nav.programmesRegistration, path: '/programmes/registration', icon: 'approvals', show: (c) => seesProgrammes(c), lights: (p) => p === '/programmes/registration' || p.startsWith('/programmes/r/') },
     ],
   },
   {
@@ -89,26 +99,26 @@ export const GROUPS: NavGroup[] = [
     label: t.groups.school,
     items: [
       { key: 'people', label: t.nav.people, path: '/settings/people', icon: 'people', show: (c) => holdsAnywhere(c, 'access.roles.assign'), lights: under('/settings/people') },
-      { key: 'roles', label: t.nav.roles, path: '/settings/roles', icon: 'roles', show: (c) => can(c, 'access.roles.manage'), lights: under('/settings/roles') },
-      { key: 'subjects', label: t.nav.subjects, path: '/settings/subjects', icon: 'subjects', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/subjects'), named: (c) => schoolWord(c, 'subject') },
-      { key: 'teaching', label: t.nav.teaching, path: '/settings/teaching', icon: 'teaching', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/teaching') },
-      { key: 'timetable', label: t.nav.timetable, path: '/settings/timetable', icon: 'timetable', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/timetable') },
-      { key: 'next-year', label: t.nav.nextYear, path: '/settings/next-year', icon: 'timetable', show: (c) => can(c, 'academics.manage'), lights: under('/settings/next-year') },
+      { key: 'roles', where: 'school', label: t.nav.roles, path: '/settings/roles', icon: 'roles', show: (c) => can(c, 'access.roles.manage'), lights: under('/settings/roles') },
+      { key: 'subjects', where: 'division', label: t.nav.subjects, path: '/settings/subjects', icon: 'subjects', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/subjects'), named: (c) => schoolWord(c, 'subject') },
+      { key: 'teaching', where: 'division', label: t.nav.teaching, path: '/settings/teaching', icon: 'teaching', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/teaching') },
+      { key: 'timetable', where: 'division', label: t.nav.timetable, path: '/settings/timetable', icon: 'timetable', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/timetable') },
+      { key: 'next-year', where: 'school', label: t.nav.nextYear, path: '/settings/next-year', icon: 'timetable', show: (c) => can(c, 'academics.manage'), lights: under('/settings/next-year') },
     ],
   },
   {
     key: 'settings',
     label: t.groups.settings,
     items: [
-      { key: 'look', label: t.nav.look, path: '/settings/branding', icon: 'look', show: (c) => can(c, 'institution.manage'), lights: under('/settings/branding') },
-      { key: 'support-settings', label: t.nav.supportSettings, path: '/settings/support', icon: 'support', show: (c) => moduleOn(c, 'support') && can(c, 'support.manage'), lights: under('/settings/support') },
-      { key: 'conduct-settings', label: t.nav.conductSettings, path: '/settings/conduct', icon: 'conduct', show: (c) => moduleOn(c, 'conduct') && can(c, 'conduct.manage'), lights: under('/settings/conduct') },
-      { key: 'fee-settings', label: t.nav.feeSettings, path: '/settings/fees', icon: 'fees', show: (c) => moduleOn(c, 'fees') && can(c, 'fees.manage'), lights: under('/settings/fees') },
-      { key: 'document-types', label: t.nav.documentTypes, path: '/settings/learner-documents', icon: 'learners', show: (c) => can(c, 'enrolment.manage'), lights: under('/settings/learner-documents') },
-      { key: 'messages', label: t.nav.messages, path: '/settings/messages', icon: 'messages', show: (c) => can(c, 'notify.manage'), lights: under('/settings/messages') },
-      { key: 'assessment', label: t.nav.assessment, path: '/settings/assessment', icon: 'assessment', show: (c) => keepsGrading(c), lights: under('/settings/assessment') },
-      { key: 'approvals', label: t.nav.approvals, path: '/settings/approvals', icon: 'roles', show: (c) => can(c, 'access.approvals.manage'), lights: under('/settings/approvals') },
-      { key: 'modules', label: t.nav.modules, path: '/settings/modules', icon: 'modules', show: (c) => can(c, 'modules.manage'), lights: under('/settings/modules') },
+      { key: 'look', where: 'school', label: t.nav.look, path: '/settings/branding', icon: 'look', show: (c) => can(c, 'institution.manage'), lights: under('/settings/branding') },
+      { key: 'support-settings', where: 'school', label: t.nav.supportSettings, path: '/settings/support', icon: 'support', show: (c) => moduleOn(c, 'support') && can(c, 'support.manage'), lights: under('/settings/support') },
+      { key: 'conduct-settings', where: 'school', label: t.nav.conductSettings, path: '/settings/conduct', icon: 'conduct', show: (c) => moduleOn(c, 'conduct') && can(c, 'conduct.manage'), lights: under('/settings/conduct') },
+      { key: 'fee-settings', where: 'school', label: t.nav.feeSettings, path: '/settings/fees', icon: 'fees', show: (c) => moduleOn(c, 'fees') && can(c, 'fees.manage'), lights: under('/settings/fees') },
+      { key: 'document-types', where: 'school', label: t.nav.documentTypes, path: '/settings/learner-documents', icon: 'learners', show: (c) => can(c, 'enrolment.manage'), lights: under('/settings/learner-documents') },
+      { key: 'messages', where: 'school', label: t.nav.messages, path: '/settings/messages', icon: 'messages', show: (c) => can(c, 'notify.manage'), lights: under('/settings/messages') },
+      { key: 'assessment', where: 'school', label: t.nav.assessment, path: '/settings/assessment', icon: 'assessment', show: (c) => keepsGrading(c), lights: under('/settings/assessment') },
+      { key: 'approvals', where: 'school', label: t.nav.approvals, path: '/settings/approvals', icon: 'roles', show: (c) => can(c, 'access.approvals.manage'), lights: under('/settings/approvals') },
+      { key: 'modules', where: 'school', label: t.nav.modules, path: '/settings/modules', icon: 'modules', show: (c) => can(c, 'modules.manage'), lights: under('/settings/modules') },
     ],
   },
 ]
@@ -199,12 +209,18 @@ export function seesProgrammes(context: AppContext): boolean {
   )
 }
 
-export const DIVISION_ONLY = ['my-day', 'registers', 'marks', 'room', 'observations', 'reviews', 'pickup']
-
-/** Where the account stands among the divisions: the one it works in (null for all), and how many it works in. */
+/** Where the account stands among the divisions: the one it works in (null for all), how many it works in, and whether it works in a finance office. */
 export interface Lens {
   division: Division | null
   reach: number
+  office?: boolean
+}
+
+/** Whether a division's profile has a part (D-099). A profile with no list has every part. */
+export function hasPart(division: Division, module: string): boolean {
+  const parts = division.modules
+
+  return parts.length === 0 || parts.includes(module)
 }
 
 /**
@@ -214,14 +230,25 @@ export interface Lens {
  */
 export function visibleGroups(context: AppContext, lens?: Lens): NavGroup[] {
   const many = lens !== undefined && lens.reach > 1
-  const all = many && lens.division === null
-  const ctx = lens === undefined ? context : narrowTo(context, lens.division)
+  const office = lens?.office === true
+  const all = many && lens.division === null && !office
+  const division = lens?.division ?? null
+  const ctx = lens === undefined ? context : narrowTo(context, division)
+
+  // D-099: the school view holds whole-school settings; a division its own records and parts; an office only fees.
+  const fits = (item: NavItem): boolean => {
+    if (office) return item.module === 'fees' || item.key === 'learners'
+    if (all) return item.where !== 'division'
+    if (many && division !== null) return item.where !== 'school' && (item.module === undefined || hasPart(division, item.module))
+
+    return true
+  }
 
   return GROUPS.map((group) => ({
     ...group,
     label: group.named?.(ctx) ?? group.label,
     items: group.items
-      .filter((item) => (item.key === 'divisions' ? many : !(all && DIVISION_ONLY.includes(item.key)) && item.show(ctx)))
+      .filter((item) => (item.key === 'divisions' ? many : fits(item) && item.show(ctx)))
       .map((item) => ({ ...item, label: item.named?.(ctx) ?? item.label })),
   })).filter((group) => group.items.length > 0)
 }

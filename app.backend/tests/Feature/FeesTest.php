@@ -47,6 +47,9 @@ beforeEach(function (): void {
     $this->admin = User::factory()->create(['name' => 'Grace Phiri']);
     RoleAssignment::query()->create(['user_id' => $this->admin->id, 'role_id' => Role::query()->where('is_system', true)->value('id'),
         'scope_type' => ScopeType::Institution, 'scope_id' => null, 'starts_at' => now()->subMinute()]);
+    $this->staffWorkIn('division', $this->school->id('primary'));
+    // D-100: the admin works in the school's own finance office.
+    DB::table('fee_office_staff')->insert(['office_id' => 'school', 'user_id' => $this->admin->id, 'added_at' => now()]);
 
     $admit = function (string $first, string $class, string $phone): string {
         $response = $this->actingAs($this->admin)->postJson('/api/v1/learners', [

@@ -1,5 +1,5 @@
-import { useAppContext, type Place } from '@acadly/kernel'
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { forgetLoads, setPlace, useAppContext, type Place } from '@acadly/kernel'
+import { createContext, Fragment, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { copy } from '../copy'
 import { divisionOf, letterOf, reachDivisions, type Division } from './divisions'
 
@@ -17,9 +17,13 @@ interface WorkIn {
   divisions: Division[]
   /** Enters a division, or all divisions with null. */
   enter: (divisionId: string | null) => void
+  /** The finance office worked in (D-099), or null. Inside an office only Fees is open. */
+  office: Place | null
+  /** Whether the account works in the school view: whole-school settings and figures, no records of any division (D-099). */
+  schoolView: boolean
 }
 
-const Shared = createContext<WorkIn>({ place: null, choose: () => {}, choice: false, division: null, divisions: [], enter: () => {} })
+const Shared = createContext<WorkIn>({ place: null, choose: () => {}, choice: false, division: null, divisions: [], enter: () => {}, office: null, schoolView: false })
 
 const storageKey = (user: string) => `acadly.work-in.${user}`
 
@@ -31,7 +35,12 @@ function remembered(user: string): string | null {
   }
 }
 
-/** The place the account works in, remembered on this device. Only a filter: the server decides. */
+/**
+ * The place the account works in, remembered on this device (D-099). Every
+ * request names it; the server checks it and keeps to it: a division or a
+ * campus is a wall on top of the roles. A change of place forgets what was
+ * loaded and draws every page again, so nothing of the last place stays.
+ */
 export function WorkInProvider({ children }: { children: ReactNode }) {
   const context = useAppContext()
   const places = context.places
@@ -40,9 +49,16 @@ export function WorkInProvider({ children }: { children: ReactNode }) {
   const place = places.find((p) => p.key === key) ?? fallback
   const divisions = reachDivisions(context)
   const division = divisionOf(context, place)
+  const office = place !== null && place.type === 'office' ? place : null
+  const schoolView = place?.key === 'institution:' && divisions.length > 1
+
+  // Before any page asks: every request from now on names this place.
+  setPlace(place?.key ?? null)
 
   const value = useMemo<WorkIn>(() => {
     const choose = (next: string) => {
+      forgetLoads()
+      setPlace(next)
       setKey(next)
       try {
         window.localStorage.setItem(storageKey(context.user.id), next)
@@ -51,10 +67,14 @@ export function WorkInProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    return { place, choice: places.length > 1, choose, division, divisions, enter: (id: string | null) => choose(id === null ? 'institution:' : `division:${id}`) }
-  }, [place, places.length, context.user.id, division, divisions])
+    return { place, choice: places.length > 1, choose, division, divisions, enter: (id: string | null) => choose(id === null ? 'institution:' : `division:${id}`), office, schoolView }
+  }, [place, places.length, context.user.id, division, divisions, office, schoolView])
 
-  return <Shared.Provider value={value}>{children}</Shared.Provider>
+  return (
+    <Shared.Provider value={value}>
+      <Fragment key={place?.key ?? ''}>{children}</Fragment>
+    </Shared.Provider>
+  )
 }
 
 export function useWorkIn(): WorkIn {
@@ -81,13 +101,13 @@ function day(iso: string): string {
 /** The "Work in" button at the top of the rail. Without a choice to make, it is a plain label. */
 export function WorkInButton({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   const context = useAppContext()
-  const { place, choice, division, divisions } = useWorkIn()
+  const { place, choice, division, divisions, office } = useWorkIn()
   const label = place?.label ?? copy.shell.wholeSchool
 
   // With more than one division, the rail names the division first (D-096).
   if (choice && divisions.length > 1) {
-    const name = division?.name ?? t.allDivisions
-    const inside = division !== null && place !== null && place.type !== 'division' ? place.label : division === null ? context.school.name : t.wholeDivision
+    const name = office?.label ?? division?.name ?? t.allDivisions
+    const inside = office !== null ? t.officeNote : division !== null && place !== null && place.type !== 'division' ? place.label : division === null ? context.school.name : t.wholeDivision
 
     return (
       <button
@@ -182,17 +202,19 @@ export function WorkInPanel({ onClose, className = '' }: { onClose: () => void; 
   }
 
   const held = places.filter((p) => p.held)
+  const offices = places.filter((p) => p.type === 'office')
+  const wholeSchool = places.some((p) => p.key === 'institution:')
   const q = query.trim().toLowerCase()
   const found = q === '' ? [] : places.filter((p) => p.label.toLowerCase().includes(q))
 
-  const line = (p: Place, depth: number, withRoles: boolean) => {
+  const line = (p: Place, depth: number, withRoles: boolean, under = '') => {
     const current = p.key === place?.key
     const roles = withRoles ? p.roles.map((r) => (r.ends_at !== null ? t.roleUntil(r.role, day(r.ends_at)) : r.role)).join('. ') : ''
     const small = depth >= 2
 
     return (
       <button
-        key={`${p.key}:${depth}`}
+        key={`${under}>${p.key}:${depth}`}
         type="button"
         aria-current={current ? 'true' : undefined}
         onClick={() => pick(p.key)}
@@ -210,7 +232,7 @@ export function WorkInPanel({ onClose, className = '' }: { onClose: () => void; 
   }
 
   const tree = (parent: Place, depth: number): ReactNode[] =>
-    childrenOf(places, parent.key).flatMap((child) => [line(child, depth, false), ...tree(child, depth + 1)])
+    childrenOf(places, parent.key).flatMap((child) => [line(child, depth, false, parent.key), ...tree(child, depth + 1)])
 
   const group = (text: string) => <div className="label-caps border-b-2 border-ink bg-paper px-4 pt-3.5 pb-1.5 text-text-muted">{text}</div>
 
@@ -245,7 +267,7 @@ export function WorkInPanel({ onClose, className = '' }: { onClose: () => void; 
             {divisions.length > 1 && (
               <>
                 {group(t.division)}
-                {[null, ...divisions].map((d, i) => {
+                {[...(wholeSchool ? [null] : []), ...divisions].map((d, i) => {
                   const current = (d === null && division === null) || (d !== null && division?.id === d.id)
 
                   return (
@@ -268,6 +290,12 @@ export function WorkInPanel({ onClose, className = '' }: { onClose: () => void; 
                     </button>
                   )
                 })}
+              </>
+            )}
+            {offices.length > 0 && (
+              <>
+                {group(t.offices)}
+                {offices.map((p) => line(p, 0, false))}
               </>
             )}
             {group(t.held)}

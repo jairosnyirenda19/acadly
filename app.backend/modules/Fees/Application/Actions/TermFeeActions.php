@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Acadly\Modules\Fees\Application\Actions;
 
 use Acadly\Kernel\Access\Access;
+use Acadly\Kernel\Access\ScopeRef;
+use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
@@ -67,7 +69,7 @@ final class TermFeeActions
      */
     public function saveTerm(User $by, string $periodId, string $divisionId, array $amounts, array $plan): void
     {
-        $this->access->check($by, FeesPermission::Manage);
+        $this->access->check($by, FeesPermission::Manage, ScopeRef::of(ScopeType::Division, $divisionId));
         $term = $this->terms->term($periodId, $divisionId);
         $levels = array_column($this->terms->levels($divisionId), 'code');
         $items = DB::table('fee_items')->whereNull('retired_at')->pluck('id')->all();
@@ -133,7 +135,7 @@ final class TermFeeActions
      */
     public function bill(User $by, string $periodId, string $divisionId): array
     {
-        $this->access->check($by, FeesPermission::Manage);
+        $this->access->check($by, FeesPermission::Manage, ScopeRef::of(ScopeType::Division, $divisionId));
         $term = $this->terms->term($periodId, $divisionId);
         $schedule = $this->terms->scheduleId($periodId, $divisionId);
 

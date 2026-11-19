@@ -22,6 +22,15 @@ final class Money
         return $sign.'MK '.number_format($kwacha).($tambala > 0 ? '.'.str_pad((string) $tambala, 2, '0', STR_PAD_LEFT) : '');
     }
 
+    /** A short amount for a sentence or a chart: "MK 220.4m", "MK 45,000". */
+    public static function short(int $minor): string
+    {
+        $kwacha = intdiv(abs($minor), 100);
+        $sign = $minor < 0 ? '−' : '';
+
+        return $kwacha >= 1_000_000 ? $sign.'MK '.rtrim(rtrim(number_format($kwacha / 1_000_000, 1), '0'), '.').'m' : $sign.'MK '.number_format($kwacha);
+    }
+
     /**
      * A total split by shares in basis points (10000 is the whole).
      *

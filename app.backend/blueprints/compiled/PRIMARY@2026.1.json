@@ -3,6 +3,14 @@
     "bindings": {},
     "extends": "SCHOOL_BASE@2026.1",
     "kind": "profile",
+    "modules": [
+        "fees",
+        "conduct",
+        "support",
+        "attendance",
+        "assessment",
+        "saferelease"
+    ],
     "ref": "PRIMARY@2026.1",
     "structure": {
         "grouping": "streams",

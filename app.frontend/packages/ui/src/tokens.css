@@ -39,6 +39,7 @@
   --color-red-wash: #fdf1ef;
 
   --color-disabled: #d5dde6;
+
   --color-transparent: transparent;
   --color-current: currentColor;
 
@@ -166,4 +167,23 @@
   button:disabled {
     cursor: not-allowed;
   }
+}
+
+/* Charts are drawn by a script that reads these values, not by utilities, so
+   they are always written out (static), even where no class names them.      */
+@theme static {
+  /* Charts (D-100). Who: one colour for each division, in the school's order,
+     checked for colour-blind readers; never teal, marigold or red, which keep
+     their jobs. How much: one hue, more is darker. Other: the grey of the rest. */
+  --color-series-1: #2a4f8f;
+  --color-series-2: #c2549d;
+  --color-series-3: #3f86c8;
+  --color-series-4: #8a6a12;
+  --color-series-other: #b9c4d2;
+  --color-seq-1: #e3eaf5;
+  --color-seq-2: #b9cbe6;
+  --color-seq-3: #86a6d4;
+  --color-seq-4: #4f79b8;
+  --color-seq-5: #2a4f8f;
+  --color-seq-6: #16325e;
 }

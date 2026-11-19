@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Acadly\Kernel\Approvals\Actions;
 
+use Acadly\Kernel\Access\Boundary;
 use Acadly\Kernel\Approvals\ApprovalCase;
 use Acadly\Kernel\Approvals\Approvals;
 use Acadly\Kernel\Approvals\ApprovalTopic;
@@ -78,8 +79,10 @@ final class ApprovalActions
     {
         $request = DB::table('approval_requests')->where('id', $requestId)->first();
         $topic = $request !== null ? $this->approvals->topic(Row::text($request, 'topic_key')) : null;
+        $case = $request !== null ? $topic?->case(Row::text($request, 'subject_id')) : null;
 
-        if ($request === null || $topic === null) {
+        // A request about a record outside the place worked in is not found (D-099), before anything else is said.
+        if ($request === null || $topic === null || ($case === null || app(Boundary::class)->refuses($by, $case->at, $topic->module(), $topic->permission()->key()))) {
             throw new NotFoundHttpException;
         }
 

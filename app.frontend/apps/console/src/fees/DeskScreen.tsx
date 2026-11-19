@@ -63,6 +63,13 @@ export function DeskScreen() {
         }
       />
       <div className="grid gap-6 px-[clamp(16px,3vw,40px)] pb-8">
+        {/* D-100: money is taken only by the staff named to the office. */}
+        {d.staffing !== null && !d.staffing.works && (
+          <p role="status" className="flex items-start gap-2 border-2 border-ink bg-marigold-wash px-3.5 py-2.5 text-[15px]">
+            <span className="label-caps bg-marigold px-[7px] py-[3px] text-ink">!</span>
+            <span>{d.staffing.named ? t.notNamed : t.noStaff}</span>
+          </p>
+        )}
         <div className="grid grid-cols-2 border-2 border-ink lg:grid-cols-4">
           {cells.map((c, i) => (
             <section key={c.label} className={`min-w-0 px-3.5 pt-2.5 pb-3 ${c.ink === true ? 'bg-ink text-sheet' : c.attention === true ? 'bg-marigold-wash' : 'bg-sheet'} ${i > 0 ? 'border-ink lg:border-l-2 max-lg:[&:nth-child(even)]:border-l-2 max-lg:[&:nth-child(n+3)]:border-t-2' : ''}`}>

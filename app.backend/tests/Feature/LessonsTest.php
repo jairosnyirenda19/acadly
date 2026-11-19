@@ -35,6 +35,7 @@ beforeEach(function (): void {
     foreach (['admin' => 'Grace Phiri', 'tadala' => 'Tadala Mvula', 'joseph' => 'Joseph Nyirenda', 'mercy' => 'Mercy Banda'] as $key => $name) {
         $this->people[$key] = User::factory()->create(['name' => $name]);
         RoleAssignment::query()->create(['user_id' => $this->people[$key]->id, 'role_id' => $system, 'scope_type' => ScopeType::Institution, 'scope_id' => null, 'starts_at' => now()->subMinute()]);
+        $this->inPlace('division', $this->school->id('secondary'), $this->people[$key]);
     }
 
     $this->class = $this->school->id('class_secondary_b');
@@ -181,8 +182,12 @@ it('shows a teacher their day, and lets the office cover the lessons of a teache
 });
 
 it('takes lesson registers only where the level\'s profile says so', function (): void {
+    // Inside Secondary, only Secondary's level shows (D-099).
     expect($this->actingAs($this->people['admin'])->getJson('/api/v1/registers/levels')->assertOk()->json('levels'))
-        ->toBe([['division' => 'Primary', 'mode' => 'daily'], ['division' => 'Secondary', 'mode' => 'daily_and_lessons']]);
+        ->toBe([['division' => 'Secondary', 'mode' => 'daily_and_lessons']]);
+    $this->inPlace('division', $this->school->id('primary'), $this->people['admin']);
+    $this->inPlace('division', $this->school->id('primary'), $this->people['mercy']);
+    expect($this->actingAs($this->people['admin'])->getJson('/api/v1/registers/levels')->json('levels'))->toBe([['division' => 'Primary', 'mode' => 'daily']]);
 
     $primary = Ids::next();
     DB::table('academic_subjects')->insert(['id' => $primary, 'division_id' => $this->school->id('primary'), 'short' => 'ENG', 'name' => 'English',
@@ -192,6 +197,7 @@ it('takes lesson registers only where the level\'s profile says so', function ()
 
     $this->actingAs($this->people['mercy'])->postJson('/api/v1/registers/lesson/'.slotOf(3, $this->school->id('class_primary_a')), ['day' => LESSON_DAY, 'marks' => []])
         ->assertUnprocessable()->assertJsonValidationErrors(['slot_id' => 'This level takes a morning register only.']);
+    $this->inPlace('division', $this->school->id('secondary'), $this->people['admin']);
     $this->actingAs($this->people['admin'])->getJson('/api/v1/registers?day='.LESSON_DAY)->assertOk()->assertJsonPath('lessons', true);
 });
 

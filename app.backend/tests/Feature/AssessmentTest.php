@@ -40,6 +40,8 @@ beforeEach(function (): void {
 
     RoleAssignment::query()->create(['user_id' => $this->people['admin']->id, 'role_id' => Role::query()->where('is_system', true)->value('id'),
         'scope_type' => ScopeType::Institution, 'scope_id' => null, 'starts_at' => now()->subMinute()]);
+    $this->inPlace('division', $this->school->id('secondary'), $this->people['admin']);
+    $this->staffWorkIn('division', $this->school->id('secondary'));
     $teacher = Role::query()->create(['key' => 'subject_teacher', 'name' => 'Subject teacher']);
     $teacher->grant([AssessmentPermission::Create, AssessmentPermission::Enter]);
     RoleAssignment::query()->create(['user_id' => $this->people['tadala']->id, 'role_id' => $teacher->id, 'scope_type' => ScopeType::Campus,
@@ -48,6 +50,7 @@ beforeEach(function (): void {
     $office->grant([AssessmentPermission::Lock, AssessmentPermission::View]);
     RoleAssignment::query()->create(['user_id' => $this->people['mercy']->id, 'role_id' => $office->id, 'scope_type' => ScopeType::Institution,
         'scope_id' => null, 'starts_at' => now()->subMinute()]);
+    $this->inPlace('division', $this->school->id('secondary'), $this->people['mercy']);
 
     $this->class = $this->school->id('class_secondary_b');
     $this->subjects = [];
@@ -499,6 +502,7 @@ it('publishes a ready class as a version with report cards, tells families, and 
     $head = Role::query()->create(['key' => 'head_teacher', 'name' => 'Head teacher']);
     $head->grant([AssessmentPermission::Publish, AssessmentPermission::View]);
     RoleAssignment::query()->create(['user_id' => $martha->id, 'role_id' => $head->id, 'scope_type' => ScopeType::Institution, 'scope_id' => null, 'starts_at' => now()->subMinute()]);
+    $this->inPlace('division', $this->school->id('secondary'), $martha);
     DB::table('academic_teaching')->insert(['id' => Ids::next(), 'class_id' => $this->class, 'subject_id' => null, 'user_id' => $t->id,
         'given_by' => $this->people['admin']->id, 'given_at' => now()->subMonth()]);
 

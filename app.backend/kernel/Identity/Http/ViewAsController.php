@@ -59,7 +59,8 @@ final class ViewAsController
             ->orderBy('name');
         $total = (clone $query)->count();
 
-        $people = $query->limit(self::LIMIT)->get()->map(fn (User $u): array => [
+        // Only people the People list shows in the place worked in (D-099).
+        $people = $query->limit(self::LIMIT)->get()->filter(fn (User $u): bool => $this->people->sees($admin, $u))->map(fn (User $u): array => [
             'id' => $u->id,
             'name' => $u->name,
             'email' => $u->email,

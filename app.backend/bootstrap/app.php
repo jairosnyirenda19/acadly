@@ -1,5 +1,6 @@
 <?php
 
+use Acadly\Kernel\Access\Boundary;
 use Acadly\Kernel\Http\Middleware\CodeSignInReachesPortalOnly;
 use Acadly\Kernel\Http\Middleware\EndViewAsWhenDue;
 use Acadly\Kernel\Http\Middleware\RemoveServerSignature;
@@ -19,6 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // The web apps sign in with a session cookie (Sanctum, stateful).
         $middleware->statefulApi();
+
+        // The place the console works in (D-099), for requests that cannot name it in a header
+        // (a receipt opened in a new tab, a photo). Only a place key; the server checks it like the header.
+        $middleware->encryptCookies(except: [Boundary::COOKIE]);
 
         // View as (development only) ends on time, before the request is handled.
         $middleware->api(append: [EndViewAsWhenDue::class, CodeSignInReachesPortalOnly::class]);

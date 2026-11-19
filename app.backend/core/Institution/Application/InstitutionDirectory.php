@@ -127,7 +127,7 @@ final class InstitutionDirectory implements SchoolDirectory, SchoolProfile
     public function divisions(): array
     {
         return array_map(
-            fn (DivisionView $division): array => ['id' => $division->id, 'name' => $division->name, 'profile' => $division->profile->reference()->key, 'vocabulary' => $division->profile->vocabulary, 'bindings' => $division->profile->bindings],
+            fn (DivisionView $division): array => ['id' => $division->id, 'name' => $division->name, 'profile' => $division->profile->reference()->key, 'vocabulary' => $division->profile->vocabulary, 'bindings' => $division->profile->bindings, 'modules' => $division->profile->modules],
             $this->divisionViews(),
         );
     }

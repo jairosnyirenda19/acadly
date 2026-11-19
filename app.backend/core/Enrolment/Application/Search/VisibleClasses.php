@@ -6,6 +6,7 @@ namespace Acadly\Core\Enrolment\Application\Search;
 
 use Acadly\Core\Academics\Contracts\AcademicCalendar;
 use Acadly\Core\Enrolment\Application\Learners;
+use Acadly\Kernel\Access\Boundary;
 use Acadly\Kernel\Identity\User;
 
 /**
@@ -27,6 +28,6 @@ final class VisibleClasses
     {
         $year = $this->calendar->currentYear();
 
-        return $this->known[$who->id] ??= $year === null ? [] : $this->learners->visibleClasses($who, $year['id'], null);
+        return $this->known[Boundary::cacheKey($who)] ??= $year === null ? [] : $this->learners->visibleClasses($who, $year['id'], null);
     }
 }

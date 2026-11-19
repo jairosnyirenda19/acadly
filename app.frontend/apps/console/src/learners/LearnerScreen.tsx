@@ -1,4 +1,5 @@
 import { navigate, useLoad, useLocation } from '@acadly/kernel'
+import { Elsewhere } from './Elsewhere'
 import { Button, Notice, slips, Waiting } from '@acadly/ui'
 import { useEffect, useState, type ReactNode } from 'react'
 import { copy } from '../copy'
@@ -121,7 +122,10 @@ export function LearnerScreen({ id }: { id: string }) {
   }, [id, record?.has_photo, record])
 
   if (record === undefined) {
-    return <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} rows={6} onRetry={loaded.reload} />
+    const waiting = <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} rows={6} onRetry={loaded.reload} />
+
+    // Not in the place worked in (D-099): offer the division the learner is in, when the account works there too.
+    return loaded.phase === 'failed' || loaded.phase === 'refused' ? <Elsewhere id={id} fallback={waiting} /> : waiting
   }
 
   const word = record.word.toLowerCase()

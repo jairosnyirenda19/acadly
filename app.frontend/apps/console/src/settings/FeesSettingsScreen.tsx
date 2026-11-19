@@ -5,10 +5,11 @@ import { copy } from '../copy'
 import { feesApi, kwachaText, money, parseKwacha, type FeeItem, type ShopItem, type TermFees } from '../fees/api'
 import { Input, Select } from '../setup/parts'
 import { day } from './api'
+import { FinanceOffices } from './FinanceOffices'
 import { PageHead, Tag, SettingsTabs } from './parts'
 
 const t = copy.settings.fees
-type View = 'term' | 'items' | 'shop'
+type View = 'term' | 'items' | 'shop' | 'offices'
 
 /** Settings › Fees (the approved design): the fees of a term by level, the plan, billing; the items; the shop list. */
 export function FeesSettingsScreen() {
@@ -19,7 +20,7 @@ export function FeesSettingsScreen() {
       <SettingsTabs />
       <PageHead kicker={t.kicker} title={t.title} intro={t.intro} />
       <nav aria-label={t.title} className="flex gap-6 border-b-2 border-ink px-[clamp(16px,3vw,40px)] text-[15px]">
-        {(['term', 'items', 'shop'] as View[]).map((v) => (
+        {(['term', 'items', 'shop', 'offices'] as View[]).map((v) => (
           <button
             key={v}
             type="button"
@@ -35,6 +36,7 @@ export function FeesSettingsScreen() {
         {view === 'term' && <TermView />}
         {view === 'items' && <ItemsView />}
         {view === 'shop' && <ShopView />}
+        {view === 'offices' && <FinanceOffices />}
       </div>
     </>
   )

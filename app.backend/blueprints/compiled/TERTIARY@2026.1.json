@@ -5,6 +5,12 @@
     },
     "extends": null,
     "kind": "profile",
+    "modules": [
+        "fees",
+        "conduct",
+        "support",
+        "programmes"
+    ],
     "ref": "TERTIARY@2026.1",
     "structure": {
         "grouping": "streams",

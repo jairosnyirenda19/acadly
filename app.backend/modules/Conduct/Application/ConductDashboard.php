@@ -124,7 +124,8 @@ final class ConductDashboard implements DashboardPanels
         foreach ($sizes as $k => $n) {
             $count = count(array_filter($term, fn (array $e): bool => ! $e['commendation'] && $e[$key] === (string) $k));
             $size = is_numeric($n) ? (int) $n : 0;
-            if ($size === 0) {
+            // Inside a division, only the classes that had an incident; every division shows in the school view.
+            if ($size === 0 || (! $scope->school && $count === 0)) {
                 continue;
             }
             $per = round($count / $size * 100, 1);

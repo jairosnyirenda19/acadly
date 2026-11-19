@@ -43,6 +43,7 @@ const list = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : [])
 const text = (v: unknown): string => (typeof v === 'string' ? v : '')
 const num = (v: unknown): number | null => (typeof v === 'number' ? v : null)
 const FONT = "'Archivo Variable', 'Archivo', system-ui, sans-serif"
+const HEIGHT = 230
 
 /** The base of every chart: recessive axes, the register's tooltip, screen-reader text. */
 function base(p: Palette, unit: string): EChartsCoreOption {
@@ -82,13 +83,36 @@ function LineChart({ panel }: { panel: PanelData }) {
   const unit = text(d.unit)
   const series = list<Series>(d.series)
   const labels = list<string>(d.labels)
+  // The names at the ends of the lines are spread apart when lines end close together, so none sits on another.
+  const lifts = useMemo(() => {
+    const min = num(d.min) ?? 0
+    const max = num(d.max) ?? Math.max(1, ...series.flatMap((s) => s.values.filter((v): v is number => v !== null)))
+    const plot = HEIGHT - 14 - 28
+    const ends = series.map((s, i) => {
+      const last = [...s.values].reverse().find((v) => v !== null) ?? min
+      return { i, y: 14 + plot - ((last - min) / (max - min || 1)) * plot }
+    })
+    const placed = [...ends].sort((a, b) => a.y - b.y)
+    const out: number[] = series.map(() => 0)
+    let floor = -Infinity
+    for (const e of placed) {
+      const y = Math.max(e.y, floor + 15)
+      out[e.i] = y - e.y
+      floor = y
+    }
+    // Labels pushed below the plot come back up as a block.
+    const over = floor - (14 + plot + 6)
+    if (over > 0) for (const e of placed) out[e.i] = (out[e.i] ?? 0) - over
+
+    return out
+  }, [series, d.min, d.max])
   const option = useMemo<EChartsCoreOption>(
     () => ({
       ...base(p, unit),
-      grid: { left: 44, right: 118, top: 14, bottom: 28 },
+      grid: { left: 44, right: 132, top: 14, bottom: 28 },
       xAxis: xAxis(p, labels),
       yAxis: yAxis(p, unit, num(d.min), num(d.max)),
-      series: series.map((s) => {
+      series: series.map((s, si) => {
         const c = colour(s.division_id, p)
 
         return {
@@ -101,18 +125,17 @@ function LineChart({ panel }: { panel: PanelData }) {
           showSymbol: false,
           lineStyle: { width: 2, color: c, type: s.dashed === true ? 'dashed' : 'solid' },
           itemStyle: { color: c, borderColor: p.sheet, borderWidth: 2 },
-          endLabel: { show: true, color: p.ink, fontWeight: 700, fontSize: 12, formatter: () => `${s.name} ${figure([...s.values].reverse().find((v) => v !== null) ?? null, unit)}` },
-          labelLayout: { moveOverlap: 'shiftY' },
+          endLabel: { show: true, color: p.ink, fontWeight: 700, fontSize: 12, offset: [0, lifts[si] ?? 0], formatter: () => `${s.name} ${figure([...s.values].reverse().find((v) => v !== null) ?? null, unit)}` },
           emphasis: { focus: 'series' },
         }
       }),
     }),
-    [p, unit, labels, series, d.min, d.max, colour],
+    [p, unit, labels, series, d.min, d.max, colour, lifts],
   )
 
   return (
     <>
-      <EChart option={option} height={230} label={panel.title} />
+      <EChart option={option} height={HEIGHT} label={panel.title} />
       {series.length > 1 && <Legend items={series.map((s) => ({ colour: colour(s.division_id, p), name: s.name, dashed: s.dashed === true }))} />}
     </>
   )
@@ -130,7 +153,8 @@ function ColumnChart({ panel }: { panel: PanelData }) {
   const option = useMemo<EChartsCoreOption>(
     () => ({
       ...base(p, unit),
-      tooltip: { ...(base(p, unit).tooltip as object), axisPointer: { type: 'shadow', shadowStyle: { color: p.field } } },
+      // The hover shade sits behind the bars, so the bar under the pointer stays in sight.
+      tooltip: { ...(base(p, unit).tooltip as object), axisPointer: { type: 'shadow', z: 0, shadowStyle: { color: p.field, opacity: 0.7 } } },
       grid: { left: 48, right: 12, top: 22, bottom: 28 },
       xAxis: xAxis(p, labels),
       yAxis: yAxis(p, unit),
@@ -140,6 +164,7 @@ function ColumnChart({ panel }: { panel: PanelData }) {
 
         return {
           type: 'bar',
+          z: 3,
           name: s.name,
           stack: stacked ? 'all' : undefined,
           barMaxWidth: 46,

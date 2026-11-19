@@ -10,6 +10,7 @@ use Acadly\Core\Institution\Contracts\InstitutionPermission;
 use Acadly\Core\Institution\Contracts\TodayItems;
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\Boundary;
+use Acadly\Kernel\Access\PlaceGroups;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Identity\User;
@@ -112,7 +113,7 @@ final class Dashboards
         $views = [];
         foreach (DashboardPanels::VIEWS as $key => $label) {
             if (in_array($key, $keys, true)) {
-                $views[] = ['key' => $key, 'label' => $key === 'overview' && ! $scope->school ? 'Today' : $label];
+                $views[] = ['key' => $key, 'label' => $label];
             }
         }
 
@@ -151,8 +152,12 @@ final class Dashboards
             if (! $source instanceof TodayItems) {
                 continue;
             }
+            // The school view holds no one's classes, lessons or rooms: only what is school-wide (approvals).
+            if ($scope->school && $source->key() !== 'institution') {
+                continue;
+            }
             $own = $this->forModule($scope, $source->key());
-            if ($own->divisions === [] && $scope->divisions !== []) {
+            if ($own->divisions === [] && ($scope->divisions !== [] || $this->groupModules() !== null)) {
                 continue;
             }
             $part = $source->today($own);
@@ -170,10 +175,35 @@ final class Dashboards
         return ['now' => array_slice($now, 0, 2), 'chart' => $chart, 'items' => $items];
     }
 
-    /** The scope kept to the divisions where the module is on. */
+    /**
+     * The modules open in the place, when it is a group (a finance office): only they add to its
+     * dashboard and Today. Null for any other place.
+     *
+     * @return list<string>|null
+     */
+    private function groupModules(): ?array
+    {
+        $key = $this->boundary->key();
+        if ($key === null || ! str_contains($key, ':')) {
+            return null;
+        }
+        [$prefix, $id] = explode(':', $key, 2);
+        foreach (app()->tagged(PlaceGroups::TAG) as $groups) {
+            if ($groups instanceof PlaceGroups && $groups->prefix() === $prefix) {
+                $group = $groups->group($id);
+
+                return $group === null ? [] : $group['modules'];
+            }
+        }
+
+        return null;
+    }
+
+    /** The scope kept to the divisions where the module is on, and to the modules a group place opens. */
     private function forModule(DashboardScope $scope, string $key): DashboardScope
     {
-        $on = array_values(array_filter($scope->divisions, fn (array $d): bool => $this->activation->isActive($key, ScopeRef::of(ScopeType::Division, $d['id']))));
+        $open = $this->groupModules();
+        $on = $open !== null && ! in_array($key, $open, true) ? [] : array_values(array_filter($scope->divisions, fn (array $d): bool => $this->activation->isActive($key, ScopeRef::of(ScopeType::Division, $d['id']))));
 
         return new DashboardScope($scope->viewer, $on, $scope->school, $scope->day, $this->access);
     }

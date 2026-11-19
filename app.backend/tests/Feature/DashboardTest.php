@@ -85,6 +85,10 @@ it('draws the whole-school overview in the school view only for those who may se
     expect($attendance['low']['data']['value'])->toBe(1)
         ->and(collect($attendance['attendance_heat']['data']['rows'])->pluck('name')->all())->toBe(['Primary · Area 47', 'Secondary · Blantyre']);
 
+    // The school view's Today holds no one's lessons or classes: only what is school-wide.
+    $today = $this->actingAs($this->owner)->getJson('/api/v1/today')->assertOk()->json();
+    expect($today['now'])->toBe([])->and($today['chart'])->toBeNull();
+
     // A head of Primary alone may not open the whole-school overview.
     $head = User::factory()->create(['name' => 'Head of Primary']);
     $role = Role::query()->create(['key' => 'head_'.substr(Ids::next(), -8), 'name' => 'Head']);
@@ -101,7 +105,7 @@ it('keeps a division\'s dashboard and Today to the division', function (): void 
     $this->inPlace('division', $this->school->id('primary'), $this->owner);
     $data = $this->actingAs($this->owner)->getJson('/api/v1/dashboard')->assertOk()->json();
     expect($data['school'])->toBeFalse()
-        ->and($data['views'][0])->toBe(['key' => 'overview', 'label' => 'Today']);
+        ->and($data['views'][0])->toBe(['key' => 'overview', 'label' => 'Overview']);
 
     foreach (array_column($data['views'], 'key') as $view) {
         $body = (string) $this->actingAs($this->owner)->getJson('/api/v1/dashboard?view='.$view)->assertOk()->getContent();
@@ -168,4 +172,15 @@ it('draws the dashboard of a division taught at one campus, and keeps it to that
     $data = $this->actingAs($this->owner)->getJson('/api/v1/dashboard')->assertOk()->json();
     expect(array_column($data['views'], 'key'))->toContain('overview', 'attendance')
         ->and(json_encode($data))->not->toContain('Primary')->not->toContain('Alinafe');
+});
+
+it('keeps a finance office\'s dashboard and Today to fees and finding a learner', function (): void {
+    DB::table('fee_office_staff')->insert(['office_id' => 'school', 'user_id' => $this->owner->id, 'added_at' => now()]);
+    $this->inPlace('office', 'school', $this->owner);
+
+    $views = array_column($this->actingAs($this->owner)->getJson('/api/v1/dashboard')->assertOk()->json('views'), 'key');
+    expect($views)->not->toContain('attendance', 'results', 'conduct');
+    $today = $this->actingAs($this->owner)->getJson('/api/v1/today')->assertOk()->json();
+    expect($today['now'])->toBe([])->and($today['chart'])->toBeNull()
+        ->and(array_column($today['items'], 'key'))->not->toContain('registers_late');
 });

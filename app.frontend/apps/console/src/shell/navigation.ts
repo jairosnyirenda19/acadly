@@ -45,12 +45,19 @@ const under = (base: string) => (path: string) => path === base || path.startsWi
  */
 export const GROUPS: NavGroup[] = [
   {
+    // The person's own pages, first: the dashboard on top, then their day.
+    key: 'home',
+    label: t.groups.home,
+    items: [
+      { key: 'today', label: t.nav.today, path: '/', icon: 'today', show: () => true, lights: (p) => p === '/' },
+      { key: 'my-day', where: 'division', module: 'attendance', label: t.nav.myDay, path: '/my-day', icon: 'myDay', show: (c) => takesRegisters(c), lights: (p) => p === '/my-day' },
+    ],
+  },
+  {
     key: 'daily',
     label: t.groups.daily,
     items: [
       { key: 'divisions', label: t.nav.divisions, path: '/divisions', icon: 'tiles', show: () => false, lights: (p) => p === '/divisions' },
-      { key: 'my-day', where: 'division', module: 'attendance', label: t.nav.myDay, path: '/my-day', icon: 'myDay', show: (c) => takesRegisters(c), lights: (p) => p === '/my-day' },
-      { key: 'today', label: t.nav.today, path: '/', icon: 'today', show: () => true, lights: (p) => p === '/' },
       { key: 'registers', where: 'division', module: 'attendance', label: t.nav.registers, path: '/registers', icon: 'registers', show: (c) => seesRegisters(c), lights: under('/registers') },
       { key: 'marks', where: 'division', module: 'assessment', label: t.nav.marks, path: '/marks', icon: 'marks', show: (c) => seesMarks(c), lights: under('/marks') },
       { key: 'room', where: 'division', module: 'assessment', label: t.nav.room, path: '/room', icon: 'room', show: (c) => seesObservations(c), lights: under('/room') },
@@ -237,7 +244,7 @@ export function visibleGroups(context: AppContext, lens?: Lens): NavGroup[] {
 
   // D-099: the school view holds whole-school settings; a division its own records and parts; an office only fees.
   const fits = (item: NavItem): boolean => {
-    if (office) return item.module === 'fees' || item.key === 'learners'
+    if (office) return (item.module === 'fees' && item.where !== 'school') || item.key === 'learners'
     if (all) return item.where !== 'division'
     if (many && division !== null) return item.where !== 'school' && (item.module === undefined || hasPart(division, item.module))
 

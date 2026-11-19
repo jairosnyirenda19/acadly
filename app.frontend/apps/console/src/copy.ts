@@ -439,8 +439,8 @@ export const copy = {
   shell: {
     scope: 'Current scope',
     wholeSchool: 'Whole school',
-    nav: { today: 'Today', allLearners: 'All learners', feesLedger: 'Fees ledger', myDay: 'My day', registers: 'Registers', marks: 'Marks', toApprove: 'To approve', approvals: 'Approvals', learners: 'Learners', people: 'People', roles: 'Roles', subjects: 'Subjects', teaching: 'Teaching', timetable: 'Timetable', nextYear: 'Next school year', documentTypes: 'Learner documents', feeSettings: 'Fees', conduct: 'Conduct', conductSettings: 'Conduct', support: 'Support', supportSettings: 'Support', feesDesk: 'Fees desk', feesPay: 'Record a payment', feesShop: 'School shop', messages: 'Messages', assessment: 'Assessment', modules: 'Modules', room: 'My room', observations: 'Observations', reviews: 'Progress reviews', pickup: 'Pick-up', look: 'Branding', divisions: 'Divisions', programmesStructure: 'Faculties and departments', programmesList: 'Programmes', programmesCatalogue: 'Course catalogue', programmesOfferings: 'Offerings', programmesStudents: 'Students', programmesRegistration: 'Registration' },
-    groups: { daily: 'Daily work', learners: 'Learners', fees: 'Fees', programmes: 'Programmes', school: 'School', settings: 'Settings' },
+    nav: { today: 'Dashboard', allLearners: 'All learners', feesLedger: 'Fees ledger', myDay: 'My day', registers: 'Registers', marks: 'Marks', toApprove: 'To approve', approvals: 'Approvals', learners: 'Learners', people: 'People', roles: 'Roles', subjects: 'Subjects', teaching: 'Teaching', timetable: 'Timetable', nextYear: 'Next school year', documentTypes: 'Learner documents', feeSettings: 'Fees', conduct: 'Conduct', conductSettings: 'Conduct', support: 'Support', supportSettings: 'Support', feesDesk: 'Fees desk', feesPay: 'Record a payment', feesShop: 'School shop', messages: 'Messages', assessment: 'Assessment', modules: 'Modules', room: 'My room', observations: 'Observations', reviews: 'Progress reviews', pickup: 'Pick-up', look: 'Branding', divisions: 'Divisions', programmesStructure: 'Faculties and departments', programmesList: 'Programmes', programmesCatalogue: 'Course catalogue', programmesOfferings: 'Offerings', programmesStudents: 'Students', programmesRegistration: 'Registration' },
+    groups: { home: 'Home', daily: 'Daily work', learners: 'Learners', fees: 'Fees', programmes: 'Programmes', school: 'School', settings: 'Settings' },
     menu: 'Menu',
     openMenu: 'Open the menu',
     closeMenu: 'Close the menu',
@@ -3229,6 +3229,8 @@ export const copy = {
     dark: 'Dark',
     device: 'Same as this device',
     note: 'Remembered on this device. Documents and printing are always light.',
+    toDark: 'Switch to dark',
+    toLight: 'Switch to light',
   },
 
   account: {
@@ -3329,7 +3331,7 @@ export const copy = {
   },
 
   dashboard: {
-    title: 'Overview',
+    title: 'Dashboard',
     kicker: (d: string) => `Whole school · ${d}`,
     views: 'Dashboards',
     chart: 'Chart',
@@ -3347,7 +3349,7 @@ export const copy = {
     noViews: 'There is nothing in the overview for your roles.',
   },
   today: {
-    title: 'Today',
+    title: 'Dashboard',
     kicker: (where: string, d: string) => (where === '' ? d : `${where} · ${d}`),
     todo: 'To do',
     forYou: 'For you to act on',

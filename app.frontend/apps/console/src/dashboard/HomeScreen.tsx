@@ -152,7 +152,7 @@ function Views({ views, current }: { views: { key: string; label: string }[]; cu
           href={`/?view=${v.key}`}
           aria-current={v.key === current ? 'page' : undefined}
           onClick={(e) => (e.preventDefault(), navigate(v.key === views[0]?.key ? '/' : `/?view=${v.key}`))}
-          className={`-mb-0.5 border-b-4 px-4 pt-2.5 pb-2 text-[15px] whitespace-nowrap text-ink no-underline ${v.key === current ? 'border-ink font-extrabold' : 'border-transparent hover:border-rule'}`}
+          className={`-mb-0.5 inline-flex min-h-11 shrink-0 items-center border-b-4 px-4 pt-2.5 pb-2 text-[15px] whitespace-nowrap text-ink no-underline ${v.key === current ? 'border-teal font-extrabold' : 'border-transparent font-medium hover:bg-paper'}`}
         >
           {v.label}
         </a>
@@ -217,8 +217,8 @@ export function HomeScreen() {
 
       {dash === undefined && dashboard.phase !== 'refused' && dashboard.phase !== 'failed' && <Waiting phase={dashboard.phase} what={t.title} labels={copy.loading} rows={4} onRetry={dashboard.reload} />}
 
-      {/* The person's own day: now, their week, their to-do list. A leader sees it beside the division's figures. */}
-      {onFirst && !school && (mine.now.length > 0 || mine.chart !== null) && (
+      {/* The person's own day: now, their week, their to-do list. Only inside a place, and only once the page knows it is not the school view. */}
+      {onFirst && dash !== undefined && !school && (mine.now.length > 0 || mine.chart !== null) && (
         <div className="grid items-start gap-3 md:grid-cols-2 xl:grid-cols-3">
           {mine.now.map((n) => (
             <NowCard key={n.key} now={n} />
@@ -229,7 +229,7 @@ export function HomeScreen() {
 
       {leads && <Panels panels={panels} />}
 
-      {onFirst && <Todo items={mine.items} title={leads ? t.forYou : t.todo} />}
+      {onFirst && dash !== undefined && <Todo items={mine.items} title={leads ? t.forYou : t.todo} />}
       {school && onFirst && panels.length === 0 && dash !== undefined && <p className="text-text-muted">{d.noViews}</p>}
     </div>
   )

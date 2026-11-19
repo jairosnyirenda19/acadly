@@ -73,7 +73,8 @@ export function LearnersScreen() {
   const keepsFamilies = holdsAnywhere(useAppContext(), 'enrolment.families')
   const runsYearEnd = holdsAnywhere(useAppContext(), 'enrolment.manage')
   const { place } = useWorkIn()
-  const inPlace = place !== null && place.key !== 'institution:' ? place.key : null
+  // An office is not a filter of its own: the server already keeps every list to the office's learners (D-099).
+  const inPlace = place !== null && place.key !== 'institution:' && place.type !== 'office' ? place.key : null
   const loaded = useLoad(`learners:${inPlace ?? ''}`, () => learnersApi.list(inPlace))
   const state = loaded.data
   const [query, setQuery] = useGridQuery('/learners')

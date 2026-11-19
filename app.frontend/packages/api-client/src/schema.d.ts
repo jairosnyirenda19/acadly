@@ -3213,6 +3213,244 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/programmes/{division}/structure": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Faculties, departments and programmes of a division */
+        get: operations["programmes.structure"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/faculties": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Saves the faculties, in order */
+        put: operations["programmes.faculties.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/departments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adds or changes a department */
+        post: operations["programmes.departments.save"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/catalogue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The course catalogue of a division */
+        get: operations["programmes.catalogue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adds or changes a course */
+        post: operations["programmes.courses.save"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/programmes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adds or changes a programme. A new programme starts with a draft curriculum */
+        post: operations["programmes.programmes.save"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/programmes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One programme with its curriculum versions; the version asked for, the draft, or the newest released */
+        get: operations["programmes.programmes.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/programmes/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Starts a new draft version, copied from the newest released one */
+        post: operations["programmes.versions.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/versions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Saves a draft version's elective groups and courses */
+        put: operations["programmes.versions.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/versions/{id}/release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Releases a draft version that passes every check */
+        post: operations["programmes.versions.release"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/offerings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A semester's offerings: this year's semesters, the one asked for (else the first), its groups and what is still missing */
+        get: operations["programmes.offerings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/offerings/{period}/prepare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adds group A of every course the semester needs and does not have yet */
+        post: operations["programmes.offerings.prepare"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/offerings/{period}/groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adds the next group of a course */
+        post: operations["programmes.offerings.group"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/offering/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Saves a group's size limit, lecturers and assistants */
+        put: operations["programmes.offerings.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/year-end": {
         parameters: {
             query?: never;
@@ -4231,6 +4469,12 @@ export interface components {
          * @enum {string}
          */
         AdjustmentKind: "discount" | "bursary" | "waiver" | "write_off";
+        /**
+         * Award
+         * @description What a programme leads to.
+         * @enum {string}
+         */
+        Award: "certificate" | "diploma" | "bachelor" | "postgraduate_diploma" | "master" | "doctorate";
         /**
          * Level
          * @description How serious an incident is. A serious one opens a case the office follows up.
@@ -14304,6 +14548,622 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "programmes.structure": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        faculties: {
+                            id: string;
+                            name: string;
+                            code: string;
+                            retired: boolean;
+                            departments: {
+                                id: string;
+                                name: string;
+                                code: string;
+                                prefixes: string[];
+                                head: {
+                                    id: string;
+                                    name: string;
+                                } | null;
+                                retired: boolean;
+                                programmes: number;
+                                courses: number;
+                                staff: number;
+                            }[];
+                        }[];
+                        programmes: {
+                            id: string;
+                            department_id: string;
+                            code: string;
+                            name: string;
+                            award: string;
+                            years: number;
+                            credits: number;
+                            open: boolean;
+                            retired: boolean;
+                            released: boolean;
+                        }[];
+                        periods: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                            position: number;
+                        }[];
+                        staff: {
+                            id: string;
+                            name: string;
+                        }[];
+                        can: {
+                            manage: boolean;
+                            offer: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "programmes.faculties.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    faculties: {
+                        /** Format: uuid */
+                        id?: string | null;
+                        name: string;
+                        code: string;
+                        retired: boolean;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "programmes.departments.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    id?: string | null;
+                    /** Format: uuid */
+                    faculty_id: string;
+                    name: string;
+                    code: string;
+                    prefixes: string[];
+                    /** Format: uuid */
+                    head_user_id?: string | null;
+                    retired: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "programmes.catalogue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        courses: {
+                            id: string;
+                            code: string;
+                            title: string;
+                            department_id: string;
+                            department: string;
+                            credits: number;
+                            lecture_hours: number;
+                            tutorial_hours: number;
+                            practical_hours: number;
+                            needs: {
+                                id: string;
+                                code: string;
+                            }[];
+                            used_in: string[];
+                            retired: boolean;
+                            locked: boolean;
+                        }[];
+                        departments: {
+                            id: string;
+                            name: string;
+                            prefixes: string[];
+                        }[];
+                        can: {
+                            manage: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "programmes.courses.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    id?: string | null;
+                    /** Format: uuid */
+                    department_id: string;
+                    code: string;
+                    title: string;
+                    credits: number;
+                    lecture_hours: number;
+                    tutorial_hours: number;
+                    practical_hours: number;
+                    needs: string[];
+                    retired: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "programmes.programmes.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    id?: string | null;
+                    /** Format: uuid */
+                    department_id: string;
+                    code: string;
+                    name: string;
+                    award: components["schemas"]["Award"];
+                    years: number;
+                    semesters: number;
+                    credits: number;
+                    min_load: number;
+                    max_load: number;
+                    open: boolean;
+                    retired: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "programmes.programmes.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        programme: {
+                            id: string;
+                            department_id: string;
+                            department: string;
+                            faculty: string;
+                            code: string;
+                            name: string;
+                            award: string;
+                            years: number;
+                            semesters: number;
+                            credits: number;
+                            min_load: number;
+                            max_load: number;
+                            open: boolean;
+                            retired: boolean;
+                        };
+                        versions: {
+                            id: string;
+                            label: string;
+                            released_at: string | null;
+                        }[];
+                        version: {
+                            id: string;
+                            label: string;
+                            released: boolean;
+                            groups: {
+                                id: string;
+                                year: number;
+                                semester: number;
+                                label: string;
+                                choose: number;
+                            }[];
+                            courses: {
+                                course_id: string;
+                                code: string;
+                                title: string;
+                                credits: number;
+                                retired: boolean;
+                                year: number;
+                                semester: number;
+                                group_id: string | null;
+                                needs: {
+                                    id: string;
+                                    code: string;
+                                }[];
+                            }[];
+                            problems: {
+                                [key: string]: string | number;
+                            }[];
+                            years: number[];
+                            slots: {
+                                [key: string]: number;
+                            };
+                            total: number;
+                        } | null;
+                        can: {
+                            manage: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "programmes.versions.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "programmes.versions.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    groups: {
+                        key: string;
+                        year: number;
+                        semester: number;
+                        label: string;
+                        choose: number;
+                    }[];
+                    courses: {
+                        /** Format: uuid */
+                        course_id: string;
+                        year: number;
+                        semester: number;
+                        group?: string | null;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "programmes.versions.release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        released: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "programmes.offerings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        periods: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                            position: number;
+                        }[];
+                        period: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                            position: number;
+                        } | null;
+                        offerings: {
+                            id: string;
+                            course: {
+                                id: string;
+                                code: string;
+                                title: string;
+                            };
+                            group: string;
+                            limit: number | null;
+                            lecturers: {
+                                id: string;
+                                name: string;
+                            }[];
+                            assistants: {
+                                id: string;
+                                name: string;
+                            }[];
+                            ready: boolean;
+                        }[];
+                        missing: number;
+                        staff: {
+                            id: string;
+                            name: string;
+                        }[];
+                        can: {
+                            offer: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "programmes.offerings.prepare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        added: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "programmes.offerings.group": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    course_id: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "programmes.offerings.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    limit?: number | null;
+                    lecturers: string[];
+                    assistants: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "year-end.index": {

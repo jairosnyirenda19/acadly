@@ -73,6 +73,16 @@ export const GROUPS: NavGroup[] = [
     ],
   },
   {
+    key: 'programmes',
+    label: t.groups.programmes,
+    items: [
+      { key: 'programmes-structure', label: t.nav.programmesStructure, path: '/programmes', icon: 'subjects', show: (c) => seesProgrammes(c), lights: (p) => p === '/programmes' },
+      { key: 'programmes-list', label: t.nav.programmesList, path: '/programmes/list', icon: 'assessment', show: (c) => seesProgrammes(c), lights: (p) => p === '/programmes/list' || p.startsWith('/programmes/p/') },
+      { key: 'programmes-catalogue', label: t.nav.programmesCatalogue, path: '/programmes/courses', icon: 'subjects', show: (c) => seesProgrammes(c), lights: under('/programmes/courses') },
+      { key: 'programmes-offerings', label: t.nav.programmesOfferings, path: '/programmes/offerings', icon: 'teaching', show: (c) => seesProgrammes(c), lights: under('/programmes/offerings') },
+    ],
+  },
+  {
     key: 'school',
     label: t.groups.school,
     items: [
@@ -179,6 +189,14 @@ export function keepsGrading(context: AppContext): boolean {
 }
 
 /** The pages that belong to one division's daily work: inside a division, never across all of them (D-096). */
+/** Whether the account sees programmes in a division of this view (D-097): the module on, and the permission held at the division. */
+export function seesProgrammes(context: AppContext): boolean {
+  return (
+    moduleOn(context, 'programmes') &&
+    context.divisions.some((d) => (d.bindings as Record<string, string | undefined>)['programmes.shape'] === 'programmes' && can(context, 'programmes.view', { type: 'division', id: d.id }))
+  )
+}
+
 export const DIVISION_ONLY = ['my-day', 'registers', 'marks', 'room', 'observations', 'reviews', 'pickup']
 
 /** Where the account stands among the divisions: the one it works in (null for all), and how many it works in. */
@@ -213,5 +231,5 @@ export function settingsHome(context: AppContext): string | null {
 
 /** The group of the rail that holds a page, with what this account sees of it: the tabs over a School or Settings page. */
 export function groupOf(context: AppContext, path: string): NavGroup | undefined {
-  return visibleGroups(context).find((g) => (g.key === 'school' || g.key === 'settings') && g.items.some((item) => item.lights(path)))
+  return visibleGroups(context).find((g) => (g.key === 'school' || g.key === 'settings' || g.key === 'programmes') && g.items.some((item) => item.lights(path)))
 }

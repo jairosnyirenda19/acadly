@@ -1,0 +1,61 @@
+{
+    "abstract": false,
+    "bindings": {
+        "programmes.shape": "programmes"
+    },
+    "extends": null,
+    "kind": "profile",
+    "ref": "TERTIARY@2026.1",
+    "structure": {
+        "grouping": "streams",
+        "levels": [
+            {
+                "code": "Y1",
+                "label": "Year 1"
+            },
+            {
+                "code": "Y2",
+                "label": "Year 2"
+            },
+            {
+                "code": "Y3",
+                "label": "Year 3"
+            },
+            {
+                "code": "Y4",
+                "label": "Year 4"
+            },
+            {
+                "code": "Y5",
+                "label": "Year 5"
+            }
+        ],
+        "period_model": "semesters",
+        "periods_per_year": 2
+    },
+    "subjects": [],
+    "summary": "Faculties, programmes and courses. Two semesters a year. Students register for courses each semester.",
+    "title": "College",
+    "vocabulary": {
+        "group": {
+            "many": "Groups",
+            "one": "Group"
+        },
+        "learner": {
+            "many": "Students",
+            "one": "Student"
+        },
+        "level": {
+            "many": "Years of study",
+            "one": "Year of study"
+        },
+        "period": {
+            "many": "Semesters",
+            "one": "Semester"
+        },
+        "subject": {
+            "many": "Courses",
+            "one": "Course"
+        }
+    }
+}

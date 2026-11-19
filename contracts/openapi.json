@@ -31944,6 +31944,1796 @@
                 }
             }
         },
+        "/v1/programmes/{division}/structure": {
+            "get": {
+                "operationId": "programmes.structure",
+                "summary": "Faculties, departments and programmes of a division",
+                "tags": [
+                    "Programmes"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "faculties": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "retired": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "departments": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                },
+                                                                "code": {
+                                                                    "type": "string"
+                                                                },
+                                                                "prefixes": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "head": {
+                                                                    "type": [
+                                                                        "object",
+                                                                        "null"
+                                                                    ],
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "name": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "id",
+                                                                        "name"
+                                                                    ]
+                                                                },
+                                                                "retired": {
+                                                                    "type": "boolean"
+                                                                },
+                                                                "programmes": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "courses": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "staff": {
+                                                                    "type": "integer"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name",
+                                                                "code",
+                                                                "prefixes",
+                                                                "head",
+                                                                "retired",
+                                                                "programmes",
+                                                                "courses",
+                                                                "staff"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "code",
+                                                    "retired",
+                                                    "departments"
+                                                ]
+                                            }
+                                        },
+                                        "programmes": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "department_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "award": {
+                                                        "type": "string"
+                                                    },
+                                                    "years": {
+                                                        "type": "integer"
+                                                    },
+                                                    "credits": {
+                                                        "type": "integer"
+                                                    },
+                                                    "open": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "retired": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "released": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "department_id",
+                                                    "code",
+                                                    "name",
+                                                    "award",
+                                                    "years",
+                                                    "credits",
+                                                    "open",
+                                                    "retired",
+                                                    "released"
+                                                ]
+                                            }
+                                        },
+                                        "periods": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "starts_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "ends_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "position": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "starts_on",
+                                                    "ends_on",
+                                                    "position"
+                                                ]
+                                            }
+                                        },
+                                        "staff": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name"
+                                                ]
+                                            }
+                                        },
+                                        "can": {
+                                            "type": "object",
+                                            "properties": {
+                                                "manage": {
+                                                    "type": "boolean"
+                                                },
+                                                "offer": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "manage",
+                                                "offer"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "faculties",
+                                        "programmes",
+                                        "periods",
+                                        "staff",
+                                        "can"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/faculties": {
+            "put": {
+                "operationId": "programmes.faculties.save",
+                "summary": "Saves the faculties, in order",
+                "tags": [
+                    "Programmes"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "faculties": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "uuid"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "maxLength": 120
+                                                },
+                                                "code": {
+                                                    "type": "string",
+                                                    "maxLength": 12
+                                                },
+                                                "retired": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "code",
+                                                "retired"
+                                            ]
+                                        },
+                                        "maxItems": 40
+                                    }
+                                },
+                                "required": [
+                                    "faculties"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/departments": {
+            "post": {
+                "operationId": "programmes.departments.save",
+                "summary": "Adds or changes a department",
+                "tags": [
+                    "Programmes"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "uuid"
+                                    },
+                                    "faculty_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 120
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "maxLength": 12
+                                    },
+                                    "prefixes": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "maxLength": 5
+                                        },
+                                        "maxItems": 12
+                                    },
+                                    "head_user_id": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "uuid"
+                                    },
+                                    "retired": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "faculty_id",
+                                    "name",
+                                    "code",
+                                    "prefixes",
+                                    "retired"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/catalogue": {
+            "get": {
+                "operationId": "programmes.catalogue",
+                "summary": "The course catalogue of a division",
+                "tags": [
+                    "Programmes"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "courses": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "department_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "department": {
+                                                        "type": "string"
+                                                    },
+                                                    "credits": {
+                                                        "type": "integer"
+                                                    },
+                                                    "lecture_hours": {
+                                                        "type": "integer"
+                                                    },
+                                                    "tutorial_hours": {
+                                                        "type": "integer"
+                                                    },
+                                                    "practical_hours": {
+                                                        "type": "integer"
+                                                    },
+                                                    "needs": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "code": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "code"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "used_in": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "retired": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "locked": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "code",
+                                                    "title",
+                                                    "department_id",
+                                                    "department",
+                                                    "credits",
+                                                    "lecture_hours",
+                                                    "tutorial_hours",
+                                                    "practical_hours",
+                                                    "needs",
+                                                    "used_in",
+                                                    "retired",
+                                                    "locked"
+                                                ]
+                                            }
+                                        },
+                                        "departments": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "prefixes": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "prefixes"
+                                                ]
+                                            }
+                                        },
+                                        "can": {
+                                            "type": "object",
+                                            "properties": {
+                                                "manage": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "manage"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "courses",
+                                        "departments",
+                                        "can"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/courses": {
+            "post": {
+                "operationId": "programmes.courses.save",
+                "summary": "Adds or changes a course",
+                "tags": [
+                    "Programmes"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "uuid"
+                                    },
+                                    "department_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "maxLength": 16
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "maxLength": 160
+                                    },
+                                    "credits": {
+                                        "type": "integer"
+                                    },
+                                    "lecture_hours": {
+                                        "type": "integer"
+                                    },
+                                    "tutorial_hours": {
+                                        "type": "integer"
+                                    },
+                                    "practical_hours": {
+                                        "type": "integer"
+                                    },
+                                    "needs": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "maxItems": 12
+                                    },
+                                    "retired": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "department_id",
+                                    "code",
+                                    "title",
+                                    "credits",
+                                    "lecture_hours",
+                                    "tutorial_hours",
+                                    "practical_hours",
+                                    "needs",
+                                    "retired"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/programmes": {
+            "post": {
+                "operationId": "programmes.programmes.save",
+                "summary": "Adds or changes a programme. A new programme starts with a draft curriculum",
+                "tags": [
+                    "Programmes"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "uuid"
+                                    },
+                                    "department_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "maxLength": 12
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 160
+                                    },
+                                    "award": {
+                                        "$ref": "#/components/schemas/Award"
+                                    },
+                                    "years": {
+                                        "type": "integer"
+                                    },
+                                    "semesters": {
+                                        "type": "integer"
+                                    },
+                                    "credits": {
+                                        "type": "integer"
+                                    },
+                                    "min_load": {
+                                        "type": "integer"
+                                    },
+                                    "max_load": {
+                                        "type": "integer"
+                                    },
+                                    "open": {
+                                        "type": "boolean"
+                                    },
+                                    "retired": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "department_id",
+                                    "code",
+                                    "name",
+                                    "award",
+                                    "years",
+                                    "semesters",
+                                    "credits",
+                                    "min_load",
+                                    "max_load",
+                                    "open",
+                                    "retired"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/programmes/{id}": {
+            "get": {
+                "operationId": "programmes.programmes.show",
+                "summary": "One programme with its curriculum versions; the version asked for, the draft, or the newest released",
+                "tags": [
+                    "Programmes"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "programme": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "department_id": {
+                                                    "type": "string"
+                                                },
+                                                "department": {
+                                                    "type": "string"
+                                                },
+                                                "faculty": {
+                                                    "type": "string"
+                                                },
+                                                "code": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "award": {
+                                                    "type": "string"
+                                                },
+                                                "years": {
+                                                    "type": "integer"
+                                                },
+                                                "semesters": {
+                                                    "type": "integer"
+                                                },
+                                                "credits": {
+                                                    "type": "integer"
+                                                },
+                                                "min_load": {
+                                                    "type": "integer"
+                                                },
+                                                "max_load": {
+                                                    "type": "integer"
+                                                },
+                                                "open": {
+                                                    "type": "boolean"
+                                                },
+                                                "retired": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "department_id",
+                                                "department",
+                                                "faculty",
+                                                "code",
+                                                "name",
+                                                "award",
+                                                "years",
+                                                "semesters",
+                                                "credits",
+                                                "min_load",
+                                                "max_load",
+                                                "open",
+                                                "retired"
+                                            ]
+                                        },
+                                        "versions": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "released_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "label",
+                                                    "released_at"
+                                                ]
+                                            }
+                                        },
+                                        "version": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "label": {
+                                                    "type": "string"
+                                                },
+                                                "released": {
+                                                    "type": "boolean"
+                                                },
+                                                "groups": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "year": {
+                                                                "type": "integer"
+                                                            },
+                                                            "semester": {
+                                                                "type": "integer"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "choose": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "year",
+                                                            "semester",
+                                                            "label",
+                                                            "choose"
+                                                        ]
+                                                    }
+                                                },
+                                                "courses": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "course_id": {
+                                                                "type": "string"
+                                                            },
+                                                            "code": {
+                                                                "type": "string"
+                                                            },
+                                                            "title": {
+                                                                "type": "string"
+                                                            },
+                                                            "credits": {
+                                                                "type": "integer"
+                                                            },
+                                                            "retired": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "year": {
+                                                                "type": "integer"
+                                                            },
+                                                            "semester": {
+                                                                "type": "integer"
+                                                            },
+                                                            "group_id": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "needs": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "code": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "id",
+                                                                        "code"
+                                                                    ]
+                                                                }
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "course_id",
+                                                            "code",
+                                                            "title",
+                                                            "credits",
+                                                            "retired",
+                                                            "year",
+                                                            "semester",
+                                                            "group_id",
+                                                            "needs"
+                                                        ]
+                                                    }
+                                                },
+                                                "problems": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "additionalProperties": {
+                                                            "type": [
+                                                                "string",
+                                                                "integer"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "years": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "slots": {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "label",
+                                                "released",
+                                                "groups",
+                                                "courses",
+                                                "problems",
+                                                "years",
+                                                "slots",
+                                                "total"
+                                            ]
+                                        },
+                                        "can": {
+                                            "type": "object",
+                                            "properties": {
+                                                "manage": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "manage"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "programme",
+                                        "versions",
+                                        "version",
+                                        "can"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/programmes/{id}/versions": {
+            "post": {
+                "operationId": "programmes.versions.store",
+                "summary": "Starts a new draft version, copied from the newest released one",
+                "tags": [
+                    "Programmes"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/versions/{id}": {
+            "put": {
+                "operationId": "programmes.versions.save",
+                "summary": "Saves a draft version's elective groups and courses",
+                "tags": [
+                    "Programmes"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "groups": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "key": {
+                                                    "type": "string",
+                                                    "maxLength": 40
+                                                },
+                                                "year": {
+                                                    "type": "integer"
+                                                },
+                                                "semester": {
+                                                    "type": "integer"
+                                                },
+                                                "label": {
+                                                    "type": "string",
+                                                    "maxLength": 40
+                                                },
+                                                "choose": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "key",
+                                                "year",
+                                                "semester",
+                                                "label",
+                                                "choose"
+                                            ]
+                                        },
+                                        "maxItems": 60
+                                    },
+                                    "courses": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "course_id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "year": {
+                                                    "type": "integer"
+                                                },
+                                                "semester": {
+                                                    "type": "integer"
+                                                },
+                                                "group": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "maxLength": 40
+                                                }
+                                            },
+                                            "required": [
+                                                "course_id",
+                                                "year",
+                                                "semester"
+                                            ]
+                                        },
+                                        "maxItems": 400
+                                    }
+                                },
+                                "required": [
+                                    "groups",
+                                    "courses"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/versions/{id}/release": {
+            "post": {
+                "operationId": "programmes.versions.release",
+                "summary": "Releases a draft version that passes every check",
+                "tags": [
+                    "Programmes"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "released": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "released"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/offerings": {
+            "get": {
+                "operationId": "programmes.offerings",
+                "summary": "A semester's offerings: this year's semesters, the one asked for (else the first), its groups and what is still missing",
+                "tags": [
+                    "Programmes"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "periods": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "starts_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "ends_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "position": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "starts_on",
+                                                    "ends_on",
+                                                    "position"
+                                                ]
+                                            }
+                                        },
+                                        "period": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "starts_on": {
+                                                    "type": "string"
+                                                },
+                                                "ends_on": {
+                                                    "type": "string"
+                                                },
+                                                "position": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "starts_on",
+                                                "ends_on",
+                                                "position"
+                                            ]
+                                        },
+                                        "offerings": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "course": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "code": {
+                                                                "type": "string"
+                                                            },
+                                                            "title": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "code",
+                                                            "title"
+                                                        ]
+                                                    },
+                                                    "group": {
+                                                        "type": "string"
+                                                    },
+                                                    "limit": {
+                                                        "type": [
+                                                            "integer",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "lecturers": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "assistants": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "ready": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "course",
+                                                    "group",
+                                                    "limit",
+                                                    "lecturers",
+                                                    "assistants",
+                                                    "ready"
+                                                ]
+                                            }
+                                        },
+                                        "missing": {
+                                            "type": "integer"
+                                        },
+                                        "staff": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name"
+                                                ]
+                                            }
+                                        },
+                                        "can": {
+                                            "type": "object",
+                                            "properties": {
+                                                "offer": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "offer"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "periods",
+                                        "period",
+                                        "offerings",
+                                        "missing",
+                                        "staff",
+                                        "can"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/offerings/{period}/prepare": {
+            "post": {
+                "operationId": "programmes.offerings.prepare",
+                "summary": "Adds group A of every course the semester needs and does not have yet",
+                "tags": [
+                    "Programmes"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "period",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "added": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "added"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/offerings/{period}/groups": {
+            "post": {
+                "operationId": "programmes.offerings.group",
+                "summary": "Adds the next group of a course",
+                "tags": [
+                    "Programmes"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "period",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "course_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                },
+                                "required": [
+                                    "course_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/offering/{id}": {
+            "put": {
+                "operationId": "programmes.offerings.save",
+                "summary": "Saves a group's size limit, lecturers and assistants",
+                "tags": [
+                    "Programmes"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "limit": {
+                                        "type": [
+                                            "integer",
+                                            "null"
+                                        ]
+                                    },
+                                    "lecturers": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "maxItems": 6
+                                    },
+                                    "assistants": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "maxItems": 6
+                                    }
+                                },
+                                "required": [
+                                    "lecturers",
+                                    "assistants"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/year-end": {
             "get": {
                 "operationId": "year-end.index",
@@ -45492,6 +47282,19 @@
                     "write_off"
                 ],
                 "title": "AdjustmentKind"
+            },
+            "Award": {
+                "type": "string",
+                "description": "What a programme leads to.\n",
+                "enum": [
+                    "certificate",
+                    "diploma",
+                    "bachelor",
+                    "postgraduate_diploma",
+                    "master",
+                    "doctorate"
+                ],
+                "title": "Award"
             },
             "Level": {
                 "type": "string",

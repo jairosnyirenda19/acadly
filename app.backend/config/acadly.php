@@ -12,6 +12,7 @@ use Acadly\Modules\Assessment\AssessmentModule;
 use Acadly\Modules\Attendance\AttendanceModule;
 use Acadly\Modules\Conduct\ConductModule;
 use Acadly\Modules\Fees\FeesModule;
+use Acadly\Modules\Programmes\ProgrammesModule;
 use Acadly\Modules\SafeRelease\SafeReleaseModule;
 use Acadly\Modules\Support\SupportModule;
 
@@ -145,6 +146,7 @@ return [
         ConductModule::class,
         SupportModule::class,
         SafeReleaseModule::class,
+        ProgrammesModule::class,
     ],
 
 ];

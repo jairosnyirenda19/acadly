@@ -45,6 +45,11 @@ import { NextYearScreen } from './settings/NextYearScreen'
 import { DocumentTypesScreen } from './settings/DocumentTypesScreen'
 import { FeesSettingsScreen } from './settings/FeesSettingsScreen'
 import { ConductSettingsScreen } from './settings/ConductSettingsScreen'
+import { CatalogueScreen } from './programmes/CatalogueScreen'
+import { OfferingsScreen } from './programmes/OfferingsScreen'
+import { ProgrammeListScreen } from './programmes/ProgrammeListScreen'
+import { ProgrammeScreen } from './programmes/ProgrammeScreen'
+import { StructureScreen } from './programmes/StructureScreen'
 import { SupportSettingsScreen } from './settings/SupportSettingsScreen'
 import { LookScreen } from './settings/LookScreen'
 import { DivisionsScreen } from './shell/DivisionsScreen'
@@ -80,7 +85,7 @@ import { ApprovalScreen, ApprovalsScreen } from './approvals/ApprovalsScreen'
 import { ApprovalSettingsScreen } from './approvals/ApprovalSettingsScreen'
 import { SetupWizard } from './setup/SetupWizard'
 import { ConsoleShell, holdsAnywhere, settingsHome } from './shell/ConsoleShell'
-import { keepsGrading, observes, seesMarks, seesObservations, seesPickup, seesRegisters, takesRegisters } from './shell/navigation'
+import { keepsGrading, observes, seesMarks, seesObservations, seesPickup, seesProgrammes, seesRegisters, takesRegisters } from './shell/navigation'
 import { WorkInProvider } from './shell/WorkIn'
 import { SignInScreen } from './sign-in/SignInScreen'
 import { StatusScreen } from './StatusScreen'
@@ -112,6 +117,8 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const cards = /^\/marks\/cards\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const exported = /^\/exports\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const approval = /^\/approvals\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const programmes = seesProgrammes(context)
+  const programme = /^\/programmes\/p\/([0-9a-f-]{36})$/.exec(path)?.[1]
 
   useEffect(() => {
     if (path === '/settings' && home !== null) navigate(home, true)
@@ -128,6 +135,11 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/settings/support' && support && can(context, 'support.manage')) page = <SupportSettingsScreen />
   else if (path === '/settings/branding' && can(context, 'institution.manage')) page = <LookScreen />
   else if (path === '/divisions') page = <DivisionsScreen />
+  else if (path === '/programmes' && programmes) page = <StructureScreen />
+  else if (path === '/programmes/list' && programmes) page = <ProgrammeListScreen />
+  else if (programme !== undefined && programmes) page = <ProgrammeScreen key={programme} id={programme} />
+  else if (path === '/programmes/courses' && programmes) page = <CatalogueScreen />
+  else if (path === '/programmes/offerings' && programmes) page = <OfferingsScreen />
   else if (path === '/support' && support && (holdsAnywhere(context, 'support.view') || holdsAnywhere(context, 'support.lead'))) page = <WatchScreen />
   else if (path === '/support/plans/new' && support && holdsAnywhere(context, 'support.lead')) page = <OpenPlanScreen />
   else if (plan !== undefined && support) page = <PlanScreen key={plan} id={plan} />

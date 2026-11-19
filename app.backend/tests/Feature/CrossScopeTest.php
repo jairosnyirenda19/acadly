@@ -27,7 +27,7 @@ use Tests\Fixtures\TwoCampusSchool;
 /** Routes open to anyone: they reveal nothing about a place. */
 const OPEN_ROUTES = [
     'sanctum.csrf-cookie', 'auth.sign-in', 'auth.two-step', 'academics.calendar.feed', 'auth.forgot-password', 'auth.reset-password', 'auth.phone.code', 'auth.phone.sign-in',
-    'kernel.health', 'kernel.ready', 'kernel.school', 'institution.logo.public', 'notify.reports',
+    'kernel.health', 'kernel.ready', 'kernel.school', 'institution.logo.public', 'notify.reports', 'kernel.check',
 ];
 
 /** Routes about the account itself, not about a place. */
@@ -64,7 +64,8 @@ const RECORD_ROUTES = [
  * For these the test checks that nothing of campus B is in the answer.
  */
 const LIST_ROUTES = ['people.index', 'academics.teaching.index', 'academics.timetable.index', 'learners.index', 'learners.grid', 'people.grid', 'registers.index',
-    'registers.lessons', 'registers.missed', 'registers.levels', 'assessment.mine', 'assessment.options', 'assessment.grid', 'assessment.publishing', 'fees.shop.index', 'conduct.kinds.index', 'support.watch'];
+    'registers.lessons', 'registers.missed', 'registers.levels', 'assessment.mine', 'assessment.options', 'assessment.grid', 'assessment.publishing', 'fees.shop.index', 'conduct.kinds.index', 'support.watch',
+    'assessment.rooms', 'assessment.reviews', 'assessment.reviews.share', 'pickup.desk', 'divisions.overview'];
 
 uses(DatabaseTransactions::class);
 
@@ -94,6 +95,7 @@ it('refuses every place-bound route to an account that holds everything, but onl
     DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'fees', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
     DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'conduct', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
     DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'support', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
+    DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'saferelease', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
     $school = TwoCampusSchool::make();
 
     $everything = Role::query()->create(['key' => 'everything_at_a', 'name' => 'Everything at campus A']);
@@ -158,6 +160,7 @@ it('refuses every place-bound route to an account that holds everything, but onl
         'year-end.' => ['division' => $school->id('secondary'), 'id' => $learner],
         'conduct.' => ['id' => $learner, 'step' => 'take-up'],
         'support.' => ['id' => $learner, 'what' => 'agree'],
+        'pickup.' => ['id' => $learner],
         'fees.' => ['id' => $learner, 'period' => $term, 'division' => $school->id('secondary'), 'day' => '2026-10-01'],
     ];
     $b = [

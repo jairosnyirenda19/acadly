@@ -1,0 +1,75 @@
+/* ── The school's own look, and dark mode (D-096) ──────────────────────────────
+   tokens.css holds the register book's values. This file lets a school's two
+   colours stand in for ink and accent, and gives every token its dark value.
+   It is written outside any layer, so it wins over the theme's own values.
+
+   The school's colours arrive as --brand-* on :root (set by applyLook). The
+   colours that mean done, attention and wrong are never the school's.         */
+
+:root {
+  --color-ink: var(--brand-main, #0c2340);
+  --color-ink-rule: var(--brand-rule, #3a5173);
+  --color-accent: var(--brand-accent, #2fd6cf);
+}
+
+/* Dark: the same jobs on a dark sheet. Text and heavy rules turn light; the
+   rail and the dark blocks stay the darkest surface. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-ink: #e8eef5;
+  --color-paper: #0a1422;
+  --color-sheet: #0f1d30;
+  --color-field: #18293f;
+  --color-rule: #26394f;
+  --color-rule-dashed: #5a6f88;
+  --color-text-muted: #9db0c6;
+  --color-disabled: #22344b;
+  --color-ink-rule: var(--brand-rule-dark, #22344b);
+  --color-teal-wash: #0f3433;
+  --color-marigold-wash: #2e2610;
+  --color-red-text: #ff8a7e;
+  --color-red-wash: #3a1714;
+}
+
+:root[data-theme='dark'] .bg-ink {
+  background-color: var(--brand-block-dark, #050d18);
+}
+
+/* White stays white: on the rail, a dark block, a teal button or a red tag, and on hover there. */
+:root[data-theme='dark'] .text-sheet,
+:root[data-theme='dark'] [class*='hover:text-sheet']:hover {
+  color: #ffffff;
+}
+
+/* A heavy rule is a calm line in the dark, not a bright one. */
+:root[data-theme='dark'] .border-ink {
+  border-color: #4a6180;
+}
+
+/* The red pen keeps its fill, so white writing on it stays readable; red writing is lifted. */
+:root[data-theme='dark'] .text-red-pen {
+  color: #ff6a5c;
+}
+
+/* Teal text is lifted so it stays readable on a dark sheet. */
+:root[data-theme='dark'] .text-teal {
+  color: #2fd6cf;
+}
+
+/* Light fills keep dark writing: marigold tags, the middle nursery step, teal-bright marks. A disabled control keeps its own. */
+:root[data-theme='dark'] :is(.bg-marigold, .bg-teal-mid, .bg-teal-bright, .bg-accent):not(:disabled),
+:root[data-theme='dark'] :is(.bg-marigold, .bg-teal-mid, .bg-teal-bright, .bg-accent):not(:disabled) :is(.text-ink, .text-text-muted) {
+  color: #0c2340;
+}
+
+/* Paper documents are always printed light. */
+@media print {
+  :root[data-theme='dark'] {
+    color-scheme: light;
+  }
+}
+
+/* A logo stands on white in light and dark, so any logo stays clear. */
+.logo-plate {
+  background-color: #ffffff;
+}

@@ -47,6 +47,8 @@ function ChildCard({ child }: { child: Child }) {
   const href = `/child/${child.id}`
   const today = child.lines.find((l) => l.key === 'today')
   const card = child.lines.find((l) => l.key === 'card')
+  const review = child.lines.find((l) => l.key === 'review')
+  const pickup = child.lines.find((l) => l.key === 'pickup')
   const reason = `/child/${child.id}/reason`
   const ask = today !== undefined && today.word === 'absent_ask' && child.state !== 'suspended'
 
@@ -78,6 +80,15 @@ function ChildCard({ child }: { child: Child }) {
       )}
       {card !== undefined && card.word === 'new_card' && (
         <span className="block border-t border-rule bg-marigold-wash px-3.5 py-2.5 text-base font-extrabold">{t.home.newCard(card.label ?? '')}</span>
+      )}
+      {review !== undefined && review.word === 'new_review' && (
+        <span className="block border-t border-rule bg-marigold-wash px-3.5 py-2.5 text-base font-extrabold">{t.home.newReview(review.label ?? '')}</span>
+      )}
+      {pickup !== undefined && pickup.word !== 'not_collected' && child.state !== 'suspended' && (
+        <span className="flex items-center gap-2.5 border-t border-rule px-3.5 py-2.5">
+          <Mark tone={pickup.tone as Tone} />
+          <span className="text-base font-bold">{pickup.word === 'collected' ? t.pickup.collected(pickup.label ?? '') : t.pickup.refused(pickup.label ?? '')}</span>
+        </span>
       )}
     </a>
     {ask && (
@@ -208,6 +219,8 @@ export function ChildScreen({ id }: { id: string }) {
   }
 
   const card = child.lines.find((l) => l.key === 'card')
+  const review = child.lines.find((l) => l.key === 'review')
+  const pickup = child.lines.find((l) => l.key === 'pickup')
   const base = `/child/${child.id}`
 
   return (
@@ -220,13 +233,32 @@ export function ChildScreen({ id }: { id: string }) {
         </span>
       </div>
       <div className="px-4 pb-6">
-        <Tile
-          icon="card"
-          title={t.child.card}
-          note={card === undefined ? t.child.noCard : card.word === 'new_card' ? t.child.newCard(card.label ?? '') : (card.label ?? '')}
-          fresh={card?.word === 'new_card'}
-          href={`${base}/card`}
-        />
+        {review !== undefined ? (
+          <Tile
+            icon="review"
+            title={t.child.review}
+            note={review.word === 'no_review' ? t.review.none : review.word === 'new_review' ? t.child.newCard(review.label ?? '') : (review.label ?? '')}
+            fresh={review.word === 'new_review'}
+            href={`${base}/review`}
+          />
+        ) : (
+          <Tile
+            icon="card"
+            title={t.child.card}
+            note={card === undefined ? t.child.noCard : card.word === 'new_card' ? t.child.newCard(card.label ?? '') : (card.label ?? '')}
+            fresh={card?.word === 'new_card'}
+            href={`${base}/card`}
+          />
+        )}
+        {pickup !== undefined && (
+          <Tile
+            icon="gate"
+            title={t.child.pickup}
+            note={pickup.word === 'collected' ? t.pickup.collected(pickup.label ?? '') : pickup.word === 'refused' ? t.pickup.refused(pickup.label ?? '') : t.pickup.notCollected}
+            fresh={pickup.word === 'refused'}
+            href={`${base}/pickup`}
+          />
+        )}
         <Tile icon="cal" title={t.child.attendance} note={t.child.seeTerm} href={`${base}/attendance`} />
         <Tile icon="bell" title={t.child.messages} note={t.child.seeMessages} href={`${base}/messages`} />
         {data.school.phone !== null && <Tile icon="call" title={t.child.call} note={data.school.phone} href={`tel:${data.school.phone.replace(/\s/g, '')}`} />}

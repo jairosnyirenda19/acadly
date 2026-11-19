@@ -27,6 +27,16 @@ final class ConfiguredSchool implements SchoolProfile
         return false;
     }
 
+    public function letterhead(): array
+    {
+        return ['name' => $this->name(), 'address' => null, 'phone' => null, 'logo' => null, 'timezone' => 'Africa/Blantyre'];
+    }
+
+    public function look(): array
+    {
+        return ['app_name' => null, 'main' => Contrast::MAIN, 'accent' => Contrast::ACCENT, 'accent_last' => true, 'custom' => false];
+    }
+
     public function isOpen(): bool
     {
         return true;

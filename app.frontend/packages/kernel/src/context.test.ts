@@ -4,7 +4,7 @@ import { can, moduleOn, type AppContext } from './context'
 function context(overrides: Partial<AppContext> = {}): AppContext {
   return {
     user: { id: 'u1', name: 'Agnes Banda', email: 'a.banda@sunrise.example', phone: null },
-    school: { name: 'Sunrise Academy', short_name: 'Sunrise', has_logo: false, open: true },
+    school: { name: 'Sunrise Academy', short_name: 'Sunrise', has_logo: false, open: true, look: { app_name: null, main: '#0C2340', accent: '#2FD6CF', accent_last: true, custom: false } },
     setup_required: false,
     licence: { status: 'valid', read_only: false },
     modules: ['institution', 'attendance'],

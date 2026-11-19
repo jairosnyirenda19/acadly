@@ -1,0 +1,147 @@
+{
+    "initial": "announced",
+    "kind": "journey",
+    "milestones": [],
+    "ref": "saferelease.pickup@2026.1",
+    "stages": [
+        {
+            "key": "gate",
+            "steps": [
+                "verify",
+                "release",
+                "dispute",
+                "cancel"
+            ],
+            "title": "At the gate"
+        }
+    ],
+    "states": [
+        {
+            "id": "announced",
+            "label": "At the gate"
+        },
+        {
+            "id": "verified",
+            "label": "Checked"
+        },
+        {
+            "id": "released",
+            "label": "Collected"
+        },
+        {
+            "id": "disputed",
+            "label": "Not released"
+        },
+        {
+            "id": "cancelled",
+            "label": "Cancelled"
+        }
+    ],
+    "steps": [
+        {
+            "capability": "saferelease.release",
+            "four_eyes": null,
+            "from": [
+                "announced"
+            ],
+            "gates": [
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Modules\\SafeRelease\\Journeys\\Pickup\\CollectorIsNamed"
+                }
+            ],
+            "id": "verify",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "verified",
+                    "requires_reason": false,
+                    "title": "On the list",
+                    "to": "verified"
+                }
+            ],
+            "stage": "gate",
+            "title": "Check who is collecting"
+        },
+        {
+            "capability": "saferelease.release",
+            "four_eyes": null,
+            "from": [
+                "verified"
+            ],
+            "gates": [
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Modules\\SafeRelease\\Journeys\\Pickup\\CollectorIsNamed"
+                }
+            ],
+            "id": "release",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "released",
+                    "requires_reason": false,
+                    "title": "Released",
+                    "to": "released"
+                }
+            ],
+            "stage": "gate",
+            "title": "Release the child"
+        },
+        {
+            "capability": "saferelease.release",
+            "four_eyes": null,
+            "from": [
+                "announced",
+                "verified"
+            ],
+            "gates": [],
+            "id": "dispute",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "not_on_the_list",
+                    "requires_reason": true,
+                    "title": "Not on the list",
+                    "to": "disputed"
+                }
+            ],
+            "stage": "gate",
+            "title": "Do not release"
+        },
+        {
+            "capability": "saferelease.release",
+            "four_eyes": null,
+            "from": [
+                "announced",
+                "verified"
+            ],
+            "gates": [],
+            "id": "cancel",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "cancelled",
+                    "requires_reason": true,
+                    "title": "Cancelled",
+                    "to": "cancelled"
+                }
+            ],
+            "stage": "gate",
+            "title": "Cancel"
+        }
+    ],
+    "subject": "Acadly\\Modules\\SafeRelease\\Domain\\Pickup",
+    "terminal": [
+        "released",
+        "disputed",
+        "cancelled"
+    ],
+    "title": "Pick-up"
+}

@@ -94,7 +94,7 @@ export function SubjectsScreen() {
                     setPanel({ mode: 'add' })
                     setMessage(null)
                   }}
-                  className={`border-b-4 px-4 pt-3 pb-2.5 text-[15px] ${current ? 'border-ink font-extrabold' : 'border-transparent font-medium'}`}
+                  className={`border-b-4 px-4 pt-3 pb-2.5 text-[15px] ${current ? 'border-teal font-extrabold' : 'border-transparent font-medium'}`}
                 >
                   {l.division} <span className="ref text-xs text-text-muted">{t.tabNote(l.subjects.length, l.subject_word_plural)}</span>
                 </button>

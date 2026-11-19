@@ -17,10 +17,10 @@ final class SchoolController
      * logo, and `portal` is the address of its parent portal, or null. It
      * requires no authentication and discloses nothing else.
      *
-     * @response array{name: string, has_logo: bool, portal: string|null}
+     * @response array{name: string, has_logo: bool, portal: string|null, look: array{app_name: string|null, main: string, accent: string, accent_last: bool, custom: bool}}
      */
     public function __invoke(SchoolProfile $school): JsonResponse
     {
-        return response()->json(['name' => $school->name(), 'has_logo' => $school->hasLogo(), 'portal' => PortalLink::url()]);
+        return response()->json(['name' => $school->name(), 'has_logo' => $school->hasLogo(), 'portal' => PortalLink::url(), 'look' => $school->look()]);
     }
 }

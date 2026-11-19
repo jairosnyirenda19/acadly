@@ -3,7 +3,7 @@ import { Button, Notice, slips, Waiting } from '@acadly/ui'
 import { useEffect, useState, type ReactNode } from 'react'
 import { copy } from '../copy'
 import { errorFor, type Saved } from '../setup/api'
-import { Attention, Input, Select, Total, TotalsBand } from '../setup/parts'
+import { Attention, Input, Select } from '../setup/parts'
 import { day } from '../settings/api'
 import { SmallButton, Tag } from '../settings/parts'
 import { initials, learnersApi, today, type ContactInput, type LearnerState } from './api'
@@ -21,6 +21,67 @@ const r = copy.learners.record
 const s = copy.settings
 
 type Panel = 'none' | 'correct' | 'move' | 'contact' | 'photo'
+
+/** The figures of one part of the record, under its name. */
+interface BandGroup {
+  key: string
+  title: string
+  cells: BandCell[]
+  /** The tab the name opens, or null when the part has none. */
+  tab: string | null
+}
+
+/**
+ * The band (the approved learner dashboard, regrouped): one block per part of
+ * the record, its name above its figures. Blocks grow by how many figures they
+ * hold and wrap whole, so no figure is ever cut, and a large amount keeps its
+ * size. The first block stands in ink.
+ */
+function Band({ groups, learnerId }: { groups: BandGroup[]; learnerId: string }) {
+  return (
+    <div className="flex flex-wrap gap-[2px] border-y-2 border-ink bg-ink">
+      {groups.map((g, gi) => {
+        const ink = gi === 0
+        const title = (
+          <h2 className={`label-caps ${ink ? 'text-teal-bright' : 'text-ink'}`}>
+            {g.title}
+            {g.tab !== null && <span aria-hidden="true"> ›</span>}
+          </h2>
+        )
+
+        return (
+          <section key={g.key} aria-label={g.title} className={`min-w-0 ${ink ? 'bg-ink text-sheet' : 'bg-sheet'}`} style={{ flex: `${g.cells.length} 1 ${g.cells.length * 168}px` }}>
+            <div className={`border-b px-4 pt-2.5 pb-1.5 ${ink ? 'border-ink-rule' : 'border-rule'}`}>
+              {g.tab !== null ? (
+                <a href={tabHref(learnerId, g.tab)} onClick={(e) => follow(e, tabHref(learnerId, g.tab ?? 'overview'))} className="text-inherit no-underline hover:underline">
+                  {title}
+                </a>
+              ) : (
+                title
+              )}
+            </div>
+            <div className="grid" style={{ gridTemplateColumns: `repeat(${g.cells.length}, minmax(0, 1fr))` }}>
+              {g.cells.map((c, i) => {
+                const attention = c.tone === 'attention'
+
+                return (
+                  <div key={`${c.label}-${i}`} className={`min-w-0 px-4 pt-2 pb-3 ${i > 0 ? (ink ? 'border-l border-ink-rule' : 'border-l border-rule') : ''} ${attention ? 'bg-marigold text-ink' : ''}`}>
+                    <h3 className={`label-caps text-[10px] ${attention ? '' : ink ? 'text-on-ink-muted' : 'text-text-muted'}`}>
+                      {attention && <span aria-hidden="true">! </span>}
+                      {c.label}
+                    </h3>
+                    <div className={`type-numeral my-0.5 text-[clamp(26px,2.4vw,38px)] leading-none break-words ${ink && !attention ? 'text-teal-bright' : ''}`}>{c.value}</div>
+                    <p className={`text-xs leading-snug ${attention ? 'font-semibold' : ink ? 'text-on-ink-soft' : 'text-text-muted'}`}>{c.note}</p>
+                  </div>
+                )
+              })}
+            </div>
+          </section>
+        )
+      })}
+    </div>
+  )
+}
 
 /** A cell of the record's band: from a part of the record, or what the family was told. */
 interface BandCell {
@@ -83,12 +144,16 @@ export function LearnerScreen({ id }: { id: string }) {
   const asked = query.get('tab') ?? 'overview'
   const tab = tabs.some((x) => x.key === asked) ? asked : 'overview'
 
-  const cells: BandCell[] = [
-    ...record.parts.flatMap((p) => p.band),
-    ...(record.told.all > 0
-      ? [{ label: r.toldLabel, value: String(record.told.all), note: r.toldNote(record.told.all, record.told.delivered, record.told.not_delivered), tone: record.told.not_delivered > 0 ? ('attention' as const) : ('plain' as const) }]
-      : []),
+  const told: BandCell[] =
+    record.told.all > 0
+      ? [{ label: r.toldLabel, value: String(record.told.all), note: r.toldNote(record.told.all, record.told.delivered, record.told.not_delivered), tone: record.told.not_delivered > 0 ? 'attention' : 'plain' }]
+      : []
+  // The band in groups: each part's figures under its own name, which opens its tab.
+  const groups: BandGroup[] = [
+    ...record.parts.filter((p) => p.band.length > 0).map((p) => ({ key: p.key, title: p.title, cells: p.band, tab: PART_VIEWS[p.key] !== undefined ? p.key : null })),
+    ...(told.length > 0 ? [{ key: 'messages', title: r.tabs.messages, cells: told, tab: 'messages' }] : []),
   ]
+  const cells = groups.flatMap((g) => g.cells)
   const attentionTags = record.parts.filter((p) => p.attention > 0).map((p) => ({ key: p.key, word: r.partAttention[p.key] ?? r.partAttentionOther }))
   const current = parts.find((p) => p.key === tab)
   const PartTab = current !== undefined ? PART_VIEWS[current.key]?.Tab : undefined
@@ -193,11 +258,7 @@ export function LearnerScreen({ id }: { id: string }) {
       {cells.length > 0 && (
         <>
           <div className="hidden md:block">
-            <TotalsBand compact>
-              {cells.map((c, i) => (
-                <Total key={`${c.label}-${i}`} compact tone={i === 0 ? 'ink' : c.tone === 'attention' ? 'attention' : 'plain'} label={c.label} value={c.value} note={c.note} />
-              ))}
-            </TotalsBand>
+            <Band groups={groups} learnerId={record.id} />
           </div>
           <div className="grid grid-cols-3 border-y-2 border-ink md:hidden">
             {cells.slice(0, 3).map((c, i) => (
@@ -221,7 +282,7 @@ export function LearnerScreen({ id }: { id: string }) {
               href={href}
               aria-current={x.key === tab ? 'page' : undefined}
               onClick={(e) => follow(e, href)}
-              className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 border-b-4 px-3.5 pt-2.5 pb-2 text-[15px] whitespace-nowrap text-ink no-underline md:px-4 ${x.key === tab ? 'border-ink font-extrabold' : 'border-transparent font-medium hover:bg-paper'}`}
+              className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 border-b-4 px-3.5 pt-2.5 pb-2 text-[15px] whitespace-nowrap text-ink no-underline md:px-4 ${x.key === tab ? 'border-teal font-extrabold' : 'border-transparent font-medium hover:bg-paper'}`}
             >
               <span className="md:hidden">{x.short}</span>
               <span className="hidden md:inline">{x.label}</span>

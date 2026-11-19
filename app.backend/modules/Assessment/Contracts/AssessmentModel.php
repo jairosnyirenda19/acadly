@@ -10,7 +10,7 @@ enum AssessmentModel: string
     /** Assessments with marks, and term grades worked out from them. */
     case Marks = 'marks';
 
-    /** Observations against learning areas, with no marks. Not in the first release. */
+    /** Observations against learning areas, with no marks, and a progress review each term (D-094). */
     case Observational = 'observational';
 
     public function takesMarks(): bool

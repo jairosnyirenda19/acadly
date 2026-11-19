@@ -65,6 +65,7 @@ const en = {
     tellWhy: 'Tell the school why',
     card: (term: string) => `${term} report card`,
     newCard: (term: string) => `New: ${term} report card`,
+    newReview: (term: string) => `New: ${term} progress review`,
   },
 
   child: {
@@ -76,6 +77,8 @@ const en = {
     newCard: (term: string) => `${term} · new`,
     seeTerm: 'This term',
     seeMessages: 'From the school',
+    review: 'Progress review',
+    pickup: 'Pick-up',
   },
 
   card: {
@@ -139,6 +142,37 @@ const en = {
     failed: 'Try again in a moment.',
     notOpenTitle: 'This day cannot take a reason',
     notOpen: 'Call the school office about this day.',
+  },
+
+  review: {
+    kicker: (term: string) => `${term} · progress review`,
+    title: (name: string) => `${name} this term`,
+    none: 'Not shared yet',
+    noneNote: 'The progress review shows here on the day the school shares it.',
+    steps: { starting: 'Starting', growing: 'Growing', can_do: 'Can do it' } as Record<string, string>,
+    family: 'What you need to know',
+    home: 'What can help at home',
+    note: 'Steps and words only. No marks, no ranks, no other child.',
+  },
+
+  pickup: {
+    kicker: 'Pick-up',
+    collected: (at: string) => `Collected ${at}`,
+    refused: (at: string) => `At ${at} someone not on your list came to collect. Your child was kept safe at school. Call the school now.`,
+    notCollected: 'Not collected yet today',
+    whoMay: (name: string) => `Who may collect ${name}`,
+    todayOnly: 'Today only',
+    someoneElse: 'Someone else collects today',
+    someoneElseNote: 'Give their name and how they know your child. You get a code to give them. They show it at the gate. It works for today only.',
+    name: 'Their name',
+    relationship: 'How they know your child',
+    phone: 'Their phone (if you know it)',
+    add: 'Get the code',
+    cancel: 'Cancel',
+    codeTitle: 'The code for today',
+    codeNote: (name: string) => `Give this code to ${name}. They show it at the gate today. It is shown once.`,
+    failed: 'This could not be saved. Try again, or call the school.',
+    rule: 'Your child is released only to someone on this list.',
   },
 
   messages: {
@@ -209,6 +243,7 @@ const ny: Words = {
     tellWhy: 'Uzani sukulu chifukwa',
     card: (term: string) => `Lipoti la ${term}`,
     newCard: (term: string) => `Chatsopano: lipoti la ${term}`,
+    newReview: (term: string) => `Chatsopano: lipoti la kukula la ${term}`,
   },
 
   child: {
@@ -220,6 +255,8 @@ const ny: Words = {
     newCard: (term: string) => `${term} · chatsopano`,
     seeTerm: 'Teremu ino',
     seeMessages: 'Kuchokera ku sukulu',
+    review: 'Lipoti la kukula',
+    pickup: 'Kutenga mwana',
   },
 
   card: {
@@ -283,6 +320,37 @@ const ny: Words = {
     failed: 'Yesaninso pakapita kanthawi.',
     notOpenTitle: 'Tsikuli silingalandire chifukwa',
     notOpen: 'Imbirani ofesi ya sukulu za tsikuli.',
+  },
+
+  review: {
+    kicker: (term: string) => `${term} · lipoti la kukula`,
+    title: (name: string) => `${name} mu term iyi`,
+    none: 'Silinatumizidwe',
+    noneNote: 'Lipoti la kukula lidzaonekera pano pa tsiku limene sukulu ilitumiza.',
+    steps: { starting: 'Akuyamba', growing: 'Akukula', can_do: 'Akutha yekha' } as Record<string, string>,
+    family: 'Zomwe muyenera kudziwa',
+    home: 'Zomwe zingathandize kunyumba',
+    note: 'Masitepe ndi mawu okha. Palibe maksi, palibe malo, palibe mwana wina.',
+  },
+
+  pickup: {
+    kicker: 'Kutenga mwana',
+    collected: (at: string) => `Watengedwa ${at}`,
+    refused: (at: string) => `Nthawi ${at} munthu yemwe sali pa mndandanda wanu anabwera kudzatenga mwana. Mwana wanu ali bwino ku sukulu. Imbirani sukulu tsopano.`,
+    notCollected: 'Sanatengedwe lero',
+    whoMay: (name: string) => `Amene angatenge ${name}`,
+    todayOnly: 'Lero lokha',
+    someoneElse: 'Munthu wina akutenga lero',
+    someoneElseNote: 'Lembani dzina lake ndi m\'mene akudziwira mwana wanu. Mudzalandira nambala yachinsinsi yoti mumupatse. Adzaionetsa pa geti. Ikugwira ntchito lero lokha.',
+    name: 'Dzina lake',
+    relationship: 'M\'mene akudziwira mwana',
+    phone: 'Foni yake (ngati mukuidziwa)',
+    add: 'Landirani nambala',
+    cancel: 'Siyani',
+    codeTitle: 'Nambala ya lero',
+    codeNote: (name: string) => `Patsani ${name} nambala iyi. Adzaionetsa pa geti lero. Ikuonetsedwa kamodzi kokha.`,
+    failed: 'Sizinasungidwe. Yesaninso, kapena imbirani sukulu.',
+    rule: 'Mwana wanu amaperekedwa kwa munthu wa pa mndandanda uwu wokha.',
   },
 
   messages: {

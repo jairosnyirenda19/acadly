@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Acadly\Modules\Fees;
 
 use Acadly\Core\Enrolment\Contracts\LearnerRecordPart;
+use Acadly\Kernel\Grid\Grids;
+use Acadly\Modules\Fees\Application\BehindGrid;
 use Acadly\Modules\Fees\Application\FeesRecordPart;
+use Acadly\Modules\Fees\Application\PaymentsGrid;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,6 +18,7 @@ final class FeesServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->tag([FeesRecordPart::class], LearnerRecordPart::TAG);
+        $this->app->tag([PaymentsGrid::class, BehindGrid::class], Grids::TAG);
     }
 
     public function boot(): void

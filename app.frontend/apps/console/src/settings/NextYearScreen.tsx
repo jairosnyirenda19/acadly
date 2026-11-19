@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { copy } from '../copy'
 import { errorFor, read, settle } from '../setup/api'
 import { Input } from '../setup/parts'
-import { PageHead, Tag } from './parts'
+import { PageHead, SettingsTabs, Tag } from './parts'
 
 const t = copy.nextYear
 
@@ -34,6 +34,7 @@ export function NextYearScreen() {
   if (state.current === null || state.next === null) {
     return (
       <div className="flex flex-1 flex-col bg-paper">
+        <SettingsTabs />
         <PageHead kicker={t.kicker} title={t.title} intro="" />
         <div className="px-[clamp(16px,3vw,40px)]">
           <Notice tone="wrong" title={t.noYear} />
@@ -89,6 +90,7 @@ function Form({ current, next, onSaved }: { current: NonNullable<State['current'
 
   return (
     <div className="flex flex-1 flex-col bg-paper">
+      <SettingsTabs />
       <PageHead
         kicker={t.kicker}
         title={t.title}

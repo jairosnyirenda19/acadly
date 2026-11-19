@@ -1,6 +1,7 @@
 @import '@fontsource-variable/archivo/wdth.css';
 @import 'tailwindcss';
 @import '@acadly/ui/tokens.css';
+@import '@acadly/ui/look.css';
 
 /* Tailwind scans this app and the shared packages for class names. */
 @source '../../../packages/ui/src';

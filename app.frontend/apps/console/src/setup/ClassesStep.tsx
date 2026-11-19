@@ -109,7 +109,7 @@ export function ClassesStep({ academics, onAcademics, layout, next }: StepProps)
                     type="button"
                     aria-current={current ? 'page' : undefined}
                     onClick={() => setTab(keyOf(o))}
-                    className={`border-b-4 px-4 pt-3 pb-2.5 text-[15px] ${current ? 'border-ink font-extrabold' : 'border-transparent font-medium'}`}
+                    className={`border-b-4 px-4 pt-3 pb-2.5 text-[15px] ${current ? 'border-teal font-extrabold' : 'border-transparent font-medium'}`}
                   >
                     {o.division} · {o.campus} <span className="ref text-xs text-text-muted">{totals[i]}</span>
                   </button>

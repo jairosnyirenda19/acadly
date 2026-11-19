@@ -6,6 +6,7 @@ namespace Acadly\Core\Institution\Http;
 
 use Acadly\Core\Institution\Application\Actions\ReplaceLogo;
 use Acadly\Core\Institution\Application\Actions\SaveCampus;
+use Acadly\Core\Institution\Application\Actions\SaveLook;
 use Acadly\Core\Institution\Application\Actions\SaveSchoolDetails;
 use Acadly\Core\Institution\Application\Actions\SetLevels;
 use Acadly\Core\Institution\Application\Actions\SetOffering;
@@ -23,6 +24,7 @@ use Acadly\Kernel\Blueprint\Blueprints;
 use Acadly\Kernel\Blueprint\Compiled\CompiledProfile;
 use Acadly\Kernel\Documents\DocumentReader;
 use Acadly\Kernel\Identity\User;
+use Acadly\Kernel\School\SchoolProfile;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -91,6 +93,19 @@ final class InstitutionController
         $save->handle(self::user($request), $request->only(['name', 'short_name', 'code', 'email', 'phone', 'website', 'country', 'district', 'physical_address', 'postal_address']));
 
         return $this->show($request, app(Access::class), app(Blueprints::class));
+    }
+
+    /**
+     * Saves the school's own look: `{app_name, short_name, main, accent, accent_last}`. Empty values return to the product's own.
+     *
+     * @response array{app_name: string|null, main: string, accent: string, accent_last: bool, custom: bool}
+     */
+    public function look(Request $request, SaveLook $save, SchoolProfile $school): JsonResponse
+    {
+        $str = fn (string $key): ?string => is_string($request->input($key)) ? $request->string($key)->toString() : null;
+        $save->handle(self::user($request), $str('app_name'), $str('main'), $str('accent'), $request->boolean('accent_last', true), $str('short_name'));
+
+        return response()->json($school->look());
     }
 
     /** Sets the school logo: a PNG or JPEG of at most 1 MB. */

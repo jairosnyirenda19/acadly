@@ -23,6 +23,8 @@ enum AssessmentAudit: string implements AuditAction
     case CommentWritten = 'assessment.comment_written';
     case ResultsPublished = 'assessment.results_published';
     case CardSettingsSaved = 'assessment.card_settings_saved';
+    case Observed = 'assessment.observed';
+    case ReviewSaved = 'assessment.review_saved';
 
     public function key(): string
     {
@@ -43,6 +45,8 @@ enum AssessmentAudit: string implements AuditAction
             self::CommentWritten => "Wrote a report card comment for a learner's term.",
             self::ResultsPublished => "Published a class's term results and report cards.",
             self::CardSettingsSaved => 'Changed what report cards show.',
+            self::Observed => 'Recorded observations of children in a room.',
+            self::ReviewSaved => "Saved a child's progress review.",
         };
     }
 

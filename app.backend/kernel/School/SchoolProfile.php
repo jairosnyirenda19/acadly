@@ -23,10 +23,27 @@ interface SchoolProfile
 
     public function hasLogo(): bool;
 
+    /**
+     * The school's own look (D-096): the name the console shows (null: the
+     * product's), the main and accent colours, and whether the last word of
+     * the name takes the accent.
+     *
+     * @return array{app_name: string|null, main: string, accent: string, accent_last: bool, custom: bool}
+     */
+    public function look(): array;
+
+    /**
+     * What every document's letterhead carries: the school's name, address and
+     * phone, the logo's bytes when there is one, and the school's time zone.
+     *
+     * @return array{name: string, address: string|null, phone: string|null, logo: string|null, timezone: string}
+     */
+    public function letterhead(): array;
+
     /** Setup is finished and the school's work is available. */
     public function isOpen(): bool;
 
-    /** @return list<array{id: string, name: string, vocabulary: array<string, array{one: string, many: string}>}> */
+    /** @return list<array{id: string, name: string, profile: string, vocabulary: array<string, array{one: string, many: string}>, bindings: array<string, string>}> */
     public function divisions(): array;
 
     /** @return list<array{id: string, name: string}> */

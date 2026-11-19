@@ -12,6 +12,7 @@ use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Modules\Fees\Contracts\FeesPermission;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Tests\Fixtures\TwoCampusSchool;
 
@@ -132,16 +133,48 @@ it('cancels a receipt with a reason: the payment stays on the statement and what
     $id = ($this->pay)(mk(50000), [['learner_id' => $this->alinafe, 'amount' => mk(50000)]], 'mpamba', 'TNM-77120')->assertCreated()->json('id');
     $clerk = feeStaff(ScopeRef::of(ScopeType::Institution, null), [FeesPermission::Collect, FeesPermission::View]);
 
+    // The receipt as a document, with a check code anyone may confirm (D-096).
+    $pdf = $this->actingAs($clerk)->get("/api/v1/fees/payments/{$id}/pdf")->assertOk()->assertHeader('Content-Type', 'application/pdf');
+    expect(substr((string) $pdf->getContent(), 0, 4))->toBe('%PDF');
+    $code = (string) DB::table('document_checks')->where('kind', 'fees.receipt')->value('code');
+    expect($code)->toMatch('/^[A-Z2-9]{4}-[A-Z2-9]{4}-[A-Z2-9]{4}$/');
+    $this->actingAs($clerk)->get("/api/v1/fees/payments/{$id}/pdf")->assertOk();
+    expect(DB::table('document_checks')->where('kind', 'fees.receipt')->count())->toBe(1);
+    Auth::forgetGuards();
+    $this->getJson('/api/v1/check/'.strtolower(str_replace('-', '', $code)))->assertOk()->assertJson(['kind' => 'Receipt', 'state' => 'genuine'])->assertJsonMissingPath('payer');
+    $this->getJson('/api/v1/check/AAAA-BBBB-CCCC')->assertNotFound();
+
     $this->actingAs($clerk)->postJson("/api/v1/fees/payments/{$id}/cancel", ['reason' => 'Reversed by the provider.'])->assertForbidden();
     $this->actingAs($this->admin)->postJson("/api/v1/fees/payments/{$id}/cancel", ['reason' => ''])->assertUnprocessable();
     $this->actingAs($this->admin)->postJson("/api/v1/fees/payments/{$id}/cancel", ['reason' => 'Reversed by the provider.'])->assertOk()->assertJson(['number' => 'VOID-2026-000001']);
     $this->actingAs($this->admin)->postJson("/api/v1/fees/payments/{$id}/cancel", ['reason' => 'Again.'])->assertUnprocessable();
+    expect($this->getJson("/api/v1/check/{$code}")->json('state'))->toBe('cancelled');
+    $this->actingAs($this->admin)->get("/api/v1/learners/{$this->alinafe}")->assertOk();
+    expect(substr((string) $this->actingAs($this->admin)->get("/api/v1/fees/learners/{$this->alinafe}/statement")->assertOk()->getContent(), 0, 4))->toBe('%PDF');
 
     $fees = $this->actingAs($this->admin)->getJson("/api/v1/fees/learners/{$this->alinafe}")->json();
     expect(array_column($fees['statement'], 'kind'))->toBe(['charge', 'payment', 'void'])
         ->and(end($fees['statement'])['balance'])->toBe(mk(165000))
         ->and($fees['standing']['paid'])->toBe(0)
         ->and($this->actingAs($this->admin)->getJson("/api/v1/fees/payments/{$id}")->json('void.number'))->toBe('VOID-2026-000001');
+
+    // The ledger keeps the cancelled receipt, marked, and finds it by the learner's name.
+    $ledger = $this->actingAs($clerk)->getJson('/api/v1/fees/payments/grid?q=alinafe')->assertOk()->json();
+    expect($ledger['total'])->toBe(1)
+        ->and($ledger['rows'][0]['cancelled'])->toBeTrue()
+        ->and($ledger['rows'][0]['method_label'])->toBe('TNM Mpamba')
+        ->and($this->actingAs($clerk)->getJson('/api/v1/fees/payments/grid?filter[state]=counted')->json('total'))->toBe(0);
+
+    // Alinafe owes again: she is on the grid of learners behind their plan once the first instalment is due.
+    $this->travelTo('2026-10-20 10:00:00');
+    $behind = $this->actingAs($clerk)->getJson('/api/v1/fees/behind/grid?q=alinafe')->assertOk()->json();
+    expect($behind['total'])->toBe(1)
+        ->and($behind['rows'][0]['due_now'])->toBeGreaterThan(0)
+        ->and($behind['bulk'])->toBe([['key' => 'remind', 'label' => 'Remind the families']]);
+
+    // The ledger is the whole school's: a teacher of one class is refused.
+    $teacher = feeStaff($this->school->scope(ScopeType::ClassGroup, 'class_primary_a'), [FeesPermission::View], 'Teacher');
+    $this->actingAs($teacher)->getJson('/api/v1/fees/payments/grid')->assertForbidden();
 });
 
 it('agrees a different plan with a family, and gives a bursary that reduces the charge', function (): void {

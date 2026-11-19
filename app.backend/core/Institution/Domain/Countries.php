@@ -25,6 +25,12 @@ final class Countries
         ],
     ];
 
+    /** The time zone of a country the school may be in; Malawi's when unknown. */
+    public static function timezone(?string $code): string
+    {
+        return self::ALL[$code ?? '']['timezone'] ?? 'Africa/Blantyre';
+    }
+
     public static function has(string $code): bool
     {
         return isset(self::ALL[$code]);

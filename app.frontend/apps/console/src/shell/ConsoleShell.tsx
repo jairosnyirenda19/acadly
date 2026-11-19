@@ -7,6 +7,8 @@ import { ViewAsBar, ViewAsKey } from './ViewAs'
 import { SearchBar } from '../search/SearchBar'
 import { holdsAnywhere, settingsHome, visibleGroups, type NavGroup } from './navigation'
 import { WorkInButton, WorkInPanel, useWorkIn } from './WorkIn'
+import { SchoolInitials, SchoolLogo, SchoolMark } from './SchoolMark'
+import { useLanding } from './DivisionsScreen'
 
 export { holdsAnywhere, settingsHome }
 
@@ -115,7 +117,7 @@ function Rail({
       {top}
       {folded ? (
         choice && (
-          <button type="button" title={t.workIn.change(place?.label ?? t.wholeSchool)} aria-label={t.workIn.change(place?.label ?? t.wholeSchool)} onClick={onWorkIn} className="flex justify-center border-b border-ink-rule py-3 text-teal-bright hover:bg-ink-rule">
+          <button type="button" title={t.workIn.change(place?.label ?? t.wholeSchool)} aria-label={t.workIn.change(place?.label ?? t.wholeSchool)} onClick={onWorkIn} className="flex justify-center border-b border-ink-rule py-3 text-accent hover:bg-ink-rule">
             <Icon name="chevrons" size={16} stroke={3} />
           </button>
         )
@@ -158,7 +160,7 @@ function Rail({
                         onGo()
                       }}
                       className={`flex items-center gap-3 border-l-4 no-underline hover:bg-ink-rule ${folded ? 'justify-center py-2.5' : 'py-[9px] pr-5 pl-4'} ${
-                        current ? 'border-teal-bright font-extrabold text-sheet' : 'border-transparent font-medium text-on-ink-soft'
+                        current ? 'border-accent font-extrabold text-sheet' : 'border-transparent font-medium text-on-ink-soft'
                       }`}
                     >
                       <Icon name={item.icon} />
@@ -223,7 +225,9 @@ export function ConsoleShell({ children, onSignedOut }: { children: ReactNode; o
   const { path } = useLocation()
   const busy = useLoading()
   const width = useWidth()
-  const groups = visibleGroups(context)
+  const { division, divisions, enter } = useWorkIn()
+  useLanding()
+  const groups = visibleGroups(context, { division, reach: divisions.length })
   const [folded, setFolded] = useRemembered('acadly.rail.folded', false)
   const [shut, setShut] = useRemembered<Record<string, boolean>>('acadly.rail.groups', {})
   const [open, setOpen] = useState(false)
@@ -252,8 +256,18 @@ export function ConsoleShell({ children, onSignedOut }: { children: ReactNode; o
   const closeChoosing = useCallback(() => setChoosing(false), [])
 
   // Ctrl [ folds the rail on a desktop, and opens it over the page elsewhere; Escape closes what is open.
+  // Alt 0 opens all divisions; Alt 1, 2 … enter each division (D-096).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (e.altKey && !e.ctrlKey && !e.metaKey && /^[0-9]$/.test(e.key) && divisions.length > 1) {
+        const n = Number(e.key)
+        const to = n === 0 ? null : divisions[n - 1]
+        if (to !== undefined) {
+          e.preventDefault()
+          enter(to?.id ?? null)
+          navigate(to === null ? '/divisions' : '/')
+        }
+      }
       if ((e.ctrlKey || e.metaKey) && e.key === '[') {
         e.preventDefault()
         if (width === 'desktop') setFolded(!folded)
@@ -264,7 +278,7 @@ export function ConsoleShell({ children, onSignedOut }: { children: ReactNode; o
     window.addEventListener('keydown', onKey)
 
     return () => window.removeEventListener('keydown', onKey)
-  }, [width, folded, setFolded, open, choosing, closeOverlay])
+  }, [width, folded, setFolded, open, choosing, closeOverlay, divisions, enter])
 
   // A desktop has no drawer; leaving the narrow layout closes it.
   useEffect(() => {
@@ -286,36 +300,46 @@ export function ConsoleShell({ children, onSignedOut }: { children: ReactNode; o
   const toggleGroup = (group: string) => setShut({ ...shut, [group]: !(shut[group] ?? false) })
   const railFolded = width === 'tablet' || (width === 'desktop' && folded)
 
-  const brand = (
-    <span className="type-display flex-1 text-[32px] leading-[0.9]">
-      {copy.setup.product} <span className="text-teal-bright">{copy.setup.productAccent}</span>
-    </span>
-  )
+  // The product's name sits beside the key; a school's own name takes its own row, the rail's full width (D-096).
+  const own = context.school.look.app_name !== null && context.school.look.app_name !== ''
+  const head = (button: ReactNode, pad: string) =>
+    own ? (
+      <div className={`grid gap-2.5 ${pad}`}>
+        <div className="flex items-center gap-2.5">
+          <SchoolLogo />
+          <span className="flex-1" />
+          {button}
+        </div>
+        <SchoolMark />
+      </div>
+    ) : (
+      <div className={`flex items-center gap-2.5 ${pad}`}>
+        <span className="flex min-w-0 flex-1 items-center gap-2.5">
+          <SchoolLogo />
+          <SchoolMark />
+        </span>
+        {button}
+      </div>
+    )
 
   const railTop = railFolded ? (
     <div className="flex justify-center border-b border-ink-rule pt-3.5 pb-2.5">
-      <span aria-hidden="true" className="type-display grid size-10 place-items-center bg-teal-bright text-xl text-ink">
-        {copy.setup.product[0]}
-      </span>
+      <SchoolInitials />
     </div>
   ) : (
-    <div className="flex items-center gap-2.5 pt-[18px] pr-4 pb-3.5 pl-5">
-      {brand}
-      <button type="button" aria-label={t.fold} title={t.fold} onClick={() => setFolded(true)} className="grid size-8 place-items-center border-2 border-ink-rule text-on-ink-soft hover:bg-ink-rule hover:text-sheet">
-        <Icon name="fold" size={16} />
-      </button>
-    </div>
+    head(null, 'pt-[18px] pr-4 pb-3.5 pl-5')
   )
 
-  const railBottom = railFolded ? (
+  // On a desktop the rail folds from the top bar; a tablet opens it from the foot of the folded rail.
+  const railBottom = width === 'tablet' ? (
     <div className="mt-auto flex justify-center pb-3.5">
       <button
         ref={width === 'tablet' ? opener : undefined}
         type="button"
-        aria-label={width === 'tablet' ? t.openMenu : t.unfold}
-        title={width === 'tablet' ? t.openMenu : t.unfold}
-        aria-expanded={width === 'tablet' ? open : undefined}
-        onClick={() => (width === 'tablet' ? setOpen(true) : setFolded(false))}
+        aria-label={t.openMenu}
+        title={t.openMenu}
+        aria-expanded={open}
+        onClick={() => setOpen(true)}
         className="grid size-9 place-items-center border-2 border-ink-rule text-on-ink-soft hover:bg-ink-rule hover:text-sheet"
       >
         <Icon name="unfold" size={16} />
@@ -353,14 +377,12 @@ export function ConsoleShell({ children, onSignedOut }: { children: ReactNode; o
               shut={shut}
               onShut={toggleGroup}
               onGo={() => setOpen(false)}
-              top={
-                <div className="flex items-center gap-2.5 pt-3.5 pr-3.5 pb-3 pl-5">
-                  {brand}
-                  <button type="button" aria-label={t.closeMenu} onClick={closeOverlay} className={`${key} border-sheet text-sheet hover:bg-ink-rule`}>
-                    <Icon name="close" size={18} />
-                  </button>
-                </div>
-              }
+              top={head(
+                <button type="button" aria-label={t.closeMenu} onClick={closeOverlay} className={`${key} shrink-0 border-sheet text-sheet hover:bg-ink-rule`}>
+                  <Icon name="close" size={18} />
+                </button>,
+                'pt-3.5 pr-3.5 pb-3 pl-5',
+              )}
               onWorkIn={() => setChoosing(true)}
               onSignedOut={onSignedOut}
             />
@@ -380,10 +402,15 @@ export function ConsoleShell({ children, onSignedOut }: { children: ReactNode; o
               <button ref={opener} type="button" aria-label={t.openMenu} aria-expanded={open} onClick={() => setOpen(true)} className={`${key} border-ink text-ink hover:bg-field`}>
                 <Icon name="menu" />
               </button>
-              <span className="type-display text-2xl leading-[0.9]">
-                {copy.setup.product} <span className="text-teal">{copy.setup.productAccent}</span>
+              <span className="min-w-0 flex-1">
+                <SchoolMark phone />
               </span>
             </>
+          )}
+          {width === 'desktop' && (
+            <button type="button" aria-label={folded ? t.unfold : t.fold} title={folded ? t.unfold : t.fold} aria-expanded={!folded} onClick={() => setFolded(!folded)} className={`${key} shrink-0 border-ink text-ink hover:bg-field`}>
+              <Icon name={folded ? 'unfold' : 'fold'} size={18} />
+            </button>
           )}
           {width !== 'phone' && <SearchBar phone={false} />}
           <div className="ml-auto flex items-center gap-2">

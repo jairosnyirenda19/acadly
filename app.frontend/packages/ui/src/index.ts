@@ -38,3 +38,4 @@ export {
   type SortDir,
   type ViewState,
 } from './grid/state'
+export { applyAppearance, applyLook, contrast, isColour, keepAppearance, nameSize, savedAppearance, shade, type Appearance, type Look } from './look'

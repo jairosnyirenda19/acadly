@@ -1,5 +1,5 @@
 import { api, contextChanged, getPortalAddress, useAppContext, useLoad, type paths } from '@acadly/kernel'
-import { Button, Notice, slips, Waiting } from '@acadly/ui'
+import { Button, Notice, slips, Waiting, keepAppearance, savedAppearance, type Appearance } from '@acadly/ui'
 import { useEffect, useState } from 'react'
 import { copy } from '../copy'
 import { errorFor, read, settle } from '../setup/api'
@@ -57,6 +57,7 @@ export function AccountScreen() {
           </section>
         </div>
         <aside className="grid content-start gap-7">
+          <AppearancePart />
           <section>
             <Head>{t.whoYouAre}</Head>
             <Fact label={t.name} value={data.user.name} />
@@ -92,6 +93,33 @@ export function AccountScreen() {
         ))}
       </section>
     </div>
+  )
+}
+
+/** Light, dark, or the same as this device (D-096). */
+function AppearancePart() {
+  const a = copy.appearance
+  const [choice, setChoice] = useState<Appearance>(savedAppearance())
+
+  return (
+    <section>
+      <Head>{a.title}</Head>
+      <div role="radiogroup" aria-label={a.title} className="grid grid-cols-3 gap-1.5 pt-2.5">
+        {(['light', 'dark', 'device'] as const).map((v) => (
+          <button
+            key={v}
+            type="button"
+            role="radio"
+            aria-checked={choice === v}
+            onClick={() => (setChoice(v), keepAppearance(v))}
+            className={`min-h-11 px-2 text-sm font-bold ${choice === v ? 'bg-ink text-sheet' : 'border-2 border-ink bg-sheet text-ink hover:bg-field'}`}
+          >
+            {a[v]}
+          </button>
+        ))}
+      </div>
+      <p className="mt-2 text-xs text-text-muted">{a.note}</p>
+    </section>
   )
 }
 

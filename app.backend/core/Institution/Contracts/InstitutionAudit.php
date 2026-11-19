@@ -14,6 +14,7 @@ enum InstitutionAudit: string implements AuditAction
     case CampusSaved = 'institution.campus_saved';
     case OfferingSet = 'institution.offering_set';
     case Opened = 'institution.opened';
+    case LookSaved = 'institution.look_saved';
 
     public function key(): string
     {
@@ -29,6 +30,7 @@ enum InstitutionAudit: string implements AuditAction
             self::CampusSaved => 'Added or changed a campus.',
             self::OfferingSet => 'Changed where a level is taught.',
             self::Opened => 'Opened the school.',
+            self::LookSaved => 'Changed the branding: the name shown, the logo, the colours.',
         };
     }
 

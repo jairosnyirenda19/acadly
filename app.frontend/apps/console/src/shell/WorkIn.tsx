@@ -1,6 +1,7 @@
 import { useAppContext, type Place } from '@acadly/kernel'
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { copy } from '../copy'
+import { divisionOf, letterOf, reachDivisions, type Division } from './divisions'
 
 const t = copy.shell.workIn
 
@@ -10,9 +11,15 @@ interface WorkIn {
   choose: (key: string) => void
   /** Whether there is more than one place to choose from. */
   choice: boolean
+  /** The division worked in (D-096), or null for all divisions: the start screen. */
+  division: Division | null
+  /** The divisions the account works in. */
+  divisions: Division[]
+  /** Enters a division, or all divisions with null. */
+  enter: (divisionId: string | null) => void
 }
 
-const Shared = createContext<WorkIn>({ place: null, choose: () => {}, choice: false })
+const Shared = createContext<WorkIn>({ place: null, choose: () => {}, choice: false, division: null, divisions: [], enter: () => {} })
 
 const storageKey = (user: string) => `acadly.work-in.${user}`
 
@@ -31,22 +38,21 @@ export function WorkInProvider({ children }: { children: ReactNode }) {
   const fallback = places.find((p) => p.key === 'institution:') ?? places.find((p) => p.held) ?? places[0] ?? null
   const [key, setKey] = useState<string | null>(() => remembered(context.user.id))
   const place = places.find((p) => p.key === key) ?? fallback
+  const divisions = reachDivisions(context)
+  const division = divisionOf(context, place)
 
-  const value = useMemo<WorkIn>(
-    () => ({
-      place,
-      choice: places.length > 1,
-      choose: (next) => {
-        setKey(next)
-        try {
-          window.localStorage.setItem(storageKey(context.user.id), next)
-        } catch {
-          // Not remembered on this device; the choice still holds for this visit.
-        }
-      },
-    }),
-    [place, places.length, context.user.id],
-  )
+  const value = useMemo<WorkIn>(() => {
+    const choose = (next: string) => {
+      setKey(next)
+      try {
+        window.localStorage.setItem(storageKey(context.user.id), next)
+      } catch {
+        // Not remembered on this device; the choice still holds for this visit.
+      }
+    }
+
+    return { place, choice: places.length > 1, choose, division, divisions, enter: (id: string | null) => choose(id === null ? 'institution:' : `division:${id}`) }
+  }, [place, places.length, context.user.id, division, divisions])
 
   return <Shared.Provider value={value}>{children}</Shared.Provider>
 }
@@ -75,8 +81,35 @@ function day(iso: string): string {
 /** The "Work in" button at the top of the rail. Without a choice to make, it is a plain label. */
 export function WorkInButton({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   const context = useAppContext()
-  const { place, choice } = useWorkIn()
+  const { place, choice, division, divisions } = useWorkIn()
   const label = place?.label ?? copy.shell.wholeSchool
+
+  // With more than one division, the rail names the division first (D-096).
+  if (choice && divisions.length > 1) {
+    const name = division?.name ?? t.allDivisions
+    const inside = division !== null && place !== null && place.type !== 'division' ? place.label : division === null ? context.school.name : t.wholeDivision
+
+    return (
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-label={t.change(name)}
+        onClick={onToggle}
+        className={`flex w-full items-center gap-2.5 border-y border-ink-rule px-5 py-3 text-left ${open ? 'bg-accent text-ink' : 'text-sheet hover:bg-ink-rule'}`}
+      >
+        <DivisionLetter name={division?.name ?? null} on={!open} />
+        <span className="min-w-0 flex-1">
+          <span className={`label-caps block ${open ? '' : 'text-on-ink-muted'}`}>{t.division}</span>
+          <span className="block truncate text-[15px] font-extrabold">{name}</span>
+          <span className={`block truncate text-[13px] ${open ? '' : 'text-on-ink-soft'}`}>{inside}</span>
+        </span>
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="square">
+          <path d="M8 9l4-4 4 4" />
+          <path d="M8 15l4 4 4-4" />
+        </svg>
+      </button>
+    )
+  }
 
   if (!choice) {
     return (
@@ -94,7 +127,7 @@ export function WorkInButton({ open, onToggle }: { open: boolean; onToggle: () =
       aria-expanded={open}
       aria-label={t.change(label)}
       onClick={onToggle}
-      className={`flex w-full items-center gap-2.5 border-y border-ink-rule px-5 py-3 text-left ${open ? 'bg-teal-bright text-ink' : 'text-sheet hover:bg-ink-rule'}`}
+      className={`flex w-full items-center gap-2.5 border-y border-ink-rule px-5 py-3 text-left ${open ? 'bg-accent text-ink' : 'text-sheet hover:bg-ink-rule'}`}
     >
       <span className="min-w-0 flex-1">
         <span className={`label-caps block ${open ? '' : 'text-on-ink-muted'}`}>{t.workingIn}</span>
@@ -109,10 +142,29 @@ export function WorkInButton({ open, onToggle }: { open: boolean; onToggle: () =
   )
 }
 
+/** A division's letter, on a square: teal-bright when it is the one worked in; a grid of tiles for all divisions. */
+export function DivisionLetter({ name, on = true, size = 'size-[30px] text-lg' }: { name: string | null; on?: boolean; size?: string }) {
+  if (name === null) {
+    return (
+      <span aria-hidden="true" className={`grid shrink-0 place-items-center border-2 border-current ${size}`}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="square">
+          <path d="M3 3h8v8H3z M13 3h8v5h-8z M13 10h8v11h-8z M3 13h8v8H3z" />
+        </svg>
+      </span>
+    )
+  }
+
+  return (
+    <span aria-hidden="true" className={`type-display grid shrink-0 place-items-center ${size} ${on ? 'bg-accent text-ink' : 'border-2 border-current'}`}>
+      {letterOf(name)}
+    </span>
+  )
+}
+
 /** The panel that lists where the account can work. */
 export function WorkInPanel({ onClose, className = '' }: { onClose: () => void; className?: string }) {
   const { places } = useAppContext()
-  const { place, choose } = useWorkIn()
+  const { place, choose, division, divisions, enter } = useWorkIn()
   const [query, setQuery] = useState('')
 
   useEffect(() => {
@@ -190,6 +242,34 @@ export function WorkInPanel({ onClose, className = '' }: { onClose: () => void; 
           </>
         ) : (
           <>
+            {divisions.length > 1 && (
+              <>
+                {group(t.division)}
+                {[null, ...divisions].map((d, i) => {
+                  const current = (d === null && division === null) || (d !== null && division?.id === d.id)
+
+                  return (
+                    <button
+                      key={d?.id ?? 'all'}
+                      type="button"
+                      aria-current={current ? 'true' : undefined}
+                      onClick={() => {
+                        enter(d?.id ?? null)
+                        onClose()
+                      }}
+                      className={`flex min-h-14 w-full items-center gap-3 border-b border-l-4 border-b-rule py-2 pr-4 pl-4 text-left ${current ? 'border-l-teal-bright bg-ink text-sheet' : 'border-l-transparent bg-sheet text-ink hover:bg-paper'}`}
+                    >
+                      <DivisionLetter name={d?.name ?? null} on={current} />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-base font-extrabold">{d?.name ?? t.allDivisions}</span>
+                        <span className={`block text-[13px] ${current ? 'text-on-ink-soft' : 'text-text-muted'}`}>{d === null ? t.allNote : (d.vocabulary.learner?.many ?? '')}</span>
+                      </span>
+                      <span className={`ref text-xs ${current ? 'text-on-ink-soft' : 'text-text-muted'}`}>{t.alt(i)}</span>
+                    </button>
+                  )
+                })}
+              </>
+            )}
             {group(t.held)}
             {held.map((p) => line(p, 0, true))}
             {held

@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Acadly\Modules\Fees\Application\Actions;
 
 use Acadly\Kernel\Audit\Audit;
+use Acadly\Kernel\Documents\Pdf\DocumentChecks;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Notify\Notifier;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Kernel\Support\Row;
+use Acadly\Modules\Fees\Application\FeeDocuments;
 use Acadly\Modules\Fees\Application\FeesReach;
 use Acadly\Modules\Fees\Application\Ledger;
 use Acadly\Modules\Fees\Application\Numbers;
@@ -169,6 +171,8 @@ final class PaymentActions
             $number = Numbers::next(Numbers::VOID, $today);
             DB::table('fee_payment_voids')->insert(['payment_id' => $paymentId, 'number' => $number, 'reason' => mb_substr($reason, 0, 1000),
                 'voided_by' => $by->id, 'voided_on' => $today, 'created_at' => $this->clock->now()]);
+            // The receipt's check code now says it was cancelled (D-096).
+            app(DocumentChecks::class)->cancel(FeeDocuments::RECEIPT, Row::text($payment, 'number'), $today, $number);
             $this->audit->record(FeesAudit::ReceiptCancelled, actor: $this->audit->actorFor($by), reason: $reason,
                 meta: ['payment_id' => $paymentId, 'number' => Row::text($payment, 'number'), 'void' => $number]);
 

@@ -35,7 +35,7 @@ export function ReceiptScreen({ id }: { id: string }) {
   return (
     <div className="grid justify-items-center gap-5 px-4 py-6 print:p-0">
       <div className="flex w-full max-w-[560px] flex-wrap gap-2.5 print:hidden">
-        <Button onClick={() => window.print()}>{t.printReceipt}</Button>
+        <Button onClick={() => window.open(feesApi.receiptPdf(r.id), '_blank', 'noopener')}>{t.printReceipt}</Button>
         {first !== undefined && (
           <Button variant="secondary" onClick={() => navigate(`/learners/${first.learner_id}?tab=fees`)}>
             {t.backToLearner}

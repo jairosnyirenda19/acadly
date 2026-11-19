@@ -32,6 +32,8 @@ use Acadly\Kernel\Documents\Console\DocumentsStorageCommand;
 use Acadly\Kernel\Documents\DocumentAccess;
 use Acadly\Kernel\Documents\DocumentCatalogue;
 use Acadly\Kernel\Documents\DocumentReader;
+use Acadly\Kernel\Documents\Pdf\PdfRenderer;
+use Acadly\Kernel\Documents\Pdf\ReportlabRenderer;
 use Acadly\Kernel\Documents\Scanning\ClamavScanner;
 use Acadly\Kernel\Documents\Scanning\MissingScanner;
 use Acadly\Kernel\Documents\Scanning\NoScanner;
@@ -99,6 +101,7 @@ final class KernelServiceProvider extends ServiceProvider
         );
 
         $this->app->singleton(Audit::class);
+        $this->app->bind(PdfRenderer::class, ReportlabRenderer::class);
 
         $this->app->singleton(
             EventCatalogue::class,

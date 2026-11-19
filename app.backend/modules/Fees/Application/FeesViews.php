@@ -17,7 +17,12 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-/** What the fee screens read: a learner's fees, a receipt, the desk (D-091). */
+/**
+ * What the fee screens read: a learner's fees, a receipt, the desk (D-091).
+ *
+ * @phpstan-import-type Term from TermFees
+ * @phpstan-import-type Standing from Ledger
+ */
 final class FeesViews
 {
     public function __construct(
@@ -78,7 +83,7 @@ final class FeesViews
         ];
     }
 
-    /** @return array<string, mixed> */
+    /** @return array{id: string, number: string, received_on: string, recorded_at: string, method: string, method_label: string, reference: string|null, payer: string, amount: int, received_by: string|null, void: array{number: string, reason: string, on: string}|null, shares: list<array{learner_id: string, name: string, class: string, amount: int, applied: list<array{label: string, amount: int}>, balance_after: int}>, can_cancel: bool} */
     public function receipt(User $viewer, string $paymentId): array
     {
         $p = DB::table('fee_payments as p')->leftJoin('users as u', 'u.id', '=', 'p.received_by')->leftJoin('fee_payment_voids as v', 'v.payment_id', '=', 'p.id')
@@ -115,16 +120,110 @@ final class FeesViews
             'amount' => Row::int($p, 'amount_minor'),
             'received_by' => Row::maybeText($p, 'received_by'),
             'void' => Row::maybeText($p, 'void_number') === null ? null : ['number' => Row::text($p, 'void_number'), 'reason' => Row::text($p, 'void_reason'), 'on' => Row::text($p, 'voided_on')],
-            'shares' => array_map(fn (object $s): array => [
+            'shares' => array_values(array_map(fn (object $s): array => [
                 'learner_id' => Row::text($s, 'learner_id'),
                 'name' => $names[Row::text($s, 'learner_id')] ?? '',
                 'class' => $this->className(Row::text($s, 'learner_id')),
                 'amount' => Row::int($s, 'amount_minor'),
                 'applied' => self::lines(Row::text($s, 'applied')),
                 'balance_after' => Row::int($s, 'balance_after_minor'),
-            ], $shares->all()),
+            ], $shares->all())),
             'can_cancel' => Row::maybeText($p, 'void_number') === null && $shares->every(fn (object $s): bool => $this->reach->may($viewer, FeesPermission::Adjust, Row::text($s, 'learner_id'))),
         ];
+    }
+
+    /**
+     * The term each division is in now, with its fee schedule.
+     *
+     * @return array<string, Term> division id => term
+     */
+    public function currentTerms(): array
+    {
+        $terms = [];
+
+        foreach ($this->terms->terms() as $term) {
+            $current = $this->terms->currentTerm($term['division_id']);
+
+            if ($current !== null && $current['period_id'] === $term['period_id'] && ! isset($terms[$term['division_id']])) {
+                $terms[$term['division_id']] = $term;
+            }
+        }
+
+        return $terms;
+    }
+
+    /**
+     * Where every learner billed this term stands.
+     *
+     * @param  array<string, Term>  $terms
+     * @return array<string, Standing>
+     */
+    public function termStandings(array $terms): array
+    {
+        $learners = [];
+
+        foreach (DB::table('fee_charges')->whereIn('schedule_id', $this->schedulesOf($terms))->get(['learner_id']) as $c) {
+            $learners[Row::text($c, 'learner_id')] = true;
+        }
+
+        return $this->ledger->standings(array_map('strval', array_keys($learners)));
+    }
+
+    /**
+     * The fee schedules of these terms.
+     *
+     * @param  array<string, Term>  $terms
+     * @return list<string>
+     */
+    private function schedulesOf(array $terms): array
+    {
+        $schedules = [];
+
+        foreach ($terms as $term) {
+            $schedule = $this->terms->scheduleId($term['period_id'], $term['division_id']);
+
+            if ($schedule !== null) {
+                $schedules[] = $schedule;
+            }
+        }
+
+        return $schedules;
+    }
+
+    /**
+     * The learners behind their plan: owing now, since an instalment fell due.
+     *
+     * @param  array<string, Standing>  $standings
+     * @return list<array{learner_id: string, due_now: int, since: string, owed_on: string, days: int}>
+     */
+    public function behindOf(array $standings, string $today): array
+    {
+        $behind = [];
+
+        foreach ($standings as $id => $s) {
+            if ($s['due_now'] <= 0 || $s['overdue_since'] === null) {
+                continue;
+            }
+
+            $first = null;
+
+            foreach ($s['instalments'] as $i) {
+                if ($i['state'] === 'overdue') {
+                    $first ??= $i;
+                }
+            }
+
+            $behind[] = ['learner_id' => (string) $id, 'due_now' => $s['due_now'], 'since' => $s['overdue_since'], 'owed_on' => $first === null ? '' : $first['charge'].' · '.$first['label'],
+                'days' => (int) round((strtotime($today) - strtotime($s['overdue_since'])) / 86400)];
+        }
+
+        return $behind;
+    }
+
+    /** The class a learner is in now, by name. */
+    public function classOf(string $learnerId): string
+    {
+        return $this->className($learnerId);
     }
 
     /** @return array<string, mixed> */
@@ -132,32 +231,9 @@ final class FeesViews
     {
         $this->access->check($viewer, FeesPermission::Collect);
         $today = $this->clock->today();
-        $terms = [];
-        $schedules = [];
-
-        foreach ($this->terms->terms() as $term) {
-            $current = $this->terms->currentTerm($term['division_id']);
-
-            if ($current !== null && $current['period_id'] === $term['period_id'] && ! isset($terms[$term['division_id']])) {
-                $terms[$term['division_id']] = $term;
-                $schedule = $this->terms->scheduleId($term['period_id'], $term['division_id']);
-
-                if ($schedule !== null) {
-                    $schedules[] = $schedule;
-                }
-            }
-        }
-
-        $billed = DB::table('fee_charges')->whereIn('schedule_id', $schedules)->get(['learner_id', 'total_minor']);
-        $learners = [];
-
-        foreach ($billed as $c) {
-            $learners[Row::text($c, 'learner_id')] = true;
-        }
-
-        $learners = array_map('strval', array_keys($learners));
-        $standings = $this->ledger->standings($learners);
-        $behind = [];
+        $terms = $this->currentTerms();
+        $standings = $this->termStandings($terms);
+        $behind = $this->behindOf($standings, $today);
         $paidInFull = 0;
         $dueUnpaid = 0;
         $credit = 0;
@@ -168,16 +244,6 @@ final class FeesViews
 
             if ($s['due_now'] > 0 && $s['overdue_since'] !== null) {
                 $dueUnpaid += $s['due_now'];
-                $first = null;
-
-                foreach ($s['instalments'] as $i) {
-                    if ($i['state'] === 'overdue') {
-                        $first ??= $i;
-                    }
-                }
-
-                $behind[] = ['learner_id' => $id, 'due_now' => $s['due_now'], 'since' => $s['overdue_since'], 'owed_on' => $first === null ? '' : $first['charge'].' · '.$first['label'],
-                    'days' => (int) round((strtotime($today) - strtotime($s['overdue_since'])) / 86400)];
             }
         }
 
@@ -213,8 +279,8 @@ final class FeesViews
         return [
             'today' => $today,
             'terms' => array_map(fn (array $t): array => ['division' => $t['division'], 'name' => $t['name'], 'year' => $t['year']], array_values($terms)),
-            'billed' => array_sum(array_map(fn (object $c): int => Row::int($c, 'total_minor'), $billed->all())),
-            'billed_learners' => count($learners),
+            'billed' => (int) DB::table('fee_charges')->whereIn('schedule_id', $this->schedulesOf($terms))->sum('total_minor'),
+            'billed_learners' => count($standings),
             'collected' => $collected,
             'due_unpaid' => $dueUnpaid,
             'behind_count' => count($standings) === 0 ? 0 : count(array_filter($standings, fn (array $s): bool => $s['due_now'] > 0 && $s['overdue_since'] !== null)),

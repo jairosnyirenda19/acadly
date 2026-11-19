@@ -11,6 +11,7 @@ Route::middleware('auth:sanctum')->prefix('institution')->name('institution.')->
     Route::get('/', [InstitutionController::class, 'show'])->name('show');
     Route::put('/', [InstitutionController::class, 'update'])->name('update');
     Route::post('/logo', [InstitutionController::class, 'logo'])->name('logo');
+    Route::put('/look', [InstitutionController::class, 'look'])->name('look');
     Route::put('/levels', [InstitutionController::class, 'levels'])->name('levels');
     Route::post('/campuses', [InstitutionController::class, 'storeCampus'])->name('campuses.store');
     Route::put('/campuses/{id}', [InstitutionController::class, 'updateCampus'])->whereUuid('id')->name('campuses.update');

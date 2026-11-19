@@ -111,7 +111,7 @@ describe('the school', function (): void {
         $this->actingAs($admin)->putJson('/api/v1/institution', schoolDetails(['name' => 'Sunrise Academy Lilongwe']))
             ->assertOk()->assertJsonPath('school.details_complete', true);
 
-        $this->getJson('/api/v1/school')->assertExactJson(['name' => 'Sunrise Academy Lilongwe', 'has_logo' => false, 'portal' => PortalLink::url()]);
+        $this->getJson('/api/v1/school')->assertExactJson(['name' => 'Sunrise Academy Lilongwe', 'has_logo' => false, 'portal' => PortalLink::url(), 'look' => ['app_name' => null, 'main' => '#0C2340', 'accent' => '#2FD6CF', 'accent_last' => true, 'custom' => false]]);
         expect(DB::table('audit_events')->where('action', 'institution.details_saved')->exists())->toBeTrue();
     });
 

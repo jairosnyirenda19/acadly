@@ -1,6 +1,8 @@
-import { getAccount, getSchoolName, navigate, signOut, useLocation, type Account } from '@acadly/kernel'
+import { getAccount, getSchoolLook, getSchoolName, navigate, signOut, useLocation, type Account } from '@acadly/kernel'
+import { applyLook } from '@acadly/ui'
 import { useEffect, useState } from 'react'
 import { AttendancePage, CardPage, MessagesPage, ReasonPage } from './ChildPages'
+import { PickupPage, ReviewPage } from './EarlyPages'
 import type { Language } from './copy'
 import { ChildScreen, Home } from './Family'
 import { keepLanguage, LanguageContext, savedLanguage } from './parts'
@@ -20,6 +22,7 @@ export function App() {
   useEffect(() => {
     void getAccount().then(setAccount)
     void getSchoolName().then(setSchool)
+    void getSchoolLook().then((look) => look !== null && applyLook(look))
   }, [])
 
   useEffect(() => {
@@ -33,7 +36,7 @@ export function App() {
   }
 
   let screen
-  const child = /^\/child\/([0-9a-f-]{36})(?:\/(card|attendance|messages|reason)(?:\/(\d{4}-\d{2}-\d{2}))?)?$/.exec(path)
+  const child = /^\/child\/([0-9a-f-]{36})(?:\/(card|attendance|messages|reason|review|pickup)(?:\/(\d{4}-\d{2}-\d{2}))?)?$/.exec(path)
 
   if (account === undefined) screen = <div className="min-h-screen bg-paper" />
   else if (account === null) {
@@ -55,6 +58,10 @@ export function App() {
         <AttendancePage id={id} />
       ) : child[2] === 'messages' ? (
         <MessagesPage id={id} />
+      ) : child[2] === 'review' ? (
+        <ReviewPage id={id} />
+      ) : child[2] === 'pickup' ? (
+        <PickupPage id={id} />
       ) : child[2] === 'reason' ? (
         <ReasonPage id={id} day={child[3] ?? null} />
       ) : (

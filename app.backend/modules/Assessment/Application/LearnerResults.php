@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace Acadly\Modules\Assessment\Application;
 
+use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
 use Acadly\Core\Enrolment\Contracts\LearnerRecordPart;
+use Acadly\Core\Enrolment\Contracts\TitledForLearner;
 use Acadly\Kernel\Identity\User;
+use Acadly\Modules\Assessment\Contracts\AssessmentPermission;
+use Acadly\Modules\Assessment\Domain\ProgressReview;
+use Acadly\Modules\Assessment\Journeys\Review\State;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -13,9 +18,15 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * design): the term grades so far, and the best six or the average. A viewer
  * who may not see the learner's assessments gets no numbers.
  */
-final class LearnerResults implements LearnerRecordPart
+final class LearnerResults implements LearnerRecordPart, TitledForLearner
 {
-    public function __construct(private readonly Results $results) {}
+    public function __construct(
+        private readonly Results $results,
+        private readonly Reach $reach,
+        private readonly EnrolmentDirectory $directory,
+        private readonly ProgressReviews $reviews,
+        private readonly Observations $observations,
+    ) {}
 
     public function key(): string
     {
@@ -27,8 +38,17 @@ final class LearnerResults implements LearnerRecordPart
         return 'Results';
     }
 
+    public function titleFor(string $learnerId): string
+    {
+        return $this->observes($learnerId) ? 'Observations' : 'Results';
+    }
+
     public function band(User $viewer, string $learnerId): array
     {
+        if ($this->observes($learnerId)) {
+            return $this->observed($viewer, $learnerId);
+        }
+
         try {
             $r = $this->results->learner($viewer, $learnerId);
         } catch (NotFoundHttpException) {
@@ -59,6 +79,54 @@ final class LearnerResults implements LearnerRecordPart
 
     public function attention(User $viewer, string $learnerId): int
     {
-        return 0;
+        if (! $this->observes($learnerId)) {
+            return 0;
+        }
+
+        // A review waiting for the person who checks it.
+        $review = $this->review($viewer, $learnerId);
+
+        return $review !== null && $review->state === State::Ready->value && $this->reach->may($viewer, AssessmentPermission::Review, $review->class_id) ? 1 : 0;
+    }
+
+    /** Whether the learner's level records observations, not marks. */
+    private function observes(string $learnerId): bool
+    {
+        $place = $this->directory->placeOf($learnerId);
+
+        return $place !== null && ! $this->reach->takesMarks($place['division_id']);
+    }
+
+    /** @return list<array{label: string, value: string, note: string, tone: 'plain'|'attention'}> */
+    private function observed(User $viewer, string $learnerId): array
+    {
+        try {
+            [, $period] = $this->reviews->placeOf($viewer, $learnerId);
+        } catch (NotFoundHttpException) {
+            return [];
+        }
+
+        $days = $this->observations->seenIn($learnerId, $period['id']);
+        $review = $this->review($viewer, $learnerId);
+
+        return [
+            ['label' => 'Observed', 'value' => (string) $days, 'note' => $days === 1 ? "Day observed in {$period['name']}." : "Days observed in {$period['name']}.", 'tone' => 'plain'],
+            ['label' => 'Progress review', 'value' => $review === null ? 'Not started' : State::from($review->state)->label(),
+                'note' => $review !== null && $review->state === State::Shared->value ? 'Shared with the family.' : "For {$period['name']}.",
+                'tone' => $review !== null && $review->state === State::Ready->value ? 'attention' : 'plain'],
+        ];
+    }
+
+    private function review(User $viewer, string $learnerId): ?ProgressReview
+    {
+        try {
+            [, $period] = $this->reviews->placeOf($viewer, $learnerId);
+        } catch (NotFoundHttpException) {
+            return null;
+        }
+
+        $review = ProgressReview::query()->where('learner_id', $learnerId)->where('period_id', $period['id'])->first();
+
+        return $review instanceof ProgressReview ? $review : null;
     }
 }

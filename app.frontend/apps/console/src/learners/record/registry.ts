@@ -4,7 +4,7 @@ import { AttendanceSummary, AttendanceTab } from './AttendancePart'
 import { FeesSummary, FeesTab } from './FeesPart'
 import { ConductSummary, ConductTab } from './ConductPart'
 import { SupportSummary, SupportTab } from './SupportPart'
-import { ResultsSummary, ResultsTab } from './ResultsPart'
+import { AssessmentSummary, AssessmentTab, PickupSummary, PickupTab } from './EarlyParts'
 
 /**
  * The parts of a learner's record the console can draw, by the key the server
@@ -21,7 +21,8 @@ export interface PartView {
 
 export const PART_VIEWS: Partial<Record<string, PartView>> = {
   attendance: { Summary: AttendanceSummary, Tab: AttendanceTab },
-  assessment: { Summary: ResultsSummary, Tab: ResultsTab },
+  assessment: { Summary: AssessmentSummary, Tab: AssessmentTab },
+  saferelease: { Summary: PickupSummary, Tab: PickupTab },
   fees: { Summary: FeesSummary, Tab: FeesTab },
   conduct: { Summary: ConductSummary, Tab: ConductTab },
   support: { Summary: SupportSummary, Tab: SupportTab },

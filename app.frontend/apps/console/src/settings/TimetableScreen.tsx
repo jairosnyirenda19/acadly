@@ -94,7 +94,7 @@ export function TimetableScreen({ view }: { view: View }) {
                 type="button"
                 aria-current={on ? 'page' : undefined}
                 onClick={() => navigate(pathOf(view, { division_id: x.division_id, campus_id: x.campus_id }))}
-                className={`shrink-0 border-b-4 px-4 pt-3 pb-2.5 text-[15px] whitespace-nowrap ${on ? 'border-ink font-extrabold' : 'border-transparent font-medium'}`}
+                className={`shrink-0 border-b-4 px-4 pt-3 pb-2.5 text-[15px] whitespace-nowrap ${on ? 'border-teal font-extrabold' : 'border-transparent font-medium'}`}
               >
                 {x.label}
               </button>

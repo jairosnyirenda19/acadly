@@ -45,7 +45,7 @@ export function MarksScreen({ view }: { view: View }) {
                 href={href}
                 aria-current={key === shown ? 'page' : undefined}
                 onClick={(e) => follow(e, href)}
-                className={`inline-flex min-h-11 shrink-0 items-center border-b-4 px-3.5 pt-2.5 pb-2 text-[15px] whitespace-nowrap text-ink no-underline ${key === shown ? 'border-ink font-extrabold' : 'border-transparent font-medium hover:bg-paper'}`}
+                className={`inline-flex min-h-11 shrink-0 items-center border-b-4 px-3.5 pt-2.5 pb-2 text-[15px] whitespace-nowrap text-ink no-underline ${key === shown ? 'border-teal font-extrabold' : 'border-transparent font-medium hover:bg-paper'}`}
               >
                 {t.tabs[key]}
               </a>

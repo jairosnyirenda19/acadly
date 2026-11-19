@@ -12,6 +12,7 @@ use Acadly\Modules\Assessment\AssessmentModule;
 use Acadly\Modules\Attendance\AttendanceModule;
 use Acadly\Modules\Conduct\ConductModule;
 use Acadly\Modules\Fees\FeesModule;
+use Acadly\Modules\SafeRelease\SafeReleaseModule;
 use Acadly\Modules\Support\SupportModule;
 
 return [
@@ -68,6 +69,15 @@ return [
     | Where people use the console. Password reset links point here.
     */
     'frontend_url' => env('ACADLY_FRONTEND_URL', 'http://localhost:5173'),
+
+    /*
+    | The document engine (D-096): the Python that runs workers/acadly_pdf.py
+    | (with ReportLab installed), and how long a document may take.
+    */
+    'pdf' => [
+        'python' => env('ACADLY_PYTHON_BIN', 'python3'),
+        'timeout' => env('ACADLY_PDF_TIMEOUT', 60),
+    ],
 
     // The parent portal's address, as families type it. Text messages that open the portal end with it (D-083).
     'portal_url' => env('ACADLY_PORTAL_URL', 'http://localhost:5174'),
@@ -134,6 +144,7 @@ return [
         FeesModule::class,
         ConductModule::class,
         SupportModule::class,
+        SafeReleaseModule::class,
     ],
 
 ];

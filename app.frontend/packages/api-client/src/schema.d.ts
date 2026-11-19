@@ -572,6 +572,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/check/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Whether a document with this code was issued by the school, and whether it was cancelled
+         * @description Only the kind, the number and the date: never a name, an amount or a mark.
+         */
+        get: operations["kernel.check"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/conduct": {
         parameters: {
             query?: never;
@@ -756,7 +776,9 @@ export interface paths {
          *     wording, the account's permissions per scope and the navigation
          *     (docs/architecture/03-deployment-campus-access.md §5.8). `setup_required`
          *     holds until the school is opened. `vocabulary` is the words of the only
-         *     division when there is one; with several, each division carries its own.
+         *     division when there is one; with several, each division carries its own. `bindings` are
+         *     the choices each division's profile makes (slot key => value), so the
+         *     screens follow the binding and never the level.
          *     `places` are where the account can work: where it holds a role, and
          *     what is inside (the "Work in" switcher). Navigation is empty until the
          *     screens that fill it. The screens use this
@@ -780,6 +802,26 @@ export interface paths {
         };
         /** Return an empty response simply to trigger the storage of the CSRF cookie in the browser */
         get: operations["sanctum.csrf-cookie"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/divisions/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The divisions the account works in, with today's figures, and the tiles the school shares
+         * @description Each figure is there only when the account may see it. No money and no learner names.
+         */
+        get: operations["divisions.overview"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1153,6 +1195,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/fees/payments/{id}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The receipt as an A4 PDF, with its check code (D-096) */
+        get: operations["fees.payments.pdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/learners/{id}/statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A learner's fee statement as an A4 PDF, with its check code (D-096) */
+        get: operations["fees.learner.statement"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/fees/payments/{id}/cancel": {
         parameters: {
             query?: never;
@@ -1248,6 +1324,40 @@ export interface paths {
         };
         /** The fees desk: this term's totals, who is behind their plan, and today's takings */
         get: operations["fees.desk"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/payments/grid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The payments ledger as a data grid: `?page=&per_page=&sort=&dir=&q=&filter[received]=from..to&filter[method]=cash&filter[state]=cancelled` */
+        get: operations["fees.payments.grid"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/behind/grid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The learners behind their plan as a data grid: `?page=&per_page=&sort=&dir=&q=&filter[class]=…&filter[overdue]=month&filter[since]=from..to` */
+        get: operations["fees.behind.grid"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1567,6 +1677,23 @@ export interface paths {
         put?: never;
         /** Sets the school logo: a PNG or JPEG of at most 1 MB */
         post: operations["institution.logo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/institution/look": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Saves the school's own look: `{app_name, short_name, main, accent, accent_last}`. Empty values return to the product's own */
+        put: operations["institution.look"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2453,6 +2580,181 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/portal/children/{id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A child's newest shared progress review, for the parent portal
+         * @description Only steps and words. `review` is null until a review is shared.
+         */
+        get: operations["portal.review"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The rooms the account sees, in levels that record observations */
+        get: operations["assessment.rooms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/rooms/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A room today: learning areas seen this week, children not seen, and the term's reviews */
+        get: operations["assessment.rooms.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/rooms/{id}/observations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What a room recorded for one learning area on a day */
+        get: operations["assessment.rooms.observations"];
+        put?: never;
+        /** Records the observations of one learning area on a day */
+        post: operations["assessment.rooms.observe"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every child of the rooms the account sees, with this term's review */
+        get: operations["assessment.reviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/reviews/share": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Shares checked reviews with their families */
+        post: operations["assessment.reviews.share"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/reviews/learner/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A child's progress review this term, beside the term's observations */
+        get: operations["assessment.reviews.learner"];
+        /** Saves the draft of a child's review */
+        put: operations["assessment.reviews.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/reviews/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sends a review to be checked */
+        post: operations["assessment.reviews.submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/reviews/{id}/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Marks a review checked. Never one the account sent to be checked */
+        post: operations["assessment.reviews.check"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/reviews/{id}/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Returns a review to the caregiver with what must change */
+        post: operations["assessment.reviews.return"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/forgot-password": {
         parameters: {
             query?: never;
@@ -2735,6 +3037,176 @@ export interface paths {
          *     signed in for 90 days. The response is the same as GET /me.
          */
         post: operations["auth.phone.sign-in"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portal/children/{id}/pickup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pick-up for the parent portal: who collected the child today, and who may collect */
+        get: operations["portal.pickup"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portal/children/{id}/collectors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A parent names someone to collect the child today. The code is given once */
+        post: operations["portal.collectors"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/pickup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The pick-up desk: the rooms the account sees and each child of the chosen room today */
+        get: operations["pickup.desk"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/pickup/learners/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One child: who may collect today, who must not, and the child's pick-ups */
+        get: operations["pickup.child"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/pickup/learners/{id}/release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Releases a child to someone on the list */
+        post: operations["pickup.release"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/pickup/learners/{id}/refuse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Records that someone not on the list came, and the child was kept */
+        post: operations["pickup.refuse"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/pickup/learners/{id}/collectors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adds someone who may collect the child, for good or for today only */
+        post: operations["pickup.collectors.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/pickup/collectors/{id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ends someone's right to collect the child */
+        post: operations["pickup.collectors.end"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/pickup/learners/{id}/bars": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Records that a contact must not collect the child */
+        post: operations["pickup.bars.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/pickup/bars/{id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ends a record that a contact must not collect the child */
+        post: operations["pickup.bars.end"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3779,6 +4251,18 @@ export interface components {
         Sanction: "no_action" | "warning" | "detention" | "suspension" | "referred";
     };
     responses: {
+        /** @description Not found */
+        NotFoundHttpException: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    /** @description Error overview. */
+                    message: string;
+                };
+            };
+        };
         /** @description Validation error */
         ValidationException: {
             headers: {
@@ -3797,18 +4281,6 @@ export interface components {
         };
         /** @description Unauthenticated */
         AuthenticationException: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Error overview. */
-                    message: string;
-                };
-            };
-        };
-        /** @description Not found */
-        NotFoundHttpException: {
             headers: {
                 [name: string]: unknown;
             };
@@ -6249,6 +6721,39 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "kernel.check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        school: string;
+                        kind: string;
+                        reference: string;
+                        issued_on: string;
+                        /** @enum {string} */
+                        state: "genuine" | "cancelled";
+                        cancelled: {
+                            on: string;
+                            by: string;
+                        } | null;
+                    };
+                };
+            };
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
     "conduct.overview": {
         parameters: {
             query?: never;
@@ -6728,6 +7233,13 @@ export interface operations {
                             short_name: string;
                             has_logo: boolean;
                             open: boolean;
+                            look: {
+                                app_name: string | null;
+                                main: string;
+                                accent: string;
+                                accent_last: boolean;
+                                custom: boolean;
+                            };
                         };
                         setup_required: boolean;
                         licence: {
@@ -6739,11 +7251,15 @@ export interface operations {
                         divisions: {
                             id: string;
                             name: string;
+                            profile: string;
                             vocabulary: {
                                 [key: string]: {
                                     one: string;
                                     many: string;
                                 };
+                            };
+                            bindings: {
+                                [key: string]: string;
                             };
                         }[];
                         campuses: {
@@ -6807,6 +7323,59 @@ export interface operations {
                     "application/json": unknown[];
                 };
             };
+        };
+    };
+    "divisions.overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        day: string;
+                        divisions: {
+                            id: string;
+                            name: string;
+                            profile: string;
+                            learners: number | null;
+                            word: string;
+                            present: number | null;
+                            marked: number | null;
+                            states: {
+                                /** @enum {string} */
+                                tone: "done" | "attention" | "wrong";
+                                text: string;
+                            }[];
+                        }[];
+                        school: {
+                            present: {
+                                present: number;
+                                marked: number;
+                            } | null;
+                            approvals: number | null;
+                            messages: {
+                                sent: number;
+                                attention: number;
+                            } | null;
+                            term: {
+                                name: string;
+                                ends_on: string;
+                                days_left: number;
+                            } | null;
+                            staff: number | null;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "documents.store": {
@@ -7740,6 +8309,56 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "fees.payments.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    "Cache-Control"?: "no-store";
+                    "X-Content-Type-Options"?: "nosniff";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "fees.learner.statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    "Cache-Control"?: "no-store";
+                    "X-Content-Type-Options"?: "nosniff";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "fees.payments.cancel": {
         parameters: {
             query?: never;
@@ -7986,6 +8605,154 @@ export interface operations {
                             counted: number;
                             at: string;
                         } | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "fees.payments.grid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        rows: {
+                            id: string;
+                            receipt: string;
+                            received_on: string;
+                            learners: string;
+                            payer: string;
+                            method: string;
+                            method_label: string;
+                            reference: string | null;
+                            amount: number;
+                            received_by: string | null;
+                            cancelled: boolean;
+                            void_number: string | null;
+                        }[];
+                        total: number;
+                        page: number;
+                        per_page: number;
+                        pages: number;
+                        sort: string;
+                        /** @enum {string} */
+                        dir: "asc" | "desc";
+                        q: string;
+                        filters: {
+                            [key: string]: string[];
+                        };
+                        columns: {
+                            key: string;
+                            label: string;
+                            sortable: boolean;
+                            shown: boolean;
+                            always: boolean;
+                        }[];
+                        filter_options: {
+                            key: string;
+                            label: string;
+                            /** @enum {string} */
+                            kind: "choice" | "dates";
+                            options: {
+                                value: string;
+                                label: string;
+                                count: number;
+                            }[];
+                        }[];
+                        views: {
+                            id: string;
+                            name: string;
+                            state: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        bulk: {
+                            key: string;
+                            label: string;
+                        }[];
+                        can_export: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "fees.behind.grid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        rows: {
+                            id: string;
+                            name: string;
+                            class_id: string | null;
+                            class: string;
+                            owed_on: string;
+                            due_now: number;
+                            since: string;
+                            days: number;
+                        }[];
+                        total: number;
+                        page: number;
+                        per_page: number;
+                        pages: number;
+                        sort: string;
+                        /** @enum {string} */
+                        dir: "asc" | "desc";
+                        q: string;
+                        filters: {
+                            [key: string]: string[];
+                        };
+                        columns: {
+                            key: string;
+                            label: string;
+                            sortable: boolean;
+                            shown: boolean;
+                            always: boolean;
+                        }[];
+                        filter_options: {
+                            key: string;
+                            label: string;
+                            /** @enum {string} */
+                            kind: "choice" | "dates";
+                            options: {
+                                value: string;
+                                label: string;
+                                count: number;
+                            }[];
+                        }[];
+                        views: {
+                            id: string;
+                            name: string;
+                            state: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        bulk: {
+                            key: string;
+                            label: string;
+                        }[];
+                        can_export: boolean;
                     };
                 };
             };
@@ -8761,6 +9528,39 @@ export interface operations {
             403: components["responses"]["AuthorizationException"];
         };
     };
+    "institution.look": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @default true */
+                    accent_last?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        app_name: string | null;
+                        main: string;
+                        accent: string;
+                        accent_last: boolean;
+                        custom: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "institution.levels": {
         parameters: {
             query?: never;
@@ -9440,6 +10240,7 @@ export interface operations {
                         } | null;
                         level: string | null;
                         division: string | null;
+                        division_id: string | null;
                         campus: string | null;
                         class_teacher: string | null;
                         placements: {
@@ -9560,6 +10361,7 @@ export interface operations {
                         } | null;
                         level: string | null;
                         division: string | null;
+                        division_id: string | null;
                         campus: string | null;
                         class_teacher: string | null;
                         placements: unknown[];
@@ -9668,6 +10470,7 @@ export interface operations {
                         } | null;
                         level: string | null;
                         division: string | null;
+                        division_id: string | null;
                         campus: string | null;
                         class_teacher: string | null;
                         placements: unknown[];
@@ -9746,6 +10549,7 @@ export interface operations {
                         } | null;
                         level: string | null;
                         division: string | null;
+                        division_id: string | null;
                         campus: string | null;
                         class_teacher: string | null;
                         placements: unknown[];
@@ -9818,6 +10622,7 @@ export interface operations {
                         } | null;
                         level: string | null;
                         division: string | null;
+                        division_id: string | null;
                         campus: string | null;
                         class_teacher: string | null;
                         placements: unknown[];
@@ -9890,6 +10695,7 @@ export interface operations {
                         } | null;
                         level: string | null;
                         division: string | null;
+                        division_id: string | null;
                         campus: string | null;
                         class_teacher: string | null;
                         placements: unknown[];
@@ -9962,6 +10768,7 @@ export interface operations {
                         } | null;
                         level: string | null;
                         division: string | null;
+                        division_id: string | null;
                         campus: string | null;
                         class_teacher: string | null;
                         placements: unknown[];
@@ -10056,6 +10863,7 @@ export interface operations {
                         } | null;
                         level: string | null;
                         division: string | null;
+                        division_id: string | null;
                         campus: string | null;
                         class_teacher: string | null;
                         placements: unknown[];
@@ -10396,6 +11204,7 @@ export interface operations {
                                 future: boolean;
                             }[];
                         }[];
+                        takes_lessons: boolean;
                         lessons_today: {
                             period: number;
                             name: string;
@@ -11830,6 +12639,475 @@ export interface operations {
             404: components["responses"]["NotFoundHttpException"];
         };
     };
+    "portal.review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        child: {
+                            id: string;
+                            first_name: string;
+                            name: string;
+                            class_id: string | null;
+                            class: string;
+                        };
+                        review: {
+                            period: string;
+                            room: string;
+                            shared_at: string;
+                            areas: {
+                                name: string;
+                                step: string;
+                                label: string;
+                                strokes: number;
+                            }[];
+                            family_note: string;
+                            home_note: string | null;
+                        } | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "assessment.rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        rooms: {
+                            id: string;
+                            name: string;
+                            level: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.rooms.show": {
+        parameters: {
+            query?: {
+                day?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        room: {
+                            id: string;
+                            name: string;
+                            level: string;
+                        };
+                        day: string;
+                        week_from: string;
+                        period: {
+                            id: string;
+                            name: string;
+                            ends_on: string;
+                        } | null;
+                        areas: {
+                            id: string;
+                            name: string;
+                            short: string;
+                            seen: number;
+                            observations: number;
+                        }[];
+                        children: {
+                            id: string;
+                            name: string;
+                            seen_this_week: boolean;
+                            last_seen: string | null;
+                        }[];
+                        reviews: {
+                            children: number;
+                            started: number;
+                            ready: number;
+                            checked: number;
+                            shared: number;
+                        };
+                        can: {
+                            observe: boolean;
+                            review: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.rooms.observations": {
+        parameters: {
+            query?: {
+                day?: string;
+                subject_id?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        room: {
+                            id: string;
+                            name: string;
+                        };
+                        day: string;
+                        subject: {
+                            id: string;
+                            name: string;
+                        };
+                        focus: string | null;
+                        children: {
+                            id: string;
+                            name: string;
+                            step: string | null;
+                            note: string | null;
+                        }[];
+                        areas: {
+                            id: string;
+                            name: string;
+                        }[];
+                        steps: {
+                            key: string;
+                            label: string;
+                            strokes: number;
+                        }[];
+                        can_observe: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.rooms.observe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    subject_id: string;
+                    /** Format: date */
+                    observed_on: string;
+                    focus?: string | null;
+                    marks: {
+                        /** Format: uuid */
+                        learner_id: string;
+                        step: string;
+                        note?: string | null;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        recorded: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "assessment.reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        children: {
+                            learner_id: string;
+                            name: string;
+                            room_id: string;
+                            room: string;
+                            review_id: string | null;
+                            state: string | null;
+                            state_label: string;
+                            steps: (string | null)[];
+                            by: string | null;
+                            updated_at: string | null;
+                        }[];
+                        areas: number;
+                        totals: {
+                            children: number;
+                            started: number;
+                            ready: number;
+                            checked: number;
+                            shared: number;
+                        };
+                        can_review: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.reviews.share": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    ids?: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        shared: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "assessment.reviews.learner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        learner: {
+                            id: string;
+                            name: string;
+                            room_id: string;
+                            room: string;
+                        };
+                        period: {
+                            id: string;
+                            name: string;
+                            ends_on: string;
+                        };
+                        review: {
+                            id: string | null;
+                            state: string;
+                            state_label: string;
+                            family_note: string;
+                            home_note: string;
+                            drafted_by: string | null;
+                            shared_at: string | null;
+                        };
+                        areas: {
+                            id: string;
+                            name: string;
+                            step: string | null;
+                            trail: {
+                                observed_on: string;
+                                step: string;
+                                focus: string | null;
+                                note: string | null;
+                            }[];
+                        }[];
+                        steps: {
+                            key: string;
+                            label: string;
+                            strokes: number;
+                        }[];
+                        can: {
+                            edit: boolean;
+                            submit: boolean;
+                            check: boolean;
+                            return: boolean;
+                            share: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.reviews.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    steps: string[];
+                    family_note?: string | null;
+                    home_note?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "assessment.reviews.submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ok: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.reviews.check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ok: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.reviews.return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ok: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "auth.forgot-password": {
         parameters: {
             query?: never;
@@ -12644,6 +13922,388 @@ export interface operations {
                 };
             };
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "portal.pickup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        child: {
+                            id: string;
+                            first_name: string;
+                            name: string;
+                            class_id: string | null;
+                            class: string;
+                        };
+                        today: {
+                            id: string;
+                            state: string;
+                            state_label: string;
+                            name: string;
+                            relationship: string | null;
+                            at: string;
+                            note: string | null;
+                        } | null;
+                        may_collect: {
+                            name: string;
+                            relationship: string;
+                            day_only: boolean;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "portal.collectors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    relationship: string;
+                    phone?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "pickup.desk": {
+        parameters: {
+            query?: {
+                class_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        day: string;
+                        rooms: {
+                            id: string;
+                            name: string;
+                        }[];
+                        room: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        children: {
+                            id: string;
+                            name: string;
+                            collected: {
+                                id: string;
+                                state: string;
+                                state_label: string;
+                                name: string;
+                                relationship: string | null;
+                                at: string;
+                                note: string | null;
+                            } | null;
+                            refused: number;
+                        }[];
+                        totals: {
+                            children: number;
+                            collected: number;
+                            here: number;
+                        };
+                        can_release: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "pickup.child": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        learner: {
+                            id: string;
+                            name: string;
+                        };
+                        may_collect: {
+                            /** @enum {string} */
+                            kind: "contact" | "collector";
+                            id: string;
+                            name: string;
+                            relationship: string;
+                            phone: string | null;
+                            day_only: boolean;
+                            needs_code: boolean;
+                            added_as: string;
+                        }[];
+                        barred: {
+                            id: string;
+                            contact_id: string;
+                            name: string;
+                            reason: string;
+                            since: string;
+                        }[];
+                        contacts: {
+                            id: string;
+                            name: string;
+                        }[];
+                        today: {
+                            id: string;
+                            state: string;
+                            state_label: string;
+                            name: string;
+                            relationship: string | null;
+                            at: string;
+                            note: string | null;
+                        }[];
+                        recent: {
+                            id: string;
+                            state: string;
+                            state_label: string;
+                            name: string;
+                            relationship: string | null;
+                            at: string;
+                            note: string | null;
+                            day: string;
+                        }[];
+                        can: {
+                            release: boolean;
+                            manage: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "pickup.release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    kind: "contact" | "collector";
+                    /** Format: uuid */
+                    collector_id: string;
+                    code?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "pickup.refuse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    note?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "pickup.collectors.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    relationship: string;
+                    phone?: string | null;
+                    today_only?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "pickup.collectors.end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ok: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "pickup.bars.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    contact_id: string;
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ok: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "pickup.bars.end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ok: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "year-end.index": {
@@ -14658,6 +16318,13 @@ export interface operations {
                         name: string;
                         has_logo: boolean;
                         portal: string | null;
+                        look: {
+                            app_name: string | null;
+                            main: string;
+                            accent: string;
+                            accent_last: boolean;
+                            custom: boolean;
+                        };
                     };
                 };
             };

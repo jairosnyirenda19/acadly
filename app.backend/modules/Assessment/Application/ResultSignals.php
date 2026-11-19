@@ -27,6 +27,7 @@ final class ResultSignals implements LearnerSignals
         private readonly AcademicCalendar $calendar,
         private readonly EnrolmentDirectory $directory,
         private readonly Clock $clock,
+        private readonly Reach $reach,
     ) {}
 
     public function key(): string
@@ -98,6 +99,13 @@ final class ResultSignals implements LearnerSignals
 
     public function trends(string $learnerId, array $terms): array
     {
+        $place = $this->directory->placeOf($learnerId);
+
+        // A level that records observations has no term result to follow.
+        if ($place !== null && ! $this->reach->takesMarks($place['division_id'])) {
+            return [];
+        }
+
         $today = $this->clock->today();
         $result = [];
         $below = [];
@@ -131,7 +139,7 @@ final class ResultSignals implements LearnerSignals
             }
         }
 
-        if ($class === null || $class['division_id'] !== $period['division_id']) {
+        if ($class === null || $class['division_id'] !== $period['division_id'] || ! $this->reach->takesMarks($class['division_id'])) {
             return [];
         }
 

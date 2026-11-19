@@ -163,7 +163,7 @@ function PaymentForm({ learnerId, fees, onOther }: { learnerId: string; fees: Le
   const firstError = Object.values(errors)[0]?.[0]
 
   return (
-    <div className="grid items-start gap-x-8 gap-y-6 xl:grid-cols-[minmax(0,1fr)_400px]">
+    <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-x-8 gap-y-6 xl:grid-cols-[minmax(0,1fr)_400px]">
       <div className="grid gap-5">
         {firstError !== undefined && (
           <Notice tone="wrong" title={t.notSaved}>

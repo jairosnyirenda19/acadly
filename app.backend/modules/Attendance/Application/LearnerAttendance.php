@@ -41,6 +41,7 @@ final class LearnerAttendance implements LearnerRecordPart
         private readonly Deliveries $deliveries,
         private readonly AbsenceReasons $reasons,
         private readonly Clock $clock,
+        private readonly Modes $modes,
     ) {}
 
     public function key(): string
@@ -59,12 +60,18 @@ final class LearnerAttendance implements LearnerRecordPart
         /** @var array{marked: int, present: int, absent: int, late: int, missed: int, missed_today: int, share: int|null, last_absent: string|null} $t */
         $t = $r['totals'];
 
-        return [
+        $band = [
             ['label' => 'Present this term', 'value' => $t['share'] !== null ? $t['share'].'%' : '–', 'note' => "{$t['present']} of {$t['marked']} school days.", 'tone' => 'plain'],
             ['label' => 'Absent', 'value' => (string) $t['absent'], 'note' => $t['last_absent'] !== null ? 'Days. Last on '.CarbonImmutable::parse($t['last_absent'])->format('l j F').'.' : 'Days this term.', 'tone' => 'plain'],
             ['label' => 'Late', 'value' => (string) $t['late'], 'note' => 'Mornings this term.', 'tone' => 'plain'],
-            ['label' => 'Missed a lesson', 'value' => (string) $t['missed'], 'note' => $t['missed_today'] > 0 ? 'Today too.' : 'Here in the morning, absent later.', 'tone' => $t['missed_today'] > 0 ? 'attention' : 'plain'],
         ];
+
+        // A level that takes registers in the morning only has no lessons to miss.
+        if ($r['takes_lessons'] === true) {
+            $band[] = ['label' => 'Missed a lesson', 'value' => (string) $t['missed'], 'note' => $t['missed_today'] > 0 ? 'Today too.' : 'Here in the morning, absent later.', 'tone' => $t['missed_today'] > 0 ? 'attention' : 'plain'];
+        }
+
+        return $band;
     }
 
     public function attention(User $viewer, string $learnerId): int
@@ -228,6 +235,7 @@ final class LearnerAttendance implements LearnerRecordPart
                 'last_absent' => $absentDays[0] ?? null,
             ],
             'weeks' => $this->weeks($place['division_id'], $term, $today, $morning),
+            'takes_lessons' => $this->modes->takesLessons($place['division_id']),
             'lessons_today' => $this->lessonsToday($place['class_id'], $learnerId, $today),
             'subjects' => array_values($subjects),
             'absences' => $this->withFollowUps($learnerId, $absences),

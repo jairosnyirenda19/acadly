@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Acadly\Kernel\Access\Http\RolesController;
 use Acadly\Kernel\Approvals\Http\ApprovalsController;
+use Acadly\Kernel\Documents\Http\CheckController;
 use Acadly\Kernel\Documents\Http\DocumentsController;
 use Acadly\Kernel\Grid\GridsController;
 use Acadly\Kernel\Http\HealthController;
@@ -29,6 +30,8 @@ Route::get('/health', HealthController::class)->name('kernel.health');
 Route::post('/notify/reports/{token}', [MessagesController::class, 'report'])->where('token', '[A-Za-z0-9]{16,64}')->middleware('throttle:240,1')->name('notify.reports');
 Route::get('/ready', ReadinessController::class)->name('kernel.ready');
 Route::get('/school', SchoolController::class)->name('kernel.school');
+// The public document check (D-096): a code, and nothing about anyone.
+Route::get('/check/{code}', CheckController::class)->where('code', '[A-Za-z0-9-]{4,20}')->middleware('throttle:30,1')->name('kernel.check');
 
 Route::prefix('auth')->name('auth.')->group(function (): void {
     Route::post('/sign-in', SignInController::class)->name('sign-in');

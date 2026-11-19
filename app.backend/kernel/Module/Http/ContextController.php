@@ -24,13 +24,15 @@ final class ContextController
      * wording, the account's permissions per scope and the navigation
      * (docs/architecture/03-deployment-campus-access.md §5.8). `setup_required`
      * holds until the school is opened. `vocabulary` is the words of the only
-     * division when there is one; with several, each division carries its own.
+     * division when there is one; with several, each division carries its own. `bindings` are
+     * the choices each division's profile makes (slot key => value), so the
+     * screens follow the binding and never the level.
      * `places` are where the account can work: where it holds a role, and
      * what is inside (the "Work in" switcher). Navigation is empty until the
      * screens that fill it. The screens use this
      * to decide what to offer; the server checks every request again.
      *
-     * @response array{user: array{id: string, name: string, email: string, phone: string|null}, school: array{name: string, short_name: string, has_logo: bool, open: bool}, setup_required: bool, licence: array{status: 'valid'|'expired'|'missing'|'development', read_only: bool}, modules: list<string>, divisions: list<array{id: string, name: string, vocabulary: array<string, array{one: string, many: string}>}>, campuses: list<array{id: string, name: string}>, vocabulary: array<string, array{one: string, many: string}>, navigation: list<array{key: string, permission: string}>, grants: list<array{permission: string, scope_type: 'institution'|'division'|'campus'|'offering'|'class', scope_id: string|null}>, places: list<array{key: string, type: 'institution'|'division'|'campus'|'offering'|'class', id: string|null, label: string, within: list<string>, held: bool, roles: list<array{role: string, ends_at: string|null}>}>}
+     * @response array{user: array{id: string, name: string, email: string, phone: string|null}, school: array{name: string, short_name: string, has_logo: bool, open: bool, look: array{app_name: string|null, main: string, accent: string, accent_last: bool, custom: bool}}, setup_required: bool, licence: array{status: 'valid'|'expired'|'missing'|'development', read_only: bool}, modules: list<string>, divisions: list<array{id: string, name: string, profile: string, vocabulary: array<string, array{one: string, many: string}>, bindings: array<string, string>}>, campuses: list<array{id: string, name: string}>, vocabulary: array<string, array{one: string, many: string}>, navigation: list<array{key: string, permission: string}>, grants: list<array{permission: string, scope_type: 'institution'|'division'|'campus'|'offering'|'class', scope_id: string|null}>, places: list<array{key: string, type: 'institution'|'division'|'campus'|'offering'|'class', id: string|null, label: string, within: list<string>, held: bool, roles: list<array{role: string, ends_at: string|null}>}>}
      */
     public function __invoke(Request $request, Access $access, ModuleActivation $activation, Licences $licences, SchoolProfile $school, WorkPlaces $places): JsonResponse
     {
@@ -45,7 +47,7 @@ final class ContextController
 
         return response()->json([
             'user' => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email, 'phone' => $user->phone],
-            'school' => ['name' => $school->name(), 'short_name' => $school->shortName(), 'has_logo' => $school->hasLogo(), 'open' => $school->isOpen()],
+            'school' => ['name' => $school->name(), 'short_name' => $school->shortName(), 'has_logo' => $school->hasLogo(), 'open' => $school->isOpen(), 'look' => $school->look()],
             'setup_required' => ! $school->isOpen(),
             'licence' => ['status' => $licence->status->value, 'read_only' => ! $licence->status->allowsChanges()],
             'modules' => $activation->activeKeys(),

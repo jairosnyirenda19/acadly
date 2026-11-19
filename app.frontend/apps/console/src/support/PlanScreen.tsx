@@ -52,7 +52,7 @@ export function PlanScreen({ id }: { id: string }) {
           ))}
         </ol>
 
-        <div className="grid items-start gap-x-8 gap-y-6 xl:grid-cols-[minmax(0,1fr)_440px]">
+        <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-x-8 gap-y-6 xl:grid-cols-[minmax(0,1fr)_440px]">
           <div className="grid gap-5">
             <section className="border-2 border-ink bg-sheet px-4 py-3">
               <h2 className="type-display mb-2 text-[26px] leading-none">{t.theConcern}</h2>

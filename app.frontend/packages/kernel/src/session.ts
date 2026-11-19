@@ -47,6 +47,17 @@ export async function getSchoolName(): Promise<string | null> {
   }
 }
 
+/** The school's own look (D-096), for the screens before sign-in too; null when it cannot be read. */
+export async function getSchoolLook(): Promise<{ app_name: string | null; main: string; accent: string; accent_last: boolean } | null> {
+  try {
+    const { data } = await api.GET('/v1/school')
+
+    return data?.look ?? null
+  } catch {
+    return null
+  }
+}
+
 /** The signed-in account, or null when there is no session. */
 export async function getAccount(): Promise<Account | null> {
   try {

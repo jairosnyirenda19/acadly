@@ -1,27 +1,27 @@
-import { can, navigate, useAppContext } from '@acadly/kernel'
+import { navigate, useAppContext, useLocation } from '@acadly/kernel'
 import type { ReactNode } from 'react'
 import { copy } from '../copy'
-import { holdsAnywhere, keepsGrading } from '../shell/navigation'
+import { groupOf } from '../shell/navigation'
 import type { PersonStateName } from './api'
 
 const t = copy.settings
 
 export type SettingsTab = 'people' | 'roles' | 'subjects' | 'teaching' | 'timetable' | 'messages' | 'assessment' | 'approvals' | 'modules'
 
-/** The settings tabs that are built and that the account may use. */
-export function SettingsTabs({ current }: { current: SettingsTab }) {
+/**
+ * The tabs over a School or Settings page: every page of the same group of
+ * the rail that the account may use, so a page added to the rail is never
+ * missing here. `current` is kept for the pages that name themselves.
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function SettingsTabs({ current }: { current?: SettingsTab }) {
   const context = useAppContext()
-  const tabs = [
-    { key: 'people' as const, path: '/settings/people', show: holdsAnywhere(context, 'access.roles.assign') },
-    { key: 'roles' as const, path: '/settings/roles', show: can(context, 'access.roles.manage') },
-    { key: 'subjects' as const, path: '/settings/subjects', show: holdsAnywhere(context, 'academics.manage') },
-    { key: 'teaching' as const, path: '/settings/teaching', show: holdsAnywhere(context, 'academics.manage') },
-    { key: 'timetable' as const, path: '/settings/timetable', show: holdsAnywhere(context, 'academics.manage') },
-    { key: 'messages' as const, path: '/settings/messages', show: can(context, 'notify.manage') },
-    { key: 'assessment' as const, path: '/settings/assessment', show: keepsGrading(context) },
-    { key: 'approvals' as const, path: '/settings/approvals', show: can(context, 'access.approvals.manage') },
-    { key: 'modules' as const, path: '/settings/modules', show: can(context, 'modules.manage') },
-  ]
+  const { path } = useLocation()
+  const group = groupOf(context, path)
+
+  if (group === undefined || group.items.length < 2) return null
+
+  const tabs = group.items.map((item) => ({ key: item.key, path: item.path, label: item.label, on: item.lights(path), show: true }))
 
   return (
     <nav aria-label={t.tabsLabel} className="flex gap-1 overflow-x-auto border-b-2 border-ink bg-sheet px-3 [scrollbar-width:none] md:px-[clamp(16px,3vw,40px)]">
@@ -31,14 +31,14 @@ export function SettingsTabs({ current }: { current: SettingsTab }) {
           <a
             key={tab.key}
             href={tab.path}
-            aria-current={tab.key === current ? 'page' : undefined}
+            aria-current={tab.on ? 'page' : undefined}
             onClick={(event) => {
               event.preventDefault()
               navigate(tab.path)
             }}
-            className={`shrink-0 border-b-4 px-4 pt-3 pb-2.5 text-[15px] whitespace-nowrap text-ink no-underline ${tab.key === current ? 'border-ink font-extrabold' : 'border-transparent font-medium'}`}
+            className={`shrink-0 border-b-4 px-4 pt-3 pb-2.5 text-[15px] whitespace-nowrap text-ink no-underline ${tab.on ? 'border-teal font-extrabold' : 'border-transparent font-medium'}`}
           >
-            {t.tabs[tab.key]}
+            {tab.label}
           </a>
         ))}
     </nav>

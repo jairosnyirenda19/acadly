@@ -6,6 +6,7 @@ namespace Acadly\Modules\Fees\Http;
 
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Audit\Audit;
+use Acadly\Kernel\Grid\Grids;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Row;
 use Acadly\Modules\Fees\Application\Actions\DeskActions;
@@ -190,6 +191,26 @@ final class FeesSettingsController
     public function desk(Request $request, FeesViews $views): JsonResponse
     {
         return response()->json($views->desk(self::user($request)));
+    }
+
+    /**
+     * The payments ledger as a data grid: `?page=&per_page=&sort=&dir=&q=&filter[received]=from..to&filter[method]=cash&filter[state]=cancelled`.
+     *
+     * @response array{rows: list<array{id: string, receipt: string, received_on: string, learners: string, payer: string, method: string, method_label: string, reference: string|null, amount: int, received_by: string|null, cancelled: bool, void_number: string|null}>, total: int, page: int, per_page: int, pages: int, sort: string, dir: 'asc'|'desc', q: string, filters: array<string, list<string>>, columns: list<array{key: string, label: string, sortable: bool, shown: bool, always: bool}>, filter_options: list<array{key: string, label: string, kind: 'choice'|'dates', options: list<array{value: string, label: string, count: int}>}>, views: list<array{id: string, name: string, state: array<string, mixed>}>, bulk: list<array{key: string, label: string}>, can_export: bool}
+     */
+    public function payments(Request $request, Grids $grids): JsonResponse
+    {
+        return response()->json($grids->page(self::user($request), $grids->grid('fee-payments'), $request->query()));
+    }
+
+    /**
+     * The learners behind their plan as a data grid: `?page=&per_page=&sort=&dir=&q=&filter[class]=…&filter[overdue]=month&filter[since]=from..to`.
+     *
+     * @response array{rows: list<array{id: string, name: string, class_id: string|null, class: string, owed_on: string, due_now: int, since: string, days: int}>, total: int, page: int, per_page: int, pages: int, sort: string, dir: 'asc'|'desc', q: string, filters: array<string, list<string>>, columns: list<array{key: string, label: string, sortable: bool, shown: bool, always: bool}>, filter_options: list<array{key: string, label: string, kind: 'choice'|'dates', options: list<array{value: string, label: string, count: int}>}>, views: list<array{id: string, name: string, state: array<string, mixed>}>, bulk: list<array{key: string, label: string}>, can_export: bool}
+     */
+    public function behind(Request $request, Grids $grids): JsonResponse
+    {
+        return response()->json($grids->page(self::user($request), $grids->grid('fee-behind'), $request->query()));
     }
 
     /**

@@ -33,8 +33,8 @@
                 "MIDDLE",
                 "TOP"
             ],
-            "name": "Language and communication",
-            "short": "LAN"
+            "name": "Talking and listening",
+            "short": "TAL"
         },
         {
             "core": true,
@@ -43,7 +43,7 @@
                 "MIDDLE",
                 "TOP"
             ],
-            "name": "Numeracy",
+            "name": "Early numbers",
             "short": "NUM"
         },
         {
@@ -53,8 +53,8 @@
                 "MIDDLE",
                 "TOP"
             ],
-            "name": "Creative arts",
-            "short": "CRE"
+            "name": "Moving and doing",
+            "short": "MOV"
         },
         {
             "core": true,
@@ -63,8 +63,8 @@
                 "MIDDLE",
                 "TOP"
             ],
-            "name": "Physical development",
-            "short": "PHY"
+            "name": "Playing with others",
+            "short": "PLA"
         },
         {
             "core": true,
@@ -73,8 +73,18 @@
                 "MIDDLE",
                 "TOP"
             ],
-            "name": "Social and emotional development",
-            "short": "SOC"
+            "name": "Making and pretending",
+            "short": "MAK"
+        },
+        {
+            "core": true,
+            "levels": [
+                "BABY",
+                "MIDDLE",
+                "TOP"
+            ],
+            "name": "Caring for self",
+            "short": "CAR"
         }
     ],
     "summary": "Children from 3 to 5 years. Rooms, caregivers and observations instead of marks.",

@@ -8,6 +8,8 @@ export type Proposed = FamilyState['to_confirm'][number]
 export type AttendanceState = Json<'/v1/portal/children/{id}/attendance', 'get'>
 export type CardState = Json<'/v1/portal/children/{id}/card', 'get'>
 export type MessagesState = Json<'/v1/portal/children/{id}/messages', 'get'>
+export type ReviewState = Json<'/v1/portal/children/{id}/review', 'get'>
+export type PickupState = Json<'/v1/portal/children/{id}/pickup', 'get'>
 
 /** The data, 'refused' when the parent may not see it (or is signed out), or null when it could not be read. */
 async function read<T>(request: Promise<{ data?: T; response: Response }>): Promise<T | 'refused' | null> {
@@ -49,6 +51,19 @@ export const portalApi = {
   },
   card: (id: string) => read(api.GET('/v1/portal/children/{id}/card', { params: { path: { id } } })),
   messages: (id: string) => read(api.GET('/v1/portal/children/{id}/messages', { params: { path: { id } } })),
+  review: (id: string) => read(api.GET('/v1/portal/children/{id}/review', { params: { path: { id } } })),
+  pickup: (id: string) => read(api.GET('/v1/portal/children/{id}/pickup', { params: { path: { id } } })),
+  /** Name someone to collect the child today; the code to give them, or null when it was not saved. */
+  collectToday: async (id: string, name: string, relationship: string, phone: string): Promise<{ id: string; code: string } | null> => {
+    try {
+      await api.GET('/v1/auth/csrf-cookie')
+      const { data } = await api.POST('/v1/portal/children/{id}/collectors', { params: { path: { id } }, body: { name, relationship, phone } as never })
+
+      return (data as { id: string; code: string } | undefined) ?? null
+    } catch {
+      return null
+    }
+  },
 }
 
 /**

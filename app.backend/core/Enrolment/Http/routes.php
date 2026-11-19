@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Acadly\Core\Enrolment\Http\DivisionsController;
 use Acadly\Core\Enrolment\Http\FamiliesController;
 use Acadly\Core\Enrolment\Http\LearnerDocumentsController;
 use Acadly\Core\Enrolment\Http\LearnerImportController;
@@ -10,6 +11,7 @@ use Acadly\Core\Enrolment\Http\ProgressionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function (): void {
+    Route::get('/divisions/overview', DivisionsController::class)->name('divisions.overview');
     Route::get('/families', [FamiliesController::class, 'index'])->name('families.index');
     Route::post('/families/invite', [FamiliesController::class, 'invite'])->middleware('throttle:10,1')->name('families.invite');
     Route::post('/families/links/{id}', [FamiliesController::class, 'link'])->whereUuid('id')->name('families.link');

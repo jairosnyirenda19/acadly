@@ -23,12 +23,12 @@ export function InLink({ href, children }: { href: string; children: ReactNode }
   )
 }
 
-/** One ruled column of the record. A second column is divided from the first by a 2px ink rule. */
-export function Column({ children, edge = false, grow = 'flex-[1_1_300px]', tinted = false, label }: { children: ReactNode; edge?: boolean; grow?: string; tinted?: boolean; label?: string | undefined }) {
+/** One ruled column of the record. The row draws the 2px ink rules between columns and rows. `edge` is kept for the parts that pass it. */
+export function Column({ children, grow = 'flex-[1_1_300px]', tinted = false, label }: { children: ReactNode; edge?: boolean; grow?: string; tinted?: boolean; label?: string | undefined }) {
   return (
     <section
       aria-label={label}
-      className={`min-w-0 px-4 pt-4.5 pb-5.5 md:px-7 ${grow} ${tinted ? 'bg-paper' : 'bg-sheet'} ${edge ? 'border-ink max-[700px]:border-t-2 min-[701px]:border-l-2' : ''}`}
+      className={`min-w-0 px-4 pt-4.5 pb-5.5 md:px-7 ${grow} ${tinted ? 'bg-paper' : 'bg-sheet'}`}
     >
       {children}
     </section>
@@ -37,7 +37,8 @@ export function Column({ children, edge = false, grow = 'flex-[1_1_300px]', tint
 
 /** A row of ruled columns. */
 export function Columns({ children, top = false }: { children: ReactNode; top?: boolean }) {
-  return <div className={`flex flex-wrap items-stretch ${top ? 'border-t-2 border-ink' : ''}`}>{children}</div>
+  // The 2px gaps show the ink behind: a rule between every column and every row, however they wrap.
+  return <div className={`flex flex-wrap items-stretch gap-[2px] bg-ink ${top ? 'border-t-2 border-ink' : ''}`}>{children}</div>
 }
 
 export function SectionTitle({ children, aside }: { children: ReactNode; aside?: ReactNode }) {

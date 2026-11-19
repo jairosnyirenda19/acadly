@@ -14,6 +14,7 @@ colors:
   ink-rule: "#3A5173"
   teal: "#0A7775"
   teal-bright: "#2FD6CF"
+  accent: "#2FD6CF"
   teal-mid: "#8FD6D2"
   teal-wash: "#DDF3F1"
   marigold: "#FFB703"
@@ -165,6 +166,7 @@ Cool paper and navy ink, with three working colours that each mean one thing.
 ### Primary
 - **Register Ink** (`ink`): text, heavy rules, the navigation rail, and the solid block behind the most important number on a screen. On ink, secondary text uses `on-ink-soft` and labels use `on-ink-muted`.
 - **Done Teal** (`teal`): the present stroke, the primary action, a finished step, a submitted register. On ink it becomes `teal-bright`. `teal-mid` and `teal-wash` exist only as steps of a scale (attendance heat, nursery steps).
+- **Accent** (`accent`): the brand's own mark on ink: the last word of the name, the current page's edge in the rail, a large number on a dark block. It equals `teal-bright` until a school chooses its own (D-096). It never means done.
 
 ### Secondary
 - **Marigold** (`marigold`): attention required. Offline, in progress, waiting for you, the place where a new item lands, a sight permission. `marigold-wash` tints a whole row.
@@ -296,6 +298,21 @@ Light is the first theme and the one all approved screens show. Dark is the same
 
 ### Tags
 - Square, `label` type. Marigold for attention (OFFLINE, SIGHT). Never used as decoration.
+
+## Branding
+
+A school may choose (Settings › Branding, D-096):
+- **The name shown** in the rail, up to 40 letters; empty shows Acadly IQ-X. One line at 32px up to 14 letters, then 27px and 24px, then two lines at 21px broken between words. Never an ellipsis; never more than two lines.
+- **A short name**, up to 16, for text messages, phones and the folded rail.
+- **The logo**, always on a white square, so any logo stays clear.
+- **A main colour**, standing in for `ink`: the rail, headings, heavy rules, dark blocks. White text on it must reach 4.5 : 1.
+- **An accent colour**, standing in for `accent`. On the main colour it must reach 3 : 1.
+
+Teal, marigold and the red pen are never the school's to change: a mark reads the same in every school.
+
+## Dark
+
+Each person chooses Light, Dark or Same as this device. The same tokens take dark values: `paper` #0A1422, `sheet` #0F1D30, `field` #18293F, `rule` #26394F; text and `ink` rules turn light (#E8EEF5); the rail and dark blocks are the darkest surface; teal text lifts to `teal-bright`; red lifts to #FF6A5C. Light fills (marigold, teal-mid) keep dark writing. Documents and printing are always light. The family portal stays light until it is reviewed for dark.
 
 ## Do's and Don'ts
 

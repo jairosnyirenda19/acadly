@@ -5,7 +5,7 @@ import { conductApi, LEVELS, type KindList, type Level } from '../conduct/api'
 import { EntryTag } from '../learners/record/ConductPart'
 import { copy } from '../copy'
 import { Input, Select } from '../setup/parts'
-import { PageHead } from './parts'
+import { PageHead, SettingsTabs } from './parts'
 
 const t = copy.settings.conduct
 const c = copy.conduct
@@ -47,6 +47,7 @@ function Editor({ data, onSaved }: { data: KindList; onSaved: () => void }) {
 
   return (
     <>
+      <SettingsTabs />
       <PageHead kicker={t.kicker} title={t.title} intro={t.intro} />
       <div className="grid items-start gap-x-8 gap-y-6 px-[clamp(16px,3vw,40px)] pb-8 xl:grid-cols-[minmax(0,1fr)_420px]">
         <section aria-label={t.kindsTitle} className="grid gap-3 border-2 border-ink bg-sheet px-4 py-3.5">

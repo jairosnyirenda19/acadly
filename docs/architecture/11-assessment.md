@@ -25,7 +25,7 @@ Seeds by profile (a school may rename, add or retire kinds):
 | Tertiary | Coursework · Continuous assessment test · Practical · Final exam |
 
 - **"Class test"** is the name for the unscheduled test a teacher sets on any day (the "random" test). It is short, set by the teacher, and needs no approval to create.
-- **ECD does not use marks.** Its kinds use a descriptive scale (for example *Emerging · Developing · Secure*) against learning areas, plus a short written note. The same tables hold it; only the scale and the screen differ. The profile binds `AssessmentSlot::Model = Observational`.
+- **ECD does not use marks.** Its kinds use a descriptive scale (for example *Emerging · Developing · Secure*) against learning areas, plus a short written note. Observations and progress reviews have their own tables (`assessment_observations`, `progress_reviews`), because an observation is not a test of the whole room and has no marks journey (D-094). The profile binds `AssessmentSlot::Model = Observational`.
 - The vocabulary follows the division: a nursery teacher never sees the word "exam".
 - **ECD steps as designed:** three steps, drawn as strokes and always shown with their word: `/` Starting (tries it with a lot of help), `//` Growing (does it with a little help), `///` Can do it (does it alone, more than once). A caregiver may also record "Not seen". The steps are a seed; a school may rename them.
 - **ECD learning areas (seed):** Talking and listening · Early numbers · Moving and doing · Playing with others · Making and pretending · Caring for self.

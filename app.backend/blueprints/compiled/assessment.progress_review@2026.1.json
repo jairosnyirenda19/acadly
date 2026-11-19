@@ -1,0 +1,140 @@
+{
+    "initial": "draft",
+    "kind": "journey",
+    "milestones": [],
+    "ref": "assessment.progress_review@2026.1",
+    "stages": [
+        {
+            "key": "draft",
+            "steps": [
+                "submit"
+            ],
+            "title": "Draft"
+        },
+        {
+            "key": "check",
+            "steps": [
+                "check",
+                "return",
+                "share"
+            ],
+            "title": "Check"
+        }
+    ],
+    "states": [
+        {
+            "id": "draft",
+            "label": "Draft"
+        },
+        {
+            "id": "ready",
+            "label": "Ready to check"
+        },
+        {
+            "id": "checked",
+            "label": "Checked"
+        },
+        {
+            "id": "shared",
+            "label": "Shared"
+        }
+    ],
+    "steps": [
+        {
+            "capability": "assessment.observe",
+            "four_eyes": null,
+            "from": [
+                "draft"
+            ],
+            "gates": [
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Modules\\Assessment\\Journeys\\Review\\ReviewIsComplete"
+                }
+            ],
+            "id": "submit",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "submitted",
+                    "requires_reason": false,
+                    "title": "Send to be checked",
+                    "to": "ready"
+                }
+            ],
+            "stage": "draft",
+            "title": "Send the review to be checked"
+        },
+        {
+            "capability": "assessment.review",
+            "four_eyes": "submit",
+            "from": [
+                "ready"
+            ],
+            "gates": [],
+            "id": "check",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "checked",
+                    "requires_reason": false,
+                    "title": "Checked",
+                    "to": "checked"
+                }
+            ],
+            "stage": "check",
+            "title": "Check the review"
+        },
+        {
+            "capability": "assessment.review",
+            "four_eyes": null,
+            "from": [
+                "ready",
+                "checked"
+            ],
+            "gates": [],
+            "id": "return",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "returned",
+                    "requires_reason": true,
+                    "title": "Return",
+                    "to": "draft"
+                }
+            ],
+            "stage": "check",
+            "title": "Return the review to the caregiver"
+        },
+        {
+            "capability": "assessment.review",
+            "four_eyes": null,
+            "from": [
+                "checked"
+            ],
+            "gates": [],
+            "id": "share",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "shared",
+                    "requires_reason": false,
+                    "title": "Share",
+                    "to": "shared"
+                }
+            ],
+            "stage": "check",
+            "title": "Share the review with the family"
+        }
+    ],
+    "subject": "Acadly\\Modules\\Assessment\\Domain\\ProgressReview",
+    "terminal": [
+        "shared"
+    ],
+    "title": "Progress review"
+}

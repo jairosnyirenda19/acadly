@@ -9,6 +9,7 @@ use Acadly\Core\Enrolment\Contracts\EnrolmentAudit;
 use Acadly\Core\Enrolment\Contracts\EnrolmentPermission;
 use Acadly\Core\Enrolment\Contracts\LearnerRecordPart;
 use Acadly\Core\Enrolment\Contracts\Relationship;
+use Acadly\Core\Enrolment\Contracts\TitledForLearner;
 use Acadly\Core\Enrolment\Domain\Learner;
 use Acadly\Core\Institution\Contracts\SchoolDirectory;
 use Acadly\Core\Institution\Contracts\Term;
@@ -132,6 +133,7 @@ final class Learners
             'class' => $class === null ? null : ['id' => $class['id'], 'name' => $class['name']],
             'level' => $place !== null ? $division?->profile->levelLabel($place['level_code']) : null,
             'division' => $division?->name,
+            'division_id' => $division?->id,
             'campus' => $place !== null ? $this->school->campus($place['campus_id'])?->name : null,
             'class_teacher' => $teacher !== null ? self::userName($teacher) : null,
             'placements' => $this->placements($learner->id),
@@ -323,7 +325,7 @@ final class Learners
 
         foreach (app()->tagged(LearnerRecordPart::TAG) as $part) {
             if ($part instanceof LearnerRecordPart && $activation->isActive($part->key(), $at)) {
-                $parts[] = ['key' => $part->key(), 'title' => $part->title(), 'band' => $part->band($viewer, $learnerId), 'attention' => $part->attention($viewer, $learnerId)];
+                $parts[] = ['key' => $part->key(), 'title' => $part instanceof TitledForLearner ? $part->titleFor($learnerId) : $part->title(), 'band' => $part->band($viewer, $learnerId), 'attention' => $part->attention($viewer, $learnerId)];
             }
         }
 

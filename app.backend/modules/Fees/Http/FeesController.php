@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Acadly\Modules\Fees\Http;
 
+use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Row;
 use Acadly\Modules\Fees\Application\Actions\ChargeActions;
 use Acadly\Modules\Fees\Application\Actions\PaymentActions;
+use Acadly\Modules\Fees\Application\FeeDocuments;
 use Acadly\Modules\Fees\Application\FeesReach;
 use Acadly\Modules\Fees\Application\FeesViews;
 use Acadly\Modules\Fees\Contracts\FeesPermission;
@@ -17,6 +19,7 @@ use Acadly\Modules\Fees\Domain\PaymentMethod;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -75,6 +78,32 @@ final class FeesController
     public function receipt(Request $request, string $id, FeesViews $views): JsonResponse
     {
         return response()->json($views->receipt(self::user($request), $id));
+    }
+
+    /** The receipt as an A4 PDF, with its check code (D-096). */
+    public function receiptPdf(Request $request, string $id, FeeDocuments $documents): Response
+    {
+        return self::pdf($documents->receipt(self::user($request), $id));
+    }
+
+    /** A learner's fee statement as an A4 PDF, with its check code (D-096). */
+    public function statementPdf(Request $request, string $id, FeeDocuments $documents, EnrolmentDirectory $directory, FeesViews $views): Response
+    {
+        $who = self::user($request);
+        $views->learner($who, $id);
+
+        return self::pdf($documents->statement($who, $id, $directory->names([$id])[$id] ?? '', $views->classOf($id)));
+    }
+
+    /** @param array{name: string, pdf: string} $doc */
+    private static function pdf(array $doc): Response
+    {
+        return new Response($doc['pdf'], 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.str_replace('"', '', $doc['name']).'"',
+            'Cache-Control' => 'no-store',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
     }
 
     /**

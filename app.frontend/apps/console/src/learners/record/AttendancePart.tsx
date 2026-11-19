@@ -64,6 +64,7 @@ export function AttendanceSummary({ learner }: { learner: LearnerState }) {
                 <WeekRow key={w.week} week={w} />
               ))}
           </div>
+          {a.takes_lessons && (
           <div className="mt-4">
             <Caption>{t.todayLessons}</Caption>
             {a.lessons_today.length === 0 ? (
@@ -81,6 +82,7 @@ export function AttendanceSummary({ learner }: { learner: LearnerState }) {
               </ul>
             )}
           </div>
+          )}
           <InLink href={tabHref(learner.id, 'attendance')}>{t.seeAttendance}</InLink>
         </>
       )}
@@ -151,6 +153,7 @@ export function AttendanceTab({ learner }: { learner: LearnerState }) {
             </li>
           </ul>
         </Column>
+        {a.takes_lessons && (
         <Column edge label={t.subjectsTitle}>
           <SectionTitle>{t.subjectsTitle}</SectionTitle>
           <p className="mb-3 text-[13px] text-text-muted">{t.subjectsNote}</p>
@@ -174,6 +177,7 @@ export function AttendanceTab({ learner }: { learner: LearnerState }) {
             })}
           </ul>
         </Column>
+        )}
       </Columns>
 
       <Columns top>

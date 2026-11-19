@@ -107,6 +107,19 @@ const ICONS = {
     </>
   ),
   call: <path d="M5 4h4l2 5-3 2a11 11 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" />,
+  review: (
+    <>
+      <path d="M5 4h14v16H5z" />
+      <path d="M8 9h8" />
+      <path d="M8 13h5" />
+    </>
+  ),
+  gate: (
+    <>
+      <path d="M4 20V4h9l7 7v9z" />
+      <path d="M13 4v7h7" />
+    </>
+  ),
 }
 
 export function Icon({ name }: { name: keyof typeof ICONS }) {

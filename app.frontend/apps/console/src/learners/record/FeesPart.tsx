@@ -139,7 +139,7 @@ export function FeesTab({ learner }: { learner: LearnerState }) {
               {t.optional}
             </Button>
           )}
-          <Button variant="secondary" onClick={() => window.print()}>
+          <Button variant="secondary" onClick={() => window.open(feesApi.statementPdf(learner.id), '_blank', 'noopener')}>
             {t.print}
           </Button>
         </div>

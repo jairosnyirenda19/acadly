@@ -9,12 +9,15 @@ use Acadly\Core\Institution\Contracts\DivisionView;
 use Acadly\Core\Institution\Contracts\InstitutionAudit;
 use Acadly\Core\Institution\Contracts\SchoolDirectory;
 use Acadly\Core\Institution\Domain\Campus;
+use Acadly\Core\Institution\Domain\Countries;
 use Acadly\Core\Institution\Domain\Division;
 use Acadly\Core\Institution\Domain\School;
 use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Blueprint\BlueprintRef;
 use Acadly\Kernel\Blueprint\Blueprints;
+use Acadly\Kernel\Documents\DocumentReader;
 use Acadly\Kernel\Identity\User;
+use Acadly\Kernel\School\Contrast;
 use Acadly\Kernel\School\SchoolProfile;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Row;
@@ -55,6 +58,47 @@ final class InstitutionDirectory implements SchoolDirectory, SchoolProfile
         return School::current()->logo_document_id !== null;
     }
 
+    public function letterhead(): array
+    {
+        $school = School::current();
+        $logo = null;
+
+        if ($school->logo_document_id !== null) {
+            try {
+                $logo = '';
+
+                foreach (app(DocumentReader::class)->openPublic($school->logo_document_id)['bytes'] as $piece) {
+                    $logo .= $piece;
+                }
+            } catch (\Throwable) {
+                $logo = null; // a logo that cannot be read is left out, never a failed document
+            }
+        }
+
+        $address = $school->postal_address ?? $school->physical_address;
+
+        return [
+            'name' => $school->name,
+            'address' => $address !== null ? (string) preg_replace('/\s*\n\s*/', ', ', trim($address)) : null,
+            'phone' => $school->phone,
+            'logo' => $logo,
+            'timezone' => Countries::timezone($school->country),
+        ];
+    }
+
+    public function look(): array
+    {
+        $school = School::current();
+
+        return [
+            'app_name' => $school->app_name,
+            'main' => $school->brand_main ?? Contrast::MAIN,
+            'accent' => $school->brand_accent ?? Contrast::ACCENT,
+            'accent_last' => $school->accent_last_word,
+            'custom' => $school->brand_main !== null || $school->brand_accent !== null,
+        ];
+    }
+
     public function isOpen(): bool
     {
         return School::current()->isOpen();
@@ -83,7 +127,7 @@ final class InstitutionDirectory implements SchoolDirectory, SchoolProfile
     public function divisions(): array
     {
         return array_map(
-            fn (DivisionView $division): array => ['id' => $division->id, 'name' => $division->name, 'vocabulary' => $division->profile->vocabulary],
+            fn (DivisionView $division): array => ['id' => $division->id, 'name' => $division->name, 'profile' => $division->profile->reference()->key, 'vocabulary' => $division->profile->vocabulary, 'bindings' => $division->profile->bindings],
             $this->divisionViews(),
         );
     }

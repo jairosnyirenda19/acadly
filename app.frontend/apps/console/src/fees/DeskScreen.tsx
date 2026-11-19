@@ -1,11 +1,14 @@
-import { can, navigate, useAppContext, useLoad } from '@acadly/kernel'
-import { Button, slips, Waiting } from '@acadly/ui'
+import { can, navigate, useAppContext, useLoad, useLocation } from '@acadly/kernel'
+import { Button, DataGrid, NO_SELECTION, slips, viewState, Waiting } from '@acadly/ui'
+import { useGridPage, useGridPrefs, useGridQuery, startExport, useGridSelection } from '../grid/useGrid'
 import { useState } from 'react'
 import { copy } from '../copy'
 import { Input } from '../setup/parts'
 import { day } from '../settings/api'
 import { PageHead, Tag } from '../settings/parts'
-import { feesApi, money, parseKwacha, today } from './api'
+import { behindGrid, feesApi, money, parseKwacha, paymentsGrid, today, type BehindRow, type PaymentRow } from './api'
+import { gridsApi, type BulkAnswer } from '../grid/api'
+import { BulkResult } from '../grid/BulkResult'
 
 const t = copy.fees
 
@@ -13,6 +16,7 @@ const t = copy.fees
 export function DeskScreen() {
   const context = useAppContext()
   const loaded = useLoad('fees:desk', () => feesApi.desk())
+  const { query } = useLocation()
   const d = loaded.data
   const [counted, setCounted] = useState('')
   const [note, setNote] = useState('')
@@ -22,6 +26,7 @@ export function DeskScreen() {
 
   if (d === undefined) return <Waiting phase={loaded.phase} what={t.deskTitle} labels={copy.loading} rows={6} onRetry={loaded.reload} />
 
+  const view = query.get('view') === 'behind' ? 'behind' : 'ledger'
   const pct = d.billed > 0 ? Math.round((d.collected / d.billed) * 100) : 0
   const cells = [
     { label: t.collected, value: money(d.collected), note: `${pct}% · ${t.collectedNote(money(d.billed))}`, ink: true },
@@ -30,14 +35,6 @@ export function DeskScreen() {
     { label: t.creditHeld, value: money(d.credit), note: t.creditHeldNote(d.credit_learners) },
   ]
   const countedValue = parseKwacha(counted)
-
-  const remind = async () => {
-    setBusy(true)
-    const result = await feesApi.remind(d.behind.map((b) => b.learner_id))
-    setBusy(false)
-    if (result.kind === 'saved') slips.done({ word: copy.slips.saved, title: t.reminded(result.data.sent) })
-    else slips.wrong({ word: t.notSaved, title: t.failed })
-  }
 
   const close = async () => {
     if (countedValue === null) return
@@ -76,39 +73,23 @@ export function DeskScreen() {
           ))}
         </div>
 
-        <div className="grid items-start gap-x-8 gap-y-6 xl:grid-cols-[minmax(0,1fr)_420px]">
-          <section aria-label={t.behind} className="border-2 border-ink bg-sheet px-4 pt-3 pb-4">
-            <h2 className="type-display mb-2 text-[26px] leading-none">{t.behind}</h2>
-            {d.behind.length === 0 ? (
-              <p className="text-sm text-text-muted">{t.behindNone}</p>
-            ) : (
-              <ul>
-                {d.behind.map((b) => (
-                  <li key={b.learner_id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 border-b border-rule py-2.5 md:grid-cols-[minmax(0,1fr)_220px_140px_90px]">
-                    <a href={`/learners/${b.learner_id}?tab=fees`} onClick={(e) => (e.preventDefault(), navigate(`/learners/${b.learner_id}?tab=fees`))} className="min-w-0 text-ink no-underline">
-                      <b className="block text-[15px] underline-offset-[3px] hover:underline">{b.name}</b>
-                      <span className="text-xs text-text-muted">{b.class}</span>
-                    </a>
-                    <span className="text-sm max-md:col-start-1">{b.owed_on}</span>
-                    <span className="ref text-right text-sm font-extrabold max-md:col-start-2 max-md:row-start-1">{money(b.due_now)}</span>
-                    <span className="text-right max-md:col-start-2 max-md:row-start-2">
-                      <Tag tone="attention">! {t.days(b.days)}</Tag>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {d.behind.length > 0 && (
-              <div className="mt-3 grid gap-1.5">
-                <div>
-                  <Button variant="secondary" busy={busy} onClick={() => void remind()}>
-                    {t.remind(d.behind.length)}
-                  </Button>
-                </div>
-                <p className="text-[13px] text-text-muted">{t.remindNote}</p>
-              </div>
-            )}
-          </section>
+        <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-x-8 gap-y-6 xl:grid-cols-[minmax(0,1fr)_420px]">
+          <div className="min-w-0">
+            <nav aria-label={t.deskTabs} className="flex gap-1 overflow-x-auto border-b-2 border-ink [scrollbar-width:none]">
+              {(['ledger', 'behind'] as const).map((v) => (
+                <a
+                  key={v}
+                  href={v === 'ledger' ? '/fees' : '/fees?view=behind'}
+                  aria-current={v === view ? 'page' : undefined}
+                  onClick={(e) => (e.preventDefault(), navigate(v === 'ledger' ? '/fees' : '/fees?view=behind'))}
+                  className={`inline-flex min-h-11 shrink-0 items-center border-b-4 px-3.5 pt-2.5 pb-2 text-[15px] whitespace-nowrap text-ink no-underline ${v === view ? 'border-teal font-extrabold' : 'border-transparent font-medium hover:bg-paper'}`}
+                >
+                  {v === 'ledger' ? t.ledgerTab : t.behindTab(d.behind_count)}
+                </a>
+              ))}
+            </nav>
+            {view === 'ledger' ? <Ledger /> : <BehindList onReminded={loaded.reload} />}
+          </div>
 
           <aside className="grid gap-5">
             <section className="border-2 border-ink bg-sheet px-4 py-3.5">
@@ -168,5 +149,161 @@ export function DeskScreen() {
         </div>
       </div>
     </>
+  )
+}
+
+/** Who is behind their plan (D-095), on the data grid: choose rows, or every row that matches, and remind the families. */
+function BehindList({ onReminded }: { onReminded: () => void }) {
+  const [query, setQuery] = useGridQuery('/fees', ['view'])
+  const grid = useGridPage('fee-behind', query, behindGrid)
+  const [selection, setSelection] = useGridSelection(query)
+  const prefs = useGridPrefs('fee-behind', grid.reload)
+  const [result, setResult] = useState<BulkAnswer | null>(null)
+  const g = t.behindGrid
+  const page = grid.page
+  const labels = copy.grid.labels({ name: t.behind, word: g.word, plural: g.plural, searchPlaceholder: g.search, columnsNote: g.columnsNote, emptyText: g.empty, noMatchText: g.noMatch })
+  const open = (row: BehindRow) => navigate(`/learners/${row.id}?tab=fees`)
+  const sort = { sort: page?.sort ?? query.sort, dir: page?.dir ?? query.dir }
+
+  const render = {
+    learner: (row: BehindRow) => (
+      <>
+        <a href={`/learners/${row.id}?tab=fees`} onClick={(e) => (e.preventDefault(), open(row))} className="block font-extrabold text-ink no-underline hover:underline">
+          {row.name}
+        </a>
+      </>
+    ),
+    class: (row: BehindRow) => <span className="text-sm">{row.class}</span>,
+    owed_on: (row: BehindRow) => <span className="text-sm">{row.owed_on}</span>,
+    due_now: (row: BehindRow) => <span className="ref font-extrabold whitespace-nowrap">{money(row.due_now)}</span>,
+    days: (row: BehindRow) => <Tag tone="attention">! {t.days(row.days)}</Tag>,
+  }
+
+  const card = (row: BehindRow) => ({
+    title: row.name,
+    meta: [row.class, row.owed_on].filter((x) => x !== '').join(' · '),
+    aside: <span className="ref font-extrabold">{money(row.due_now)}</span>,
+  })
+
+  const bulk = (action: string) => {
+    if (action !== 'remind') return
+    void gridsApi.bulk('fee-behind', { action, ...(selection.all ? { all: true as const } : { ids: selection.ids }), state: viewState(query, sort), input: {} }).then((r) => {
+      if (r.kind === 'saved') {
+        setResult(r.data)
+        setSelection(NO_SELECTION)
+        slips.done({ word: copy.slips.sent, title: g.reminded(r.data.done) })
+        onReminded()
+      } else slips.wrong({ word: t.notSaved, title: t.failed })
+    })
+  }
+
+  return (
+    <div className="border-2 border-t-0 border-ink bg-sheet">
+      <DataGrid
+        labels={labels}
+        page={page}
+        phase={grid.phase}
+        query={query}
+        onQuery={(next, replace) => {
+          setResult(null)
+          setQuery(next, replace)
+        }}
+        onRetry={grid.reload}
+        render={render}
+        alignEnd={['due_now']}
+        card={card}
+        rowName={(row) => row.name}
+        rowTone={() => null}
+        onOpen={open}
+        selection={selection}
+        onSelection={setSelection}
+        onBulk={bulk}
+        notice={
+          result !== null && (
+            <BulkResult
+              label={g.remindLabel}
+              done={g.reminded(result.done)}
+              notDoneCount={g.notReminded(result.refused.length)}
+              notDone={g.notRemindedWord}
+              line={g.resultLine}
+              refused={result.refused}
+              close={g.close}
+              onClose={() => setResult(null)}
+            />
+          )
+        }
+        onColumns={prefs.onColumns}
+        views={prefs.views}
+        onExport={(scope) => {
+          if (page !== undefined) startExport('fee-behind', scope, { page, query, selection, word: g.word, plural: g.plural })
+        }}
+      />
+      <p className="px-4 pt-1 pb-3 text-[13px] text-text-muted">{t.remindNote}</p>
+    </div>
+  )
+}
+
+/** The payments ledger (D-095): every receipt, newest first, on the data grid. A cancelled receipt stays, marked. */
+function Ledger() {
+  const [query, setQuery] = useGridQuery('/fees', ['view'])
+  const grid = useGridPage('fee-payments', query, paymentsGrid)
+  const [selection, setSelection] = useGridSelection(query)
+  const prefs = useGridPrefs('fee-payments', grid.reload)
+  const l = t.ledger
+  const page = grid.page
+  const labels = copy.grid.labels({ name: t.ledgerTab, word: l.word, plural: l.plural, searchPlaceholder: l.search, columnsNote: l.columnsNote, emptyText: l.empty, noMatchText: l.noMatch })
+  const open = (row: PaymentRow) => navigate(`/fees/receipts/${row.id}`)
+
+  const render = {
+    receipt: (row: PaymentRow) => (
+      <a href={`/fees/receipts/${row.id}`} onClick={(e) => (e.preventDefault(), open(row))} className={`ref font-extrabold text-ink no-underline hover:underline ${row.cancelled ? 'line-through' : ''}`}>
+        {row.receipt}
+      </a>
+    ),
+    received_on: (row: PaymentRow) => <span className="ref text-[13px]">{day(row.received_on)}</span>,
+    learners: (row: PaymentRow) => <span className="text-sm">{row.learners}</span>,
+    payer: (row: PaymentRow) => <span className="text-sm">{row.payer}</span>,
+    method: (row: PaymentRow) => (
+      <span className="text-sm">
+        {row.method_label}
+        {row.reference !== null && <span className="ref block text-xs text-text-muted">{row.reference}</span>}
+      </span>
+    ),
+    amount: (row: PaymentRow) => <span className={`ref font-extrabold whitespace-nowrap ${row.cancelled ? 'text-text-muted line-through' : ''}`}>{money(row.amount)}</span>,
+    received_by: (row: PaymentRow) => <span className="text-sm">{row.received_by ?? ''}</span>,
+    state: (row: PaymentRow) => (row.cancelled ? <Tag tone="wrong">✕ {l.cancelled}</Tag> : <Tag tone="done">✓ {l.counted}</Tag>),
+  }
+
+  const card = (row: PaymentRow) => ({
+    title: <span className="ref">{row.receipt}</span>,
+    meta: [day(row.received_on), row.learners, row.method_label].filter((x) => x !== '').join(' · '),
+    aside: <span className={`ref font-extrabold ${row.cancelled ? 'line-through' : ''}`}>{money(row.amount)}</span>,
+  })
+
+  return (
+    <div className="border-2 border-t-0 border-ink bg-sheet">
+      <DataGrid
+        labels={labels}
+        page={page}
+        phase={grid.phase}
+        query={query}
+        onQuery={setQuery}
+        onRetry={grid.reload}
+        render={render}
+        alignEnd={['amount']}
+        card={card}
+        rowName={(row) => row.receipt}
+        rowTone={(row) => (row.cancelled ? 'wrong' : null)}
+        onOpen={open}
+        selection={selection}
+        onSelection={setSelection}
+        onBulk={() => undefined}
+        onColumns={prefs.onColumns}
+        views={prefs.views}
+        onExport={(scope) => {
+          if (page !== undefined) startExport('fee-payments', scope, { page, query, selection, word: l.word, plural: l.plural })
+        }}
+      />
+    </div>
   )
 }

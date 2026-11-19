@@ -1,4 +1,5 @@
 import { api, type paths } from '@acadly/kernel'
+import { gridApiQuery, type GridQuery } from '@acadly/ui'
 import { read, settle } from '../setup/api'
 
 type Get<P extends keyof paths> = paths[P] extends { get: { responses: { 200: { content: { 'application/json': infer T } } } } } ? T : never
@@ -9,6 +10,16 @@ export type StatementLine = LearnerFees['statement'][number]
 export type FeeCharge = LearnerFees['charges'][number]
 export type Receipt = Get<'/v1/fees/payments/{id}'>
 export type Desk = Get<'/v1/fees/desk'>
+export type PaymentsPage = Get<'/v1/fees/payments/grid'>
+export type PaymentRow = PaymentsPage['rows'][number]
+export type BehindPage = Get<'/v1/fees/behind/grid'>
+export type BehindRow = BehindPage['rows'][number]
+
+/** The learners behind their plan, one page of the data grid. */
+export const behindGrid = (query: GridQuery) => read(api.GET('/v1/fees/behind/grid', { params: { query: gridApiQuery(query) as never } }))
+
+/** The payments ledger, one page of the data grid. */
+export const paymentsGrid = (query: GridQuery) => read(api.GET('/v1/fees/payments/grid', { params: { query: gridApiQuery(query) as never } }))
 export type TermList = Get<'/v1/fees/terms'>
 export type TermFees = Get<'/v1/fees/terms/{period}/{division}'>
 export type FeeItem = TermFees['items'][number]
@@ -52,6 +63,9 @@ export const feesApi = {
 
   closeDay: (day: string, counted: number, note: string) => settle(api.POST('/v1/fees/days/{day}/close', { params: { path: { day } }, body: { counted, note } as never }) as Done<{ difference: number }>),
   remind: (learnerIds: string[]) => settle(api.POST('/v1/fees/reminders', { body: { learner_ids: learnerIds } as never }) as Done<{ sent: number }>),
+  /** The receipt and the fee statement as A4 documents, drawn by the document engine (D-096). */
+  receiptPdf: (id: string) => `${API}/v1/fees/payments/${id}/pdf`,
+  statementPdf: (learnerId: string) => `${API}/v1/fees/learners/${learnerId}/statement`,
   exportUrl: (from: string, to: string) => `${API}/v1/fees/export?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,
 }
 

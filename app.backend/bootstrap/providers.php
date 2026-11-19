@@ -10,6 +10,7 @@ use Acadly\Modules\Assessment\AssessmentServiceProvider;
 use Acadly\Modules\Attendance\AttendanceServiceProvider;
 use Acadly\Modules\Conduct\ConductServiceProvider;
 use Acadly\Modules\Fees\FeesServiceProvider;
+use Acadly\Modules\SafeRelease\SafeReleaseServiceProvider;
 use Acadly\Modules\Support\SupportServiceProvider;
 use App\Providers\AppServiceProvider;
 
@@ -26,4 +27,5 @@ return [
     FeesServiceProvider::class,
     ConductServiceProvider::class,
     SupportServiceProvider::class,
+    SafeReleaseServiceProvider::class,
 ];

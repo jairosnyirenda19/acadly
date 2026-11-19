@@ -5,7 +5,7 @@ import { copy } from '../copy'
 import { feesApi, kwachaText, money, parseKwacha, type FeeItem, type ShopItem, type TermFees } from '../fees/api'
 import { Input, Select } from '../setup/parts'
 import { day } from './api'
-import { PageHead, Tag } from './parts'
+import { PageHead, Tag, SettingsTabs } from './parts'
 
 const t = copy.settings.fees
 type View = 'term' | 'items' | 'shop'
@@ -16,6 +16,7 @@ export function FeesSettingsScreen() {
 
   return (
     <>
+      <SettingsTabs />
       <PageHead kicker={t.kicker} title={t.title} intro={t.intro} />
       <nav aria-label={t.title} className="flex gap-6 border-b-2 border-ink px-[clamp(16px,3vw,40px)] text-[15px]">
         {(['term', 'items', 'shop'] as View[]).map((v) => (
@@ -24,7 +25,7 @@ export function FeesSettingsScreen() {
             type="button"
             aria-current={view === v ? 'page' : undefined}
             onClick={() => setView(v)}
-            className={`min-h-11 border-b-4 px-0.5 ${view === v ? 'border-ink font-extrabold' : 'border-transparent font-medium text-text-muted'}`}
+            className={`min-h-11 border-b-4 px-0.5 ${view === v ? 'border-teal font-extrabold' : 'border-transparent font-medium text-text-muted'}`}
           >
             {t.tabs[v]}
           </button>
@@ -54,7 +55,7 @@ function TermView() {
   return (
     <div className="grid gap-5">
       <div className="flex flex-wrap items-end gap-3">
-        <div className="min-w-[280px]">
+        <div className="w-full min-w-0 max-w-[420px] sm:w-auto sm:min-w-[280px]">
           <Select label={t.term} value={key(current)} onChange={(e) => setChosen(e.target.value)}>
             {list.map((x) => (
               <option key={key(x)} value={key(x)}>
@@ -130,7 +131,7 @@ function TermEditor({ data, onSaved }: { data: TermFees; onSaved: () => void }) 
   const firstError = Object.values(errors)[0]?.[0]
 
   return (
-    <div className="grid items-start gap-x-8 gap-y-6 xl:grid-cols-[minmax(0,1fr)_400px]">
+    <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-x-8 gap-y-6 xl:grid-cols-[minmax(0,1fr)_400px]">
       <section aria-label={t.byLevel} className="border-2 border-ink bg-sheet px-4 pt-3 pb-4">
         <h2 className="type-display mb-2 text-[26px] leading-none">{t.byLevel}</h2>
         {firstError !== undefined && (

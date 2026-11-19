@@ -5,7 +5,7 @@ import { copy } from '../copy'
 import { Input } from '../setup/parts'
 import { supportApi, type Rules } from '../support/api'
 import { SourceTag } from '../support/WatchScreen'
-import { PageHead } from './parts'
+import { PageHead, SettingsTabs } from './parts'
 
 const t = copy.settings.support
 
@@ -36,6 +36,7 @@ function Editor({ data }: { data: Rules }) {
 
   return (
     <>
+      <SettingsTabs />
       <PageHead kicker={t.kicker} title={t.title} intro={t.intro} />
       <div className="grid items-start gap-x-8 gap-y-6 px-[clamp(16px,3vw,40px)] pb-8 xl:grid-cols-[minmax(0,1fr)_420px]">
         <section aria-label={t.signals} className="grid gap-1 border-2 border-ink bg-sheet px-4 py-3.5">

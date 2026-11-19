@@ -5,7 +5,7 @@ import { copy } from '../copy'
 import { AccessTag } from '../learners/documents/DocumentsTab'
 import { documentsApi, type DocumentAccess, type TypesState } from '../learners/documents/api'
 import { Input } from '../setup/parts'
-import { PageHead, Tag } from './parts'
+import { PageHead, Tag, SettingsTabs } from './parts'
 
 const t = copy.settings.documentTypes
 const d = copy.learners.documents
@@ -23,6 +23,7 @@ export function DocumentTypesScreen() {
 
   return (
     <>
+      <SettingsTabs />
       <PageHead kicker={t.kicker} title={t.title} intro={t.intro} />
       <div className={`grid items-start gap-x-8 gap-y-6 px-[clamp(16px,3vw,40px)] pb-8 ${editing !== null ? "xl:grid-cols-[minmax(0,1fr)_400px]" : "max-w-[1100px]"}`}>
         <section aria-label={t.title} className="@container border-2 border-ink bg-sheet px-4 pt-2 pb-4 md:px-5">

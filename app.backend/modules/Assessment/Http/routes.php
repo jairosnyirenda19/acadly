@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Acadly\Modules\Assessment\Http\AssessmentController;
 use Acadly\Modules\Assessment\Http\FamilyCardController;
+use Acadly\Modules\Assessment\Http\ObservationController;
 use Acadly\Modules\Assessment\Http\PublishController;
 use Acadly\Modules\Assessment\Http\ResultsController;
 use Acadly\Modules\Assessment\Http\SettingsController;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 // The parent portal: a parent's own child. No permission: the active link is the rule.
 Route::middleware(['auth:sanctum', 'module:assessment'])->get('/portal/children/{id}/card', FamilyCardController::class)->whereUuid('id')->name('portal.card');
+Route::middleware(['auth:sanctum', 'module:assessment'])->get('/portal/children/{id}/review', [ObservationController::class, 'family'])->whereUuid('id')->name('portal.review');
 
 Route::middleware(['auth:sanctum', 'module:assessment'])->prefix('assessment')->name('assessment.')->group(function (): void {
     Route::get('/scales', [SettingsController::class, 'scales'])->name('scales.index');
@@ -37,6 +39,18 @@ Route::middleware(['auth:sanctum', 'module:assessment'])->prefix('assessment')->
     Route::get('/results', [ResultsController::class, 'index'])->name('results');
     Route::get('/results/working', [ResultsController::class, 'working'])->name('results.working');
     Route::get('/learner/{id}', [ResultsController::class, 'learner'])->whereUuid('id')->name('learner');
+
+    Route::get('/rooms', [ObservationController::class, 'rooms'])->name('rooms');
+    Route::get('/rooms/{id}', [ObservationController::class, 'room'])->whereUuid('id')->name('rooms.show');
+    Route::get('/rooms/{id}/observations', [ObservationController::class, 'day'])->whereUuid('id')->name('rooms.observations');
+    Route::post('/rooms/{id}/observations', [ObservationController::class, 'record'])->whereUuid('id')->name('rooms.observe');
+    Route::get('/reviews', [ObservationController::class, 'reviews'])->name('reviews');
+    Route::post('/reviews/share', [ObservationController::class, 'share'])->name('reviews.share');
+    Route::get('/reviews/learner/{id}', [ObservationController::class, 'review'])->whereUuid('id')->name('reviews.learner');
+    Route::put('/reviews/learner/{id}', [ObservationController::class, 'save'])->whereUuid('id')->name('reviews.save');
+    Route::post('/reviews/{id}/submit', [ObservationController::class, 'submit'])->whereUuid('id')->name('reviews.submit');
+    Route::post('/reviews/{id}/check', [ObservationController::class, 'check'])->whereUuid('id')->name('reviews.check');
+    Route::post('/reviews/{id}/return', [ObservationController::class, 'return'])->whereUuid('id')->name('reviews.return');
 
     Route::get('/publishing', [PublishController::class, 'index'])->name('publishing');
     Route::post('/publishing', [PublishController::class, 'publish'])->name('publishing.publish');

@@ -1,5 +1,6 @@
 import { can, moduleOn, type AppContext } from '@acadly/kernel'
 import { copy } from '../copy'
+import { narrowTo, type Division } from './divisions'
 import type { IconName } from './icons'
 
 const t = copy.shell
@@ -18,12 +19,15 @@ export interface NavItem {
   show: (context: AppContext) => boolean
   /** Paths that light this item: the item's own, and pages under it. */
   lights: (path: string) => boolean
+  /** The school's own word for the page, where its levels name it: "Children" in a nursery. */
+  named?: (context: AppContext) => string | undefined
 }
 
 export interface NavGroup {
   key: string
   label: string
   items: NavItem[]
+  named?: (context: AppContext) => string | undefined
 }
 
 const under = (base: string) => (path: string) => path === base || path.startsWith(`${base}/`)
@@ -37,18 +41,24 @@ export const GROUPS: NavGroup[] = [
     key: 'daily',
     label: t.groups.daily,
     items: [
+      { key: 'divisions', label: t.nav.divisions, path: '/divisions', icon: 'tiles', show: () => false, lights: (p) => p === '/divisions' },
       { key: 'my-day', label: t.nav.myDay, path: '/my-day', icon: 'myDay', show: (c) => takesRegisters(c), lights: (p) => p === '/my-day' },
       { key: 'today', label: t.nav.today, path: '/', icon: 'today', show: () => true, lights: (p) => p === '/' },
       { key: 'registers', label: t.nav.registers, path: '/registers', icon: 'registers', show: (c) => seesRegisters(c), lights: under('/registers') },
       { key: 'marks', label: t.nav.marks, path: '/marks', icon: 'marks', show: (c) => seesMarks(c), lights: under('/marks') },
+      { key: 'room', label: t.nav.room, path: '/room', icon: 'room', show: (c) => seesObservations(c), lights: under('/room') },
+      { key: 'observations', label: t.nav.observations, path: '/observations', icon: 'observations', show: (c) => observes(c) && holdsAnywhere(c, 'assessment.observe'), lights: under('/observations') },
+      { key: 'reviews', label: t.nav.reviews, path: '/reviews', icon: 'reviews', show: (c) => seesObservations(c), lights: under('/reviews') },
+      { key: 'pickup', label: t.nav.pickup, path: '/pickup', icon: 'pickup', show: (c) => seesPickup(c), lights: under('/pickup') },
       { key: 'to-approve', label: t.nav.toApprove, path: '/approvals', icon: 'approvals', show: (c) => decides(c), lights: under('/approvals') },
     ],
   },
   {
     key: 'learners',
     label: t.groups.learners,
+    named: (c) => schoolWord(c, 'learner'),
     items: [
-      { key: 'learners', label: t.nav.learners, path: '/learners', icon: 'learners', show: (c) => holdsAnywhere(c, 'enrolment.learners.view'), lights: under('/learners') },
+      { key: 'learners', label: t.nav.learners, path: '/learners', icon: 'learners', show: (c) => holdsAnywhere(c, 'enrolment.learners.view'), lights: under('/learners'), named: (c) => schoolWord(c, 'learner') },
       { key: 'support', label: t.nav.support, path: '/support', icon: 'support', show: (c) => moduleOn(c, 'support') && (holdsAnywhere(c, 'support.view') || holdsAnywhere(c, 'support.lead')), lights: under('/support') },
       { key: 'conduct', label: t.nav.conduct, path: '/conduct', icon: 'conduct', show: (c) => moduleOn(c, 'conduct') && (can(c, 'conduct.view') || can(c, 'conduct.follow_up')), lights: under('/conduct') },
     ],
@@ -68,10 +78,17 @@ export const GROUPS: NavGroup[] = [
     items: [
       { key: 'people', label: t.nav.people, path: '/settings/people', icon: 'people', show: (c) => holdsAnywhere(c, 'access.roles.assign'), lights: under('/settings/people') },
       { key: 'roles', label: t.nav.roles, path: '/settings/roles', icon: 'roles', show: (c) => can(c, 'access.roles.manage'), lights: under('/settings/roles') },
-      { key: 'subjects', label: t.nav.subjects, path: '/settings/subjects', icon: 'subjects', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/subjects') },
+      { key: 'subjects', label: t.nav.subjects, path: '/settings/subjects', icon: 'subjects', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/subjects'), named: (c) => schoolWord(c, 'subject') },
       { key: 'teaching', label: t.nav.teaching, path: '/settings/teaching', icon: 'teaching', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/teaching') },
       { key: 'timetable', label: t.nav.timetable, path: '/settings/timetable', icon: 'timetable', show: (c) => holdsAnywhere(c, 'academics.manage'), lights: under('/settings/timetable') },
       { key: 'next-year', label: t.nav.nextYear, path: '/settings/next-year', icon: 'timetable', show: (c) => can(c, 'academics.manage'), lights: under('/settings/next-year') },
+    ],
+  },
+  {
+    key: 'settings',
+    label: t.groups.settings,
+    items: [
+      { key: 'look', label: t.nav.look, path: '/settings/branding', icon: 'look', show: (c) => can(c, 'institution.manage'), lights: under('/settings/branding') },
       { key: 'support-settings', label: t.nav.supportSettings, path: '/settings/support', icon: 'support', show: (c) => moduleOn(c, 'support') && can(c, 'support.manage'), lights: under('/settings/support') },
       { key: 'conduct-settings', label: t.nav.conductSettings, path: '/settings/conduct', icon: 'conduct', show: (c) => moduleOn(c, 'conduct') && can(c, 'conduct.manage'), lights: under('/settings/conduct') },
       { key: 'fee-settings', label: t.nav.feeSettings, path: '/settings/fees', icon: 'fees', show: (c) => moduleOn(c, 'fees') && can(c, 'fees.manage'), lights: under('/settings/fees') },
@@ -103,32 +120,98 @@ export function takesRegisters(context: AppContext): boolean {
   return moduleOn(context, 'attendance') && holdsAnywhere(context, 'attendance.capture')
 }
 
-/** Whether the account works with marks anywhere: sets, enters, locks or sees assessments, with the module on. */
+/** The model a division's profile binds for learning: 'marks' unless it says otherwise. */
+function modelOf(division: AppContext['divisions'][number]): string {
+  const bindings = division.bindings as Record<string, string> | undefined
+
+  return bindings?.['assessment.model'] ?? 'marks'
+}
+
+/** Whether some level of the school takes marks. A school with no levels yet is treated as one that does. */
+export function takesMarks(context: AppContext): boolean {
+  return context.divisions.length === 0 || context.divisions.some((d) => modelOf(d) === 'marks')
+}
+
+/** Whether some level of the school records observations instead of marks, with the module on. */
+export function observes(context: AppContext): boolean {
+  return moduleOn(context, 'assessment') && context.divisions.some((d) => modelOf(d) === 'observational')
+}
+
+/** Whether the account works with observations or progress reviews anywhere. */
+export function seesObservations(context: AppContext): boolean {
+  return observes(context) && ['assessment.observe', 'assessment.review', 'assessment.view'].some((p) => holdsAnywhere(context, p))
+}
+
+/** Whether the account works at pick-up anywhere, with the module on. */
+export function seesPickup(context: AppContext): boolean {
+  return moduleOn(context, 'saferelease') && ['saferelease.release', 'saferelease.manage', 'saferelease.view'].some((p) => holdsAnywhere(context, p))
+}
+
+/**
+ * The school's own word, many form, when the school has one level and its
+ * profile names it ("Children", "Learning areas"). With several levels the
+ * console keeps its general words.
+ */
+export function schoolWord(context: AppContext, term: 'learner' | 'subject' | 'group' | 'level'): string | undefined {
+  const words = context.vocabulary as Record<string, { one: string; many: string } | undefined>
+
+  return words[term]?.many
+}
+
+/** Whether the account works with marks anywhere: sets, enters, locks or sees assessments, with the module on, in a school whose levels take marks. */
 export function seesMarks(context: AppContext): boolean {
-  return moduleOn(context, 'assessment') && ['assessment.create', 'assessment.enter', 'assessment.lock', 'assessment.view', 'assessment.publish'].some((p) => holdsAnywhere(context, p))
+  return moduleOn(context, 'assessment') && takesMarks(context) && ['assessment.create', 'assessment.enter', 'assessment.lock', 'assessment.view', 'assessment.publish'].some((p) => holdsAnywhere(context, p))
 }
 
 /** Whether the account sees every assessment of its classes: the office's list, with lock and return. */
 export function seesAllMarks(context: AppContext): boolean {
-  return moduleOn(context, 'assessment') && ['assessment.lock', 'assessment.view'].some((p) => holdsAnywhere(context, p))
+  return moduleOn(context, 'assessment') && takesMarks(context) && ['assessment.lock', 'assessment.view'].some((p) => holdsAnywhere(context, p))
 }
 
 /** Whether the account publishes term results somewhere, with the module on. */
 export function publishesResults(context: AppContext): boolean {
-  return moduleOn(context, 'assessment') && holdsAnywhere(context, 'assessment.publish')
+  return moduleOn(context, 'assessment') && takesMarks(context) && holdsAnywhere(context, 'assessment.publish')
 }
 
 /** Whether the account keeps the scales and grading plans somewhere, with the module on. */
 export function keepsGrading(context: AppContext): boolean {
-  return moduleOn(context, 'assessment') && holdsAnywhere(context, 'assessment.plan')
+  return moduleOn(context, 'assessment') && takesMarks(context) && holdsAnywhere(context, 'assessment.plan')
 }
 
-/** The groups and items this account sees. */
-export function visibleGroups(context: AppContext): NavGroup[] {
-  return GROUPS.map((group) => ({ ...group, items: group.items.filter((item) => item.show(context)) })).filter((group) => group.items.length > 0)
+/** The pages that belong to one division's daily work: inside a division, never across all of them (D-096). */
+export const DIVISION_ONLY = ['my-day', 'registers', 'marks', 'room', 'observations', 'reviews', 'pickup']
+
+/** Where the account stands among the divisions: the one it works in (null for all), and how many it works in. */
+export interface Lens {
+  division: Division | null
+  reach: number
+}
+
+/**
+ * The groups and items this account sees. Inside a division, the rail takes
+ * that division's words and bindings; across all divisions it keeps the
+ * school's shared pages and the Divisions start screen (D-096).
+ */
+export function visibleGroups(context: AppContext, lens?: Lens): NavGroup[] {
+  const many = lens !== undefined && lens.reach > 1
+  const all = many && lens.division === null
+  const ctx = lens === undefined ? context : narrowTo(context, lens.division)
+
+  return GROUPS.map((group) => ({
+    ...group,
+    label: group.named?.(ctx) ?? group.label,
+    items: group.items
+      .filter((item) => (item.key === 'divisions' ? many : !(all && DIVISION_ONLY.includes(item.key)) && item.show(ctx)))
+      .map((item) => ({ ...item, label: item.named?.(ctx) ?? item.label })),
+  })).filter((group) => group.items.length > 0)
 }
 
 /** The first settings page the account may use, or null. */
 export function settingsHome(context: AppContext): string | null {
-  return GROUPS.find((g) => g.key === 'school')?.items.find((item) => item.show(context))?.path ?? null
+  return GROUPS.filter((g) => g.key === 'school' || g.key === 'settings').flatMap((g) => g.items).find((item) => item.show(context))?.path ?? null
+}
+
+/** The group of the rail that holds a page, with what this account sees of it: the tabs over a School or Settings page. */
+export function groupOf(context: AppContext, path: string): NavGroup | undefined {
+  return visibleGroups(context).find((g) => (g.key === 'school' || g.key === 'settings') && g.items.some((item) => item.lights(path)))
 }

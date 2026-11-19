@@ -31,6 +31,12 @@ const PATHS = {
   support: 'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z',
   pay: 'M12 4v16 M4 12h16',
   shop: 'M4 8h16l-1 12H5z M9 8V6a3 3 0 0 1 6 0v2',
+  room: 'M4 20V9l8-5 8 5v11z M10 20v-6h4v6',
+  observations: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+  reviews: 'M5 4h14v16H5z M8 9h8 M8 13h5',
+  pickup: 'M4 20V4h9l7 7v9z M13 4v7h7',
+  look: 'M4 4h16v16H4z M4 14l5-5 4 4 3-3 4 4 M15 8h.01',
+  tiles: 'M3 3h8v8H3z M13 3h8v5h-8z M13 10h8v11h-8z M3 13h8v8H3z',
 } as const
 
 export type IconName = keyof typeof PATHS

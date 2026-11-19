@@ -5,6 +5,7 @@ import {
   getAccount,
   getContext,
   getSchoolName,
+  getSchoolLook,
   moduleOn,
   navigate,
   signOut,
@@ -13,7 +14,7 @@ import {
   type Account,
   type AppContext,
 } from '@acadly/kernel'
-import { Button, Notice, SlipPad } from '@acadly/ui'
+import { applyLook, Button, Notice, SlipPad } from '@acadly/ui'
 import { useEffect, useState } from 'react'
 import { copy } from './copy'
 import { AuthLayout, Heading } from './sign-in/AuthLayout'
@@ -45,9 +46,16 @@ import { DocumentTypesScreen } from './settings/DocumentTypesScreen'
 import { FeesSettingsScreen } from './settings/FeesSettingsScreen'
 import { ConductSettingsScreen } from './settings/ConductSettingsScreen'
 import { SupportSettingsScreen } from './settings/SupportSettingsScreen'
+import { LookScreen } from './settings/LookScreen'
+import { DivisionsScreen } from './shell/DivisionsScreen'
 import { WatchScreen } from './support/WatchScreen'
 import { OpenPlanScreen } from './support/OpenPlanScreen'
 import { PlanScreen } from './support/PlanScreen'
+import { MyRoomScreen } from './early/MyRoomScreen'
+import { ObservationScreen } from './early/ObservationScreen'
+import { ReviewsScreen } from './early/ReviewsScreen'
+import { ReviewScreen } from './early/ReviewScreen'
+import { PickupScreen } from './early/PickupScreen'
 import { OverviewScreen as ConductOverviewScreen } from './conduct/OverviewScreen'
 import { RecordConductScreen } from './conduct/RecordConductScreen'
 import { IncidentScreen } from './conduct/IncidentScreen'
@@ -72,10 +80,11 @@ import { ApprovalScreen, ApprovalsScreen } from './approvals/ApprovalsScreen'
 import { ApprovalSettingsScreen } from './approvals/ApprovalSettingsScreen'
 import { SetupWizard } from './setup/SetupWizard'
 import { ConsoleShell, holdsAnywhere, settingsHome } from './shell/ConsoleShell'
-import { keepsGrading, seesMarks, seesRegisters, takesRegisters } from './shell/navigation'
+import { keepsGrading, observes, seesMarks, seesObservations, seesPickup, seesRegisters, takesRegisters } from './shell/navigation'
 import { WorkInProvider } from './shell/WorkIn'
 import { SignInScreen } from './sign-in/SignInScreen'
 import { StatusScreen } from './StatusScreen'
+import { CheckScreen } from './CheckScreen'
 
 /** The console after the school opens: the shell, and the page for the path. */
 function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void }) {
@@ -93,6 +102,7 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const conduct = moduleOn(context, 'conduct')
   const support = moduleOn(context, 'support')
   const plan = /^\/support\/plans\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const review = /^\/reviews\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const incident = /^\/conduct\/incidents\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const registers = seesRegisters(context)
   const register = /^\/registers\/([0-9a-f-]{36})$/.exec(path)?.[1]
@@ -116,9 +126,16 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/settings/fees' && fees && can(context, 'fees.manage')) page = <FeesSettingsScreen />
   else if (path === '/settings/conduct' && conduct && can(context, 'conduct.manage')) page = <ConductSettingsScreen />
   else if (path === '/settings/support' && support && can(context, 'support.manage')) page = <SupportSettingsScreen />
+  else if (path === '/settings/branding' && can(context, 'institution.manage')) page = <LookScreen />
+  else if (path === '/divisions') page = <DivisionsScreen />
   else if (path === '/support' && support && (holdsAnywhere(context, 'support.view') || holdsAnywhere(context, 'support.lead'))) page = <WatchScreen />
   else if (path === '/support/plans/new' && support && holdsAnywhere(context, 'support.lead')) page = <OpenPlanScreen />
   else if (plan !== undefined && support) page = <PlanScreen key={plan} id={plan} />
+  else if (path === '/room' && seesObservations(context)) page = <MyRoomScreen />
+  else if (path === '/observations' && observes(context) && holdsAnywhere(context, 'assessment.observe')) page = <ObservationScreen />
+  else if (path === '/reviews' && seesObservations(context)) page = <ReviewsScreen />
+  else if (review !== undefined && seesObservations(context)) page = <ReviewScreen key={review} learnerId={review} />
+  else if (path === '/pickup' && seesPickup(context)) page = <PickupScreen />
   else if (path === '/conduct' && conduct && (can(context, 'conduct.view') || can(context, 'conduct.follow_up'))) page = <ConductOverviewScreen />
   else if (path === '/conduct/record' && conduct && holdsAnywhere(context, 'conduct.record')) page = <RecordConductScreen />
   else if (incident !== undefined && conduct) page = <IncidentScreen key={incident} id={incident} />
@@ -202,7 +219,13 @@ export function App() {
   useEffect(() => {
     void getAccount().then(setAccount)
     void getSchoolName().then(setSchool)
+    void getSchoolLook().then((look) => look !== null && applyLook(look))
   }, [])
+
+  // The school's own colours, as soon as the context says them (D-096).
+  useEffect(() => {
+    if (context !== null && context !== undefined) applyLook(context.school.look)
+  }, [context])
 
   useEffect(() => {
     if (school !== null) document.title = school
@@ -228,6 +251,11 @@ export function App() {
 
   if (path === '/status') {
     return <StatusScreen />
+  }
+
+  // The public document check needs no sign-in (D-096).
+  if (path === '/check') {
+    return <CheckScreen school={school} />
   }
 
   // The session check is still running: show the empty page, not a wrong screen.

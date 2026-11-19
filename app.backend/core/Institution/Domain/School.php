@@ -25,6 +25,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $physical_address
  * @property string|null $postal_address
  * @property string|null $logo_document_id
+ * @property string|null $app_name
+ * @property string|null $brand_main
+ * @property string|null $brand_accent
+ * @property bool $accent_last_word
  * @property CarbonImmutable|null $opened_at
  * @property string|null $opened_by
  */
@@ -36,7 +40,7 @@ final class School extends Model implements Auditable
 
     protected $guarded = [];
 
-    protected $casts = ['opened_at' => 'immutable_datetime'];
+    protected $casts = ['opened_at' => 'immutable_datetime', 'accent_last_word' => 'boolean'];
 
     public static function current(): self
     {

@@ -117,7 +117,7 @@ export function TeachingScreen() {
                     setMessage(null)
                     setTab({ division_id: x.division_id, campus_id: x.campus_id })
                   }}
-                  className={`border-b-4 px-4 pt-3 pb-2.5 text-[15px] ${on ? 'border-ink font-extrabold' : 'border-transparent font-medium'}`}
+                  className={`border-b-4 px-4 pt-3 pb-2.5 text-[15px] ${on ? 'border-teal font-extrabold' : 'border-transparent font-medium'}`}
                 >
                   {x.label} <span className="ref text-xs text-text-muted">{t.tabNote(x.not_given)}</span>
                 </button>

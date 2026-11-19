@@ -9,7 +9,7 @@ import { Bar, go, Loading, Mark, Screen, shortDay, longDay, useWords, when, type
 let sentFor: string | null = null
 
 /** The frame of a child's page: the way back to the child, then the page. */
-function ChildPage<T>({ id, phase, data, onRetry, children, foot }: { id: string; phase: string; data: T | undefined; onRetry: () => void; children: (data: T) => ReactNode; foot?: ReactNode }) {
+export function ChildPage<T>({ id, phase, data, onRetry, children, foot }: { id: string; phase: string; data: T | undefined; onRetry: () => void; children: (data: T) => ReactNode; foot?: ReactNode }) {
   const t = useWords()
   const family = useFamily().data
   const child = family?.children.find((c) => c.id === id)

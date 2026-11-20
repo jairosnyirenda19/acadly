@@ -15,6 +15,7 @@ enum ProgrammesPermission: string implements Permission
     case Register = 'programmes.register';
     case Approve = 'programmes.approve';
     case AllowFees = 'programmes.allow_fees';
+    case Accounts = 'programmes.accounts';
 
     public function key(): string
     {
@@ -30,6 +31,7 @@ enum ProgrammesPermission: string implements Permission
             self::Register => 'Place students and register them for a semester',
             self::Approve => 'Approve semester registrations',
             self::AllowFees => 'Allow registration without the fees needed',
+            self::Accounts => 'Look after student accounts',
         };
     }
 
@@ -42,6 +44,7 @@ enum ProgrammesPermission: string implements Permission
             self::Register => 'Place students in programmes, set the registration dates, start a semester, choose courses for a student, complete registrations and change courses in the add and drop period.',
             self::Approve => 'Approve or return the semester registrations of the division. Usually the head of department.',
             self::AllowFees => 'Let a student\'s registration complete before the share of fees needed is paid, with a reason. Usually the bursar.',
+            self::Accounts => 'Keep each student\'s phone for codes, send set-up codes, and suspend or restore a student\'s sign-in, with a reason. Never sees a password.',
         };
     }
 

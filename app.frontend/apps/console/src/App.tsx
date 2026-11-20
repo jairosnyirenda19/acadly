@@ -57,6 +57,8 @@ import { SupportSettingsScreen } from './settings/SupportSettingsScreen'
 import { LookScreen } from './settings/LookScreen'
 import { DivisionsScreen } from './shell/DivisionsScreen'
 import { HomeScreen } from './dashboard/HomeScreen'
+import { NewsScreen } from './news/NewsScreen'
+import { AccountsScreen as StudentAccountsScreen } from './programmes/AccountsScreen'
 import { SchoolLearnersScreen } from './dashboard/SchoolLearnersScreen'
 import { SchoolLedgerScreen } from './dashboard/SchoolLedgerScreen'
 import { WatchScreen } from './support/WatchScreen'
@@ -150,6 +152,8 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/programmes/courses' && programmes) page = <CatalogueScreen />
   else if (path === '/programmes/offerings' && programmes) page = <OfferingsScreen />
   else if (path === '/programmes/students' && programmes) page = <StudentsScreen />
+  else if (path === '/programmes/accounts' && programmes && holdsAnywhere(context, 'programmes.accounts')) page = <StudentAccountsScreen />
+  else if (path === '/news' && moduleOn(context, 'news')) page = <NewsScreen />
   else if (path === '/programmes/registration' && programmes) page = <RegistrationDeskScreen />
   else if (registration !== undefined && programmes) page = <RegistrationScreen key={registration} id={registration} />
   else if (path === '/support' && support && (holdsAnywhere(context, 'support.view') || holdsAnywhere(context, 'support.lead'))) page = <WatchScreen />

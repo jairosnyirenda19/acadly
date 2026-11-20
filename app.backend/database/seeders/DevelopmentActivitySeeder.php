@@ -15,6 +15,7 @@ use Acadly\Modules\Fees\Domain\PaymentMethod;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -50,6 +51,44 @@ final class DevelopmentActivitySeeder extends Seeder
         $registers = $this->registers($calendar, $by, $today);
         $paid = $this->payments($payments, $by, $today);
         $this->command?->getOutput()->writeln("  {$registers} registers and {$paid} payments added.");
+        $this->college($by, $clock);
+    }
+
+    /**
+     * D-101. In the college: News switched on with two posts, and one student account to sign in
+     * with, its password taken from DEV_STUDENT_PASSWORD in the local .env (never kept in code).
+     */
+    private function college(User $by, Clock $clock): void
+    {
+        $college = DB::table('institution_divisions')->where('profile_ref', 'like', 'TERTIARY@%')->whereNull('ended_at')->value('id');
+        $password = env('DEV_STUDENT_PASSWORD');
+        if (! is_string($college) || ! is_string($password) || mb_strlen($password) < 12) {
+            return;
+        }
+        if (! DB::table('module_switches')->where('module_key', 'news')->exists()) {
+            DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'news', 'enabled' => true, 'reason' => 'Development school.', 'switched_at' => $clock->now()]);
+        }
+        $learner = DB::table('programme_students')->where('division_id', $college)->whereNull('ended_at')->orderBy('created_at')->value('learner_id');
+        if (! is_string($learner)) {
+            return;
+        }
+        $account = DB::table('programme_student_accounts')->where('learner_id', $learner)->value('user_id');
+        if (! is_string($account)) {
+            $name = DB::table('learners')->where('id', $learner)->first(['first_name', 'surname']);
+            $user = User::query()->create(['name' => $name === null ? 'Student' : Row::text($name, 'first_name').' '.Row::text($name, 'surname'),
+                'email' => $learner.'@students.invalid', 'password' => Hash::make($password), 'status' => 'active']);
+            DB::table('programme_student_accounts')->insert(['learner_id' => $learner, 'division_id' => $college, 'user_id' => $user->id, 'phone' => '+265991234534',
+                'code_sent_at' => $clock->now(), 'set_up_at' => $clock->now(), 'created_by' => $by->id, 'created_at' => $clock->now()]);
+        }
+        if (! DB::table('news_posts')->where('division_id', $college)->exists()) {
+            foreach ([['Semester 1 examination timetable', "The examination timetable for Semester 1 is published.\n\nCheck the room and the time of each paper. Bring your student card to every paper.", '2026-12-20'],
+                ['Library hours for the exam weeks', 'The library opens from 07:00 to 21:00 on weekdays during the examinations.', null]] as [$title, $body, $pinned]) {
+                $id = Ids::next();
+                DB::table('news_posts')->insert(['id' => $id, 'root_id' => $id, 'version' => 1, 'division_id' => $college, 'title' => $title, 'body' => $body, 'audience' => 'everyone',
+                    'pinned_until' => $pinned, 'publish_at' => $clock->now()->subHours(3), 'author_id' => $by->id, 'created_at' => $clock->now()]);
+            }
+        }
+        $this->command?->getOutput()->writeln('  The college student account and two news posts are ready (DEV_STUDENT_NUMBER in .env).');
     }
 
     private function registers(AcademicCalendar $calendar, User $by, string $today): int

@@ -88,6 +88,18 @@ final class FeeDocuments
     public function statement(User $viewer, string $learnerId, string $name, ?string $class): array
     {
         $this->reach->learner($viewer, $learnerId, FeesPermission::View);
+
+        return $this->statementOf($viewer, $learnerId, $name, $class);
+    }
+
+    /**
+     * A learner's statement, drawn without a check: for a caller that has proved the person may
+     * see it (the student portal proves the learner is the person asking, D-101).
+     *
+     * @return array{name: string, pdf: string}
+     */
+    public function statementOf(User $viewer, string $learnerId, string $name, ?string $class): array
+    {
         $s = $this->ledger->standing($learnerId);
         $statement = $this->ledger->statement($learnerId);
         $today = $this->clock->today();

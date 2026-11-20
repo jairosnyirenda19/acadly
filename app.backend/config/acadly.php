@@ -12,6 +12,7 @@ use Acadly\Modules\Assessment\AssessmentModule;
 use Acadly\Modules\Attendance\AttendanceModule;
 use Acadly\Modules\Conduct\ConductModule;
 use Acadly\Modules\Fees\FeesModule;
+use Acadly\Modules\News\NewsModule;
 use Acadly\Modules\Programmes\ProgrammesModule;
 use Acadly\Modules\SafeRelease\SafeReleaseModule;
 use Acadly\Modules\Support\SupportModule;
@@ -82,6 +83,8 @@ return [
 
     // The parent portal's address, as families type it. Text messages that open the portal end with it (D-083).
     'portal_url' => env('ACADLY_PORTAL_URL', 'http://localhost:5174'),
+    // The student portal (D-101): college students sign in here.
+    'student_url' => env('ACADLY_STUDENT_URL', 'http://localhost:5175'),
 
     /*
     | Compiled blueprints and the lock of released versions (02 §1). Made by
@@ -146,6 +149,7 @@ return [
         ConductModule::class,
         SupportModule::class,
         SafeReleaseModule::class,
+        NewsModule::class,
         ProgrammesModule::class,
     ],
 

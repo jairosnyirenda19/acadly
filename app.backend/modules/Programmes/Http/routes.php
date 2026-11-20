@@ -4,7 +4,22 @@ declare(strict_types=1);
 
 use Acadly\Modules\Programmes\Http\ProgrammesController;
 use Acadly\Modules\Programmes\Http\RegistrationController;
+use Acadly\Modules\Programmes\Http\StudentAccountsController;
+use Acadly\Modules\Programmes\Http\StudentPortalController;
 use Illuminate\Support\Facades\Route;
+
+// The student portal (D-101): setting up the account, then the student's own records.
+Route::post('student/set-up', [StudentPortalController::class, 'setUp'])->middleware('throttle:20,1')->name('student.set-up');
+Route::middleware(['auth:sanctum', 'module:programmes'])->prefix('student')->name('student.')->group(function (): void {
+    Route::get('/me', [StudentPortalController::class, 'me'])->name('me');
+    Route::get('/courses', [StudentPortalController::class, 'courses'])->name('courses');
+    Route::get('/registration', [StudentPortalController::class, 'registration'])->name('registration');
+    Route::put('/registration/courses', [StudentPortalController::class, 'saveCourses'])->name('registration.courses');
+    Route::post('/registration/submit', [StudentPortalController::class, 'submit'])->name('registration.submit');
+    Route::get('/registration/slip', [StudentPortalController::class, 'slip'])->middleware('throttle:30,1')->name('registration.slip');
+    Route::get('/fees', [StudentPortalController::class, 'fees'])->name('fees');
+    Route::get('/fees/statement', [StudentPortalController::class, 'statement'])->middleware('throttle:30,1')->name('fees.statement');
+});
 
 Route::middleware(['auth:sanctum', 'module:programmes'])->get('programmes/learners/{id}', [RegistrationController::class, 'learner'])->whereUuid('id')->name('programmes.learner');
 
@@ -36,4 +51,8 @@ Route::middleware(['auth:sanctum', 'module:programmes'])->prefix('programmes/{di
     Route::put('/registrations/{id}/courses', [RegistrationController::class, 'saveCourses'])->whereUuid('id')->name('registrations.courses');
     Route::post('/registrations/{id}/{action}', [RegistrationController::class, 'act'])->whereUuid('id')->whereIn('action', ['submit', 'return', 'allow-fees', 'change', 'withdraw'])->name('registrations.act');
     Route::get('/registrations/{id}/slip', [RegistrationController::class, 'slip'])->whereUuid('id')->middleware('throttle:30,1')->name('registrations.slip');
+    Route::get('/accounts', [StudentAccountsController::class, 'index'])->name('accounts');
+    Route::put('/accounts/{learner}/phone', [StudentAccountsController::class, 'phone'])->whereUuid('learner')->name('accounts.phone');
+    Route::post('/accounts/codes', [StudentAccountsController::class, 'codes'])->middleware('throttle:120,1')->name('accounts.codes');
+    Route::post('/accounts/{learner}/suspend', [StudentAccountsController::class, 'suspend'])->whereUuid('learner')->name('accounts.suspend');
 });

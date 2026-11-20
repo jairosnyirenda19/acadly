@@ -14,7 +14,7 @@ final class RouteRules
     /** Routes open to anyone: they reveal nothing about a place. */
     public const array OPEN_ROUTES = [
         'sanctum.csrf-cookie', 'auth.sign-in', 'auth.two-step', 'academics.calendar.feed', 'auth.forgot-password', 'auth.reset-password', 'auth.phone.code', 'auth.phone.sign-in',
-        'kernel.health', 'kernel.ready', 'kernel.school', 'institution.logo.public', 'notify.reports', 'kernel.check',
+        'kernel.health', 'kernel.ready', 'kernel.school', 'institution.logo.public', 'notify.reports', 'kernel.check', 'student.set-up',
     ];
 
     /** Routes about the account itself, not about a place. */

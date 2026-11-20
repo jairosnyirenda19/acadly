@@ -20,7 +20,8 @@ final class SignInController
     public function __invoke(Request $request, SignIn $signIn, MeController $me): JsonResponse
     {
         $request->validate([
-            'email' => ['required', 'string', 'email', 'max:255'],
+            // An email address, or a student number for a student account (D-101).
+            'email' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string', 'max:255'],
         ]);
 

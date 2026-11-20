@@ -48,8 +48,10 @@ use Acadly\Kernel\Grid\PurgeExportsCommand;
 use Acadly\Kernel\Identity\FamilyAccounts;
 use Acadly\Kernel\Identity\NoFamilyAccounts;
 use Acadly\Kernel\Identity\NoPhoneHolders;
+use Acadly\Kernel\Identity\NoStudentAccounts;
 use Acadly\Kernel\Identity\PeopleGrid;
 use Acadly\Kernel\Identity\PhoneHolders;
+use Acadly\Kernel\Identity\StudentAccounts;
 use Acadly\Kernel\Module\Http\RequireModule;
 use Acadly\Kernel\Module\Licence\Licences;
 use Acadly\Kernel\Module\ModuleActivation;
@@ -150,6 +152,7 @@ final class KernelServiceProvider extends ServiceProvider
         $this->app->singleton(Notifier::class);
         $this->app->bindIf(PhoneHolders::class, NoPhoneHolders::class);
         $this->app->bindIf(FamilyAccounts::class, NoFamilyAccounts::class);
+        $this->app->bindIf(StudentAccounts::class, NoStudentAccounts::class);
         // Search everything (12-search, D-089): every place a module registers.
         $this->app->when(Search::class)->needs('$sources')->giveTagged(SearchSource::TAG);
         $this->app->tag([StaffSearch::class], SearchSource::TAG);

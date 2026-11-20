@@ -27188,6 +27188,523 @@
                 }
             }
         },
+        "/v1/news/{division}": {
+            "get": {
+                "operationId": "news.index",
+                "summary": "The news of a division: for those who publish, every post with how many have seen it, and the audiences to choose from;\nfor other staff, the news for everyone and for staff",
+                "tags": [
+                    "News"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "can_publish": {
+                                            "type": "boolean"
+                                        },
+                                        "posts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "body": {
+                                                        "type": "string"
+                                                    },
+                                                    "audience": {
+                                                        "type": "string"
+                                                    },
+                                                    "audience_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "year": {
+                                                        "type": [
+                                                            "integer",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "audience_label": {
+                                                        "type": "string"
+                                                    },
+                                                    "pinned": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "pinned_until": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "publish_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "scheduled": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "updated": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "author": {
+                                                        "type": "string"
+                                                    },
+                                                    "read": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "seen": {
+                                                        "type": [
+                                                            "integer",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reach": {
+                                                        "type": [
+                                                            "integer",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "title",
+                                                    "body",
+                                                    "audience",
+                                                    "audience_id",
+                                                    "year",
+                                                    "audience_label",
+                                                    "pinned",
+                                                    "pinned_until",
+                                                    "publish_at",
+                                                    "scheduled",
+                                                    "updated",
+                                                    "author",
+                                                    "read",
+                                                    "seen",
+                                                    "reach"
+                                                ]
+                                            }
+                                        },
+                                        "audiences": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "faculties": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name"
+                                                        ]
+                                                    }
+                                                },
+                                                "departments": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name"
+                                                        ]
+                                                    }
+                                                },
+                                                "programmes": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name"
+                                                        ]
+                                                    }
+                                                },
+                                                "years": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "integer"
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "faculties",
+                                                "departments",
+                                                "programmes",
+                                                "years"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "can_publish",
+                                        "posts",
+                                        "audiences"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "news.store",
+                "tags": [
+                    "News"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/news/posts/{id}": {
+            "put": {
+                "operationId": "news.update",
+                "tags": [
+                    "News"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/news/posts/{id}/withdraw": {
+            "post": {
+                "operationId": "news.withdraw",
+                "tags": [
+                    "News"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    }
+                                },
+                                "required": [
+                                    "reason"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/news": {
+            "get": {
+                "operationId": "student.news",
+                "summary": "The student's news, pinned first",
+                "tags": [
+                    "News"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "posts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "body": {
+                                                        "type": "string"
+                                                    },
+                                                    "audience": {
+                                                        "type": "string"
+                                                    },
+                                                    "audience_label": {
+                                                        "type": "string"
+                                                    },
+                                                    "pinned": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "publish_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "updated": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "author": {
+                                                        "type": "string"
+                                                    },
+                                                    "read": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "title",
+                                                    "body",
+                                                    "audience",
+                                                    "audience_label",
+                                                    "pinned",
+                                                    "publish_at",
+                                                    "updated",
+                                                    "author",
+                                                    "read"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "posts"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/news/{id}": {
+            "get": {
+                "operationId": "student.news.show",
+                "summary": "One post for the student, marked read",
+                "tags": [
+                    "News"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "post": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "body": {
+                                                    "type": "string"
+                                                },
+                                                "audience": {
+                                                    "type": "string"
+                                                },
+                                                "audience_label": {
+                                                    "type": "string"
+                                                },
+                                                "pinned": {
+                                                    "type": "boolean"
+                                                },
+                                                "publish_at": {
+                                                    "type": "string"
+                                                },
+                                                "updated": {
+                                                    "type": "boolean"
+                                                },
+                                                "author": {
+                                                    "type": "string"
+                                                },
+                                                "read": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "title",
+                                                "body",
+                                                "audience",
+                                                "audience_label",
+                                                "pinned",
+                                                "publish_at",
+                                                "updated",
+                                                "author",
+                                                "read"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "post"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/academics/next-year": {
             "get": {
                 "operationId": "academics.next-year",
@@ -46902,7 +47419,7 @@
                                 "properties": {
                                     "email": {
                                         "type": "string",
-                                        "format": "email",
+                                        "description": "An email address, or a student number for a student account (D-101).",
                                         "maxLength": 255
                                     },
                                     "password": {
@@ -47172,6 +47689,1365 @@
                 "responses": {
                     "204": {
                         "description": "No content"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/accounts": {
+            "get": {
+                "operationId": "programmes.accounts",
+                "summary": "Every active student of the division with the state of their account",
+                "tags": [
+                    "StudentAccounts"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "totals": {
+                                            "type": "object",
+                                            "properties": {
+                                                "students": {
+                                                    "type": "integer"
+                                                },
+                                                "active": {
+                                                    "type": "integer"
+                                                },
+                                                "code_sent": {
+                                                    "type": "integer"
+                                                },
+                                                "none": {
+                                                    "type": "integer"
+                                                },
+                                                "suspended": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "students",
+                                                "active",
+                                                "code_sent",
+                                                "none",
+                                                "suspended"
+                                            ]
+                                        },
+                                        "rows": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "number": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "programme": {
+                                                        "type": "string"
+                                                    },
+                                                    "year": {
+                                                        "type": "integer"
+                                                    },
+                                                    "phone": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "active",
+                                                            "code_sent",
+                                                            "none",
+                                                            "suspended"
+                                                        ]
+                                                    },
+                                                    "since": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "learner_id",
+                                                    "number",
+                                                    "name",
+                                                    "programme",
+                                                    "year",
+                                                    "phone",
+                                                    "state",
+                                                    "since",
+                                                    "reason"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "totals",
+                                        "rows"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/accounts/{learner}/phone": {
+            "put": {
+                "operationId": "programmes.accounts.phone",
+                "tags": [
+                    "StudentAccounts"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "learner",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "phone": {
+                                        "type": "string",
+                                        "maxLength": 30
+                                    }
+                                },
+                                "required": [
+                                    "phone"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/accounts/codes": {
+            "post": {
+                "operationId": "programmes.accounts.codes",
+                "summary": "Sends set-up codes to students: one, several, or every student who has no account yet",
+                "tags": [
+                    "StudentAccounts"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "learners": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "maxItems": 500
+                                    }
+                                },
+                                "required": [
+                                    "learners"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sent": {
+                                            "type": "integer"
+                                        },
+                                        "no_phone": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "sent",
+                                        "no_phone"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/programmes/{division}/accounts/{learner}/suspend": {
+            "post": {
+                "operationId": "programmes.accounts.suspend",
+                "tags": [
+                    "StudentAccounts"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "learner",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "restore": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "reason"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/set-up": {
+            "post": {
+                "operationId": "student.set-up",
+                "summary": "Sets up a student account with the student number, the code sent to the phone, and a new password; then signs in",
+                "tags": [
+                    "StudentPortal"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "number": {
+                                        "type": "string",
+                                        "maxLength": 40
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "maxLength": 10
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    }
+                                },
+                                "required": [
+                                    "number",
+                                    "code",
+                                    "password"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "signed_in": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "signed_in"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/me": {
+            "get": {
+                "operationId": "student.me",
+                "summary": "Who the student is",
+                "tags": [
+                    "StudentPortal"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "number": {
+                                            "type": "string"
+                                        },
+                                        "college": {
+                                            "type": "string"
+                                        },
+                                        "programme": {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "code",
+                                                "name"
+                                            ]
+                                        },
+                                        "year": {
+                                            "type": "integer"
+                                        },
+                                        "semester": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "email": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "phone": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "name",
+                                        "number",
+                                        "college",
+                                        "programme",
+                                        "year",
+                                        "semester",
+                                        "email",
+                                        "phone"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/courses": {
+            "get": {
+                "operationId": "student.courses",
+                "summary": "The student's courses this semester",
+                "tags": [
+                    "StudentPortal"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "semester": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "state": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "credits": {
+                                            "type": "integer"
+                                        },
+                                        "courses": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "credits": {
+                                                        "type": "integer"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "group": {
+                                                        "type": "string"
+                                                    },
+                                                    "lecturers": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "code",
+                                                    "title",
+                                                    "credits",
+                                                    "kind",
+                                                    "group",
+                                                    "lecturers"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "semester",
+                                        "state",
+                                        "credits",
+                                        "courses"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/registration": {
+            "get": {
+                "operationId": "student.registration",
+                "summary": "The student's registration for the semester, or null when none is open",
+                "tags": [
+                    "StudentPortal"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "registration": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string"
+                                                },
+                                                "late": {
+                                                    "type": "boolean"
+                                                },
+                                                "version": {
+                                                    "type": "integer"
+                                                },
+                                                "period": {
+                                                    "type": "string"
+                                                },
+                                                "period_id": {
+                                                    "type": "string"
+                                                },
+                                                "student": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "learner_id": {
+                                                            "type": "string"
+                                                        },
+                                                        "code": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "programme": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "code": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "code",
+                                                                "name"
+                                                            ]
+                                                        },
+                                                        "curriculum": {
+                                                            "type": "string"
+                                                        },
+                                                        "year": {
+                                                            "type": "integer"
+                                                        },
+                                                        "semester": {
+                                                            "type": "integer"
+                                                        },
+                                                        "mode": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "learner_id",
+                                                        "code",
+                                                        "name",
+                                                        "programme",
+                                                        "curriculum",
+                                                        "year",
+                                                        "semester",
+                                                        "mode"
+                                                    ]
+                                                },
+                                                "courses": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "offering_id": {
+                                                                "type": "string"
+                                                            },
+                                                            "course": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "code": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "title": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "code",
+                                                                    "title"
+                                                                ]
+                                                            },
+                                                            "kind": {
+                                                                "type": "string"
+                                                            },
+                                                            "elective_group_id": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "group": {
+                                                                "type": "string"
+                                                            },
+                                                            "credits": {
+                                                                "type": "integer"
+                                                            },
+                                                            "needs": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "offering_id",
+                                                            "course",
+                                                            "kind",
+                                                            "elective_group_id",
+                                                            "group",
+                                                            "credits",
+                                                            "needs"
+                                                        ]
+                                                    }
+                                                },
+                                                "core": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "groups": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "choose": {
+                                                                "type": "integer"
+                                                            },
+                                                            "courses": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "label",
+                                                            "choose",
+                                                            "courses"
+                                                        ]
+                                                    }
+                                                },
+                                                "offerings": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "course": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "code": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "title": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "code",
+                                                                    "title"
+                                                                ]
+                                                            },
+                                                            "group": {
+                                                                "type": "string"
+                                                            },
+                                                            "credits": {
+                                                                "type": "integer"
+                                                            },
+                                                            "seats_left": {
+                                                                "type": [
+                                                                    "integer",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "course",
+                                                            "group",
+                                                            "credits",
+                                                            "seats_left"
+                                                        ]
+                                                    }
+                                                },
+                                                "checks": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "problems": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "kind": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "text": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "kind",
+                                                                    "text"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "load": {
+                                                            "type": "integer"
+                                                        },
+                                                        "min": {
+                                                            "type": "integer"
+                                                        },
+                                                        "max": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "problems",
+                                                        "load",
+                                                        "min",
+                                                        "max"
+                                                    ]
+                                                },
+                                                "fees": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "known": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "share": {
+                                                            "type": "integer"
+                                                        },
+                                                        "owed": {
+                                                            "type": "integer"
+                                                        },
+                                                        "paid": {
+                                                            "type": "integer"
+                                                        },
+                                                        "needed": {
+                                                            "type": "integer"
+                                                        },
+                                                        "more": {
+                                                            "type": "integer"
+                                                        },
+                                                        "cleared": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "allowed": {
+                                                            "type": [
+                                                                "object",
+                                                                "null"
+                                                            ],
+                                                            "properties": {
+                                                                "by": {
+                                                                    "type": "string"
+                                                                },
+                                                                "reason": {
+                                                                    "type": "string"
+                                                                },
+                                                                "at": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "by",
+                                                                "reason",
+                                                                "at"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "known",
+                                                        "share",
+                                                        "owed",
+                                                        "paid",
+                                                        "needed",
+                                                        "more",
+                                                        "cleared",
+                                                        "allowed"
+                                                    ]
+                                                },
+                                                "steps": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "step": {
+                                                                "type": "string"
+                                                            },
+                                                            "title": {
+                                                                "type": "string"
+                                                            },
+                                                            "outcomes": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "outcome": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "title": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "requires_reason": {
+                                                                            "type": "boolean"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "outcome",
+                                                                        "title",
+                                                                        "requires_reason"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "permitted": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "blocked_reason": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "remedy": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "step",
+                                                            "title",
+                                                            "outcomes",
+                                                            "permitted",
+                                                            "blocked_reason",
+                                                            "remedy"
+                                                        ]
+                                                    }
+                                                },
+                                                "history": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "step": {
+                                                                "type": "string"
+                                                            },
+                                                            "outcome": {
+                                                                "type": "string"
+                                                            },
+                                                            "by": {
+                                                                "type": "string"
+                                                            },
+                                                            "at": {
+                                                                "type": "string"
+                                                            },
+                                                            "reason": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "step",
+                                                            "outcome",
+                                                            "by",
+                                                            "at",
+                                                            "reason"
+                                                        ]
+                                                    }
+                                                },
+                                                "phase": {
+                                                    "type": "string"
+                                                },
+                                                "add_drop": {
+                                                    "type": "boolean"
+                                                },
+                                                "window": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "closes_on": {
+                                                            "type": "string"
+                                                        },
+                                                        "late_until": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "closes_on",
+                                                        "late_until"
+                                                    ]
+                                                },
+                                                "editable": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "state",
+                                                "late",
+                                                "version",
+                                                "period",
+                                                "period_id",
+                                                "student",
+                                                "courses",
+                                                "core",
+                                                "groups",
+                                                "offerings",
+                                                "checks",
+                                                "fees",
+                                                "steps",
+                                                "history",
+                                                "phase",
+                                                "add_drop",
+                                                "window",
+                                                "editable"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "registration"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/registration/courses": {
+            "put": {
+                "operationId": "student.registration.courses",
+                "tags": [
+                    "StudentPortal"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "offerings": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "maxItems": 20
+                                    }
+                                },
+                                "required": [
+                                    "offerings"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/registration/submit": {
+            "post": {
+                "operationId": "student.registration.submit",
+                "tags": [
+                    "StudentPortal"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sent": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "sent"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/registration/slip": {
+            "get": {
+                "operationId": "student.registration.slip",
+                "summary": "The student's registration slip, once registered",
+                "tags": [
+                    "StudentPortal"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "no-store"
+                                }
+                            },
+                            "X-Content-Type-Options": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "nosniff"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/fees": {
+            "get": {
+                "operationId": "student.fees",
+                "summary": "The student's own fees, or null when the college keeps no fees here",
+                "tags": [
+                    "StudentPortal"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "fees": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "billed": {
+                                                    "type": "integer"
+                                                },
+                                                "paid": {
+                                                    "type": "integer"
+                                                },
+                                                "left": {
+                                                    "type": "integer"
+                                                },
+                                                "due_now": {
+                                                    "type": "integer"
+                                                },
+                                                "instalments": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "charge": {
+                                                                "type": "string"
+                                                            },
+                                                            "due_on": {
+                                                                "type": "string"
+                                                            },
+                                                            "amount": {
+                                                                "type": "integer"
+                                                            },
+                                                            "covered": {
+                                                                "type": "integer"
+                                                            },
+                                                            "state": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "label",
+                                                            "charge",
+                                                            "due_on",
+                                                            "amount",
+                                                            "covered",
+                                                            "state"
+                                                        ]
+                                                    }
+                                                },
+                                                "payments": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "number": {
+                                                                "type": "string"
+                                                            },
+                                                            "received_on": {
+                                                                "type": "string"
+                                                            },
+                                                            "amount": {
+                                                                "type": "integer"
+                                                            },
+                                                            "cancelled": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "number",
+                                                            "received_on",
+                                                            "amount",
+                                                            "cancelled"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "billed",
+                                                "paid",
+                                                "left",
+                                                "due_now",
+                                                "instalments",
+                                                "payments"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "fees"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/fees/statement": {
+            "get": {
+                "operationId": "student.fees.statement",
+                "summary": "The student's own fee statement",
+                "tags": [
+                    "StudentPortal"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "no-store"
+                                }
+                            },
+                            "X-Content-Type-Options": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "nosniff"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"

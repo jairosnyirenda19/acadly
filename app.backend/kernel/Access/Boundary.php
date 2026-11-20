@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acadly\Kernel\Access;
 
 use Acadly\Kernel\Http\Problem;
+use Acadly\Kernel\Identity\StudentAccounts;
 use Acadly\Kernel\Identity\User;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Query\Builder;
@@ -305,6 +306,12 @@ final class Boundary
             if ($name === $open || (str_ends_with($open, '.') && str_starts_with($name, $open))) {
                 return;
             }
+        }
+
+        // A student account works in no place (D-101): it holds no role, reaches only its own records,
+        // and a place named by a cookie left by another app on the same device means nothing to it.
+        if ($this->container->make(StudentAccounts::class)->isStudent($user->id)) {
+            return;
         }
 
         $this->userId = $user->id;

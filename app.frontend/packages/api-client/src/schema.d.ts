@@ -2598,6 +2598,92 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/news/{division}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The news of a division: for those who publish, every post with how many have seen it, and the audiences to choose from;
+         *     for other staff, the news for everyone and for staff
+         */
+        get: operations["news.index"];
+        put?: never;
+        post: operations["news.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/news/posts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["news.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/news/posts/{id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["news.withdraw"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/news": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The student's news, pinned first */
+        get: operations["student.news"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/news/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One post for the student, marked read */
+        get: operations["student.news.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/academics/next-year": {
         parameters: {
             query?: never;
@@ -4446,6 +4532,223 @@ export interface paths {
          * @description Ends the session.
          */
         post: operations["auth.sign-out"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every active student of the division with the state of their account */
+        get: operations["programmes.accounts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/accounts/{learner}/phone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["programmes.accounts.phone"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/accounts/codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sends set-up codes to students: one, several, or every student who has no account yet */
+        post: operations["programmes.accounts.codes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/programmes/{division}/accounts/{learner}/suspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["programmes.accounts.suspend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/set-up": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sets up a student account with the student number, the code sent to the phone, and a new password; then signs in */
+        post: operations["student.set-up"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Who the student is */
+        get: operations["student.me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The student's courses this semester */
+        get: operations["student.courses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/registration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The student's registration for the semester, or null when none is open */
+        get: operations["student.registration"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/registration/courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["student.registration.courses"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/registration/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["student.registration.submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/registration/slip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The student's registration slip, once registered */
+        get: operations["student.registration.slip"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/fees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The student's own fees, or null when the college keeps no fees here */
+        get: operations["student.fees"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/fees/statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The student's own fee statement */
+        get: operations["student.fees.statement"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -13276,6 +13579,211 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "news.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        can_publish: boolean;
+                        posts: {
+                            id: string;
+                            title: string;
+                            body: string;
+                            audience: string;
+                            audience_id: string | null;
+                            year: number | null;
+                            audience_label: string;
+                            pinned: boolean;
+                            pinned_until: string | null;
+                            publish_at: string;
+                            scheduled: boolean;
+                            updated: boolean;
+                            author: string;
+                            read: boolean;
+                            seen: number | null;
+                            reach: number | null;
+                        }[];
+                        audiences: {
+                            faculties: {
+                                id: string;
+                                name: string;
+                            }[];
+                            departments: {
+                                id: string;
+                                name: string;
+                            }[];
+                            programmes: {
+                                id: string;
+                                name: string;
+                            }[];
+                            years: number[];
+                        } | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "news.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "news.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "news.withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "student.news": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        posts: {
+                            id: string;
+                            title: string;
+                            body: string;
+                            audience: string;
+                            audience_label: string;
+                            pinned: boolean;
+                            publish_at: string;
+                            updated: boolean;
+                            author: string;
+                            read: boolean;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "student.news.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        post: {
+                            id: string;
+                            title: string;
+                            body: string;
+                            audience: string;
+                            audience_label: string;
+                            pinned: boolean;
+                            publish_at: string;
+                            updated: boolean;
+                            author: string;
+                            read: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
     "academics.next-year": {
         parameters: {
             query?: never;
@@ -19237,7 +19745,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    /** Format: email */
+                    /** @description An email address, or a student number for a student account (D-101). */
                     email: string;
                     password: string;
                 };
@@ -19344,6 +19852,502 @@ export interface operations {
                 content?: never;
             };
             401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "programmes.accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        totals: {
+                            students: number;
+                            active: number;
+                            code_sent: number;
+                            none: number;
+                            suspended: number;
+                        };
+                        rows: {
+                            learner_id: string;
+                            number: string;
+                            name: string;
+                            programme: string;
+                            year: number;
+                            phone: string | null;
+                            /** @enum {string} */
+                            state: "active" | "code_sent" | "none" | "suspended";
+                            since: string | null;
+                            reason: string | null;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "programmes.accounts.phone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                learner: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    phone: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "programmes.accounts.codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    learners: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        sent: number;
+                        no_phone: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "programmes.accounts.suspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                learner: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason: string;
+                    restore?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "student.set-up": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    number: string;
+                    code: string;
+                    password: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        signed_in: boolean;
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "student.me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        name: string;
+                        number: string;
+                        college: string;
+                        programme: {
+                            code: string;
+                            name: string;
+                        };
+                        year: number;
+                        semester: string | null;
+                        email: string | null;
+                        phone: string | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "student.courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        semester: string | null;
+                        state: string | null;
+                        credits: number;
+                        courses: {
+                            code: string;
+                            title: string;
+                            credits: number;
+                            kind: string;
+                            group: string;
+                            lecturers: string[];
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "student.registration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        registration: {
+                            id: string;
+                            state: string;
+                            late: boolean;
+                            version: number;
+                            period: string;
+                            period_id: string;
+                            student: {
+                                learner_id: string;
+                                code: string;
+                                name: string;
+                                programme: {
+                                    id: string;
+                                    code: string;
+                                    name: string;
+                                };
+                                curriculum: string;
+                                year: number;
+                                semester: number;
+                                mode: string;
+                            };
+                            courses: {
+                                id: string;
+                                offering_id: string;
+                                course: {
+                                    id: string;
+                                    code: string;
+                                    title: string;
+                                };
+                                kind: string;
+                                elective_group_id: string | null;
+                                group: string;
+                                credits: number;
+                                needs: string[];
+                            }[];
+                            core: string[];
+                            groups: {
+                                id: string;
+                                label: string;
+                                choose: number;
+                                courses: string[];
+                            }[];
+                            offerings: {
+                                id: string;
+                                course: {
+                                    id: string;
+                                    code: string;
+                                    title: string;
+                                };
+                                group: string;
+                                credits: number;
+                                seats_left: number | null;
+                            }[];
+                            checks: {
+                                problems: {
+                                    kind: string;
+                                    text: string;
+                                }[];
+                                load: number;
+                                min: number;
+                                max: number;
+                            };
+                            fees: {
+                                known: boolean;
+                                share: number;
+                                owed: number;
+                                paid: number;
+                                needed: number;
+                                more: number;
+                                cleared: boolean;
+                                allowed: {
+                                    by: string;
+                                    reason: string;
+                                    at: string;
+                                } | null;
+                            };
+                            steps: {
+                                step: string;
+                                title: string;
+                                outcomes: {
+                                    outcome: string;
+                                    title: string;
+                                    requires_reason: boolean;
+                                }[];
+                                permitted: boolean;
+                                blocked_reason: string | null;
+                                remedy: string | null;
+                            }[];
+                            history: {
+                                step: string;
+                                outcome: string;
+                                by: string;
+                                at: string;
+                                reason: string | null;
+                            }[];
+                            phase: string;
+                            add_drop: boolean;
+                            window: {
+                                closes_on: string;
+                                late_until: string;
+                            } | null;
+                            editable: boolean;
+                        } | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "student.registration.courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    offerings: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "student.registration.submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        sent: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "student.registration.slip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    "Cache-Control"?: "no-store";
+                    "X-Content-Type-Options"?: "nosniff";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "student.fees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        fees: {
+                            billed: number;
+                            paid: number;
+                            left: number;
+                            due_now: number;
+                            instalments: {
+                                label: string;
+                                charge: string;
+                                due_on: string;
+                                amount: number;
+                                covered: number;
+                                state: string;
+                            }[];
+                            payments: {
+                                number: string;
+                                received_on: string;
+                                amount: number;
+                                cancelled: boolean;
+                            }[];
+                        } | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "student.fees.statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    "Cache-Control"?: "no-store";
+                    "X-Content-Type-Options"?: "nosniff";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
         };
     };
     "academics.subjects.index": {

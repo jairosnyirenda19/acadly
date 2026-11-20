@@ -135,7 +135,9 @@ it('refuses every place-bound route to an account that holds everything, but onl
         'conduct.' => ['id' => $learner, 'step' => 'take-up'],
         'support.' => ['id' => $learner, 'what' => 'agree'],
         'pickup.' => ['id' => $learner],
-        'programmes.' => ['division' => $school->id('secondary'), 'id' => $learner, 'period' => $term, 'action' => 'submit'],
+        'programmes.' => ['division' => $school->id('secondary'), 'id' => $learner, 'learner' => $learner, 'period' => $term, 'action' => 'submit'],
+        'news.' => ['division' => $school->id('secondary'), 'id' => $learner],
+        'student.' => ['id' => $learner],
         'fees.' => ['id' => $learner, 'period' => $term, 'division' => $school->id('secondary'), 'day' => '2026-10-01'],
     ];
     $b = [

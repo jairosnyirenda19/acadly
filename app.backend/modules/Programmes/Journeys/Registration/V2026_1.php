@@ -37,6 +37,16 @@ return JourneyBlueprint::make('programmes.registration@2026.1')
                 ->outcome(Outcome::make(O::Submitted)->title('Sent for approval')->transition(Transition::to(St::Submitted)))
         )
         ->step(
+            // D-101: the student sends their own registration from the student portal.
+            Step::make(S::SubmitOwn)
+                ->title('Send my registration')
+                ->from(St::Draft)
+                ->gate(InWindow::class)
+                ->gate(CoursesInOrder::class)
+                ->byHolder()
+                ->outcome(Outcome::make(O::Submitted)->title('Sent for approval')->transition(Transition::to(St::Submitted)))
+        )
+        ->step(
             Step::make(S::Approve)
                 ->title('Approve the courses')
                 ->from(St::Submitted)

@@ -153,7 +153,9 @@ it('refuses every route pointed at Secondary, and keeps every list to Primary, f
         'conduct.' => ['id' => $this->outside, 'step' => 'take-up'],
         'support.' => ['id' => $this->outside, 'what' => 'agree'],
         'pickup.' => ['id' => $this->outside],
-        'programmes.' => ['division' => $school->id('secondary'), 'id' => $this->outside, 'period' => $this->term, 'action' => 'submit'],
+        'programmes.' => ['division' => $school->id('secondary'), 'id' => $this->outside, 'learner' => $this->outside, 'period' => $this->term, 'action' => 'submit'],
+        'news.' => ['division' => $school->id('secondary'), 'id' => $this->outside],
+        'student.' => ['id' => $this->outside],
         'fees.' => ['id' => $this->outside, 'period' => $this->term, 'division' => $school->id('secondary'), 'day' => '2026-10-01'],
         // Each record route at a real record of Secondary.
         'conduct.incidents.' => ['id' => $this->case, 'step' => 'take-up'],

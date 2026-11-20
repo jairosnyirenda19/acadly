@@ -4,6 +4,7 @@ use Acadly\Kernel\Access\Boundary;
 use Acadly\Kernel\Http\Middleware\CodeSignInReachesPortalOnly;
 use Acadly\Kernel\Http\Middleware\EndViewAsWhenDue;
 use Acadly\Kernel\Http\Middleware\RemoveServerSignature;
+use Acadly\Kernel\Http\Middleware\StudentAccountsReachStudentPortalOnly;
 use Acadly\Kernel\Http\ProblemRenderer;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -26,7 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: [Boundary::COOKIE]);
 
         // View as (development only) ends on time, before the request is handled.
-        $middleware->api(append: [EndViewAsWhenDue::class, CodeSignInReachesPortalOnly::class]);
+        $middleware->api(append: [EndViewAsWhenDue::class, CodeSignInReachesPortalOnly::class, StudentAccountsReachStudentPortalOnly::class]);
 
         // An API has no sign-in page: a guest gets 401, never a redirect.
         $middleware->redirectGuestsTo(fn (): ?string => null);

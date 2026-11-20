@@ -8,11 +8,13 @@ use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Audit\Auditable;
 use Acadly\Kernel\Audit\FieldClass;
+use Acadly\Kernel\Blueprint\Journey\HeldRecord;
 use Acadly\Kernel\Blueprint\Journey\JourneySubject;
 use Acadly\Kernel\Blueprint\Journey\TravelsJourney;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * One student's registration for one semester (D-098). It travels
@@ -36,8 +38,16 @@ use Illuminate\Support\Carbon;
  * @property string $opened_by
  * @property Carbon $created_at
  */
-final class Registration extends Model implements Auditable, JourneySubject
+final class Registration extends Model implements Auditable, HeldRecord, JourneySubject
 {
+    /** The student's own account (D-101): they may send their own registration. */
+    public function heldBy(): ?string
+    {
+        $user = DB::table('programme_student_accounts')->where('learner_id', $this->learner_id)->whereNull('suspended_at')->value('user_id');
+
+        return is_string($user) ? $user : null;
+    }
+
     use HasUuids, TravelsJourney;
 
     protected $table = 'programme_registrations';

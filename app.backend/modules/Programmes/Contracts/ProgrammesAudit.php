@@ -24,6 +24,11 @@ enum ProgrammesAudit: string implements AuditAction
     case RegistrationOpened = 'programmes.registration_opened';
     case CoursesChosen = 'programmes.courses_chosen';
     case FeesAllowed = 'programmes.fees_allowed';
+    case StudentPhoneSet = 'programmes.student_phone_set';
+    case StudentCodeSent = 'programmes.student_code_sent';
+    case StudentAccountSetUp = 'programmes.student_account_set_up';
+    case StudentSuspended = 'programmes.student_suspended';
+    case StudentRestored = 'programmes.student_restored';
 
     public function key(): string
     {
@@ -48,11 +53,16 @@ enum ProgrammesAudit: string implements AuditAction
             self::RegistrationOpened => 'Opened a semester registration for a student.',
             self::CoursesChosen => 'Chose the courses of a semester registration.',
             self::FeesAllowed => 'Allowed a registration without the fees needed.',
+            self::StudentPhoneSet => 'Set the phone a student\'s codes go to.',
+            self::StudentCodeSent => 'Sent a student a code to set up their account.',
+            self::StudentAccountSetUp => 'A student set up their account.',
+            self::StudentSuspended => 'Suspended a student\'s sign-in.',
+            self::StudentRestored => 'Restored a student\'s sign-in.',
         };
     }
 
     public function requiresReason(): bool
     {
-        return $this === self::FeesAllowed;
+        return in_array($this, [self::FeesAllowed, self::StudentSuspended, self::StudentRestored], true);
     }
 }

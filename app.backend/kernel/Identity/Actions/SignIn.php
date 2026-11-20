@@ -9,6 +9,7 @@ use Acadly\Kernel\Audit\Audit;
 use Acadly\Kernel\Audit\KernelAudit;
 use Acadly\Kernel\Audit\Outcome;
 use Acadly\Kernel\Identity\AccountStatus;
+use Acadly\Kernel\Identity\StudentAccounts;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
@@ -36,12 +37,16 @@ final class SignIn
     public function __construct(
         private readonly Clock $clock,
         private readonly Audit $audit,
+        private readonly StudentAccounts $students,
     ) {}
 
+    /** Signs in with an email address, or with a student number (D-101). */
     public function handle(string $email, string $password, string $ip): User
     {
         $email = mb_strtolower(trim($email));
         $key = 'sign-in:'.sha1($email.'|'.$ip);
+        // A student may sign in with the student number instead of an email address.
+        $byNumber = ! str_contains($email, '@') ? $this->students->accountForNumber($email) : null;
 
         if (RateLimiter::tooManyAttempts($key, self::MAX_ATTEMPTS)) {
             $this->audit->record(KernelAudit::SignInPaused, subject: $this->account($email), outcome: Outcome::Refused,
@@ -50,9 +55,10 @@ final class SignIn
             throw new ThrottleRequestsException('Too many sign-in attempts.');
         }
 
-        $credentials = ['email' => $email, 'password' => $password, 'status' => AccountStatus::Active->value];
+        $who = $byNumber !== null ? ['id' => $byNumber] : ['email' => str_contains($email, '@') ? $email : "\u{0}"];
+        $credentials = [...$who, 'password' => $password, 'status' => AccountStatus::Active->value];
         $signedIn = Auth::guard('web')->validate($credentials);
-        $user = $signedIn ? User::query()->where('email', $email)->first() : null;
+        $user = $signedIn ? User::query()->where(array_key_first($who), reset($who))->first() : null;
 
         if (! $signedIn || ! $user instanceof User) {
             RateLimiter::hit($key, self::LOCK_SECONDS);

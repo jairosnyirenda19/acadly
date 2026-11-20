@@ -154,8 +154,39 @@ final class RegistrationActions
     public function saveCourses(User $by, string $divisionId, string $registrationId, array $offeringIds): void
     {
         $this->place->division($by, $divisionId, ProgrammesPermission::Register);
-        $r = $this->registration($divisionId, $registrationId);
+        $this->writeCourses($by, $divisionId, $this->registration($divisionId, $registrationId), $offeringIds);
+    }
 
+    /**
+     * The student chooses their own courses (D-101), while registration is open and the
+     * registration is theirs and still being chosen. No permission: a person acts on their own record.
+     *
+     * @param  list<string>  $offeringIds
+     */
+    public function saveOwnCourses(User $student, Registration $r, array $offeringIds): void
+    {
+        if ($r->heldBy() !== $student->id || ! in_array($this->windows->phase($r->period_id), ['open', 'late'], true)) {
+            throw ValidationException::withMessages(['offerings' => ['Registration is not open for changes now.']]);
+        }
+        $this->writeCourses($student, $r->division_id, $r, $offeringIds);
+    }
+
+    /** The student sends their own registration for approval (D-101): the journey checks it is theirs. */
+    public function submitOwn(User $student, Registration $r): void
+    {
+        $late = $this->windows->phase($r->period_id) === 'late';
+
+        DB::transaction(function () use ($student, $r, $late): void {
+            $this->engine->perform($r, $student, StepId::SubmitOwn, OutcomeId::Submitted);
+            if ($late && ! $r->late) {
+                DB::table('programme_registrations')->where('id', $r->id)->update(['late' => true]);
+            }
+        });
+    }
+
+    /** @param  list<string>  $offeringIds */
+    private function writeCourses(User $by, string $divisionId, Registration $r, array $offeringIds): void
+    {
         if ($r->state !== State::Draft->value) {
             throw ValidationException::withMessages(['offerings' => ['The courses change only while they are being chosen.']]);
         }

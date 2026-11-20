@@ -8,6 +8,7 @@
             "key": "register",
             "steps": [
                 "submit",
+                "submit_own",
                 "approve",
                 "register",
                 "change",
@@ -70,6 +71,39 @@
             ],
             "stage": "register",
             "title": "Send for approval"
+        },
+        {
+            "capability": null,
+            "four_eyes": null,
+            "from": [
+                "draft"
+            ],
+            "gates": [
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Modules\\Programmes\\Journeys\\Registration\\InWindow"
+                },
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Modules\\Programmes\\Journeys\\Registration\\CoursesInOrder"
+                }
+            ],
+            "holder": true,
+            "id": "submit_own",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "submitted",
+                    "requires_reason": false,
+                    "title": "Sent for approval",
+                    "to": "submitted"
+                }
+            ],
+            "stage": "register",
+            "title": "Send my registration"
         },
         {
             "capability": "programmes.approve",

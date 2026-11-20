@@ -194,6 +194,6 @@ it('offers each division only the parts its profile lists', function (): void {
         ->and($modules->state('attendance', $college))->toBe(ModuleState::NotOffered);
 
     $divisions = collect($this->actingAs($this->admin)->getJson('/api/v1/me/context')->assertOk()->json('divisions'))->keyBy('id');
-    expect($divisions[$this->college]['modules'])->toBe(['fees', 'conduct', 'support', 'programmes'])
+    expect($divisions[$this->college]['modules'])->toBe(['fees', 'conduct', 'support', 'programmes', 'news'])
         ->and($divisions[$this->other]['modules'])->toContain('attendance', 'assessment', 'fees');
 });

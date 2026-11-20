@@ -202,6 +202,16 @@ it('holds registration until the fees needed are paid, or allowed with a reason'
         {
             return ['owed' => 10000000, 'paid' => 2000000];
         }
+
+        public function ownFees(string $learnerId): array
+        {
+            return ['billed' => 10000000, 'paid' => 2000000, 'left' => 8000000, 'due_now' => 0, 'instalments' => [], 'payments' => []];
+        }
+
+        public function ownStatement(User $viewer, string $learnerId): array
+        {
+            return ['name' => 'Statement.pdf', 'pdf' => ''];
+        }
     });
 
     ($this->placeAll)([$this->learners[0]]);

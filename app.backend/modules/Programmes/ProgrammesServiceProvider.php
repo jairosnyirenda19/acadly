@@ -7,10 +7,12 @@ namespace Acadly\Modules\Programmes;
 use Acadly\Core\Enrolment\Contracts\LearnerRecordPart;
 use Acadly\Core\Institution\Contracts\TodayItems;
 use Acadly\Kernel\Identity\StudentAccounts;
+use Acadly\Modules\Programmes\Application\CourseTeachingReader;
 use Acadly\Modules\Programmes\Application\ProgrammesRecordPart;
 use Acadly\Modules\Programmes\Application\Registration\RegistrationToday;
 use Acadly\Modules\Programmes\Application\StudentAccountDirectory;
 use Acadly\Modules\Programmes\Application\StudentPlacesReader;
+use Acadly\Modules\Programmes\Contracts\CourseTeaching;
 use Acadly\Modules\Programmes\Contracts\StudentPlaces;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -24,6 +26,7 @@ final class ProgrammesServiceProvider extends ServiceProvider
         $this->app->tag([RegistrationToday::class], TodayItems::TAG);
         $this->app->bind(StudentAccounts::class, StudentAccountDirectory::class);
         $this->app->bind(StudentPlaces::class, StudentPlacesReader::class);
+        $this->app->bind(CourseTeaching::class, CourseTeachingReader::class);
     }
 
     public function boot(): void

@@ -10,6 +10,7 @@ use Acadly\Modules\Assessment\AssessmentServiceProvider;
 use Acadly\Modules\Attendance\AttendanceServiceProvider;
 use Acadly\Modules\Conduct\ConductServiceProvider;
 use Acadly\Modules\Fees\FeesServiceProvider;
+use Acadly\Modules\Lectures\LecturesServiceProvider;
 use Acadly\Modules\News\NewsServiceProvider;
 use Acadly\Modules\Programmes\ProgrammesServiceProvider;
 use Acadly\Modules\SafeRelease\SafeReleaseServiceProvider;
@@ -32,4 +33,5 @@ return [
     SafeReleaseServiceProvider::class,
     NewsServiceProvider::class,
     ProgrammesServiceProvider::class,
+    LecturesServiceProvider::class,
 ];

@@ -21729,6 +21729,2733 @@
                 }
             }
         },
+        "/v1/lectures/learners/{learner}": {
+            "get": {
+                "operationId": "lectures.learner",
+                "summary": "The Lecture attendance tab of the learner record",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "learner",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "semester": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "rate": {
+                                            "type": [
+                                                "integer",
+                                                "null"
+                                            ]
+                                        },
+                                        "held": {
+                                            "type": "integer"
+                                        },
+                                        "missed": {
+                                            "type": "integer"
+                                        },
+                                        "courses": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "held": {
+                                                        "type": "integer"
+                                                    },
+                                                    "missed": {
+                                                        "type": "integer"
+                                                    },
+                                                    "late": {
+                                                        "type": "integer"
+                                                    },
+                                                    "rate": {
+                                                        "type": [
+                                                            "integer",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "code",
+                                                    "title",
+                                                    "held",
+                                                    "missed",
+                                                    "late",
+                                                    "rate"
+                                                ]
+                                            }
+                                        },
+                                        "marks": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "day": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "mark": {
+                                                        "type": "string"
+                                                    },
+                                                    "source": {
+                                                        "type": "string"
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "by": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "was": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "day",
+                                                    "code",
+                                                    "kind",
+                                                    "mark",
+                                                    "source",
+                                                    "reason",
+                                                    "by",
+                                                    "was"
+                                                ]
+                                            }
+                                        },
+                                        "phone": {
+                                            "type": "object",
+                                            "properties": {
+                                                "set": {
+                                                    "type": "boolean"
+                                                },
+                                                "set_on": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "set",
+                                                "set_on"
+                                            ]
+                                        },
+                                        "can_reset": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "semester",
+                                        "rate",
+                                        "held",
+                                        "missed",
+                                        "courses",
+                                        "marks",
+                                        "phone",
+                                        "can_reset"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/lectures/learners/{learner}/phone/reset": {
+            "post": {
+                "operationId": "lectures.phone.reset",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "learner",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    }
+                                },
+                                "required": [
+                                    "reason"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/lectures/{division}/rooms": {
+            "get": {
+                "operationId": "lectures.rooms",
+                "summary": "Rooms, the campus areas, and how long scanning stays open",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "rooms": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "seats": {
+                                                        "type": "integer"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "retired": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "code",
+                                                    "name",
+                                                    "seats",
+                                                    "kind",
+                                                    "retired"
+                                                ]
+                                            }
+                                        },
+                                        "areas": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "latitude": {
+                                                        "type": "number"
+                                                    },
+                                                    "longitude": {
+                                                        "type": "number"
+                                                    },
+                                                    "reach": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "name",
+                                                    "latitude",
+                                                    "longitude",
+                                                    "reach"
+                                                ]
+                                            }
+                                        },
+                                        "scan_minutes": {
+                                            "type": "integer"
+                                        },
+                                        "can_change": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "rooms",
+                                        "areas",
+                                        "scan_minutes",
+                                        "can_change"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "lectures.rooms.save",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "uuid"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "maxLength": 16
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 120
+                                    },
+                                    "seats": {
+                                        "type": "integer"
+                                    },
+                                    "kind": {
+                                        "type": "string",
+                                        "maxLength": 12
+                                    },
+                                    "retired": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "code",
+                                    "name",
+                                    "seats",
+                                    "kind"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/lectures/{division}/areas": {
+            "put": {
+                "operationId": "lectures.areas.save",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "areas": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "maxLength": 80
+                                                },
+                                                "latitude": {
+                                                    "type": "number"
+                                                },
+                                                "longitude": {
+                                                    "type": "number"
+                                                },
+                                                "reach": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "latitude",
+                                                "longitude",
+                                                "reach"
+                                            ]
+                                        },
+                                        "maxItems": 10
+                                    },
+                                    "scan_minutes": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "required": [
+                                    "areas",
+                                    "scan_minutes"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/lectures/{division}/timetable": {
+            "get": {
+                "operationId": "lectures.timetable",
+                "summary": "The lecture timetable of a semester: the current one unless another is asked for",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "periods": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name"
+                                                ]
+                                            }
+                                        },
+                                        "period": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "starts_on": {
+                                                    "type": "string"
+                                                },
+                                                "ends_on": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "starts_on",
+                                                "ends_on"
+                                            ]
+                                        },
+                                        "published": {
+                                            "type": "boolean"
+                                        },
+                                        "can_change": {
+                                            "type": "boolean"
+                                        },
+                                        "rooms": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "seats": {
+                                                        "type": "integer"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "retired": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "code",
+                                                    "name",
+                                                    "seats",
+                                                    "kind",
+                                                    "retired"
+                                                ]
+                                            }
+                                        },
+                                        "offerings": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "group": {
+                                                        "type": "string"
+                                                    },
+                                                    "department": {
+                                                        "type": "string"
+                                                    },
+                                                    "lecturers": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "taken": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "code",
+                                                    "title",
+                                                    "group",
+                                                    "department",
+                                                    "lecturers",
+                                                    "taken"
+                                                ]
+                                            }
+                                        },
+                                        "cohorts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "offerings": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "label",
+                                                    "offerings"
+                                                ]
+                                            }
+                                        },
+                                        "staff": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name"
+                                                ]
+                                            }
+                                        },
+                                        "slots": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "offering_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "weekday": {
+                                                        "type": "integer"
+                                                    },
+                                                    "starts": {
+                                                        "type": "string"
+                                                    },
+                                                    "ends": {
+                                                        "type": "string"
+                                                    },
+                                                    "room_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "lecturer_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "lecturer": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "offering_id",
+                                                    "kind",
+                                                    "weekday",
+                                                    "starts",
+                                                    "ends",
+                                                    "room_id",
+                                                    "lecturer_id",
+                                                    "lecturer"
+                                                ]
+                                            }
+                                        },
+                                        "checks": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "tone": {
+                                                        "type": "string"
+                                                    },
+                                                    "slots": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "count": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "kind",
+                                                    "tone",
+                                                    "slots",
+                                                    "count"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "periods",
+                                        "period",
+                                        "published",
+                                        "can_change",
+                                        "rooms",
+                                        "offerings",
+                                        "cohorts",
+                                        "staff",
+                                        "slots",
+                                        "checks"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/lectures/{division}/timetable/{period}/slots": {
+            "post": {
+                "operationId": "lectures.slots.save",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "period",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "uuid"
+                                    },
+                                    "offering_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "kind": {
+                                        "type": "string",
+                                        "maxLength": 10
+                                    },
+                                    "weekday": {
+                                        "type": "integer"
+                                    },
+                                    "starts": {
+                                        "type": "string",
+                                        "minLength": 5,
+                                        "maxLength": 5
+                                    },
+                                    "ends": {
+                                        "type": "string",
+                                        "minLength": 5,
+                                        "maxLength": 5
+                                    },
+                                    "room_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "lecturer_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                },
+                                "required": [
+                                    "offering_id",
+                                    "kind",
+                                    "weekday",
+                                    "starts",
+                                    "ends",
+                                    "room_id",
+                                    "lecturer_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/lectures/{division}/timetable/{period}/publish": {
+            "post": {
+                "operationId": "lectures.timetable.publish",
+                "summary": "Publishes the timetable, unless a check stops it",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "period",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "published": {
+                                            "type": "boolean"
+                                        },
+                                        "checks": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "tone": {
+                                                        "type": "string"
+                                                    },
+                                                    "slots": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "count": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "kind",
+                                                    "tone",
+                                                    "slots",
+                                                    "count"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "published",
+                                        "checks"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/lectures/{division}/slots/{id}/remove": {
+            "post": {
+                "operationId": "lectures.slots.remove",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/lectures/{division}/cover": {
+            "get": {
+                "operationId": "lectures.cover",
+                "summary": "The week's lectures that need cover or changed",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "week",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "week": {
+                                            "type": "string"
+                                        },
+                                        "can_arrange": {
+                                            "type": "boolean"
+                                        },
+                                        "rows": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "slot_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "day": {
+                                                        "type": "string"
+                                                    },
+                                                    "held_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "starts": {
+                                                        "type": "string"
+                                                    },
+                                                    "ends": {
+                                                        "type": "string"
+                                                    },
+                                                    "room": {
+                                                        "type": "string"
+                                                    },
+                                                    "seats": {
+                                                        "type": "integer"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "department": {
+                                                        "type": "string"
+                                                    },
+                                                    "students": {
+                                                        "type": "integer"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "lecturer_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "lecturer": {
+                                                        "type": "string"
+                                                    },
+                                                    "cover": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "asked_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "asked": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "moved": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "day": {
+                                                                "type": "string"
+                                                            },
+                                                            "starts": {
+                                                                "type": "string"
+                                                            },
+                                                            "ends": {
+                                                                "type": "string"
+                                                            },
+                                                            "room": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "day",
+                                                            "starts",
+                                                            "ends",
+                                                            "room"
+                                                        ]
+                                                    },
+                                                    "taken": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "present": {
+                                                                "type": "integer"
+                                                            },
+                                                            "closed": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "scanning": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "present",
+                                                            "closed",
+                                                            "scanning"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "slot_id",
+                                                    "day",
+                                                    "held_on",
+                                                    "starts",
+                                                    "ends",
+                                                    "room",
+                                                    "seats",
+                                                    "kind",
+                                                    "code",
+                                                    "title",
+                                                    "department",
+                                                    "students",
+                                                    "state",
+                                                    "lecturer_id",
+                                                    "lecturer",
+                                                    "cover",
+                                                    "asked_id",
+                                                    "asked",
+                                                    "reason",
+                                                    "moved",
+                                                    "taken"
+                                                ]
+                                            }
+                                        },
+                                        "counts": {
+                                            "type": "object",
+                                            "properties": {
+                                                "need": {
+                                                    "type": "integer"
+                                                },
+                                                "asked": {
+                                                    "type": "integer"
+                                                },
+                                                "covered": {
+                                                    "type": "integer"
+                                                },
+                                                "changed": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "need",
+                                                "asked",
+                                                "covered",
+                                                "changed"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "week",
+                                        "can_arrange",
+                                        "rows",
+                                        "counts"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/lectures/{division}/slots/{id}/free": {
+            "get": {
+                "operationId": "lectures.cover.free",
+                "summary": "Colleagues who could cover a lecture, free first",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "day",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "colleagues": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "free": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "free"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "colleagues"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/lectures/{division}/slots/{id}/{action}": {
+            "post": {
+                "operationId": "lectures.cover.act",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "action",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "day": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "user_id": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "uuid"
+                                    },
+                                    "reason": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 255
+                                    },
+                                    "to_day": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date"
+                                    },
+                                    "to_starts": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "minLength": 5,
+                                        "maxLength": 5
+                                    },
+                                    "to_ends": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "minLength": 5,
+                                        "maxLength": 5
+                                    },
+                                    "to_room": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "uuid"
+                                    }
+                                },
+                                "required": [
+                                    "day"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/lectures/{division}/my-day": {
+            "get": {
+                "operationId": "lectures.my-day",
+                "summary": "The person's lectures on a day, the cover asked of them and their week ahead",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "day",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "day": {
+                                            "type": "string"
+                                        },
+                                        "now": {
+                                            "type": "string"
+                                        },
+                                        "today": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "slot_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "day": {
+                                                        "type": "string"
+                                                    },
+                                                    "held_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "starts": {
+                                                        "type": "string"
+                                                    },
+                                                    "ends": {
+                                                        "type": "string"
+                                                    },
+                                                    "room": {
+                                                        "type": "string"
+                                                    },
+                                                    "seats": {
+                                                        "type": "integer"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "department": {
+                                                        "type": "string"
+                                                    },
+                                                    "students": {
+                                                        "type": "integer"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "lecturer_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "lecturer": {
+                                                        "type": "string"
+                                                    },
+                                                    "cover": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "asked_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "asked": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "moved": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "day": {
+                                                                "type": "string"
+                                                            },
+                                                            "starts": {
+                                                                "type": "string"
+                                                            },
+                                                            "ends": {
+                                                                "type": "string"
+                                                            },
+                                                            "room": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "day",
+                                                            "starts",
+                                                            "ends",
+                                                            "room"
+                                                        ]
+                                                    },
+                                                    "taken": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "present": {
+                                                                "type": "integer"
+                                                            },
+                                                            "closed": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "scanning": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "present",
+                                                            "closed",
+                                                            "scanning"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "slot_id",
+                                                    "day",
+                                                    "held_on",
+                                                    "starts",
+                                                    "ends",
+                                                    "room",
+                                                    "seats",
+                                                    "kind",
+                                                    "code",
+                                                    "title",
+                                                    "department",
+                                                    "students",
+                                                    "state",
+                                                    "lecturer_id",
+                                                    "lecturer",
+                                                    "cover",
+                                                    "asked_id",
+                                                    "asked",
+                                                    "reason",
+                                                    "moved",
+                                                    "taken"
+                                                ]
+                                            }
+                                        },
+                                        "asked": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "slot_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "day": {
+                                                        "type": "string"
+                                                    },
+                                                    "held_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "starts": {
+                                                        "type": "string"
+                                                    },
+                                                    "ends": {
+                                                        "type": "string"
+                                                    },
+                                                    "room": {
+                                                        "type": "string"
+                                                    },
+                                                    "seats": {
+                                                        "type": "integer"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "department": {
+                                                        "type": "string"
+                                                    },
+                                                    "students": {
+                                                        "type": "integer"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "lecturer_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "lecturer": {
+                                                        "type": "string"
+                                                    },
+                                                    "cover": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "asked_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "asked": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "moved": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "day": {
+                                                                "type": "string"
+                                                            },
+                                                            "starts": {
+                                                                "type": "string"
+                                                            },
+                                                            "ends": {
+                                                                "type": "string"
+                                                            },
+                                                            "room": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "day",
+                                                            "starts",
+                                                            "ends",
+                                                            "room"
+                                                        ]
+                                                    },
+                                                    "taken": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "present": {
+                                                                "type": "integer"
+                                                            },
+                                                            "closed": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "scanning": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "present",
+                                                            "closed",
+                                                            "scanning"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "slot_id",
+                                                    "day",
+                                                    "held_on",
+                                                    "starts",
+                                                    "ends",
+                                                    "room",
+                                                    "seats",
+                                                    "kind",
+                                                    "code",
+                                                    "title",
+                                                    "department",
+                                                    "students",
+                                                    "state",
+                                                    "lecturer_id",
+                                                    "lecturer",
+                                                    "cover",
+                                                    "asked_id",
+                                                    "asked",
+                                                    "reason",
+                                                    "moved",
+                                                    "taken"
+                                                ]
+                                            }
+                                        },
+                                        "ahead": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "slot_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "day": {
+                                                        "type": "string"
+                                                    },
+                                                    "held_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "starts": {
+                                                        "type": "string"
+                                                    },
+                                                    "ends": {
+                                                        "type": "string"
+                                                    },
+                                                    "room": {
+                                                        "type": "string"
+                                                    },
+                                                    "seats": {
+                                                        "type": "integer"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "department": {
+                                                        "type": "string"
+                                                    },
+                                                    "students": {
+                                                        "type": "integer"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "lecturer_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "lecturer": {
+                                                        "type": "string"
+                                                    },
+                                                    "cover": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "asked_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "asked": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "moved": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "day": {
+                                                                "type": "string"
+                                                            },
+                                                            "starts": {
+                                                                "type": "string"
+                                                            },
+                                                            "ends": {
+                                                                "type": "string"
+                                                            },
+                                                            "room": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "day",
+                                                            "starts",
+                                                            "ends",
+                                                            "room"
+                                                        ]
+                                                    },
+                                                    "taken": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "present": {
+                                                                "type": "integer"
+                                                            },
+                                                            "closed": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "scanning": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "present",
+                                                            "closed",
+                                                            "scanning"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "slot_id",
+                                                    "day",
+                                                    "held_on",
+                                                    "starts",
+                                                    "ends",
+                                                    "room",
+                                                    "seats",
+                                                    "kind",
+                                                    "code",
+                                                    "title",
+                                                    "department",
+                                                    "students",
+                                                    "state",
+                                                    "lecturer_id",
+                                                    "lecturer",
+                                                    "cover",
+                                                    "asked_id",
+                                                    "asked",
+                                                    "reason",
+                                                    "moved",
+                                                    "taken"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "day",
+                                        "now",
+                                        "today",
+                                        "asked",
+                                        "ahead"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/lectures/{division}/slots/{id}": {
+            "get": {
+                "operationId": "lectures.lecture",
+                "summary": "One lecture on one day, with its attendance",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "day",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "lecture": {
+                                            "type": "object",
+                                            "properties": {
+                                                "slot_id": {
+                                                    "type": "string"
+                                                },
+                                                "day": {
+                                                    "type": "string"
+                                                },
+                                                "held_on": {
+                                                    "type": "string"
+                                                },
+                                                "starts": {
+                                                    "type": "string"
+                                                },
+                                                "ends": {
+                                                    "type": "string"
+                                                },
+                                                "room": {
+                                                    "type": "string"
+                                                },
+                                                "seats": {
+                                                    "type": "integer"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "code": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "department": {
+                                                    "type": "string"
+                                                },
+                                                "students": {
+                                                    "type": "integer"
+                                                },
+                                                "state": {
+                                                    "type": "string"
+                                                },
+                                                "lecturer_id": {
+                                                    "type": "string"
+                                                },
+                                                "lecturer": {
+                                                    "type": "string"
+                                                },
+                                                "cover": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "asked_id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "asked": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "reason": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "moved": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "day": {
+                                                            "type": "string"
+                                                        },
+                                                        "starts": {
+                                                            "type": "string"
+                                                        },
+                                                        "ends": {
+                                                            "type": "string"
+                                                        },
+                                                        "room": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "day",
+                                                        "starts",
+                                                        "ends",
+                                                        "room"
+                                                    ]
+                                                },
+                                                "taken": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "present": {
+                                                            "type": "integer"
+                                                        },
+                                                        "closed": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "scanning": {
+                                                            "type": "boolean"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "present",
+                                                        "closed",
+                                                        "scanning"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "slot_id",
+                                                "day",
+                                                "held_on",
+                                                "starts",
+                                                "ends",
+                                                "room",
+                                                "seats",
+                                                "kind",
+                                                "code",
+                                                "title",
+                                                "department",
+                                                "students",
+                                                "state",
+                                                "lecturer_id",
+                                                "lecturer",
+                                                "cover",
+                                                "asked_id",
+                                                "asked",
+                                                "reason",
+                                                "moved",
+                                                "taken"
+                                            ]
+                                        },
+                                        "session": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "scan_until": {
+                                                    "type": "string"
+                                                },
+                                                "scanning": {
+                                                    "type": "boolean"
+                                                },
+                                                "closed": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "scan_until",
+                                                "scanning",
+                                                "closed"
+                                            ]
+                                        },
+                                        "students": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "number": {
+                                                        "type": "string"
+                                                    },
+                                                    "mark": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "source": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "refused": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "why": {
+                                                                "type": "string"
+                                                            },
+                                                            "at": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "why",
+                                                            "at"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "learner_id",
+                                                    "name",
+                                                    "number",
+                                                    "mark",
+                                                    "source",
+                                                    "at",
+                                                    "reason",
+                                                    "refused"
+                                                ]
+                                            }
+                                        },
+                                        "can_open": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "lecture",
+                                        "session",
+                                        "students",
+                                        "can_open"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/lectures/{division}/slots/{id}/open": {
+            "post": {
+                "operationId": "lectures.lecture.open",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "day": {
+                                        "type": "string",
+                                        "format": "date"
+                                    }
+                                },
+                                "required": [
+                                    "day"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "session": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "session"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/lectures/{division}/sessions/{id}/close": {
+            "post": {
+                "operationId": "lectures.session.close",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/lectures/{division}/sessions/{id}/mark": {
+            "post": {
+                "operationId": "lectures.session.mark",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "learner_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "mark": {
+                                        "type": "string",
+                                        "maxLength": 8
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    }
+                                },
+                                "required": [
+                                    "learner_id",
+                                    "mark",
+                                    "reason"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/lectures/{division}/sessions/{id}/code": {
+            "get": {
+                "operationId": "lectures.session.code",
+                "summary": "The room screen: the code now, and how many have scanned in",
+                "tags": [
+                    "Lectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "changes_in": {
+                                            "type": "integer"
+                                        },
+                                        "scanned": {
+                                            "type": "integer"
+                                        },
+                                        "of": {
+                                            "type": "integer"
+                                        },
+                                        "scan_until": {
+                                            "type": "string"
+                                        },
+                                        "open": {
+                                            "type": "boolean"
+                                        },
+                                        "lecture": {
+                                            "type": "object",
+                                            "properties": {
+                                                "slot_id": {
+                                                    "type": "string"
+                                                },
+                                                "day": {
+                                                    "type": "string"
+                                                },
+                                                "held_on": {
+                                                    "type": "string"
+                                                },
+                                                "starts": {
+                                                    "type": "string"
+                                                },
+                                                "ends": {
+                                                    "type": "string"
+                                                },
+                                                "room": {
+                                                    "type": "string"
+                                                },
+                                                "seats": {
+                                                    "type": "integer"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "code": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "department": {
+                                                    "type": "string"
+                                                },
+                                                "students": {
+                                                    "type": "integer"
+                                                },
+                                                "state": {
+                                                    "type": "string"
+                                                },
+                                                "lecturer_id": {
+                                                    "type": "string"
+                                                },
+                                                "lecturer": {
+                                                    "type": "string"
+                                                },
+                                                "cover": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "asked_id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "asked": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "reason": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "moved": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "day": {
+                                                            "type": "string"
+                                                        },
+                                                        "starts": {
+                                                            "type": "string"
+                                                        },
+                                                        "ends": {
+                                                            "type": "string"
+                                                        },
+                                                        "room": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "day",
+                                                        "starts",
+                                                        "ends",
+                                                        "room"
+                                                    ]
+                                                },
+                                                "taken": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "present": {
+                                                            "type": "integer"
+                                                        },
+                                                        "closed": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "scanning": {
+                                                            "type": "boolean"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "present",
+                                                        "closed",
+                                                        "scanning"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "slot_id",
+                                                "day",
+                                                "held_on",
+                                                "starts",
+                                                "ends",
+                                                "room",
+                                                "seats",
+                                                "kind",
+                                                "code",
+                                                "title",
+                                                "department",
+                                                "students",
+                                                "state",
+                                                "lecturer_id",
+                                                "lecturer",
+                                                "cover",
+                                                "asked_id",
+                                                "asked",
+                                                "reason",
+                                                "moved",
+                                                "taken"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "changes_in",
+                                        "scanned",
+                                        "of",
+                                        "scan_until",
+                                        "open",
+                                        "lecture"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/registers/levels": {
             "get": {
                 "operationId": "registers.levels",
@@ -27423,6 +30150,9 @@
                                 }
                             }
                         }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -48027,6 +50757,837 @@
                                     },
                                     "required": [
                                         "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/lectures/today": {
+            "get": {
+                "operationId": "student.lectures.today",
+                "summary": "Today's lectures, the one open for scanning now, and the attendance phone",
+                "tags": [
+                    "StudentLectures"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "day": {
+                                            "type": "string"
+                                        },
+                                        "lectures": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "slot_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "day": {
+                                                        "type": "string"
+                                                    },
+                                                    "held_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "starts": {
+                                                        "type": "string"
+                                                    },
+                                                    "ends": {
+                                                        "type": "string"
+                                                    },
+                                                    "room": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "lecturer": {
+                                                        "type": "string"
+                                                    },
+                                                    "cover": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "moved": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "day": {
+                                                                "type": "string"
+                                                            },
+                                                            "starts": {
+                                                                "type": "string"
+                                                            },
+                                                            "ends": {
+                                                                "type": "string"
+                                                            },
+                                                            "room": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "day",
+                                                            "starts",
+                                                            "ends",
+                                                            "room"
+                                                        ]
+                                                    },
+                                                    "mark": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "scan": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "open": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "until": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "open",
+                                                            "until"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "slot_id",
+                                                    "day",
+                                                    "held_on",
+                                                    "starts",
+                                                    "ends",
+                                                    "room",
+                                                    "kind",
+                                                    "code",
+                                                    "title",
+                                                    "state",
+                                                    "lecturer",
+                                                    "cover",
+                                                    "moved",
+                                                    "mark",
+                                                    "scan"
+                                                ]
+                                            }
+                                        },
+                                        "open": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "slot_id": {
+                                                    "type": "string"
+                                                },
+                                                "day": {
+                                                    "type": "string"
+                                                },
+                                                "held_on": {
+                                                    "type": "string"
+                                                },
+                                                "starts": {
+                                                    "type": "string"
+                                                },
+                                                "ends": {
+                                                    "type": "string"
+                                                },
+                                                "room": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "code": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string"
+                                                },
+                                                "lecturer": {
+                                                    "type": "string"
+                                                },
+                                                "cover": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "moved": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "day": {
+                                                            "type": "string"
+                                                        },
+                                                        "starts": {
+                                                            "type": "string"
+                                                        },
+                                                        "ends": {
+                                                            "type": "string"
+                                                        },
+                                                        "room": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "day",
+                                                        "starts",
+                                                        "ends",
+                                                        "room"
+                                                    ]
+                                                },
+                                                "mark": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "scan": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "properties": {
+                                                        "open": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "until": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "open",
+                                                        "until"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "slot_id",
+                                                "day",
+                                                "held_on",
+                                                "starts",
+                                                "ends",
+                                                "room",
+                                                "kind",
+                                                "code",
+                                                "title",
+                                                "state",
+                                                "lecturer",
+                                                "cover",
+                                                "moved",
+                                                "mark",
+                                                "scan"
+                                            ]
+                                        },
+                                        "phone": {
+                                            "type": "object",
+                                            "properties": {
+                                                "set": {
+                                                    "type": "boolean"
+                                                },
+                                                "credential_id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "set_on": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "rp_id": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "set",
+                                                "credential_id",
+                                                "set_on",
+                                                "rp_id"
+                                            ]
+                                        },
+                                        "location": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "day",
+                                        "lectures",
+                                        "open",
+                                        "phone",
+                                        "location"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/lectures/week": {
+            "get": {
+                "operationId": "student.lectures.week",
+                "summary": "A week of lectures, Monday to Saturday",
+                "tags": [
+                    "StudentLectures"
+                ],
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "from": {
+                                            "type": "string"
+                                        },
+                                        "days": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "day": {
+                                                        "type": "string"
+                                                    },
+                                                    "lectures": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "slot_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "day": {
+                                                                    "type": "string"
+                                                                },
+                                                                "held_on": {
+                                                                    "type": "string"
+                                                                },
+                                                                "starts": {
+                                                                    "type": "string"
+                                                                },
+                                                                "ends": {
+                                                                    "type": "string"
+                                                                },
+                                                                "room": {
+                                                                    "type": "string"
+                                                                },
+                                                                "kind": {
+                                                                    "type": "string"
+                                                                },
+                                                                "code": {
+                                                                    "type": "string"
+                                                                },
+                                                                "title": {
+                                                                    "type": "string"
+                                                                },
+                                                                "state": {
+                                                                    "type": "string"
+                                                                },
+                                                                "lecturer": {
+                                                                    "type": "string"
+                                                                },
+                                                                "cover": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "moved": {
+                                                                    "type": [
+                                                                        "object",
+                                                                        "null"
+                                                                    ],
+                                                                    "properties": {
+                                                                        "day": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "starts": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "ends": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "room": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "day",
+                                                                        "starts",
+                                                                        "ends",
+                                                                        "room"
+                                                                    ]
+                                                                },
+                                                                "mark": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "scan": {
+                                                                    "type": [
+                                                                        "object",
+                                                                        "null"
+                                                                    ],
+                                                                    "properties": {
+                                                                        "open": {
+                                                                            "type": "boolean"
+                                                                        },
+                                                                        "until": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "open",
+                                                                        "until"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "slot_id",
+                                                                "day",
+                                                                "held_on",
+                                                                "starts",
+                                                                "ends",
+                                                                "room",
+                                                                "kind",
+                                                                "code",
+                                                                "title",
+                                                                "state",
+                                                                "lecturer",
+                                                                "cover",
+                                                                "moved",
+                                                                "mark",
+                                                                "scan"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "day",
+                                                    "lectures"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "from",
+                                        "days"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/lectures/attendance": {
+            "get": {
+                "operationId": "student.lectures.attendance",
+                "summary": "The student's lecture attendance this semester",
+                "tags": [
+                    "StudentLectures"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "semester": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "rate": {
+                                            "type": [
+                                                "integer",
+                                                "null"
+                                            ]
+                                        },
+                                        "held": {
+                                            "type": "integer"
+                                        },
+                                        "missed": {
+                                            "type": "integer"
+                                        },
+                                        "courses": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "held": {
+                                                        "type": "integer"
+                                                    },
+                                                    "missed": {
+                                                        "type": "integer"
+                                                    },
+                                                    "late": {
+                                                        "type": "integer"
+                                                    },
+                                                    "rate": {
+                                                        "type": [
+                                                            "integer",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "code",
+                                                    "title",
+                                                    "held",
+                                                    "missed",
+                                                    "late",
+                                                    "rate"
+                                                ]
+                                            }
+                                        },
+                                        "marks": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "day": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "mark": {
+                                                        "type": "string"
+                                                    },
+                                                    "source": {
+                                                        "type": "string"
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "by": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "was": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "day",
+                                                    "code",
+                                                    "kind",
+                                                    "mark",
+                                                    "source",
+                                                    "reason",
+                                                    "by",
+                                                    "was"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "semester",
+                                        "rate",
+                                        "held",
+                                        "missed",
+                                        "courses",
+                                        "marks"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/lectures/phone/begin": {
+            "post": {
+                "operationId": "student.lectures.phone.begin",
+                "summary": "Starts setting up the attendance phone: what the phone needs to make its passkey",
+                "tags": [
+                    "StudentLectures"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "challenge": {
+                                            "type": "string"
+                                        },
+                                        "rp_id": {
+                                            "type": "string"
+                                        },
+                                        "user_handle": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "challenge",
+                                        "rp_id",
+                                        "user_handle",
+                                        "name"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/lectures/phone": {
+            "post": {
+                "operationId": "student.lectures.phone.set",
+                "tags": [
+                    "StudentLectures"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "client_data_json": {
+                                        "type": "string",
+                                        "maxLength": 4096
+                                    },
+                                    "attestation_object": {
+                                        "type": "string",
+                                        "maxLength": 16384
+                                    }
+                                },
+                                "required": [
+                                    "client_data_json",
+                                    "attestation_object"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/lectures/scan": {
+            "post": {
+                "operationId": "student.lectures.scan",
+                "summary": "Scans in at a lecture",
+                "tags": [
+                    "StudentLectures"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "maxLength": 120
+                                    },
+                                    "credential_id": {
+                                        "type": "string",
+                                        "maxLength": 512
+                                    },
+                                    "client_data_json": {
+                                        "type": "string",
+                                        "maxLength": 4096
+                                    },
+                                    "authenticator_data": {
+                                        "type": "string",
+                                        "maxLength": 2048
+                                    },
+                                    "signature": {
+                                        "type": "string",
+                                        "maxLength": 512
+                                    },
+                                    "latitude": {
+                                        "type": [
+                                            "number",
+                                            "null"
+                                        ],
+                                        "minimum": -90,
+                                        "maximum": 90
+                                    },
+                                    "longitude": {
+                                        "type": [
+                                            "number",
+                                            "null"
+                                        ],
+                                        "minimum": -180,
+                                        "maximum": 180
+                                    },
+                                    "accuracy": {
+                                        "type": [
+                                            "number",
+                                            "null"
+                                        ],
+                                        "minimum": 0
+                                    }
+                                },
+                                "required": [
+                                    "code",
+                                    "credential_id",
+                                    "client_data_json",
+                                    "authenticator_data",
+                                    "signature"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "why": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "course": {
+                                            "type": "string"
+                                        },
+                                        "at": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "result",
+                                        "why",
+                                        "course",
+                                        "at"
                                     ]
                                 }
                             }

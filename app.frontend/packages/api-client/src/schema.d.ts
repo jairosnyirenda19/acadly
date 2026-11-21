@@ -2141,6 +2141,287 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/lectures/learners/{learner}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Lecture attendance tab of the learner record */
+        get: operations["lectures.learner"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/lectures/learners/{learner}/phone/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["lectures.phone.reset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/lectures/{division}/rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Rooms, the campus areas, and how long scanning stays open */
+        get: operations["lectures.rooms"];
+        put?: never;
+        post: operations["lectures.rooms.save"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/lectures/{division}/areas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["lectures.areas.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/lectures/{division}/timetable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The lecture timetable of a semester: the current one unless another is asked for */
+        get: operations["lectures.timetable"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/lectures/{division}/timetable/{period}/slots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["lectures.slots.save"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/lectures/{division}/timetable/{period}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publishes the timetable, unless a check stops it */
+        post: operations["lectures.timetable.publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/lectures/{division}/slots/{id}/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["lectures.slots.remove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/lectures/{division}/cover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The week's lectures that need cover or changed */
+        get: operations["lectures.cover"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/lectures/{division}/slots/{id}/free": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Colleagues who could cover a lecture, free first */
+        get: operations["lectures.cover.free"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/lectures/{division}/slots/{id}/{action}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["lectures.cover.act"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/lectures/{division}/my-day": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The person's lectures on a day, the cover asked of them and their week ahead */
+        get: operations["lectures.my-day"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/lectures/{division}/slots/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One lecture on one day, with its attendance */
+        get: operations["lectures.lecture"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/lectures/{division}/slots/{id}/open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["lectures.lecture.open"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/lectures/{division}/sessions/{id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["lectures.session.close"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/lectures/{division}/sessions/{id}/mark": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["lectures.session.mark"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/lectures/{division}/sessions/{id}/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The room screen: the code now, and how many have scanned in */
+        get: operations["lectures.session.code"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/registers/levels": {
         parameters: {
             query?: never;
@@ -4598,6 +4879,107 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["programmes.accounts.suspend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/lectures/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Today's lectures, the one open for scanning now, and the attendance phone */
+        get: operations["student.lectures.today"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/lectures/week": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A week of lectures, Monday to Saturday */
+        get: operations["student.lectures.week"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/lectures/attendance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The student's lecture attendance this semester */
+        get: operations["student.lectures.attendance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/lectures/phone/begin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Starts setting up the attendance phone: what the phone needs to make its passkey */
+        post: operations["student.lectures.phone.begin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/lectures/phone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["student.lectures.phone.set"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/lectures/scan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Scans in at a lecture */
+        post: operations["student.lectures.scan"];
         delete?: never;
         options?: never;
         head?: never;
@@ -11996,6 +12378,878 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "lectures.learner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                learner: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        semester: string | null;
+                        rate: number | null;
+                        held: number;
+                        missed: number;
+                        courses: {
+                            code: string;
+                            title: string;
+                            held: number;
+                            missed: number;
+                            late: number;
+                            rate: number | null;
+                        }[];
+                        marks: {
+                            day: string;
+                            code: string;
+                            kind: string;
+                            mark: string;
+                            source: string;
+                            reason: string | null;
+                            by: string | null;
+                            was: string | null;
+                        }[];
+                        phone: {
+                            set: boolean;
+                            set_on: string | null;
+                        };
+                        can_reset: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "lectures.phone.reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                learner: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "lectures.rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        rooms: {
+                            id: string;
+                            code: string;
+                            name: string;
+                            seats: number;
+                            kind: string;
+                            retired: boolean;
+                        }[];
+                        areas: {
+                            name: string;
+                            latitude: number;
+                            longitude: number;
+                            reach: number;
+                        }[];
+                        scan_minutes: number;
+                        can_change: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "lectures.rooms.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    id?: string | null;
+                    code: string;
+                    name: string;
+                    seats: number;
+                    kind: string;
+                    retired?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "lectures.areas.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    areas: {
+                        name: string;
+                        latitude: number;
+                        longitude: number;
+                        reach: number;
+                    }[];
+                    scan_minutes: number;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "lectures.timetable": {
+        parameters: {
+            query?: {
+                period?: string | null;
+            };
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        periods: {
+                            id: string;
+                            name: string;
+                        }[];
+                        period: {
+                            id: string;
+                            name: string;
+                            starts_on: string;
+                            ends_on: string;
+                        } | null;
+                        published: boolean;
+                        can_change: boolean;
+                        rooms: {
+                            id: string;
+                            code: string;
+                            name: string;
+                            seats: number;
+                            kind: string;
+                            retired: boolean;
+                        }[];
+                        offerings: {
+                            id: string;
+                            code: string;
+                            title: string;
+                            group: string;
+                            department: string;
+                            lecturers: {
+                                id: string;
+                                name: string;
+                            }[];
+                            taken: number;
+                        }[];
+                        cohorts: {
+                            id: string;
+                            label: string;
+                            offerings: string[];
+                        }[];
+                        staff: {
+                            id: string;
+                            name: string;
+                        }[];
+                        slots: {
+                            id: string;
+                            offering_id: string;
+                            kind: string;
+                            weekday: number;
+                            starts: string;
+                            ends: string;
+                            room_id: string;
+                            lecturer_id: string;
+                            lecturer: string;
+                        }[];
+                        checks: {
+                            kind: string;
+                            tone: string;
+                            slots: string[];
+                            count: number;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "lectures.slots.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    id?: string | null;
+                    /** Format: uuid */
+                    offering_id: string;
+                    kind: string;
+                    weekday: number;
+                    starts: string;
+                    ends: string;
+                    /** Format: uuid */
+                    room_id: string;
+                    /** Format: uuid */
+                    lecturer_id: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "lectures.timetable.publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        published: boolean;
+                        checks: {
+                            kind: string;
+                            tone: string;
+                            slots: string[];
+                            count: number;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "lectures.slots.remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "lectures.cover": {
+        parameters: {
+            query?: {
+                week?: string | null;
+            };
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        week: string;
+                        can_arrange: boolean;
+                        rows: {
+                            slot_id: string;
+                            day: string;
+                            held_on: string;
+                            starts: string;
+                            ends: string;
+                            room: string;
+                            seats: number;
+                            kind: string;
+                            code: string;
+                            title: string;
+                            department: string;
+                            students: number;
+                            state: string;
+                            lecturer_id: string;
+                            lecturer: string;
+                            cover: string | null;
+                            asked_id: string | null;
+                            asked: string | null;
+                            reason: string | null;
+                            moved: {
+                                day: string;
+                                starts: string;
+                                ends: string;
+                                room: string;
+                            } | null;
+                            taken: {
+                                present: number;
+                                closed: boolean;
+                                scanning: boolean;
+                            } | null;
+                        }[];
+                        counts: {
+                            need: number;
+                            asked: number;
+                            covered: number;
+                            changed: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "lectures.cover.free": {
+        parameters: {
+            query: {
+                day: string;
+            };
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        colleagues: {
+                            id: string;
+                            name: string;
+                            free: boolean;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "lectures.cover.act": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+                action: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: date */
+                    day: string;
+                    /** Format: uuid */
+                    user_id?: string | null;
+                    reason?: string | null;
+                    /** Format: date */
+                    to_day?: string | null;
+                    to_starts?: string | null;
+                    to_ends?: string | null;
+                    /** Format: uuid */
+                    to_room?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "lectures.my-day": {
+        parameters: {
+            query?: {
+                day?: string | null;
+            };
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        day: string;
+                        now: string;
+                        today: {
+                            slot_id: string;
+                            day: string;
+                            held_on: string;
+                            starts: string;
+                            ends: string;
+                            room: string;
+                            seats: number;
+                            kind: string;
+                            code: string;
+                            title: string;
+                            department: string;
+                            students: number;
+                            state: string;
+                            lecturer_id: string;
+                            lecturer: string;
+                            cover: string | null;
+                            asked_id: string | null;
+                            asked: string | null;
+                            reason: string | null;
+                            moved: {
+                                day: string;
+                                starts: string;
+                                ends: string;
+                                room: string;
+                            } | null;
+                            taken: {
+                                present: number;
+                                closed: boolean;
+                                scanning: boolean;
+                            } | null;
+                        }[];
+                        asked: {
+                            slot_id: string;
+                            day: string;
+                            held_on: string;
+                            starts: string;
+                            ends: string;
+                            room: string;
+                            seats: number;
+                            kind: string;
+                            code: string;
+                            title: string;
+                            department: string;
+                            students: number;
+                            state: string;
+                            lecturer_id: string;
+                            lecturer: string;
+                            cover: string | null;
+                            asked_id: string | null;
+                            asked: string | null;
+                            reason: string | null;
+                            moved: {
+                                day: string;
+                                starts: string;
+                                ends: string;
+                                room: string;
+                            } | null;
+                            taken: {
+                                present: number;
+                                closed: boolean;
+                                scanning: boolean;
+                            } | null;
+                        }[];
+                        ahead: {
+                            slot_id: string;
+                            day: string;
+                            held_on: string;
+                            starts: string;
+                            ends: string;
+                            room: string;
+                            seats: number;
+                            kind: string;
+                            code: string;
+                            title: string;
+                            department: string;
+                            students: number;
+                            state: string;
+                            lecturer_id: string;
+                            lecturer: string;
+                            cover: string | null;
+                            asked_id: string | null;
+                            asked: string | null;
+                            reason: string | null;
+                            moved: {
+                                day: string;
+                                starts: string;
+                                ends: string;
+                                room: string;
+                            } | null;
+                            taken: {
+                                present: number;
+                                closed: boolean;
+                                scanning: boolean;
+                            } | null;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "lectures.lecture": {
+        parameters: {
+            query: {
+                day: string;
+            };
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        lecture: {
+                            slot_id: string;
+                            day: string;
+                            held_on: string;
+                            starts: string;
+                            ends: string;
+                            room: string;
+                            seats: number;
+                            kind: string;
+                            code: string;
+                            title: string;
+                            department: string;
+                            students: number;
+                            state: string;
+                            lecturer_id: string;
+                            lecturer: string;
+                            cover: string | null;
+                            asked_id: string | null;
+                            asked: string | null;
+                            reason: string | null;
+                            moved: {
+                                day: string;
+                                starts: string;
+                                ends: string;
+                                room: string;
+                            } | null;
+                            taken: {
+                                present: number;
+                                closed: boolean;
+                                scanning: boolean;
+                            } | null;
+                        };
+                        session: {
+                            id: string;
+                            scan_until: string;
+                            scanning: boolean;
+                            closed: boolean;
+                        } | null;
+                        students: {
+                            learner_id: string;
+                            name: string;
+                            number: string;
+                            mark: string | null;
+                            source: string | null;
+                            at: string | null;
+                            reason: string | null;
+                            refused: {
+                                why: string;
+                                at: string;
+                            } | null;
+                        }[];
+                        can_open: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "lectures.lecture.open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: date */
+                    day: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        session: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "lectures.session.close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "lectures.session.mark": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    learner_id: string;
+                    mark: string;
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "lectures.session.code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        changes_in: number;
+                        scanned: number;
+                        of: number;
+                        scan_until: string;
+                        open: boolean;
+                        lecture: {
+                            slot_id: string;
+                            day: string;
+                            held_on: string;
+                            starts: string;
+                            ends: string;
+                            room: string;
+                            seats: number;
+                            kind: string;
+                            code: string;
+                            title: string;
+                            department: string;
+                            students: number;
+                            state: string;
+                            lecturer_id: string;
+                            lecturer: string;
+                            cover: string | null;
+                            asked_id: string | null;
+                            asked: string | null;
+                            reason: string | null;
+                            moved: {
+                                day: string;
+                                starts: string;
+                                ends: string;
+                                room: string;
+                            } | null;
+                            taken: {
+                                present: number;
+                                closed: boolean;
+                                scanning: boolean;
+                            } | null;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "registers.levels": {
         parameters: {
             query?: never;
@@ -13657,6 +14911,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
         };
     };
     "news.update": {
@@ -19986,6 +21241,275 @@ export interface operations {
                 content: {
                     "application/json": {
                         saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "student.lectures.today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        day: string;
+                        lectures: {
+                            slot_id: string;
+                            day: string;
+                            held_on: string;
+                            starts: string;
+                            ends: string;
+                            room: string;
+                            kind: string;
+                            code: string;
+                            title: string;
+                            state: string;
+                            lecturer: string;
+                            cover: string | null;
+                            moved: {
+                                day: string;
+                                starts: string;
+                                ends: string;
+                                room: string;
+                            } | null;
+                            mark: string | null;
+                            scan: {
+                                open: boolean;
+                                until: string;
+                            } | null;
+                        }[];
+                        open: {
+                            slot_id: string;
+                            day: string;
+                            held_on: string;
+                            starts: string;
+                            ends: string;
+                            room: string;
+                            kind: string;
+                            code: string;
+                            title: string;
+                            state: string;
+                            lecturer: string;
+                            cover: string | null;
+                            moved: {
+                                day: string;
+                                starts: string;
+                                ends: string;
+                                room: string;
+                            } | null;
+                            mark: string | null;
+                            scan: {
+                                open: boolean;
+                                until: string;
+                            } | null;
+                        } | null;
+                        phone: {
+                            set: boolean;
+                            credential_id: string | null;
+                            set_on: string | null;
+                            rp_id: string;
+                        };
+                        location: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "student.lectures.week": {
+        parameters: {
+            query?: {
+                from?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        from: string;
+                        days: {
+                            day: string;
+                            lectures: {
+                                slot_id: string;
+                                day: string;
+                                held_on: string;
+                                starts: string;
+                                ends: string;
+                                room: string;
+                                kind: string;
+                                code: string;
+                                title: string;
+                                state: string;
+                                lecturer: string;
+                                cover: string | null;
+                                moved: {
+                                    day: string;
+                                    starts: string;
+                                    ends: string;
+                                    room: string;
+                                } | null;
+                                mark: string | null;
+                                scan: {
+                                    open: boolean;
+                                    until: string;
+                                } | null;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "student.lectures.attendance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        semester: string | null;
+                        rate: number | null;
+                        held: number;
+                        missed: number;
+                        courses: {
+                            code: string;
+                            title: string;
+                            held: number;
+                            missed: number;
+                            late: number;
+                            rate: number | null;
+                        }[];
+                        marks: {
+                            day: string;
+                            code: string;
+                            kind: string;
+                            mark: string;
+                            source: string;
+                            reason: string | null;
+                            by: string | null;
+                            was: string | null;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "student.lectures.phone.begin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        challenge: string;
+                        rp_id: string;
+                        user_handle: string;
+                        name: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "student.lectures.phone.set": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    client_data_json: string;
+                    attestation_object: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "student.lectures.scan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    code: string;
+                    credential_id: string;
+                    client_data_json: string;
+                    authenticator_data: string;
+                    signature: string;
+                    latitude?: number | null;
+                    longitude?: number | null;
+                    accuracy?: number | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        result: string;
+                        why: string | null;
+                        course: string;
+                        at: string | null;
                     };
                 };
             };

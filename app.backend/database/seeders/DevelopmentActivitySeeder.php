@@ -15,8 +15,8 @@ use Acadly\Modules\Fees\Domain\PaymentMethod;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use RuntimeException;
 
 /**
@@ -61,7 +61,7 @@ final class DevelopmentActivitySeeder extends Seeder
     private function college(User $by, Clock $clock): void
     {
         $college = DB::table('institution_divisions')->where('profile_ref', 'like', 'TERTIARY@%')->whereNull('ended_at')->value('id');
-        $password = env('DEV_STUDENT_PASSWORD');
+        $password = config('acadly.development.student_password');
         if (! is_string($college) || ! is_string($password) || mb_strlen($password) < 12) {
             return;
         }

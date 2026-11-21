@@ -10,6 +10,8 @@ use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Kernel\Support\Row;
+use Acadly\Modules\Lectures\Application\Actions\RoomActions;
+use Acadly\Modules\Lectures\Application\Actions\TimetableActions;
 use Acadly\Modules\Programmes\Application\Actions\CourseActions;
 use Acadly\Modules\Programmes\Application\Actions\OfferingActions;
 use Acadly\Modules\Programmes\Application\Actions\ProgrammeActions;
@@ -30,7 +32,8 @@ use RuntimeException;
  * Diploma in Accounting, a Bachelor of Accountancy still in draft, and the
  * first semester's offerings. D-098 adds students: Year 1 and Year 2
  * classes, twelve students placed in the Diploma, registration dates for
- * the semester in progress, the semester started and some approved. The
+ * the semester in progress, the semester started and some approved. D-102
+ * adds rooms, the campus area and a published lecture timetable. The
  * division, its semesters and its classes are written straight to the
  * tables, as setup would; the rest goes through the Actions.
  *
@@ -60,6 +63,7 @@ final class DevelopmentCollegeSeeder extends Seeder
             $this->division = Row::text($college, 'id');
             $this->command?->getOutput()->writeln('  The development college is there already.');
             $this->students($clock, $calendar, $offerings, $admit, $students, $registration);
+            $this->lectures($clock, $calendar);
 
             return;
         }
@@ -130,6 +134,52 @@ final class DevelopmentCollegeSeeder extends Seeder
         }
 
         $this->students($clock, $calendar, $offerings, $admit, $students, $registration);
+        $this->lectures($clock, $calendar);
+    }
+
+    /** D-102: rooms, the campus area and the semester's lecture timetable, published. The administrator gives ACC 101 and STA 101. */
+    private function lectures(Clock $clock, AcademicCalendar $calendar): void
+    {
+        if (DB::table('lecture_rooms')->where('division_id', $this->division)->exists()) {
+            return;
+        }
+        $last = DB::table('module_switches')->where('module_key', 'lectures')->orderByDesc('switched_at')->first();
+        if ($last === null || ! (bool) ($last->enabled ?? false)) {
+            DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'lectures', 'enabled' => true, 'reason' => 'Development college.',
+                'switched_by' => $this->by->id, 'switched_at' => $clock->now()]);
+            app()->forgetScopedInstances();
+        }
+        $period = $calendar->currentYear()['terms'][$this->division][0] ?? null;
+        if ($period === null) {
+            return;
+        }
+        $rooms = app(RoomActions::class);
+        $room = [];
+        foreach ([['HALL A', 'Main lecture hall', 150, 'hall'], ['B12', 'Block B, room 12', 60, 'room'], ['B14', 'Block B, room 14', 40, 'room'],
+            ['LAB 2', 'Computer laboratory 2', 30, 'laboratory'], ['S3', 'Seminar room 3', 20, 'seminar']] as [$code, $name, $seats, $kind]) {
+            $room[$code] = $rooms->saveRoom($this->by, $this->division, ['id' => null, 'code' => $code, 'name' => $name, 'seats' => $seats, 'kind' => $kind, 'retired' => false]);
+        }
+        $rooms->saveAreas($this->by, $this->division, [['name' => 'Main campus', 'latitude' => -15.7861, 'longitude' => 35.0058, 'reach' => 250]], 20);
+
+        $offering = [];
+        foreach (DB::table('programme_offerings as o')->join('programme_courses as c', 'c.id', '=', 'o.course_id')->where('o.period_id', $period['id'])->get(['o.id', 'c.code']) as $o) {
+            $offering[Row::text($o, 'code')] = Row::text($o, 'id');
+        }
+        $staff = array_values(array_filter(ProgrammesViews::staff(), fn (array $s): bool => $s['id'] !== $this->by->id));
+        $other = fn (int $i): string => $staff[$i % max(1, count($staff))]['id'] ?? $this->by->id;
+        $timetable = app(TimetableActions::class);
+        foreach ([['ACC 101', 'lecture', 1, '08:00', '10:00', 'B12', $this->by->id], ['LAW 101', 'lecture', 1, '11:00', '13:00', 'HALL A', $other(0)],
+            ['STA 101', 'lecture', 2, '09:00', '11:00', 'B12', $this->by->id], ['ICT 101', 'practical', 2, '14:00', '16:00', 'LAB 2', $other(1)],
+            ['ACC 101', 'tutorial', 3, '08:00', '09:00', 'S3', $this->by->id], ['ICT 101', 'lecture', 3, '10:00', '12:00', 'B12', $other(1)],
+            ['ACC 101', 'lecture', 4, '10:00', '12:00', 'B12', $this->by->id], ['STA 101', 'tutorial', 4, '14:00', '15:00', 'S3', $this->by->id],
+            ['LAW 101', 'tutorial', 5, '09:00', '11:00', 'B14', $other(0)]] as [$code, $kind, $weekday, $starts, $ends, $at, $lecturer]) {
+            if (isset($offering[$code], $room[$at])) {
+                $timetable->save($this->by, $this->division, $period['id'], ['id' => null, 'offering_id' => $offering[$code], 'kind' => $kind, 'weekday' => $weekday,
+                    'starts' => $starts, 'ends' => $ends, 'room_id' => $room[$at], 'lecturer_id' => $lecturer]);
+            }
+        }
+        $stopped = $timetable->publish($this->by, $this->division, $period['id']);
+        $this->command?->getOutput()->writeln('  Development college: 5 rooms and the lecture timetable'.($stopped === [] ? ', published.' : ', not published: '.count($stopped).' clashes.'));
     }
 
     /** D-098: students in the Diploma, and the semester in progress started for them. */

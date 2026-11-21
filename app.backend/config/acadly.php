@@ -12,6 +12,7 @@ use Acadly\Modules\Assessment\AssessmentModule;
 use Acadly\Modules\Attendance\AttendanceModule;
 use Acadly\Modules\Conduct\ConductModule;
 use Acadly\Modules\Fees\FeesModule;
+use Acadly\Modules\Lectures\LecturesModule;
 use Acadly\Modules\News\NewsModule;
 use Acadly\Modules\Programmes\ProgrammesModule;
 use Acadly\Modules\SafeRelease\SafeReleaseModule;
@@ -132,6 +133,9 @@ return [
         // it sees. Off unless turned on here, and never in production.
         'view_as' => (bool) env('DEV_VIEW_AS', false),
         'view_as_minutes' => (int) env('DEV_VIEW_AS_MINUTES', 60),
+
+        // The password the development college's first student signs in with (D-101). Local only.
+        'student_password' => env('DEV_STUDENT_PASSWORD'),
     ],
 
     /*
@@ -151,6 +155,7 @@ return [
         SafeReleaseModule::class,
         NewsModule::class,
         ProgrammesModule::class,
+        LecturesModule::class,
     ],
 
     /*

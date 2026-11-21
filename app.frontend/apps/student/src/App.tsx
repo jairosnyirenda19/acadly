@@ -2,6 +2,7 @@ import { getAccount, getSchoolLook, getSchoolName, navigate, useLocation, type A
 import { applyLook } from '@acadly/ui'
 import { useEffect, useState } from 'react'
 import { studentApi, type Me } from './api'
+import { AttendancePage, PhonePage, ScanPage, WeekPage } from './Lectures'
 import { AccountPage, ArticlePage, CoursesPage, FeesPage, MorePage, NewsPage, RegistrationPage, TodayPage } from './Pages'
 import { SignIn } from './SignIn'
 
@@ -54,6 +55,10 @@ export function App() {
   if (article !== undefined) return <ArticlePage key={article} me={me} id={article} />
   if (path === '/more') return <MorePage me={me} onSignedOut={signedOut} />
   if (path === '/account') return <AccountPage me={me} onSignedOut={signedOut} />
+  if (path === '/week') return <WeekPage me={me} />
+  if (path === '/attendance') return <AttendancePage me={me} />
+  if (path === '/phone') return <PhonePage me={me} />
+  if (path === '/scan') return <ScanPage />
 
   return <TodayPage me={me} />
 }

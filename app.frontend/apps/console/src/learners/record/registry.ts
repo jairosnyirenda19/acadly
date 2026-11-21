@@ -5,6 +5,7 @@ import { FeesSummary, FeesTab } from './FeesPart'
 import { ConductSummary, ConductTab } from './ConductPart'
 import { SupportSummary, SupportTab } from './SupportPart'
 import { ProgrammeSummary, ProgrammeTab } from './ProgrammePart'
+import { LecturesSummary, LecturesTab } from './LecturesPart'
 import { AssessmentSummary, AssessmentTab, PickupSummary, PickupTab } from './EarlyParts'
 
 /**
@@ -28,4 +29,5 @@ export const PART_VIEWS: Partial<Record<string, PartView>> = {
   conduct: { Summary: ConductSummary, Tab: ConductTab },
   support: { Summary: SupportSummary, Tab: SupportTab },
   programmes: { Summary: ProgrammeSummary, Tab: ProgrammeTab },
+  lectures: { Summary: LecturesSummary, Tab: LecturesTab },
 }

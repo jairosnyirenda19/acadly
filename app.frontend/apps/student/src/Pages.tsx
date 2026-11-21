@@ -1,12 +1,13 @@
 import { navigate, signOut } from '@acadly/kernel'
 import { useState } from 'react'
 import { day, money, studentApi, type Me, type Registration } from './api'
+import { LecturesNow } from './Lectures'
 import { copy } from './copy'
 import { Field, Line, Loading, Page, Primary, Section, Tag, Title, useAnswer } from './parts'
 
 const longDay = (d: Date) => d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
 
-/** Today (the approved board): registration, fees, the newest news; the lectures arrive with the timetable. */
+/** Today (the approved boards): the lecture open for scanning and the day's lectures, registration, fees, the newest news. */
 export function TodayPage({ me }: { me: Me }) {
   const t = copy.today
   const reg = useAnswer(studentApi.registration, 'reg')
@@ -19,6 +20,7 @@ export function TodayPage({ me }: { me: Me }) {
   return (
     <Page me={me} tab="today">
       <Title>{t.title(longDay(new Date()))}</Title>
+      <LecturesNow />
       {r !== null && (
         <Section title={`${t.registration} · ${r.period}`}>
           {r.editable ? (
@@ -52,7 +54,6 @@ export function TodayPage({ me }: { me: Me }) {
           (news.data?.posts ?? []).slice(0, 3).map((p) => <Line key={p.id} strong={p.title} sub={`${p.audience_label} · ${day(p.publish_at)}`} href={`/news/${p.id}`} right={!p.read ? <Tag tone="ink">{t.new}</Tag> : undefined} />)
         )}
       </Section>
-      <p className="border-2 border-dashed border-rule-dashed px-3.5 py-3 text-[14px] text-text-muted">{t.lectures}</p>
     </Page>
   )
 }
@@ -87,6 +88,9 @@ export function CoursesPage({ me }: { me: Me }) {
             {c.courses.map((x) => (
               <Line key={x.code} strong={`${x.code} · ${x.title}`} sub={`${x.credits} credits · ${x.lecturers.length > 0 ? x.lecturers.join(', ') : t.noLecturer}`} right={<Tag tone={x.kind === 'core' ? 'plain' : 'done'}>{x.kind === 'core' ? t.core : t.elective}</Tag>} />
             ))}
+          </Section>
+          <Section>
+            <Line strong={copy.more.attendance} href="/attendance" />
           </Section>
           <p className="text-[13px] text-text-muted">{t.note}</p>
         </>
@@ -323,7 +327,10 @@ export function MorePage({ me, onSignedOut }: { me: Me; onSignedOut: () => void 
     <Page me={me} tab="more">
       <Title>{t.title}</Title>
       <Section>
+        <Line strong={t.week} href="/week" />
+        <Line strong={t.attendance} href="/attendance" />
         <Line strong={t.registration} href="/registration" />
+        <Line strong={t.phone} href="/phone" />
         <Line strong={t.account} href="/account" />
       </Section>
       <button type="button" className="h-11 border-2 border-ink font-extrabold" onClick={() => void signOut().then(onSignedOut)}>

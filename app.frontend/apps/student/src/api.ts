@@ -7,6 +7,12 @@ export type Registration = NonNullable<paths['/v1/student/registration']['get'][
 export type Fees = NonNullable<paths['/v1/student/fees']['get']['responses'][200]['content']['application/json']['fees']>
 export type Post = paths['/v1/student/news']['get']['responses'][200]['content']['application/json']['posts'][number]
 
+export type LecturesToday = paths['/v1/student/lectures/today']['get']['responses'][200]['content']['application/json']
+export type Lecture = LecturesToday['lectures'][number]
+export type Week = paths['/v1/student/lectures/week']['get']['responses'][200]['content']['application/json']
+export type Attendance = paths['/v1/student/lectures/attendance']['get']['responses'][200]['content']['application/json']
+export type ScanResult = paths['/v1/student/lectures/scan']['post']['responses'][200]['content']['application/json']
+
 export type Answer<T> = T | 'refused' | null
 
 async function read<T>(request: Promise<{ data?: T; response: Response }>): Promise<Answer<T>> {
@@ -53,6 +59,23 @@ export const studentApi = {
     await api.GET('/v1/auth/csrf-cookie')
 
     return save(api.POST('/v1/student/set-up', { body: { number, code, password } }))
+  },
+  lecturesToday: () => read(api.GET('/v1/student/lectures/today')),
+  week: (from: string | null) => read(api.GET('/v1/student/lectures/week', { params: { query: (from === null ? {} : { from }) as never } })),
+  attendance: () => read(api.GET('/v1/student/lectures/attendance')),
+  phoneBegin: () => read(api.POST('/v1/student/lectures/phone/begin')),
+  phoneSet: (body: { client_data_json: string; attestation_object: string }) => save(api.POST('/v1/student/lectures/phone', { body })),
+  /** A scan: the answer, the first message for a code that is not an attendance code, or null when it could not be sent. */
+  scan: async (body: { code: string; credential_id: string; client_data_json: string; authenticator_data: string; signature: string; latitude: number | null; longitude: number | null; accuracy: number | null }) => {
+    try {
+      const { data, error, response } = await api.POST('/v1/student/lectures/scan', { body: body as never })
+      if (data !== undefined) return data
+      if (response.status === 422) return { invalid: Object.values((error as { errors?: Record<string, string[]> } | undefined)?.errors ?? {})[0]?.[0] ?? '' }
+
+      return null
+    } catch {
+      return null
+    }
   },
   password: (current: string, next: string) =>
     save(api.POST('/v1/me/account/password', { body: { current_password: current, password: next, password_confirmation: next } })),

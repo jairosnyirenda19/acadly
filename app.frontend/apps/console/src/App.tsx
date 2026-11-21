@@ -58,6 +58,12 @@ import { LookScreen } from './settings/LookScreen'
 import { DivisionsScreen } from './shell/DivisionsScreen'
 import { HomeScreen } from './dashboard/HomeScreen'
 import { NewsScreen } from './news/NewsScreen'
+import { CoverScreen } from './lectures/CoverScreen'
+import { LectureScreen } from './lectures/LectureScreen'
+import { MyLecturesScreen } from './lectures/MyLecturesScreen'
+import { RoomScreen } from './lectures/RoomScreen'
+import { RoomsScreen } from './lectures/RoomsScreen'
+import { TimetableScreen as LectureTimetableScreen } from './lectures/TimetableScreen'
 import { AccountsScreen as StudentAccountsScreen } from './programmes/AccountsScreen'
 import { SchoolLearnersScreen } from './dashboard/SchoolLearnersScreen'
 import { SchoolLedgerScreen } from './dashboard/SchoolLedgerScreen'
@@ -93,7 +99,7 @@ import { ApprovalScreen, ApprovalsScreen } from './approvals/ApprovalsScreen'
 import { ApprovalSettingsScreen } from './approvals/ApprovalSettingsScreen'
 import { SetupWizard } from './setup/SetupWizard'
 import { ConsoleShell, holdsAnywhere, settingsHome } from './shell/ConsoleShell'
-import { keepsGrading, observes, seesMarks, seesObservations, seesPickup, seesProgrammes, seesRegisters, takesRegisters } from './shell/navigation'
+import { keepsGrading, observes, seesLectures, seesMarks, seesObservations, seesPickup, seesProgrammes, seesRegisters, takesRegisters } from './shell/navigation'
 import { WorkInProvider } from './shell/WorkIn'
 import { SignInScreen } from './sign-in/SignInScreen'
 import { StatusScreen } from './StatusScreen'
@@ -128,6 +134,7 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const programmes = seesProgrammes(context)
   const programme = /^\/programmes\/p\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const registration = /^\/programmes\/r\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const lecture = /^\/lectures\/l\/([0-9a-f-]{36})\/(\d{4}-\d{2}-\d{2})$/.exec(path)
 
   useEffect(() => {
     if (path === '/settings' && home !== null) navigate(home, true)
@@ -154,6 +161,11 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/programmes/students' && programmes) page = <StudentsScreen />
   else if (path === '/programmes/accounts' && programmes && holdsAnywhere(context, 'programmes.accounts')) page = <StudentAccountsScreen />
   else if (path === '/news' && moduleOn(context, 'news')) page = <NewsScreen />
+  else if (path === '/lectures/my-day' && seesLectures(context, ['lectures.teach'])) page = <MyLecturesScreen />
+  else if (path === '/lectures/timetable' && seesLectures(context, ['lectures.view', 'lectures.timetable', 'lectures.teach', 'lectures.cover'])) page = <LectureTimetableScreen />
+  else if (path === '/lectures/rooms' && seesLectures(context, ['lectures.view', 'lectures.timetable'])) page = <RoomsScreen />
+  else if (path === '/lectures/cover' && seesLectures(context, ['lectures.view', 'lectures.cover'])) page = <CoverScreen />
+  else if (lecture !== null && seesLectures(context, ['lectures.teach', 'lectures.cover', 'lectures.view'])) page = <LectureScreen key={path} slot={lecture[1] ?? ''} day={lecture[2] ?? ''} />
   else if (path === '/programmes/registration' && programmes) page = <RegistrationDeskScreen />
   else if (registration !== undefined && programmes) page = <RegistrationScreen key={registration} id={registration} />
   else if (path === '/support' && support && (holdsAnywhere(context, 'support.view') || holdsAnywhere(context, 'support.lead'))) page = <WatchScreen />
@@ -332,6 +344,18 @@ export function App() {
           {copy.home.signOut}
         </Button>
       </AuthLayout>
+    )
+  }
+
+  // The room screen: full screen on the room's projector, with nothing else around it (D-102).
+  const roomScreen = /^\/lectures\/screen\/([0-9a-f-]{36})\/([0-9a-f-]{36})$/.exec(path)
+  if (account !== null && context !== null && context !== undefined && roomScreen !== null) {
+    return (
+      <ContextProvider value={context}>
+        <WorkInProvider>
+          <RoomScreen division={roomScreen[1] ?? ''} session={roomScreen[2] ?? ''} />
+        </WorkInProvider>
+      </ContextProvider>
     )
   }
 

@@ -2,6 +2,7 @@ import { getAccount, getSchoolLook, getSchoolName, navigate, useLocation, type A
 import { applyLook } from '@acadly/ui'
 import { useEffect, useState } from 'react'
 import { studentApi, type Me } from './api'
+import { CoursePage, TaskPage } from './Classroom'
 import { AttendancePage, PhonePage, ScanPage, WeekPage } from './Lectures'
 import { AccountPage, ArticlePage, CoursesPage, FeesPage, MorePage, NewsPage, RegistrationPage, TodayPage } from './Pages'
 import { SignIn } from './SignIn'
@@ -47,6 +48,8 @@ export function App() {
   if (me === null || me === undefined) return <SignIn school={school} onSignedIn={(signedIn) => setAccount(signedIn)} />
 
   const article = /^\/news\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const course = /^\/course\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const task = /^\/task\/([0-9a-f-]{36})$/.exec(path)?.[1]
 
   if (path === '/courses') return <CoursesPage me={me} />
   if (path === '/registration') return <RegistrationPage me={me} />
@@ -59,6 +62,8 @@ export function App() {
   if (path === '/attendance') return <AttendancePage me={me} />
   if (path === '/phone') return <PhonePage me={me} />
   if (path === '/scan') return <ScanPage />
+  if (course !== undefined) return <CoursePage key={course} me={me} id={course} />
+  if (task !== undefined) return <TaskPage key={task} me={me} id={task} />
 
   return <TodayPage me={me} />
 }

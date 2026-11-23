@@ -592,6 +592,236 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/classroom/learners/{learner}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Coursework tab of the learner record */
+        get: operations["classroom.learner"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/classroom/{division}/courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The courses the person runs, or every course of the division for those who see them */
+        get: operations["classroom.courses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/classroom/{division}/courses/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One course page */
+        get: operations["classroom.course"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/classroom/{division}/courses/{id}/resources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["classroom.resources.add"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/classroom/{division}/resources/{id}/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["classroom.resources.remove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/classroom/{division}/courses/{id}/announcements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["classroom.announce"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/classroom/{division}/courses/{id}/share": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["classroom.share"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/classroom/{division}/courses/{id}/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["classroom.tasks.save"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/classroom/{division}/courses/{id}/assessment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The course's continuous assessment */
+        get: operations["classroom.assessment"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/classroom/{division}/tasks/{id}/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["classroom.tasks.files"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/classroom/{division}/tasks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every student's hand-in for one assignment or exam paper */
+        get: operations["classroom.task"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/classroom/{division}/tasks/{id}/work/{learner}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One student's work, for marking */
+        get: operations["classroom.work"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/classroom/{division}/tasks/{id}/marks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["classroom.mark"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/classroom/{division}/tasks/{id}/release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["classroom.release"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/conduct": {
         parameters: {
             query?: never;
@@ -935,6 +1165,43 @@ export interface paths {
          *     document has none: its look is its content, and opening it is recorded
          */
         get: operations["documents.thumbnail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/documents/{id}/pages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The pages of the current version, drawn as pictures (D-103). Opening a
+         *     personal or secret document this way is recorded, as a download is
+         */
+        get: operations["documents.pages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/documents/{id}/pages/{page}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One page of the current version, as a picture (D-103) */
+        get: operations["documents.page"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4885,6 +5152,139 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/student/classroom/courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The student's courses this semester */
+        get: operations["student.classroom.courses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/classroom/courses/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One course: work, announcements, resources and marks */
+        get: operations["student.classroom.course"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/classroom/tasks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One assignment or exam paper, with the student's own hand-in */
+        get: operations["student.classroom.task"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/classroom/tasks/{id}/hand-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["student.classroom.hand-in"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/classroom/tasks/{id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["student.classroom.withdraw"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/classroom/due": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Work due soon, for Today */
+        get: operations["student.classroom.due"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/classroom/announcements/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["student.classroom.read"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/classroom/files/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A file of the student's courses or of their own work, to open or save */
+        get: operations["student.classroom.file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/student/lectures/today": {
         parameters: {
             query?: never;
@@ -8024,6 +8424,655 @@ export interface operations {
             404: components["responses"]["NotFoundHttpException"];
         };
     };
+    "classroom.learner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                learner: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        semester: string;
+                        courses: {
+                            code: string;
+                            title: string;
+                            total: number;
+                            share: number;
+                            missing: number;
+                            tasks: {
+                                title: string;
+                                kind: string;
+                                out_of: number;
+                                weight: number;
+                                mark: number | null;
+                                state: string;
+                                released: boolean;
+                            }[];
+                        }[];
+                        missing: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "classroom.courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        period: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        courses: {
+                            id: string;
+                            code: string;
+                            title: string;
+                            group: string;
+                            department: string;
+                            lecturers: string[];
+                            students: number;
+                            tasks: number;
+                            to_mark: number;
+                            teaches: boolean;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "classroom.course": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        course: {
+                            id: string;
+                            code: string;
+                            title: string;
+                            group: string;
+                            department: string;
+                            period: string;
+                            lecturers: string[];
+                            students: number;
+                        };
+                        teaches: boolean;
+                        share: number;
+                        weights: number;
+                        resources: {
+                            id: string;
+                            section: string;
+                            title: string;
+                            kind: string;
+                            url: string | null;
+                            document_id: string | null;
+                            name: string | null;
+                            size: number | null;
+                            mime: string | null;
+                            shows_from: string | null;
+                            pinned: boolean;
+                            at: string;
+                        }[];
+                        announcements: {
+                            id: string;
+                            title: string;
+                            body: string;
+                            sms: boolean;
+                            by: string;
+                            at: string;
+                            read: number;
+                        }[];
+                        tasks: {
+                            id: string;
+                            kind: string;
+                            title: string;
+                            shows_at: string;
+                            due_at: string;
+                            late_until: string | null;
+                            out_of: number;
+                            weight: number;
+                            released: boolean;
+                            accepts: string[];
+                            max_files: number;
+                            max_mb: number;
+                            counts: {
+                                registered: number;
+                                handed_in: number;
+                                late: number;
+                                missing: number;
+                                open: number;
+                                marked: number;
+                                to_mark: number;
+                            };
+                        }[];
+                        file_types: string[];
+                        max_files: number;
+                        max_mb: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "classroom.resources.add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    section: string;
+                    title?: string | null;
+                    url?: string | null;
+                    /** Format: date */
+                    shows_from?: string | null;
+                    pinned?: boolean | null;
+                    /** Format: binary */
+                    file?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "classroom.resources.remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "classroom.announce": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    title: string;
+                    body: string;
+                    sms?: boolean | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "classroom.share": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    ca_share: number;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "classroom.tasks.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    id?: string | null;
+                    kind: string;
+                    title: string;
+                    instructions?: string | null;
+                    shows_at: string;
+                    due_at: string;
+                    late_until?: string | null;
+                    out_of: number;
+                    weight: number;
+                    accepts: string[];
+                    max_files: number;
+                    max_mb: number;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "classroom.assessment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        course: {
+                            id: string;
+                            code: string;
+                            title: string;
+                        };
+                        share: number;
+                        tasks: {
+                            id: string;
+                            kind: string;
+                            title: string;
+                            shows_at: string;
+                            due_at: string;
+                            late_until: string | null;
+                            out_of: number;
+                            weight: number;
+                            released: boolean;
+                            accepts: string[];
+                            max_files: number;
+                            max_mb: number;
+                        }[];
+                        rows: {
+                            learner_id: string;
+                            name: string;
+                            number: string;
+                            cells: {
+                                mark: number | null;
+                                state: string;
+                                released: boolean;
+                            }[];
+                            total: number;
+                            missing: number;
+                        }[];
+                        average: number | null;
+                        released: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "classroom.tasks.files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "classroom.task": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        task: {
+                            id: string;
+                            kind: string;
+                            title: string;
+                            shows_at: string;
+                            due_at: string;
+                            late_until: string | null;
+                            out_of: number;
+                            weight: number;
+                            released: boolean;
+                            accepts: string[];
+                            max_files: number;
+                            max_mb: number;
+                            instructions: string;
+                            files: {
+                                id: string;
+                                name: string;
+                                size: number;
+                                mime: string;
+                            }[];
+                        };
+                        course: {
+                            id: string;
+                            code: string;
+                            title: string;
+                        };
+                        teaches: boolean;
+                        over: boolean;
+                        counts: {
+                            registered: number;
+                            handed_in: number;
+                            late: number;
+                            missing: number;
+                            open: number;
+                            marked: number;
+                            to_mark: number;
+                        };
+                        rows: {
+                            learner_id: string;
+                            name: string;
+                            number: string;
+                            state: string;
+                            at: string | null;
+                            withdrawn_at: string | null;
+                            times: number;
+                            files: {
+                                id: string;
+                                name: string;
+                                size: number;
+                                mime: string;
+                            }[];
+                            mark: {
+                                mark: number;
+                                by: string;
+                                at: string;
+                            } | null;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "classroom.work": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+                learner: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        task: {
+                            id: string;
+                            kind: string;
+                            title: string;
+                            shows_at: string;
+                            due_at: string;
+                            late_until: string | null;
+                            out_of: number;
+                            weight: number;
+                            released: boolean;
+                            accepts: string[];
+                            max_files: number;
+                            max_mb: number;
+                        };
+                        course: {
+                            id: string;
+                            code: string;
+                            title: string;
+                        };
+                        teaches: boolean;
+                        student: {
+                            learner_id: string;
+                            name: string;
+                            number: string;
+                        };
+                        state: string;
+                        history: {
+                            action: string;
+                            late: boolean;
+                            at: string;
+                        }[];
+                        files: {
+                            id: string;
+                            name: string;
+                            size: number;
+                            mime: string;
+                        }[];
+                        mark: {
+                            id: string;
+                            mark: number;
+                            feedback: string | null;
+                            reason: string | null;
+                            at: string;
+                            by: string;
+                            was: number | null;
+                            files: {
+                                id: string;
+                                name: string;
+                                size: number;
+                                mime: string;
+                            }[];
+                        } | null;
+                        position: {
+                            index: number;
+                            of: number;
+                            marked: number;
+                            previous: string | null;
+                            next: string | null;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "classroom.mark": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: uuid */
+                    learner_id: string;
+                    mark: number;
+                    feedback?: string | null;
+                    reason?: string | null;
+                    /** Format: binary */
+                    file?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "classroom.release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "conduct.overview": {
         parameters: {
             query?: never;
@@ -8882,6 +9931,61 @@ export interface operations {
             header?: never;
             path: {
                 id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "documents.pages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        status: string;
+                        version: number;
+                        name: string;
+                        mime: string;
+                        pages: {
+                            page: number;
+                            width: number;
+                            height: number;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "documents.page": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                page: number;
             };
             cookie?: never;
         };
@@ -21246,6 +22350,321 @@ export interface operations {
             };
             401: components["responses"]["AuthenticationException"];
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "student.classroom.courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        courses: {
+                            id: string;
+                            code: string;
+                            title: string;
+                            lecturers: string[];
+                            due: number;
+                            new: number;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "student.classroom.course": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        course: {
+                            id: string;
+                            code: string;
+                            title: string;
+                            lecturers: string[];
+                        };
+                        tasks: {
+                            id: string;
+                            kind: string;
+                            title: string;
+                            shows_at: string;
+                            due_at: string;
+                            late_until: string | null;
+                            out_of: number;
+                            weight: number;
+                            released: boolean;
+                            accepts: string[];
+                            max_files: number;
+                            max_mb: number;
+                            state: string;
+                            mark: number | null;
+                        }[];
+                        coming: {
+                            id: string;
+                            kind: string;
+                            title: string;
+                            shows_at: string;
+                            due_at: string;
+                            late_until: string | null;
+                            out_of: number;
+                            weight: number;
+                            released: boolean;
+                            accepts: string[];
+                            max_files: number;
+                            max_mb: number;
+                            state: string;
+                            mark: number | null;
+                        }[];
+                        announcements: {
+                            id: string;
+                            title: string;
+                            body: string;
+                            by: string;
+                            at: string;
+                            read: boolean;
+                        }[];
+                        resources: {
+                            id: string;
+                            section: string;
+                            title: string;
+                            kind: string;
+                            url: string | null;
+                            document_id: string | null;
+                            pinned: boolean;
+                        }[];
+                        share: number;
+                        ca: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "student.classroom.task": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        task: {
+                            id: string;
+                            kind: string;
+                            title: string;
+                            shows_at: string;
+                            due_at: string;
+                            late_until: string | null;
+                            out_of: number;
+                            weight: number;
+                            released: boolean;
+                            accepts: string[];
+                            max_files: number;
+                            max_mb: number;
+                            instructions: string;
+                            files: {
+                                id: string;
+                                name: string;
+                                size: number;
+                                mime: string;
+                            }[];
+                        };
+                        course: {
+                            id: string;
+                            code: string;
+                            title: string;
+                        };
+                        state: string;
+                        can_hand_in: boolean;
+                        can_withdraw: boolean;
+                        files: {
+                            id: string;
+                            name: string;
+                            size: number;
+                            mime: string;
+                        }[];
+                        history: {
+                            action: string;
+                            late: boolean;
+                            at: string;
+                            files: string[];
+                        }[];
+                        mark: {
+                            mark: number;
+                            feedback: string | null;
+                            by: string;
+                            at: string;
+                            was: number | null;
+                            reason: string | null;
+                            files: {
+                                id: string;
+                                name: string;
+                                size: number;
+                                mime: string;
+                            }[];
+                        } | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "student.classroom.hand-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    files: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "student.classroom.withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "student.classroom.due": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        due: {
+                            id: string;
+                            code: string;
+                            title: string;
+                            due_at: string;
+                            state: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "student.classroom.read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "student.classroom.file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "student.lectures.today": {

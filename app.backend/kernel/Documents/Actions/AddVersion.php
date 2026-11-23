@@ -10,6 +10,8 @@ use Acadly\Kernel\Documents\Document;
 use Acadly\Kernel\Documents\DocumentAccess;
 use Acadly\Kernel\Documents\DocumentCatalogue;
 use Acadly\Kernel\Documents\Jobs\MakeThumbnail;
+use Acadly\Kernel\Documents\Jobs\RenderPages;
+use Acadly\Kernel\Documents\Pages;
 use Acadly\Kernel\Documents\Storage\BlobStore;
 use Acadly\Kernel\Documents\Thumbnails;
 use Acadly\Kernel\Documents\UploadGuard;
@@ -75,6 +77,10 @@ final class AddVersion
 
             if (in_array($checked['mime'], Thumbnails::IMAGES, true)) {
                 MakeThumbnail::dispatch($fileId)->afterCommit();
+            }
+
+            if (config('acadly.documents.pages') === true && Pages::drawable($checked['mime'])) {
+                RenderPages::dispatch($fileId)->afterCommit();
             }
 
             $this->audit->record(KernelAudit::VersionAdded, subject: $locked, actor: $this->audit->actorFor($by),

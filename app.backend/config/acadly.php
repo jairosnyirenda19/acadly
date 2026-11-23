@@ -10,6 +10,7 @@ use Acadly\Kernel\Notify\Sms\AfricasTalkingProvider;
 use Acadly\Kernel\Notify\Sms\MeTicketProvider;
 use Acadly\Modules\Assessment\AssessmentModule;
 use Acadly\Modules\Attendance\AttendanceModule;
+use Acadly\Modules\Classroom\ClassroomModule;
 use Acadly\Modules\Conduct\ConductModule;
 use Acadly\Modules\Fees\FeesModule;
 use Acadly\Modules\Lectures\LecturesModule;
@@ -113,6 +114,10 @@ return [
         'max_upload_bytes' => (int) env('ACADLY_DOCUMENTS_MAX_UPLOAD_BYTES', 50 * 1024 * 1024),
         'trash_days' => (int) env('ACADLY_DOCUMENTS_TRASH_DAYS', 30),
         'scan' => env('ACADLY_VIRUS_SCAN'),
+        // D-103: draw the pages of each new version as pictures, for the console's viewer.
+        // LibreOffice (soffice) turns Office files into PDFs first; without it they are download-only.
+        'pages' => (bool) env('ACADLY_DOCUMENT_PAGES', true),
+        'soffice' => env('ACADLY_SOFFICE_BIN'),
         'clamav' => [
             'host' => env('CLAMAV_HOST', '127.0.0.1'),
             'port' => (int) env('CLAMAV_PORT', 3310),
@@ -156,6 +161,7 @@ return [
         NewsModule::class,
         ProgrammesModule::class,
         LecturesModule::class,
+        ClassroomModule::class,
     ],
 
     /*

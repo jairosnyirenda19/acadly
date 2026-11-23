@@ -10,6 +10,8 @@ use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Kernel\Support\Row;
+use Acadly\Modules\Classroom\Application\Actions\CourseActions as ClassroomCourses;
+use Acadly\Modules\Classroom\Application\Actions\TaskActions;
 use Acadly\Modules\Lectures\Application\Actions\RoomActions;
 use Acadly\Modules\Lectures\Application\Actions\TimetableActions;
 use Acadly\Modules\Programmes\Application\Actions\CourseActions;
@@ -33,7 +35,9 @@ use RuntimeException;
  * first semester's offerings. D-098 adds students: Year 1 and Year 2
  * classes, twelve students placed in the Diploma, registration dates for
  * the semester in progress, the semester started and some approved. D-102
- * adds rooms, the campus area and a published lecture timetable. The
+ * adds rooms, the campus area and a published lecture timetable; D-104
+ * a course page for ACC 101 with a resource, an announcement and an
+ * assignment, the administrator named as its lecturer. The
  * division, its semesters and its classes are written straight to the
  * tables, as setup would; the rest goes through the Actions.
  *
@@ -64,6 +68,7 @@ final class DevelopmentCollegeSeeder extends Seeder
             $this->command?->getOutput()->writeln('  The development college is there already.');
             $this->students($clock, $calendar, $offerings, $admit, $students, $registration);
             $this->lectures($clock, $calendar);
+            $this->classroom($clock, $calendar);
 
             return;
         }
@@ -135,6 +140,38 @@ final class DevelopmentCollegeSeeder extends Seeder
 
         $this->students($clock, $calendar, $offerings, $admit, $students, $registration);
         $this->lectures($clock, $calendar);
+        $this->classroom($clock, $calendar);
+    }
+
+    /** D-104: the ACC 101 course page, run by the administrator. */
+    private function classroom(Clock $clock, AcademicCalendar $calendar): void
+    {
+        $period = $calendar->currentYear()['terms'][$this->division][0] ?? null;
+        $acc = DB::table('programme_courses')->where('division_id', $this->division)->where('code', 'ACC 101')->value('id');
+        $offering = $period === null || ! is_string($acc) ? null : DB::table('programme_offerings')->where('period_id', $period['id'])->where('course_id', $acc)->value('id');
+        if (! is_string($offering) || DB::table('classroom_tasks')->where('offering_id', $offering)->exists()) {
+            return;
+        }
+        $last = DB::table('module_switches')->where('module_key', 'classroom')->orderByDesc('switched_at')->first();
+        if ($last === null || ! (bool) ($last->enabled ?? false)) {
+            DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'classroom', 'enabled' => true, 'reason' => 'Development college.',
+                'switched_by' => $this->by->id, 'switched_at' => $clock->now()]);
+            app()->forgetScopedInstances();
+        }
+        $named = DB::table('programme_offering_staff')->where('offering_id', $offering)->where('role', 'lecturer')->pluck('user_id')->all();
+        if (! in_array($this->by->id, $named, true)) {
+            DB::table('programme_offering_staff')->insert(['id' => Ids::next(), 'offering_id' => $offering, 'user_id' => $this->by->id, 'role' => 'lecturer']);
+        }
+        $courses = app(ClassroomCourses::class);
+        $courses->addResource($this->by, $this->division, $offering, ['section' => 'Course outline', 'title' => 'IFRS standards (external)', 'url' => 'https://www.ifrs.org/issued-standards/',
+            'shows_from' => null, 'pinned' => true], null);
+        $courses->announce($this->by, $this->division, $offering, 'Welcome to ACC 101', 'Read the course outline before the first tutorial.', false);
+        $now = $clock->now()->setTimezone(config()->string('acadly.timezone', 'UTC'));
+        app(TaskActions::class)->save($this->by, $this->division, $offering, ['id' => null, 'kind' => 'assignment', 'title' => 'Cash flow statements',
+            'instructions' => 'Prepare the statement of cash flows for Mzuzu Traders Ltd for the year to 31 December, using the indirect method. Show your workings.',
+            'shows_at' => $now->subDays(2)->format('Y-m-d H:i'), 'due_at' => $now->addDays(5)->setTime(23, 59)->format('Y-m-d H:i'), 'late_until' => null,
+            'out_of' => 50, 'weight' => 10, 'accepts' => ['pdf', 'word'], 'max_files' => 2, 'max_mb' => 20]);
+        $this->command?->getOutput()->writeln('  Development college: the ACC 101 course page, with an assignment.');
     }
 
     /** D-102: rooms, the campus area and the semester's lecture timetable, published. The administrator gives ACC 101 and STA 101. */

@@ -43,9 +43,12 @@ final class PurgeTrash
 
             $files = DB::table('document_files')->where('document_id', $document->id)->pluck('id');
             $shas = DB::table('document_files')->where('document_id', $document->id)->distinct()->pluck('blob_sha256')
-                ->merge(DB::table('document_thumbnails')->whereIn('file_id', $files)->pluck('blob_sha256'))->unique();
+                ->merge(DB::table('document_thumbnails')->whereIn('file_id', $files)->pluck('blob_sha256'))
+                ->merge(DB::table('document_pages')->whereIn('file_id', $files)->pluck('blob_sha256'))->unique();
             // A purged document's pictures go with it; they are not history.
             DB::table('document_thumbnails')->whereIn('file_id', $files)->delete();
+            DB::table('document_pages')->whereIn('file_id', $files)->delete();
+            DB::table('document_renders')->whereIn('file_id', $files)->delete();
 
             foreach ($shas as $sha) {
                 $stillUsed = DB::table('document_files as f')
@@ -53,7 +56,8 @@ final class PurgeTrash
                     ->where('f.blob_sha256', $sha)
                     ->whereNull('d.purged_at')
                     ->exists()
-                    || DB::table('document_thumbnails')->where('blob_sha256', $sha)->exists();
+                    || DB::table('document_thumbnails')->where('blob_sha256', $sha)->exists()
+                    || DB::table('document_pages')->where('blob_sha256', $sha)->exists();
 
                 if (! $stillUsed && is_string($sha)) {
                     $this->blobs->release($sha);

@@ -8,6 +8,7 @@ use Acadly\Kernel\KernelServiceProvider;
 use Acadly\Kernel\Module\ModuleServiceProvider;
 use Acadly\Modules\Assessment\AssessmentServiceProvider;
 use Acadly\Modules\Attendance\AttendanceServiceProvider;
+use Acadly\Modules\Classroom\ClassroomServiceProvider;
 use Acadly\Modules\Conduct\ConductServiceProvider;
 use Acadly\Modules\Fees\FeesServiceProvider;
 use Acadly\Modules\Lectures\LecturesServiceProvider;
@@ -34,4 +35,5 @@ return [
     NewsServiceProvider::class,
     ProgrammesServiceProvider::class,
     LecturesServiceProvider::class,
+    ClassroomServiceProvider::class,
 ];

@@ -1,1 +1,4 @@
 reportlab>=4.4
+# D-103: drawing the pages of a document as pictures (Apache-2.0 / BSD-3, and MIT-CMU).
+pypdfium2>=4.30,<6
+pillow>=10.4,<13

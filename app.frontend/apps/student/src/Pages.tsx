@@ -1,6 +1,7 @@
 import { navigate, signOut } from '@acadly/kernel'
 import { useState } from 'react'
 import { day, money, studentApi, type Me, type Registration } from './api'
+import { CoursePages, DueSoon } from './Classroom'
 import { LecturesNow } from './Lectures'
 import { copy } from './copy'
 import { Field, Line, Loading, Page, Primary, Section, Tag, Title, useAnswer } from './parts'
@@ -21,6 +22,7 @@ export function TodayPage({ me }: { me: Me }) {
     <Page me={me} tab="today">
       <Title>{t.title(longDay(new Date()))}</Title>
       <LecturesNow />
+      <DueSoon />
       {r !== null && (
         <Section title={`${t.registration} · ${r.period}`}>
           {r.editable ? (
@@ -89,6 +91,7 @@ export function CoursesPage({ me }: { me: Me }) {
               <Line key={x.code} strong={`${x.code} · ${x.title}`} sub={`${x.credits} credits · ${x.lecturers.length > 0 ? x.lecturers.join(', ') : t.noLecturer}`} right={<Tag tone={x.kind === 'core' ? 'plain' : 'done'}>{x.kind === 'core' ? t.core : t.elective}</Tag>} />
             ))}
           </Section>
+          <CoursePages />
           <Section>
             <Line strong={copy.more.attendance} href="/attendance" />
           </Section>

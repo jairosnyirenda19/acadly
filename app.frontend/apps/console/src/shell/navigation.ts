@@ -100,6 +100,7 @@ export const GROUPS: NavGroup[] = [
       { key: 'programmes-offerings', where: 'division', module: 'programmes', label: t.nav.programmesOfferings, path: '/programmes/offerings', icon: 'teaching', show: (c) => seesProgrammes(c), lights: under('/programmes/offerings') },
       { key: 'programmes-students', where: 'division', module: 'programmes', label: t.nav.programmesStudents, path: '/programmes/students', icon: 'learners', show: (c) => seesProgrammes(c), lights: under('/programmes/students') },
       { key: 'programmes-accounts', where: 'division', module: 'programmes', label: t.nav.studentAccounts, path: '/programmes/accounts', icon: 'learners', show: (c) => holdsAnywhere(c, 'programmes.accounts'), lights: under('/programmes/accounts') },
+      { key: 'classroom', where: 'division', module: 'classroom', label: t.nav.classroom, path: '/classroom', icon: 'assessment', show: (c) => seesClassroom(c), lights: (p) => p === '/classroom' || p.startsWith('/classroom/') },
       { key: 'lectures-mine', where: 'division', module: 'lectures', label: t.nav.myLectures, path: '/lectures/my-day', icon: 'today', show: (c) => seesLectures(c, ['lectures.teach']), lights: (p) => p === '/lectures/my-day' || p.startsWith('/lectures/l/') },
       { key: 'lectures-timetable', where: 'division', module: 'lectures', label: t.nav.lectureTimetable, path: '/lectures/timetable', icon: 'timetable', show: (c) => seesLectures(c, ['lectures.view', 'lectures.timetable']), lights: under('/lectures/timetable') },
       { key: 'lectures-rooms', where: 'division', module: 'lectures', label: t.nav.lectureRooms, path: '/lectures/rooms', icon: 'room', show: (c) => seesLectures(c, ['lectures.view', 'lectures.timetable']), lights: under('/lectures/rooms') },
@@ -214,6 +215,18 @@ export function keepsGrading(context: AppContext): boolean {
 }
 
 /** The pages that belong to one division's daily work: inside a division, never across all of them (D-096). */
+/** Whether the account may open Classroom in a college division of this view (D-104), with the module on. */
+export function seesClassroom(context: AppContext): boolean {
+  return (
+    moduleOn(context, 'classroom') &&
+    context.divisions.some(
+      (d) =>
+        (d.bindings as Record<string, string | undefined>)['programmes.shape'] === 'programmes' &&
+        (can(context, 'classroom.view', { type: 'division', id: d.id }) || can(context, 'classroom.teach', { type: 'division', id: d.id })),
+    )
+  )
+}
+
 /** Whether the account holds one of the Lectures permissions in a college division of this view (D-102), with the module on. */
 export function seesLectures(context: AppContext, permissions: string[]): boolean {
   return (

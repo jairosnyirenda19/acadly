@@ -13,6 +13,7 @@ use Acadly\Kernel\Documents\Document;
 use Acadly\Kernel\Documents\DocumentCatalogue;
 use Acadly\Kernel\Documents\DocumentFile;
 use Acadly\Kernel\Documents\DocumentReader;
+use Acadly\Kernel\Documents\Pages;
 use Acadly\Kernel\Documents\Storage\BlobStore;
 use Acadly\Kernel\Documents\Thumbnails;
 use Acadly\Kernel\Identity\User;
@@ -156,6 +157,36 @@ final class DocumentsController
                 echo $piece;
             }
         }, 200, ['Content-Type' => 'image/jpeg', 'Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
+    }
+
+    /**
+     * The pages of the current version, drawn as pictures (D-103). Opening a
+     * personal or secret document this way is recorded, as a download is.
+     *
+     * @response array{status: string, version: int, name: string, mime: string, pages: list<array{page: int, width: int, height: int}>}
+     */
+    public function pages(Request $request, string $id, Pages $pages): JsonResponse
+    {
+        $who = self::user($request);
+        $document = $this->reader->find($who, $id);
+        $opened = $this->reader->open($who, $document);
+        $file = $opened['file'];
+
+        return response()->json([...$pages->state($file->id, $file->mime), 'version' => $file->version, 'name' => $file->name, 'mime' => $file->mime])
+            ->header('Cache-Control', 'private, no-store');
+    }
+
+    /** One page of the current version, as a picture (D-103). */
+    public function page(Request $request, string $id, int $page, Pages $pages, BlobStore $blobs): StreamedResponse
+    {
+        $document = $this->reader->find(self::user($request), $id);
+        $sha = $pages->page((string) $document->current_file_id, $page) ?? throw (new ModelNotFoundException)->setModel(Document::class);
+
+        return new StreamedResponse(function () use ($blobs, $sha): void {
+            foreach ($blobs->read($sha) as $piece) {
+                echo $piece;
+            }
+        }, 200, ['Content-Type' => 'image/jpeg', 'Cache-Control' => 'private, max-age=600', 'X-Content-Type-Options' => 'nosniff']);
     }
 
     /**

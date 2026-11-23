@@ -39,8 +39,15 @@ final class DocumentAccess
     public function canStore(?User $who, DocumentKind $kind, string $ownerId): bool
     {
         $scope = $this->scopeOf($kind, $ownerId);
+        if ($scope === null) {
+            return false;
+        }
+        if ($this->access->allows($who, $kind->writePermission(), $scope)) {
+            return true;
+        }
+        $resolver = $this->resolver($kind);
 
-        return $scope !== null && $this->access->allows($who, $kind->writePermission(), $scope);
+        return $who !== null && $resolver instanceof DocumentParties && $resolver->mayStore($who, $ownerId);
     }
 
     public function scopeOf(DocumentKind $kind, string $ownerId): ?ScopeRef
@@ -75,8 +82,9 @@ final class DocumentAccess
                 return true;
             }
         }
+        $resolver = $this->resolver($kind);
 
-        return false;
+        return ! $write && $who !== null && $resolver instanceof DocumentParties && $resolver->mayRead($who, $document->owner_id);
     }
 
     private function resolver(DocumentKind $kind): DocumentOwner

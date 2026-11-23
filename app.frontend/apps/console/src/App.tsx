@@ -58,6 +58,9 @@ import { LookScreen } from './settings/LookScreen'
 import { DivisionsScreen } from './shell/DivisionsScreen'
 import { HomeScreen } from './dashboard/HomeScreen'
 import { NewsScreen } from './news/NewsScreen'
+import { CoursesScreen as ClassroomCoursesScreen } from './classroom/CoursesScreen'
+import { CourseScreen as ClassroomCourseScreen } from './classroom/CourseScreen'
+import { AssessmentScreen as ClassroomAssessmentScreen, HandInsScreen, MarkingScreen, TaskFormScreen } from './classroom/TaskScreens'
 import { CoverScreen } from './lectures/CoverScreen'
 import { LectureScreen } from './lectures/LectureScreen'
 import { MyLecturesScreen } from './lectures/MyLecturesScreen'
@@ -99,7 +102,7 @@ import { ApprovalScreen, ApprovalsScreen } from './approvals/ApprovalsScreen'
 import { ApprovalSettingsScreen } from './approvals/ApprovalSettingsScreen'
 import { SetupWizard } from './setup/SetupWizard'
 import { ConsoleShell, holdsAnywhere, settingsHome } from './shell/ConsoleShell'
-import { keepsGrading, observes, seesLectures, seesMarks, seesObservations, seesPickup, seesProgrammes, seesRegisters, takesRegisters } from './shell/navigation'
+import { keepsGrading, observes, seesClassroom, seesLectures, seesMarks, seesObservations, seesPickup, seesProgrammes, seesRegisters, takesRegisters } from './shell/navigation'
 import { WorkInProvider } from './shell/WorkIn'
 import { SignInScreen } from './sign-in/SignInScreen'
 import { StatusScreen } from './StatusScreen'
@@ -134,6 +137,12 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const programmes = seesProgrammes(context)
   const programme = /^\/programmes\/p\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const registration = /^\/programmes\/r\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const classCourse = /^\/classroom\/c\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const classTaskNew = /^\/classroom\/c\/([0-9a-f-]{36})\/task(?:\/([0-9a-f-]{36}))?$/.exec(path)
+  const classAssessment = /^\/classroom\/c\/([0-9a-f-]{36})\/assessment$/.exec(path)?.[1]
+  const classTask = /^\/classroom\/t\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const classWork = /^\/classroom\/t\/([0-9a-f-]{36})\/w\/([0-9a-f-]{36})$/.exec(path)
+  const classroom = seesClassroom(context)
   const lecture = /^\/lectures\/l\/([0-9a-f-]{36})\/(\d{4}-\d{2}-\d{2})$/.exec(path)
 
   useEffect(() => {
@@ -161,6 +170,14 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/programmes/students' && programmes) page = <StudentsScreen />
   else if (path === '/programmes/accounts' && programmes && holdsAnywhere(context, 'programmes.accounts')) page = <StudentAccountsScreen />
   else if (path === '/news' && moduleOn(context, 'news')) page = <NewsScreen />
+  else if (path === '/classroom' && classroom) page = <ClassroomCoursesScreen />
+  else if (classCourse !== undefined && classroom) {
+    const tab = new URLSearchParams(window.location.search).get('tab')
+    page = <ClassroomCourseScreen key={path + (tab ?? '')} id={classCourse} tab={tab === 'announcements' || tab === 'tasks' ? tab : 'resources'} />
+  } else if (classTaskNew !== null && classroom) page = <TaskFormScreen key={path} course={classTaskNew[1] ?? ''} task={classTaskNew[2] ?? null} />
+  else if (classAssessment !== undefined && classroom) page = <ClassroomAssessmentScreen key={path} course={classAssessment} />
+  else if (classTask !== undefined && classroom) page = <HandInsScreen key={path} task={classTask} />
+  else if (classWork !== null && classroom) page = <MarkingScreen key={path} task={classWork[1] ?? ''} learner={classWork[2] ?? ''} />
   else if (path === '/lectures/my-day' && seesLectures(context, ['lectures.teach'])) page = <MyLecturesScreen />
   else if (path === '/lectures/timetable' && seesLectures(context, ['lectures.view', 'lectures.timetable', 'lectures.teach', 'lectures.cover'])) page = <LectureTimetableScreen />
   else if (path === '/lectures/rooms' && seesLectures(context, ['lectures.view', 'lectures.timetable'])) page = <RoomsScreen />

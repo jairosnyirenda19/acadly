@@ -8725,6 +8725,2015 @@
                 }
             }
         },
+        "/v1/classroom/learners/{learner}": {
+            "get": {
+                "operationId": "classroom.learner",
+                "summary": "The Coursework tab of the learner record",
+                "tags": [
+                    "Classroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "learner",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "semester": {
+                                            "type": "string"
+                                        },
+                                        "courses": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "total": {
+                                                        "type": "number"
+                                                    },
+                                                    "share": {
+                                                        "type": "integer"
+                                                    },
+                                                    "missing": {
+                                                        "type": "integer"
+                                                    },
+                                                    "tasks": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "title": {
+                                                                    "type": "string"
+                                                                },
+                                                                "kind": {
+                                                                    "type": "string"
+                                                                },
+                                                                "out_of": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "weight": {
+                                                                    "type": "number"
+                                                                },
+                                                                "mark": {
+                                                                    "type": [
+                                                                        "number",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "state": {
+                                                                    "type": "string"
+                                                                },
+                                                                "released": {
+                                                                    "type": "boolean"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "title",
+                                                                "kind",
+                                                                "out_of",
+                                                                "weight",
+                                                                "mark",
+                                                                "state",
+                                                                "released"
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "code",
+                                                    "title",
+                                                    "total",
+                                                    "share",
+                                                    "missing",
+                                                    "tasks"
+                                                ]
+                                            }
+                                        },
+                                        "missing": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "semester",
+                                        "courses",
+                                        "missing"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/classroom/{division}/courses": {
+            "get": {
+                "operationId": "classroom.courses",
+                "summary": "The courses the person runs, or every course of the division for those who see them",
+                "tags": [
+                    "Classroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "period": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "courses": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "group": {
+                                                        "type": "string"
+                                                    },
+                                                    "department": {
+                                                        "type": "string"
+                                                    },
+                                                    "lecturers": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "students": {
+                                                        "type": "integer"
+                                                    },
+                                                    "tasks": {
+                                                        "type": "integer"
+                                                    },
+                                                    "to_mark": {
+                                                        "type": "integer"
+                                                    },
+                                                    "teaches": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "code",
+                                                    "title",
+                                                    "group",
+                                                    "department",
+                                                    "lecturers",
+                                                    "students",
+                                                    "tasks",
+                                                    "to_mark",
+                                                    "teaches"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "period",
+                                        "courses"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/classroom/{division}/courses/{id}": {
+            "get": {
+                "operationId": "classroom.course",
+                "summary": "One course page",
+                "tags": [
+                    "Classroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "course": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "code": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "group": {
+                                                    "type": "string"
+                                                },
+                                                "department": {
+                                                    "type": "string"
+                                                },
+                                                "period": {
+                                                    "type": "string"
+                                                },
+                                                "lecturers": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "students": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "code",
+                                                "title",
+                                                "group",
+                                                "department",
+                                                "period",
+                                                "lecturers",
+                                                "students"
+                                            ]
+                                        },
+                                        "teaches": {
+                                            "type": "boolean"
+                                        },
+                                        "share": {
+                                            "type": "integer"
+                                        },
+                                        "weights": {
+                                            "type": "number"
+                                        },
+                                        "resources": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "section": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "url": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "document_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "name": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "size": {
+                                                        "type": [
+                                                            "integer",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "mime": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "shows_from": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "pinned": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "section",
+                                                    "title",
+                                                    "kind",
+                                                    "url",
+                                                    "document_id",
+                                                    "name",
+                                                    "size",
+                                                    "mime",
+                                                    "shows_from",
+                                                    "pinned",
+                                                    "at"
+                                                ]
+                                            }
+                                        },
+                                        "announcements": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "body": {
+                                                        "type": "string"
+                                                    },
+                                                    "sms": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "by": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "read": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "title",
+                                                    "body",
+                                                    "sms",
+                                                    "by",
+                                                    "at",
+                                                    "read"
+                                                ]
+                                            }
+                                        },
+                                        "tasks": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "shows_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "due_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "late_until": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "out_of": {
+                                                        "type": "integer"
+                                                    },
+                                                    "weight": {
+                                                        "type": "number"
+                                                    },
+                                                    "released": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "accepts": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "max_files": {
+                                                        "type": "integer"
+                                                    },
+                                                    "max_mb": {
+                                                        "type": "integer"
+                                                    },
+                                                    "counts": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "registered": {
+                                                                "type": "integer"
+                                                            },
+                                                            "handed_in": {
+                                                                "type": "integer"
+                                                            },
+                                                            "late": {
+                                                                "type": "integer"
+                                                            },
+                                                            "missing": {
+                                                                "type": "integer"
+                                                            },
+                                                            "open": {
+                                                                "type": "integer"
+                                                            },
+                                                            "marked": {
+                                                                "type": "integer"
+                                                            },
+                                                            "to_mark": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "registered",
+                                                            "handed_in",
+                                                            "late",
+                                                            "missing",
+                                                            "open",
+                                                            "marked",
+                                                            "to_mark"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "kind",
+                                                    "title",
+                                                    "shows_at",
+                                                    "due_at",
+                                                    "late_until",
+                                                    "out_of",
+                                                    "weight",
+                                                    "released",
+                                                    "accepts",
+                                                    "max_files",
+                                                    "max_mb",
+                                                    "counts"
+                                                ]
+                                            }
+                                        },
+                                        "file_types": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "max_files": {
+                                            "type": "integer"
+                                        },
+                                        "max_mb": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "course",
+                                        "teaches",
+                                        "share",
+                                        "weights",
+                                        "resources",
+                                        "announcements",
+                                        "tasks",
+                                        "file_types",
+                                        "max_files",
+                                        "max_mb"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/classroom/{division}/courses/{id}/resources": {
+            "post": {
+                "operationId": "classroom.resources.add",
+                "tags": [
+                    "Classroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "section": {
+                                        "type": "string",
+                                        "maxLength": 80
+                                    },
+                                    "title": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 160
+                                    },
+                                    "url": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 500
+                                    },
+                                    "shows_from": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date"
+                                    },
+                                    "pinned": {
+                                        "type": [
+                                            "boolean",
+                                            "null"
+                                        ]
+                                    },
+                                    "file": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "binary",
+                                        "contentMediaType": "application/octet-stream"
+                                    }
+                                },
+                                "required": [
+                                    "section"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/classroom/{division}/resources/{id}/remove": {
+            "post": {
+                "operationId": "classroom.resources.remove",
+                "tags": [
+                    "Classroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/classroom/{division}/courses/{id}/announcements": {
+            "post": {
+                "operationId": "classroom.announce",
+                "tags": [
+                    "Classroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "maxLength": 160
+                                    },
+                                    "body": {
+                                        "type": "string",
+                                        "maxLength": 4000
+                                    },
+                                    "sms": {
+                                        "type": [
+                                            "boolean",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "title",
+                                    "body"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/classroom/{division}/courses/{id}/share": {
+            "put": {
+                "operationId": "classroom.share",
+                "tags": [
+                    "Classroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "ca_share": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "required": [
+                                    "ca_share"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/classroom/{division}/courses/{id}/tasks": {
+            "post": {
+                "operationId": "classroom.tasks.save",
+                "tags": [
+                    "Classroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "uuid"
+                                    },
+                                    "kind": {
+                                        "type": "string",
+                                        "maxLength": 10
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "maxLength": 160
+                                    },
+                                    "instructions": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 20000
+                                    },
+                                    "shows_at": {
+                                        "type": "string",
+                                        "maxLength": 40
+                                    },
+                                    "due_at": {
+                                        "type": "string",
+                                        "maxLength": 40
+                                    },
+                                    "late_until": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 40
+                                    },
+                                    "out_of": {
+                                        "type": "integer"
+                                    },
+                                    "weight": {
+                                        "type": "number"
+                                    },
+                                    "accepts": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "maxLength": 12
+                                        },
+                                        "minItems": 1
+                                    },
+                                    "max_files": {
+                                        "type": "integer"
+                                    },
+                                    "max_mb": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "required": [
+                                    "kind",
+                                    "title",
+                                    "shows_at",
+                                    "due_at",
+                                    "out_of",
+                                    "weight",
+                                    "accepts",
+                                    "max_files",
+                                    "max_mb"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/classroom/{division}/courses/{id}/assessment": {
+            "get": {
+                "operationId": "classroom.assessment",
+                "summary": "The course's continuous assessment",
+                "tags": [
+                    "Classroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "course": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "code": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "code",
+                                                "title"
+                                            ]
+                                        },
+                                        "share": {
+                                            "type": "integer"
+                                        },
+                                        "tasks": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "shows_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "due_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "late_until": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "out_of": {
+                                                        "type": "integer"
+                                                    },
+                                                    "weight": {
+                                                        "type": "number"
+                                                    },
+                                                    "released": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "accepts": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "max_files": {
+                                                        "type": "integer"
+                                                    },
+                                                    "max_mb": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "kind",
+                                                    "title",
+                                                    "shows_at",
+                                                    "due_at",
+                                                    "late_until",
+                                                    "out_of",
+                                                    "weight",
+                                                    "released",
+                                                    "accepts",
+                                                    "max_files",
+                                                    "max_mb"
+                                                ]
+                                            }
+                                        },
+                                        "rows": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "number": {
+                                                        "type": "string"
+                                                    },
+                                                    "cells": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "mark": {
+                                                                    "type": [
+                                                                        "number",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "state": {
+                                                                    "type": "string"
+                                                                },
+                                                                "released": {
+                                                                    "type": "boolean"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "mark",
+                                                                "state",
+                                                                "released"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "total": {
+                                                        "type": "number"
+                                                    },
+                                                    "missing": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "learner_id",
+                                                    "name",
+                                                    "number",
+                                                    "cells",
+                                                    "total",
+                                                    "missing"
+                                                ]
+                                            }
+                                        },
+                                        "average": {
+                                            "type": [
+                                                "number",
+                                                "null"
+                                            ]
+                                        },
+                                        "released": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "course",
+                                        "share",
+                                        "tasks",
+                                        "rows",
+                                        "average",
+                                        "released"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/classroom/{division}/tasks/{id}/files": {
+            "post": {
+                "operationId": "classroom.tasks.files",
+                "tags": [
+                    "Classroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "contentMediaType": "application/octet-stream"
+                                    }
+                                },
+                                "required": [
+                                    "file"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/classroom/{division}/tasks/{id}": {
+            "get": {
+                "operationId": "classroom.task",
+                "summary": "Every student's hand-in for one assignment or exam paper",
+                "tags": [
+                    "Classroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "task": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "shows_at": {
+                                                    "type": "string"
+                                                },
+                                                "due_at": {
+                                                    "type": "string"
+                                                },
+                                                "late_until": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "out_of": {
+                                                    "type": "integer"
+                                                },
+                                                "weight": {
+                                                    "type": "number"
+                                                },
+                                                "released": {
+                                                    "type": "boolean"
+                                                },
+                                                "accepts": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "max_files": {
+                                                    "type": "integer"
+                                                },
+                                                "max_mb": {
+                                                    "type": "integer"
+                                                },
+                                                "instructions": {
+                                                    "type": "string"
+                                                },
+                                                "files": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "size": {
+                                                                "type": "integer"
+                                                            },
+                                                            "mime": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name",
+                                                            "size",
+                                                            "mime"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "kind",
+                                                "title",
+                                                "shows_at",
+                                                "due_at",
+                                                "late_until",
+                                                "out_of",
+                                                "weight",
+                                                "released",
+                                                "accepts",
+                                                "max_files",
+                                                "max_mb",
+                                                "instructions",
+                                                "files"
+                                            ]
+                                        },
+                                        "course": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "code": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "code",
+                                                "title"
+                                            ]
+                                        },
+                                        "teaches": {
+                                            "type": "boolean"
+                                        },
+                                        "over": {
+                                            "type": "boolean"
+                                        },
+                                        "counts": {
+                                            "type": "object",
+                                            "properties": {
+                                                "registered": {
+                                                    "type": "integer"
+                                                },
+                                                "handed_in": {
+                                                    "type": "integer"
+                                                },
+                                                "late": {
+                                                    "type": "integer"
+                                                },
+                                                "missing": {
+                                                    "type": "integer"
+                                                },
+                                                "open": {
+                                                    "type": "integer"
+                                                },
+                                                "marked": {
+                                                    "type": "integer"
+                                                },
+                                                "to_mark": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "registered",
+                                                "handed_in",
+                                                "late",
+                                                "missing",
+                                                "open",
+                                                "marked",
+                                                "to_mark"
+                                            ]
+                                        },
+                                        "rows": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "number": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "withdrawn_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "times": {
+                                                        "type": "integer"
+                                                    },
+                                                    "files": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                },
+                                                                "size": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "mime": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "id",
+                                                                "name",
+                                                                "size",
+                                                                "mime"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "mark": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "mark": {
+                                                                "type": "number"
+                                                            },
+                                                            "by": {
+                                                                "type": "string"
+                                                            },
+                                                            "at": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "mark",
+                                                            "by",
+                                                            "at"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "learner_id",
+                                                    "name",
+                                                    "number",
+                                                    "state",
+                                                    "at",
+                                                    "withdrawn_at",
+                                                    "times",
+                                                    "files",
+                                                    "mark"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "task",
+                                        "course",
+                                        "teaches",
+                                        "over",
+                                        "counts",
+                                        "rows"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/classroom/{division}/tasks/{id}/work/{learner}": {
+            "get": {
+                "operationId": "classroom.work",
+                "summary": "One student's work, for marking",
+                "tags": [
+                    "Classroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "learner",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "task": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "shows_at": {
+                                                    "type": "string"
+                                                },
+                                                "due_at": {
+                                                    "type": "string"
+                                                },
+                                                "late_until": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "out_of": {
+                                                    "type": "integer"
+                                                },
+                                                "weight": {
+                                                    "type": "number"
+                                                },
+                                                "released": {
+                                                    "type": "boolean"
+                                                },
+                                                "accepts": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "max_files": {
+                                                    "type": "integer"
+                                                },
+                                                "max_mb": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "kind",
+                                                "title",
+                                                "shows_at",
+                                                "due_at",
+                                                "late_until",
+                                                "out_of",
+                                                "weight",
+                                                "released",
+                                                "accepts",
+                                                "max_files",
+                                                "max_mb"
+                                            ]
+                                        },
+                                        "course": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "code": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "code",
+                                                "title"
+                                            ]
+                                        },
+                                        "teaches": {
+                                            "type": "boolean"
+                                        },
+                                        "student": {
+                                            "type": "object",
+                                            "properties": {
+                                                "learner_id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "number": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "learner_id",
+                                                "name",
+                                                "number"
+                                            ]
+                                        },
+                                        "state": {
+                                            "type": "string"
+                                        },
+                                        "history": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "action": {
+                                                        "type": "string"
+                                                    },
+                                                    "late": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "action",
+                                                    "late",
+                                                    "at"
+                                                ]
+                                            }
+                                        },
+                                        "files": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "size": {
+                                                        "type": "integer"
+                                                    },
+                                                    "mime": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "size",
+                                                    "mime"
+                                                ]
+                                            }
+                                        },
+                                        "mark": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "mark": {
+                                                    "type": "number"
+                                                },
+                                                "feedback": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "reason": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "at": {
+                                                    "type": "string"
+                                                },
+                                                "by": {
+                                                    "type": "string"
+                                                },
+                                                "was": {
+                                                    "type": [
+                                                        "number",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "files": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "size": {
+                                                                "type": "integer"
+                                                            },
+                                                            "mime": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name",
+                                                            "size",
+                                                            "mime"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "mark",
+                                                "feedback",
+                                                "reason",
+                                                "at",
+                                                "by",
+                                                "was",
+                                                "files"
+                                            ]
+                                        },
+                                        "position": {
+                                            "type": "object",
+                                            "properties": {
+                                                "index": {
+                                                    "type": "integer"
+                                                },
+                                                "of": {
+                                                    "type": "integer"
+                                                },
+                                                "marked": {
+                                                    "type": "integer"
+                                                },
+                                                "previous": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "index",
+                                                "of",
+                                                "marked",
+                                                "previous",
+                                                "next"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "task",
+                                        "course",
+                                        "teaches",
+                                        "student",
+                                        "state",
+                                        "history",
+                                        "files",
+                                        "mark",
+                                        "position"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/classroom/{division}/tasks/{id}/marks": {
+            "post": {
+                "operationId": "classroom.mark",
+                "tags": [
+                    "Classroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "learner_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "mark": {
+                                        "type": "number"
+                                    },
+                                    "feedback": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 10000
+                                    },
+                                    "reason": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 255
+                                    },
+                                    "file": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "binary",
+                                        "contentMediaType": "application/octet-stream"
+                                    }
+                                },
+                                "required": [
+                                    "learner_id",
+                                    "mark"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/classroom/{division}/tasks/{id}/release": {
+            "post": {
+                "operationId": "classroom.release",
+                "tags": [
+                    "Classroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/conduct": {
             "get": {
                 "operationId": "conduct.overview",
@@ -11230,6 +13239,125 @@
                         "required": true,
                         "schema": {
                             "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/documents/{id}/pages": {
+            "get": {
+                "operationId": "documents.pages",
+                "summary": "The pages of the current version, drawn as pictures (D-103). Opening a\npersonal or secret document this way is recorded, as a download is",
+                "tags": [
+                    "Documents"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "version": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "mime": {
+                                            "type": "string"
+                                        },
+                                        "pages": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "page": {
+                                                        "type": "integer"
+                                                    },
+                                                    "width": {
+                                                        "type": "integer"
+                                                    },
+                                                    "height": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "page",
+                                                    "width",
+                                                    "height"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "status",
+                                        "version",
+                                        "name",
+                                        "mime",
+                                        "pages"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/documents/{id}/pages/{page}": {
+            "get": {
+                "operationId": "documents.page",
+                "summary": "One page of the current version, as a picture (D-103)",
+                "tags": [
+                    "Documents"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
                         }
                     }
                 ],
@@ -50764,6 +52892,908 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/classroom/courses": {
+            "get": {
+                "operationId": "student.classroom.courses",
+                "summary": "The student's courses this semester",
+                "tags": [
+                    "StudentClassroom"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "courses": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "lecturers": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "due": {
+                                                        "type": "integer"
+                                                    },
+                                                    "new": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "code",
+                                                    "title",
+                                                    "lecturers",
+                                                    "due",
+                                                    "new"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "courses"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/classroom/courses/{id}": {
+            "get": {
+                "operationId": "student.classroom.course",
+                "summary": "One course: work, announcements, resources and marks",
+                "tags": [
+                    "StudentClassroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "course": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "code": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "lecturers": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "code",
+                                                "title",
+                                                "lecturers"
+                                            ]
+                                        },
+                                        "tasks": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "shows_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "due_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "late_until": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "out_of": {
+                                                        "type": "integer"
+                                                    },
+                                                    "weight": {
+                                                        "type": "number"
+                                                    },
+                                                    "released": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "accepts": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "max_files": {
+                                                        "type": "integer"
+                                                    },
+                                                    "max_mb": {
+                                                        "type": "integer"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "mark": {
+                                                        "type": [
+                                                            "number",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "kind",
+                                                    "title",
+                                                    "shows_at",
+                                                    "due_at",
+                                                    "late_until",
+                                                    "out_of",
+                                                    "weight",
+                                                    "released",
+                                                    "accepts",
+                                                    "max_files",
+                                                    "max_mb",
+                                                    "state",
+                                                    "mark"
+                                                ]
+                                            }
+                                        },
+                                        "coming": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "shows_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "due_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "late_until": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "out_of": {
+                                                        "type": "integer"
+                                                    },
+                                                    "weight": {
+                                                        "type": "number"
+                                                    },
+                                                    "released": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "accepts": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "max_files": {
+                                                        "type": "integer"
+                                                    },
+                                                    "max_mb": {
+                                                        "type": "integer"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "mark": {
+                                                        "type": [
+                                                            "number",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "kind",
+                                                    "title",
+                                                    "shows_at",
+                                                    "due_at",
+                                                    "late_until",
+                                                    "out_of",
+                                                    "weight",
+                                                    "released",
+                                                    "accepts",
+                                                    "max_files",
+                                                    "max_mb",
+                                                    "state",
+                                                    "mark"
+                                                ]
+                                            }
+                                        },
+                                        "announcements": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "body": {
+                                                        "type": "string"
+                                                    },
+                                                    "by": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "read": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "title",
+                                                    "body",
+                                                    "by",
+                                                    "at",
+                                                    "read"
+                                                ]
+                                            }
+                                        },
+                                        "resources": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "section": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "url": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "document_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "pinned": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "section",
+                                                    "title",
+                                                    "kind",
+                                                    "url",
+                                                    "document_id",
+                                                    "pinned"
+                                                ]
+                                            }
+                                        },
+                                        "share": {
+                                            "type": "integer"
+                                        },
+                                        "ca": {
+                                            "type": "number"
+                                        }
+                                    },
+                                    "required": [
+                                        "course",
+                                        "tasks",
+                                        "coming",
+                                        "announcements",
+                                        "resources",
+                                        "share",
+                                        "ca"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/classroom/tasks/{id}": {
+            "get": {
+                "operationId": "student.classroom.task",
+                "summary": "One assignment or exam paper, with the student's own hand-in",
+                "tags": [
+                    "StudentClassroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "task": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "shows_at": {
+                                                    "type": "string"
+                                                },
+                                                "due_at": {
+                                                    "type": "string"
+                                                },
+                                                "late_until": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "out_of": {
+                                                    "type": "integer"
+                                                },
+                                                "weight": {
+                                                    "type": "number"
+                                                },
+                                                "released": {
+                                                    "type": "boolean"
+                                                },
+                                                "accepts": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "max_files": {
+                                                    "type": "integer"
+                                                },
+                                                "max_mb": {
+                                                    "type": "integer"
+                                                },
+                                                "instructions": {
+                                                    "type": "string"
+                                                },
+                                                "files": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "size": {
+                                                                "type": "integer"
+                                                            },
+                                                            "mime": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name",
+                                                            "size",
+                                                            "mime"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "kind",
+                                                "title",
+                                                "shows_at",
+                                                "due_at",
+                                                "late_until",
+                                                "out_of",
+                                                "weight",
+                                                "released",
+                                                "accepts",
+                                                "max_files",
+                                                "max_mb",
+                                                "instructions",
+                                                "files"
+                                            ]
+                                        },
+                                        "course": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "code": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "code",
+                                                "title"
+                                            ]
+                                        },
+                                        "state": {
+                                            "type": "string"
+                                        },
+                                        "can_hand_in": {
+                                            "type": "boolean"
+                                        },
+                                        "can_withdraw": {
+                                            "type": "boolean"
+                                        },
+                                        "files": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "size": {
+                                                        "type": "integer"
+                                                    },
+                                                    "mime": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "size",
+                                                    "mime"
+                                                ]
+                                            }
+                                        },
+                                        "history": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "action": {
+                                                        "type": "string"
+                                                    },
+                                                    "late": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "files": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "action",
+                                                    "late",
+                                                    "at",
+                                                    "files"
+                                                ]
+                                            }
+                                        },
+                                        "mark": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "mark": {
+                                                    "type": "number"
+                                                },
+                                                "feedback": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "by": {
+                                                    "type": "string"
+                                                },
+                                                "at": {
+                                                    "type": "string"
+                                                },
+                                                "was": {
+                                                    "type": [
+                                                        "number",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "reason": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "files": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "size": {
+                                                                "type": "integer"
+                                                            },
+                                                            "mime": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name",
+                                                            "size",
+                                                            "mime"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "mark",
+                                                "feedback",
+                                                "by",
+                                                "at",
+                                                "was",
+                                                "reason",
+                                                "files"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "task",
+                                        "course",
+                                        "state",
+                                        "can_hand_in",
+                                        "can_withdraw",
+                                        "files",
+                                        "history",
+                                        "mark"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/classroom/tasks/{id}/hand-in": {
+            "post": {
+                "operationId": "student.classroom.hand-in",
+                "tags": [
+                    "StudentClassroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "files": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary",
+                                            "contentMediaType": "application/octet-stream"
+                                        },
+                                        "minItems": 1,
+                                        "maxItems": 5
+                                    }
+                                },
+                                "required": [
+                                    "files"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/classroom/tasks/{id}/withdraw": {
+            "post": {
+                "operationId": "student.classroom.withdraw",
+                "tags": [
+                    "StudentClassroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/classroom/due": {
+            "get": {
+                "operationId": "student.classroom.due",
+                "summary": "Work due soon, for Today",
+                "tags": [
+                    "StudentClassroom"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "due": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "due_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "code",
+                                                    "title",
+                                                    "due_at",
+                                                    "state"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "due"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/classroom/announcements/{id}/read": {
+            "post": {
+                "operationId": "student.classroom.read",
+                "tags": [
+                    "StudentClassroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/classroom/files/{id}": {
+            "get": {
+                "operationId": "student.classroom.file",
+                "summary": "A file of the student's courses or of their own work, to open or save",
+                "tags": [
+                    "StudentClassroom"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"

@@ -28,6 +28,8 @@ final class RouteRules
         'documents.versions.store' => 'DocumentsTest: answers not found to a person who may not open the document',
         'documents.trash' => 'DocumentsTest: answers not found to a person who may not open the document',
         'documents.restore' => 'DocumentsTest: trashes with a reason, restores a batch together',
+        'documents.pages' => 'ClassroomTest: draws the pages of a resource, and refuses a person who may not open it',
+        'documents.page' => 'ClassroomTest: draws the pages of a resource, and refuses a person who may not open it',
         'assessment.publishing.publish' => 'AssessmentTest: publishes a ready class; a class outside the reach of the viewer is not found',
         'people.import.template' => 'PeopleImportTest: the template lists only the roles and places the viewer can give',
         'people.import.check' => 'PeopleImportTest: a row for a place outside the viewer\'s reach is not imported',

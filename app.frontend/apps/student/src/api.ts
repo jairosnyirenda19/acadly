@@ -13,6 +13,11 @@ export type Week = paths['/v1/student/lectures/week']['get']['responses'][200]['
 export type Attendance = paths['/v1/student/lectures/attendance']['get']['responses'][200]['content']['application/json']
 export type ScanResult = paths['/v1/student/lectures/scan']['post']['responses'][200]['content']['application/json']
 
+export type ClassCourses = paths['/v1/student/classroom/courses']['get']['responses'][200]['content']['application/json']
+export type ClassCourse = paths['/v1/student/classroom/courses/{id}']['get']['responses'][200]['content']['application/json']
+export type ClassTask = paths['/v1/student/classroom/tasks/{id}']['get']['responses'][200]['content']['application/json']
+export type Due = paths['/v1/student/classroom/due']['get']['responses'][200]['content']['application/json']
+
 export type Answer<T> = T | 'refused' | null
 
 async function read<T>(request: Promise<{ data?: T; response: Response }>): Promise<Answer<T>> {
@@ -77,6 +82,18 @@ export const studentApi = {
       return null
     }
   },
+  classCourses: () => read(api.GET('/v1/student/classroom/courses')),
+  classCourse: (id: string) => read(api.GET('/v1/student/classroom/courses/{id}', { params: { path: { id } } })),
+  classTask: (id: string) => read(api.GET('/v1/student/classroom/tasks/{id}', { params: { path: { id } } })),
+  due: () => read(api.GET('/v1/student/classroom/due')),
+  readAnnouncement: (id: string) => save(api.POST('/v1/student/classroom/announcements/{id}/read', { params: { path: { id } } })),
+  withdraw: (id: string) => save(api.POST('/v1/student/classroom/tasks/{id}/withdraw', { params: { path: { id } } })),
+  handIn: (id: string, files: File[]) => {
+    const form = new FormData()
+    for (const f of files) form.append('files[]', f)
+
+    return save(api.POST('/v1/student/classroom/tasks/{id}/hand-in', { params: { path: { id } }, body: form as never, bodySerializer: (body: unknown) => body as FormData }))
+  },
   password: (current: string, next: string) =>
     save(api.POST('/v1/me/account/password', { body: { current_password: current, password: next, password_confirmation: next } })),
 }
@@ -85,6 +102,9 @@ const kwacha = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 0 })
 
 /** Money from minor units: MK 245,000. */
 export const money = (minor: number): string => `MK ${kwacha.format(Math.trunc(minor / 100))}`
+
+/** Where a file of the student's courses opens. */
+export const classFile = (id: string): string => `/api/v1/student/classroom/files/${id}`
 
 /** A day as people read it: 30 Nov. */
 export const day = (iso: string): string => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })

@@ -8481,6 +8481,2295 @@
                 }
             }
         },
+        "/v1/results/{division}/setup/rules": {
+            "get": {
+                "operationId": "results.setup.rules",
+                "summary": "The board's rules",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "rules": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "good_cgpa": {
+                                                    "type": "number"
+                                                },
+                                                "carry_credits": {
+                                                    "type": "integer"
+                                                },
+                                                "max_attempts": {
+                                                    "type": "integer"
+                                                },
+                                                "time_factor": {
+                                                    "type": "integer"
+                                                },
+                                                "classes": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "diploma": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "name": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "from": {
+                                                                        "type": "number"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "name",
+                                                                    "from"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "degree": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "name": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "from": {
+                                                                        "type": "number"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "name",
+                                                                    "from"
+                                                                ]
+                                                            }
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "diploma",
+                                                        "degree"
+                                                    ]
+                                                },
+                                                "hold_certificate": {
+                                                    "type": "boolean"
+                                                },
+                                                "from_on": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "good_cgpa",
+                                                "carry_credits",
+                                                "max_attempts",
+                                                "time_factor",
+                                                "classes",
+                                                "hold_certificate",
+                                                "from_on"
+                                            ]
+                                        },
+                                        "standard": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "good_cgpa": {
+                                                    "type": "number"
+                                                },
+                                                "carry_credits": {
+                                                    "type": "integer"
+                                                },
+                                                "max_attempts": {
+                                                    "type": "integer"
+                                                },
+                                                "time_factor": {
+                                                    "type": "integer"
+                                                },
+                                                "classes": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "diploma": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "name": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "from": {
+                                                                        "type": "number"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "name",
+                                                                    "from"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "degree": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "name": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "from": {
+                                                                        "type": "number"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "name",
+                                                                    "from"
+                                                                ]
+                                                            }
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "diploma",
+                                                        "degree"
+                                                    ]
+                                                },
+                                                "hold_certificate": {
+                                                    "type": "boolean"
+                                                },
+                                                "from_on": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "good_cgpa",
+                                                "carry_credits",
+                                                "max_attempts",
+                                                "time_factor",
+                                                "classes",
+                                                "hold_certificate",
+                                                "from_on"
+                                            ]
+                                        },
+                                        "periods": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name"
+                                                ]
+                                            }
+                                        },
+                                        "can": {
+                                            "type": "object",
+                                            "properties": {
+                                                "setup": {
+                                                    "type": "boolean"
+                                                },
+                                                "release": {
+                                                    "type": "boolean"
+                                                },
+                                                "board": {
+                                                    "type": "boolean"
+                                                },
+                                                "moderate": {
+                                                    "type": "boolean"
+                                                },
+                                                "enter": {
+                                                    "type": "boolean"
+                                                },
+                                                "view": {
+                                                    "type": "boolean"
+                                                },
+                                                "award": {
+                                                    "type": "boolean"
+                                                },
+                                                "transcripts": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "setup",
+                                                "release",
+                                                "board",
+                                                "moderate",
+                                                "enter",
+                                                "view",
+                                                "award",
+                                                "transcripts"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "rules",
+                                        "standard",
+                                        "periods",
+                                        "can"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "results.setup.rules.save",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "period_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "good_cgpa": {
+                                        "type": "number"
+                                    },
+                                    "carry_credits": {
+                                        "type": "integer"
+                                    },
+                                    "max_attempts": {
+                                        "type": "integer"
+                                    },
+                                    "time_factor": {
+                                        "type": "integer"
+                                    },
+                                    "hold_certificate": {
+                                        "type": "boolean"
+                                    },
+                                    "classes": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "maxLength": 24
+                                                    },
+                                                    "from": {
+                                                        "type": "number"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "name",
+                                                    "from"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "period_id",
+                                    "good_cgpa",
+                                    "carry_credits",
+                                    "max_attempts",
+                                    "time_factor",
+                                    "hold_certificate",
+                                    "classes"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/results/{division}/progression": {
+            "get": {
+                "operationId": "results.progressions",
+                "summary": "The progression lists of the year, by programme and year of study",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "period": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "lists": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "programme_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "year": {
+                                                        "type": "integer"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "students": {
+                                                        "type": "integer"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "list_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "programme_id",
+                                                    "year",
+                                                    "label",
+                                                    "name",
+                                                    "students",
+                                                    "state",
+                                                    "list_id"
+                                                ]
+                                            }
+                                        },
+                                        "can": {
+                                            "type": "object",
+                                            "properties": {
+                                                "setup": {
+                                                    "type": "boolean"
+                                                },
+                                                "release": {
+                                                    "type": "boolean"
+                                                },
+                                                "board": {
+                                                    "type": "boolean"
+                                                },
+                                                "moderate": {
+                                                    "type": "boolean"
+                                                },
+                                                "enter": {
+                                                    "type": "boolean"
+                                                },
+                                                "view": {
+                                                    "type": "boolean"
+                                                },
+                                                "award": {
+                                                    "type": "boolean"
+                                                },
+                                                "transcripts": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "setup",
+                                                "release",
+                                                "board",
+                                                "moderate",
+                                                "enter",
+                                                "view",
+                                                "award",
+                                                "transcripts"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "period",
+                                        "lists",
+                                        "can"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/results/{division}/progression/list": {
+            "get": {
+                "operationId": "results.progression",
+                "summary": "One programme and year: every student's decision",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "programme",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "year",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "programme": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "code": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "years": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "code",
+                                                "name",
+                                                "years"
+                                            ]
+                                        },
+                                        "year": {
+                                            "type": "integer"
+                                        },
+                                        "period": {
+                                            "type": "string"
+                                        },
+                                        "list": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "state"
+                                            ]
+                                        },
+                                        "rows": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "number": {
+                                                        "type": "string"
+                                                    },
+                                                    "cgpa": {
+                                                        "type": [
+                                                            "number",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "credits": {
+                                                        "type": "integer"
+                                                    },
+                                                    "passed": {
+                                                        "type": "integer"
+                                                    },
+                                                    "failed_credits": {
+                                                        "type": "integer"
+                                                    },
+                                                    "failed": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "standing": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "proposed": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "fallback": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "why": {
+                                                        "type": "string"
+                                                    },
+                                                    "choice": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "decision": {
+                                                                "type": "string"
+                                                            },
+                                                            "reason": {
+                                                                "type": "string"
+                                                            },
+                                                            "by": {
+                                                                "type": "string"
+                                                            },
+                                                            "at": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "decision",
+                                                            "reason",
+                                                            "by",
+                                                            "at"
+                                                        ]
+                                                    },
+                                                    "decision": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "learner_id",
+                                                    "name",
+                                                    "number",
+                                                    "cgpa",
+                                                    "credits",
+                                                    "passed",
+                                                    "failed_credits",
+                                                    "failed",
+                                                    "standing",
+                                                    "proposed",
+                                                    "fallback",
+                                                    "why",
+                                                    "choice",
+                                                    "decision"
+                                                ]
+                                            }
+                                        },
+                                        "summary": {
+                                            "type": "object",
+                                            "properties": {
+                                                "proceed": {
+                                                    "type": "integer"
+                                                },
+                                                "carry": {
+                                                    "type": "integer"
+                                                },
+                                                "repeat": {
+                                                    "type": "integer"
+                                                },
+                                                "discontinue": {
+                                                    "type": "integer"
+                                                },
+                                                "open": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "proceed",
+                                                "carry",
+                                                "repeat",
+                                                "discontinue",
+                                                "open"
+                                            ]
+                                        },
+                                        "rules": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "good_cgpa": {
+                                                    "type": "number"
+                                                },
+                                                "carry_credits": {
+                                                    "type": "integer"
+                                                },
+                                                "max_attempts": {
+                                                    "type": "integer"
+                                                },
+                                                "time_factor": {
+                                                    "type": "integer"
+                                                },
+                                                "classes": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "diploma": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "name": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "from": {
+                                                                        "type": "number"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "name",
+                                                                    "from"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "degree": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "name": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "from": {
+                                                                        "type": "number"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "name",
+                                                                    "from"
+                                                                ]
+                                                            }
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "diploma",
+                                                        "degree"
+                                                    ]
+                                                },
+                                                "hold_certificate": {
+                                                    "type": "boolean"
+                                                },
+                                                "from_on": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "good_cgpa",
+                                                "carry_credits",
+                                                "max_attempts",
+                                                "time_factor",
+                                                "classes",
+                                                "hold_certificate",
+                                                "from_on"
+                                            ]
+                                        },
+                                        "steps": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "step": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "outcomes": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "outcome": {
+                                                                    "type": "string"
+                                                                },
+                                                                "title": {
+                                                                    "type": "string"
+                                                                },
+                                                                "requires_reason": {
+                                                                    "type": "boolean"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "outcome",
+                                                                "title",
+                                                                "requires_reason"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "permitted": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "blocked_reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "remedy": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "step",
+                                                    "title",
+                                                    "outcomes",
+                                                    "permitted",
+                                                    "blocked_reason",
+                                                    "remedy"
+                                                ]
+                                            }
+                                        },
+                                        "history": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "step": {
+                                                        "type": "string"
+                                                    },
+                                                    "outcome": {
+                                                        "type": "string"
+                                                    },
+                                                    "by": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "step",
+                                                    "outcome",
+                                                    "by",
+                                                    "at",
+                                                    "reason"
+                                                ]
+                                            }
+                                        },
+                                        "can": {
+                                            "type": "object",
+                                            "properties": {
+                                                "setup": {
+                                                    "type": "boolean"
+                                                },
+                                                "release": {
+                                                    "type": "boolean"
+                                                },
+                                                "board": {
+                                                    "type": "boolean"
+                                                },
+                                                "moderate": {
+                                                    "type": "boolean"
+                                                },
+                                                "enter": {
+                                                    "type": "boolean"
+                                                },
+                                                "view": {
+                                                    "type": "boolean"
+                                                },
+                                                "award": {
+                                                    "type": "boolean"
+                                                },
+                                                "transcripts": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "setup",
+                                                "release",
+                                                "board",
+                                                "moderate",
+                                                "enter",
+                                                "view",
+                                                "award",
+                                                "transcripts"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "programme",
+                                        "year",
+                                        "period",
+                                        "list",
+                                        "rows",
+                                        "summary",
+                                        "rules",
+                                        "steps",
+                                        "history",
+                                        "can"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/results/{division}/progression/choose": {
+            "post": {
+                "operationId": "results.progression.choose",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "programme_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "year": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "maximum": 10
+                                    },
+                                    "learner_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "decision": {
+                                        "type": "string",
+                                        "enum": [
+                                            "proceed",
+                                            "carry",
+                                            "repeat_year",
+                                            "discontinue",
+                                            "complete",
+                                            "continue"
+                                        ]
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    }
+                                },
+                                "required": [
+                                    "programme_id",
+                                    "year",
+                                    "learner_id",
+                                    "decision",
+                                    "reason"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/results/{division}/progression/decide": {
+            "post": {
+                "operationId": "results.progression.decide",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "programme_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "year": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "maximum": 10
+                                    }
+                                },
+                                "required": [
+                                    "programme_id",
+                                    "year"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/results/{division}/progression/{id}/reopen": {
+            "post": {
+                "operationId": "results.progression.reopen",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    }
+                                },
+                                "required": [
+                                    "reason"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/results/{division}/progression/{id}/apply": {
+            "post": {
+                "operationId": "results.progression.apply",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "applied": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "applied"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/results/{division}/graduation": {
+            "get": {
+                "operationId": "results.graduations",
+                "summary": "The graduation lists of the year, by programme",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "period": {
+                                            "type": "string"
+                                        },
+                                        "lists": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "programme_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "students": {
+                                                        "type": "integer"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "list_id": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "graduation_on": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "programme_id",
+                                                    "code",
+                                                    "name",
+                                                    "students",
+                                                    "state",
+                                                    "list_id",
+                                                    "graduation_on"
+                                                ]
+                                            }
+                                        },
+                                        "can": {
+                                            "type": "object",
+                                            "properties": {
+                                                "setup": {
+                                                    "type": "boolean"
+                                                },
+                                                "release": {
+                                                    "type": "boolean"
+                                                },
+                                                "board": {
+                                                    "type": "boolean"
+                                                },
+                                                "moderate": {
+                                                    "type": "boolean"
+                                                },
+                                                "enter": {
+                                                    "type": "boolean"
+                                                },
+                                                "view": {
+                                                    "type": "boolean"
+                                                },
+                                                "award": {
+                                                    "type": "boolean"
+                                                },
+                                                "transcripts": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "setup",
+                                                "release",
+                                                "board",
+                                                "moderate",
+                                                "enter",
+                                                "view",
+                                                "award",
+                                                "transcripts"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "period",
+                                        "lists",
+                                        "can"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/results/{division}/graduation/list": {
+            "get": {
+                "operationId": "results.graduation",
+                "summary": "One programme's graduation list",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "programme",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "programme": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "code": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "award": {
+                                                    "type": "string"
+                                                },
+                                                "credits": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "code",
+                                                "name",
+                                                "award",
+                                                "credits"
+                                            ]
+                                        },
+                                        "list": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "state": {
+                                                    "type": "string"
+                                                },
+                                                "graduation_on": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "state",
+                                                "graduation_on"
+                                            ]
+                                        },
+                                        "rows": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "number": {
+                                                        "type": "string"
+                                                    },
+                                                    "cgpa": {
+                                                        "type": [
+                                                            "number",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "credits": {
+                                                        "type": "integer"
+                                                    },
+                                                    "class": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "complete": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "missing": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "certificate": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "learner_id",
+                                                    "name",
+                                                    "number",
+                                                    "cgpa",
+                                                    "credits",
+                                                    "class",
+                                                    "complete",
+                                                    "missing",
+                                                    "certificate"
+                                                ]
+                                            }
+                                        },
+                                        "summary": {
+                                            "type": "object",
+                                            "properties": {
+                                                "complete": {
+                                                    "type": "integer"
+                                                },
+                                                "not_complete": {
+                                                    "type": "integer"
+                                                },
+                                                "classes": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "count": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "name",
+                                                            "count"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "complete",
+                                                "not_complete",
+                                                "classes"
+                                            ]
+                                        },
+                                        "classes": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "from": {
+                                                        "type": "number"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "name",
+                                                    "from"
+                                                ]
+                                            }
+                                        },
+                                        "steps": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "step": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "outcomes": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "outcome": {
+                                                                    "type": "string"
+                                                                },
+                                                                "title": {
+                                                                    "type": "string"
+                                                                },
+                                                                "requires_reason": {
+                                                                    "type": "boolean"
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "outcome",
+                                                                "title",
+                                                                "requires_reason"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "permitted": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "blocked_reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "remedy": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "step",
+                                                    "title",
+                                                    "outcomes",
+                                                    "permitted",
+                                                    "blocked_reason",
+                                                    "remedy"
+                                                ]
+                                            }
+                                        },
+                                        "history": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "step": {
+                                                        "type": "string"
+                                                    },
+                                                    "outcome": {
+                                                        "type": "string"
+                                                    },
+                                                    "by": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "step",
+                                                    "outcome",
+                                                    "by",
+                                                    "at",
+                                                    "reason"
+                                                ]
+                                            }
+                                        },
+                                        "can": {
+                                            "type": "object",
+                                            "properties": {
+                                                "setup": {
+                                                    "type": "boolean"
+                                                },
+                                                "release": {
+                                                    "type": "boolean"
+                                                },
+                                                "board": {
+                                                    "type": "boolean"
+                                                },
+                                                "moderate": {
+                                                    "type": "boolean"
+                                                },
+                                                "enter": {
+                                                    "type": "boolean"
+                                                },
+                                                "view": {
+                                                    "type": "boolean"
+                                                },
+                                                "award": {
+                                                    "type": "boolean"
+                                                },
+                                                "transcripts": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "setup",
+                                                "release",
+                                                "board",
+                                                "moderate",
+                                                "enter",
+                                                "view",
+                                                "award",
+                                                "transcripts"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "programme",
+                                        "list",
+                                        "rows",
+                                        "summary",
+                                        "classes",
+                                        "steps",
+                                        "history",
+                                        "can"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/results/{division}/graduation/approve": {
+            "post": {
+                "operationId": "results.graduation.approve",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "programme_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                },
+                                "required": [
+                                    "programme_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/results/{division}/graduation/{id}/confirm": {
+            "post": {
+                "operationId": "results.graduation.confirm",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "confirm": {
+                                        "type": "boolean"
+                                    },
+                                    "reason": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 255
+                                    }
+                                },
+                                "required": [
+                                    "confirm"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/results/{division}/graduation/{id}/day": {
+            "put": {
+                "operationId": "results.graduation.day",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "graduation_on": {
+                                        "type": "string",
+                                        "format": "date"
+                                    }
+                                },
+                                "required": [
+                                    "graduation_on"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/results/{division}/graduation/{id}/confer": {
+            "post": {
+                "operationId": "results.graduation.confer",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "conferred": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "conferred"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/results/{division}/transcripts": {
+            "get": {
+                "operationId": "results.transcripts",
+                "summary": "Transcripts asked for and issued",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "requests": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "number": {
+                                                        "type": "string"
+                                                    },
+                                                    "for_kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "organisation": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "email": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "purpose": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "issued": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "reference": {
+                                                                "type": "string"
+                                                            },
+                                                            "at": {
+                                                                "type": "string"
+                                                            },
+                                                            "by": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "reference",
+                                                            "at",
+                                                            "by"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "learner_id",
+                                                    "name",
+                                                    "number",
+                                                    "for_kind",
+                                                    "organisation",
+                                                    "email",
+                                                    "purpose",
+                                                    "at",
+                                                    "issued"
+                                                ]
+                                            }
+                                        },
+                                        "issued": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "number": {
+                                                        "type": "string"
+                                                    },
+                                                    "reference": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "by": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "learner_id",
+                                                    "name",
+                                                    "number",
+                                                    "reference",
+                                                    "at",
+                                                    "by"
+                                                ]
+                                            }
+                                        },
+                                        "can_issue": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "requests",
+                                        "issued",
+                                        "can_issue"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "results.transcripts.issue",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "learner_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "request_id": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "uuid"
+                                    }
+                                },
+                                "required": [
+                                    "learner_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/results/{division}/transcripts/{id}": {
+            "get": {
+                "operationId": "results.transcripts.show",
+                "summary": "An issued official transcript, as a PDF",
+                "tags": [
+                    "Board"
+                ],
+                "parameters": [
+                    {
+                        "name": "division",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "no-store"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access denied",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/calendar/{token}.ics": {
             "get": {
                 "operationId": "academics.calendar.feed",
@@ -48916,6 +51205,15 @@
                                                                 "offering_id": {
                                                                     "type": "string"
                                                                 },
+                                                                "course_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "attempt": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "counts": {
+                                                                    "type": "boolean"
+                                                                },
                                                                 "code": {
                                                                     "type": "string"
                                                                 },
@@ -48970,6 +51268,9 @@
                                                             },
                                                             "required": [
                                                                 "offering_id",
+                                                                "course_id",
+                                                                "attempt",
+                                                                "counts",
                                                                 "code",
                                                                 "title",
                                                                 "credits",
@@ -48997,6 +51298,18 @@
                                                             "null"
                                                         ]
                                                     },
+                                                    "cgpa": {
+                                                        "type": [
+                                                            "number",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "standing": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
                                                     "decision": {
                                                         "type": "string"
                                                     },
@@ -49014,6 +51327,8 @@
                                                     "credits",
                                                     "earned",
                                                     "gpa",
+                                                    "cgpa",
+                                                    "standing",
                                                     "decision",
                                                     "supplementary",
                                                     "deferred"
@@ -49029,15 +51344,119 @@
                                         "credits": {
                                             "type": "integer"
                                         },
+                                        "earned": {
+                                            "type": "integer"
+                                        },
                                         "open": {
                                             "type": "integer"
+                                        },
+                                        "decisions": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "period": {
+                                                        "type": "string"
+                                                    },
+                                                    "year": {
+                                                        "type": "integer"
+                                                    },
+                                                    "decision": {
+                                                        "type": "string"
+                                                    },
+                                                    "carried": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "cgpa": {
+                                                        "type": [
+                                                            "number",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "period",
+                                                    "year",
+                                                    "decision",
+                                                    "carried",
+                                                    "cgpa",
+                                                    "reason",
+                                                    "state",
+                                                    "at"
+                                                ]
+                                            }
+                                        },
+                                        "award": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "programme": {
+                                                    "type": "string"
+                                                },
+                                                "class": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "cgpa": {
+                                                    "type": [
+                                                        "number",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "credits": {
+                                                    "type": "integer"
+                                                },
+                                                "state": {
+                                                    "type": "string"
+                                                },
+                                                "graduation_on": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "certificate": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "programme",
+                                                "class",
+                                                "cgpa",
+                                                "credits",
+                                                "state",
+                                                "graduation_on",
+                                                "certificate"
+                                            ]
                                         }
                                     },
                                     "required": [
                                         "semesters",
                                         "cumulative",
                                         "credits",
-                                        "open"
+                                        "earned",
+                                        "open",
+                                        "decisions",
+                                        "award"
                                     ]
                                 }
                             }
@@ -49284,6 +51703,12 @@
                                                 },
                                                 "view": {
                                                     "type": "boolean"
+                                                },
+                                                "award": {
+                                                    "type": "boolean"
+                                                },
+                                                "transcripts": {
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "required": [
@@ -49292,7 +51717,9 @@
                                                 "board",
                                                 "moderate",
                                                 "enter",
-                                                "view"
+                                                "view",
+                                                "award",
+                                                "transcripts"
                                             ]
                                         }
                                     },
@@ -49699,6 +52126,12 @@
                                                 },
                                                 "view": {
                                                     "type": "boolean"
+                                                },
+                                                "award": {
+                                                    "type": "boolean"
+                                                },
+                                                "transcripts": {
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "required": [
@@ -49707,7 +52140,9 @@
                                                 "board",
                                                 "moderate",
                                                 "enter",
-                                                "view"
+                                                "view",
+                                                "award",
+                                                "transcripts"
                                             ]
                                         },
                                         "steps": {
@@ -50740,6 +53175,12 @@
                                                 },
                                                 "view": {
                                                     "type": "boolean"
+                                                },
+                                                "award": {
+                                                    "type": "boolean"
+                                                },
+                                                "transcripts": {
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "required": [
@@ -50748,7 +53189,9 @@
                                                 "board",
                                                 "moderate",
                                                 "enter",
-                                                "view"
+                                                "view",
+                                                "award",
+                                                "transcripts"
                                             ]
                                         }
                                     },
@@ -51012,6 +53455,12 @@
                                                 },
                                                 "view": {
                                                     "type": "boolean"
+                                                },
+                                                "award": {
+                                                    "type": "boolean"
+                                                },
+                                                "transcripts": {
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "required": [
@@ -51020,7 +53469,9 @@
                                                 "board",
                                                 "moderate",
                                                 "enter",
-                                                "view"
+                                                "view",
+                                                "award",
+                                                "transcripts"
                                             ]
                                         }
                                     },
@@ -51281,6 +53732,12 @@
                                                 },
                                                 "view": {
                                                     "type": "boolean"
+                                                },
+                                                "award": {
+                                                    "type": "boolean"
+                                                },
+                                                "transcripts": {
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "required": [
@@ -51289,7 +53746,9 @@
                                                 "board",
                                                 "moderate",
                                                 "enter",
-                                                "view"
+                                                "view",
+                                                "award",
+                                                "transcripts"
                                             ]
                                         }
                                     },
@@ -51711,6 +54170,12 @@
                                                 },
                                                 "view": {
                                                     "type": "boolean"
+                                                },
+                                                "award": {
+                                                    "type": "boolean"
+                                                },
+                                                "transcripts": {
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "required": [
@@ -51719,7 +54184,9 @@
                                                 "board",
                                                 "moderate",
                                                 "enter",
-                                                "view"
+                                                "view",
+                                                "award",
+                                                "transcripts"
                                             ]
                                         }
                                     },
@@ -58748,6 +61215,15 @@
                                                                 "offering_id": {
                                                                     "type": "string"
                                                                 },
+                                                                "course_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "attempt": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "counts": {
+                                                                    "type": "boolean"
+                                                                },
                                                                 "code": {
                                                                     "type": "string"
                                                                 },
@@ -58802,6 +61278,9 @@
                                                             },
                                                             "required": [
                                                                 "offering_id",
+                                                                "course_id",
+                                                                "attempt",
+                                                                "counts",
                                                                 "code",
                                                                 "title",
                                                                 "credits",
@@ -58829,6 +61308,18 @@
                                                             "null"
                                                         ]
                                                     },
+                                                    "cgpa": {
+                                                        "type": [
+                                                            "number",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "standing": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
                                                     "decision": {
                                                         "type": "string"
                                                     },
@@ -58846,6 +61337,8 @@
                                                     "credits",
                                                     "earned",
                                                     "gpa",
+                                                    "cgpa",
+                                                    "standing",
                                                     "decision",
                                                     "supplementary",
                                                     "deferred"
@@ -58859,6 +61352,9 @@
                                             ]
                                         },
                                         "credits": {
+                                            "type": "integer"
+                                        },
+                                        "earned": {
                                             "type": "integer"
                                         },
                                         "supplementary": {
@@ -58892,14 +61388,115 @@
                                         },
                                         "slip_held": {
                                             "type": "boolean"
+                                        },
+                                        "decisions": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "period": {
+                                                        "type": "string"
+                                                    },
+                                                    "year": {
+                                                        "type": "integer"
+                                                    },
+                                                    "decision": {
+                                                        "type": "string"
+                                                    },
+                                                    "carried": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "cgpa": {
+                                                        "type": [
+                                                            "number",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "reason": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "period",
+                                                    "year",
+                                                    "decision",
+                                                    "carried",
+                                                    "cgpa",
+                                                    "reason",
+                                                    "state",
+                                                    "at"
+                                                ]
+                                            }
+                                        },
+                                        "award": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "programme": {
+                                                    "type": "string"
+                                                },
+                                                "class": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "cgpa": {
+                                                    "type": [
+                                                        "number",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "credits": {
+                                                    "type": "integer"
+                                                },
+                                                "state": {
+                                                    "type": "string"
+                                                },
+                                                "graduation_on": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "certificate": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "programme",
+                                                "class",
+                                                "cgpa",
+                                                "credits",
+                                                "state",
+                                                "graduation_on",
+                                                "certificate"
+                                            ]
                                         }
                                     },
                                     "required": [
                                         "semesters",
                                         "cumulative",
                                         "credits",
+                                        "earned",
                                         "supplementary",
-                                        "slip_held"
+                                        "slip_held",
+                                        "decisions",
+                                        "award"
                                     ]
                                 }
                             }
@@ -59331,6 +61928,308 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/results/transcript": {
+            "get": {
+                "operationId": "student.results.transcript.copy",
+                "summary": "The student's own copy of the transcript: every released result, marked as a student copy",
+                "tags": [
+                    "StudentResults"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "no-store"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/results/transcripts": {
+            "get": {
+                "operationId": "student.results.transcripts",
+                "summary": "The student's requests for an official transcript, and those issued",
+                "tags": [
+                    "StudentResults"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "requests": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "number": {
+                                                        "type": "string"
+                                                    },
+                                                    "for_kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "organisation": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "email": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "purpose": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "issued": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "reference": {
+                                                                "type": "string"
+                                                            },
+                                                            "at": {
+                                                                "type": "string"
+                                                            },
+                                                            "by": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "reference",
+                                                            "at",
+                                                            "by"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "learner_id",
+                                                    "name",
+                                                    "number",
+                                                    "for_kind",
+                                                    "organisation",
+                                                    "email",
+                                                    "purpose",
+                                                    "at",
+                                                    "issued"
+                                                ]
+                                            }
+                                        },
+                                        "issued": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "number": {
+                                                        "type": "string"
+                                                    },
+                                                    "reference": {
+                                                        "type": "string"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    },
+                                                    "by": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "learner_id",
+                                                    "name",
+                                                    "number",
+                                                    "reference",
+                                                    "at",
+                                                    "by"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "requests",
+                                        "issued"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "student.results.transcripts.request",
+                "tags": [
+                    "StudentResults"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "for_kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "self",
+                                            "organisation"
+                                        ]
+                                    },
+                                    "organisation": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 160
+                                    },
+                                    "email": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 160
+                                    },
+                                    "purpose": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 255
+                                    }
+                                },
+                                "required": [
+                                    "for_kind"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/student/results/transcripts/{id}": {
+            "get": {
+                "operationId": "student.results.transcripts.show",
+                "summary": "An official transcript issued to the student, as a PDF",
+                "tags": [
+                    "StudentResults"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "no-store"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"

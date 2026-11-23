@@ -17,6 +17,7 @@ use Acadly\Modules\Programmes\Application\Place;
 use Acadly\Modules\Programmes\Application\Registration\FeesClearance;
 use Acadly\Modules\Programmes\Application\Registration\RegistrationChecks;
 use Acadly\Modules\Programmes\Application\Registration\Windows;
+use Acadly\Modules\Programmes\Application\StudentProgressWriter;
 use Acadly\Modules\Programmes\Contracts\ProgrammesAudit;
 use Acadly\Modules\Programmes\Contracts\ProgrammesPermission;
 use Acadly\Modules\Programmes\Contracts\StudentStatus;
@@ -337,6 +338,9 @@ final class RegistrationActions
                 $courses = [...$courses, ...$g['courses']];
             }
         }
+
+        // D-106: courses carried from an earlier year join as Repeat when this semester offers them.
+        $courses = array_values(array_unique([...$courses, ...StudentProgressWriter::carried($learnerId)]));
 
         $chosen = [];
         foreach ($courses as $courseId) {

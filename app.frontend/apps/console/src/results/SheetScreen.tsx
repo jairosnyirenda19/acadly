@@ -206,7 +206,7 @@ function MarksTable({
                   {sitting === 'supplementary' && <span className="block text-[13px] text-text-muted">{s.kinds[l.kind] ?? l.kind}</span>}
                   {l.lifted !== null && <span className="block text-[13px] text-text-muted">{`${s.lifted} · ${l.lifted}`}</span>}
                 </td>
-                <td className={`${td} font-mono text-[14px]`}>{l.number}</td>
+                <td className={`${td} font-mono text-[14px] whitespace-nowrap`}>{l.number}</td>
                 <td className={tdEnd}>{l.ca.toFixed(1)}</td>
                 <td className={tdEnd}>
                   {canType ? (

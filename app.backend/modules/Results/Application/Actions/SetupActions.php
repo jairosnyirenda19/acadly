@@ -97,6 +97,56 @@ final class SetupActions
         });
     }
 
+    /**
+     * Saves a new set of the board's rules from a semester on (D-106).
+     *
+     * @param  array{good_cgpa: float, carry_credits: int, max_attempts: int, time_factor: int, classes: array{diploma: list<array{name: string, from: float}>, degree: list<array{name: string, from: float}>}, hold_certificate: bool}  $rules
+     */
+    public function saveRules(User $by, string $divisionId, string $periodId, array $rules): string
+    {
+        $this->allowed($by, $divisionId);
+        $period = $this->sheets->period($divisionId, $periodId);
+        $errors = [];
+        if ($rules['good_cgpa'] < 0 || $rules['good_cgpa'] > 5) {
+            $errors['good_cgpa'] = ['Give a GPA from 0 to 5.'];
+        }
+        if ($rules['carry_credits'] < 0 || $rules['carry_credits'] > 120) {
+            $errors['carry_credits'] = ['Give from 0 to 120 credits.'];
+        }
+        if ($rules['max_attempts'] < 1 || $rules['max_attempts'] > 5) {
+            $errors['max_attempts'] = ['Give from 1 to 5 attempts.'];
+        }
+        if ($rules['time_factor'] < 1 || $rules['time_factor'] > 3) {
+            $errors['time_factor'] = ['Give from 1 to 3 times the programme\'s length.'];
+        }
+        foreach (['diploma', 'degree'] as $scheme) {
+            $names = [];
+            foreach ($rules['classes'][$scheme] as $i => $c) {
+                if (trim($c['name']) === '' || mb_strlen(trim($c['name'])) > 24 || in_array(trim($c['name']), $names, true) || $c['from'] < 0 || $c['from'] > 5) {
+                    $errors["classes.{$scheme}.{$i}"] = ['Give each class its own name, up to 24 characters, and a GPA from 0 to 5.'];
+                }
+                $names[] = trim($c['name']);
+            }
+            if ($rules['classes'][$scheme] === []) {
+                $errors["classes.{$scheme}"] = ['Give at least one class.'];
+            }
+        }
+        if ($errors !== []) {
+            throw ValidationException::withMessages($errors);
+        }
+        $id = Ids::next();
+        DB::transaction(function () use ($by, $divisionId, $period, $rules, $id): void {
+            DB::table('results_rules')->insert(['id' => $id, 'division_id' => $divisionId, 'from_period_id' => $period['id'], 'from_on' => $period['starts_on'],
+                'good_cgpa' => round($rules['good_cgpa'], 2), 'carry_credits' => $rules['carry_credits'], 'max_attempts' => $rules['max_attempts'], 'time_factor' => $rules['time_factor'],
+                'classes' => json_encode(['diploma' => array_map(fn (array $c): array => ['name' => trim($c['name']), 'from' => round($c['from'], 2)], $rules['classes']['diploma']),
+                    'degree' => array_map(fn (array $c): array => ['name' => trim($c['name']), 'from' => round($c['from'], 2)], $rules['classes']['degree'])]),
+                'hold_certificate' => $rules['hold_certificate'], 'created_by' => $by->id, 'created_at' => $this->clock->now()]);
+            $this->audit->record(ResultsAudit::RulesSaved, actor: $this->audit->actorFor($by), at: ScopeRef::of(ScopeType::Division, $divisionId), meta: ['rules' => $id, 'from' => $period['id']]);
+        });
+
+        return $id;
+    }
+
     private function allowed(User $by, string $divisionId): void
     {
         $this->sheets->enter($by, $divisionId);

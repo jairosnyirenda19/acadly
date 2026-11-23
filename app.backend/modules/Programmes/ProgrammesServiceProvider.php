@@ -12,8 +12,10 @@ use Acadly\Modules\Programmes\Application\ProgrammesRecordPart;
 use Acadly\Modules\Programmes\Application\Registration\RegistrationToday;
 use Acadly\Modules\Programmes\Application\StudentAccountDirectory;
 use Acadly\Modules\Programmes\Application\StudentPlacesReader;
+use Acadly\Modules\Programmes\Application\StudentProgressWriter;
 use Acadly\Modules\Programmes\Contracts\CourseTeaching;
 use Acadly\Modules\Programmes\Contracts\StudentPlaces;
+use Acadly\Modules\Programmes\Contracts\StudentProgress;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,6 +29,7 @@ final class ProgrammesServiceProvider extends ServiceProvider
         $this->app->bind(StudentAccounts::class, StudentAccountDirectory::class);
         $this->app->bind(StudentPlaces::class, StudentPlacesReader::class);
         $this->app->bind(CourseTeaching::class, CourseTeachingReader::class);
+        $this->app->bind(StudentProgress::class, StudentProgressWriter::class);
     }
 
     public function boot(): void

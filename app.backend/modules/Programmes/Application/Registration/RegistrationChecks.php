@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acadly\Modules\Programmes\Application\Registration;
 
 use Acadly\Kernel\Support\Row;
+use Acadly\Modules\Programmes\Application\StudentProgressWriter;
 use Acadly\Modules\Programmes\Contracts\StudyMode;
 use Acadly\Modules\Programmes\Domain\Registration;
 use Acadly\Modules\Programmes\Journeys\Registration\State;
@@ -56,6 +57,14 @@ final class RegistrationChecks
                 if (! in_array($core, $chosen, true)) {
                     $problems[] = ['kind' => 'core', 'text' => ($codes[$core] ?? '').' is a core course of this semester and is not chosen.'];
                 }
+            }
+        }
+
+        // D-106: a carried course offered this semester must be taken.
+        foreach (StudentProgressWriter::carried($r->learner_id) as $carried) {
+            if (! in_array($carried, $chosen, true) && DB::table('programme_offerings')->where('period_id', $r->period_id)->where('course_id', $carried)->exists()) {
+                $code = DB::table('programme_courses')->where('id', $carried)->value('code');
+                $problems[] = ['kind' => 'carried', 'text' => (is_string($code) ? $code : '').' is carried from an earlier year and must be taken.'];
             }
         }
 

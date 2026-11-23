@@ -8,6 +8,7 @@ import { PageHead, Tag } from '../settings/parts'
 import { Input, Select } from '../setup/parts'
 import { day, resultsApi, useResultsDivision, type Band, type ReleaseView, type ResultsSetup, type Sitting } from './api'
 import { NoResultsDivision, Panel, ResultsTabs } from './parts'
+import { RulesPanel } from './RulesPanel'
 
 const t = copy.results
 
@@ -225,6 +226,7 @@ function Setup({ division }: { division: string }) {
         </div>
         <Settings division={division} data={data} reload={loaded.reload} />
         {data.can.setup ? <NewScale division={division} data={data} reload={loaded.reload} /> : <p className="text-[14px] text-text-muted">{s.readOnly}</p>}
+        <RulesPanel division={division} />
       </div>
     </>
   )

@@ -62,7 +62,7 @@ function Bar({ division }: { division: string }) {
                     <td className={td}>
                       <strong>{r.name}</strong>
                     </td>
-                    <td className={`${td} font-mono text-[14px]`}>{r.number}</td>
+                    <td className={`${td} font-mono text-[14px] whitespace-nowrap`}>{r.number}</td>
                     <td className={td}>{r.code}</td>
                     <td className={`${td} tabular-nums`}>{b.attendedOf(r.attended, r.held, r.rate)}</td>
                     <td className={td}>
@@ -238,7 +238,7 @@ function CohortView({ division, cohort }: { division: string; cohort: string }) 
                   <td className={td}>
                     <strong>{st.name}</strong>
                   </td>
-                  <td className={`${td} font-mono text-[14px]`}>{st.number}</td>
+                  <td className={`${td} font-mono text-[14px] whitespace-nowrap`}>{st.number}</td>
                   {data.courses.map((c) => {
                     const r = st.courses[c.offering_id]
                     if (r === undefined) return <td key={c.offering_id} className={td} />

@@ -265,11 +265,12 @@ final class ResultsViews
             'can' => $this->can($who, $divisionId)];
     }
 
-    /** @return array{setup: bool, release: bool, board: bool, moderate: bool, enter: bool, view: bool} */
+    /** @return array{setup: bool, release: bool, board: bool, moderate: bool, enter: bool, view: bool, award: bool, transcripts: bool} */
     public function can(User $who, string $divisionId): array
     {
         return ['setup' => $this->sheets->holds($who, ResultsPermission::Setup, $divisionId), 'release' => $this->sheets->holds($who, ResultsPermission::Release, $divisionId),
             'board' => $this->sheets->holds($who, ResultsPermission::Board, $divisionId), 'moderate' => $this->sheets->holds($who, ResultsPermission::Moderate, $divisionId),
-            'enter' => $this->sheets->holds($who, ResultsPermission::Enter, $divisionId), 'view' => $this->sheets->sees($who, $divisionId)];
+            'enter' => $this->sheets->holds($who, ResultsPermission::Enter, $divisionId), 'view' => $this->sheets->sees($who, $divisionId),
+            'award' => $this->sheets->holds($who, ResultsPermission::Award, $divisionId), 'transcripts' => $this->sheets->holds($who, ResultsPermission::Transcripts, $divisionId)];
     }
 }

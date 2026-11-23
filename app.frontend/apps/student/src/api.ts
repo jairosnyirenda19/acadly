@@ -22,6 +22,10 @@ export type Results = paths['/v1/student/results']['get']['responses'][200]['con
 export type Semester = Results['semesters'][number]
 export type CourseResult = paths['/v1/student/results/courses/{id}']['get']['responses'][200]['content']['application/json']
 export type BarAttendance = paths['/v1/student/results/attendance']['get']['responses'][200]['content']['application/json']
+export type Decision = Results['decisions'][number]
+export type Award = NonNullable<Results['award']>
+export type Transcripts = paths['/v1/student/results/transcripts']['get']['responses'][200]['content']['application/json']
+export type TranscriptAsk = { for_kind: 'self' | 'organisation'; organisation?: string | null; email?: string | null; purpose?: string | null }
 
 export type Answer<T> = T | 'refused' | null
 
@@ -102,6 +106,8 @@ export const studentApi = {
   results: () => read(api.GET('/v1/student/results')),
   courseResult: (id: string) => read(api.GET('/v1/student/results/courses/{id}', { params: { path: { id } } })),
   barAttendance: () => read(api.GET('/v1/student/results/attendance')),
+  transcripts: () => read(api.GET('/v1/student/results/transcripts')),
+  askTranscript: (body: TranscriptAsk) => save(api.POST('/v1/student/results/transcripts', { body })),
   password: (current: string, next: string) =>
     save(api.POST('/v1/me/account/password', { body: { current_password: current, password: next, password_confirmation: next } })),
 }
@@ -116,6 +122,12 @@ export const classFile = (id: string): string => `/api/v1/student/classroom/file
 
 /** Where the results slip of a semester opens (PDF). */
 export const resultsSlip = (periodId: string): string => `/api/v1/student/results/slip?period=${encodeURIComponent(periodId)}`
+
+/** Where the student's own copy of the transcript opens (PDF). */
+export const transcriptCopy = '/api/v1/student/results/transcript'
+
+/** Where an issued official transcript opens (PDF). */
+export const transcriptFile = (id: string): string => `/api/v1/student/results/transcripts/${encodeURIComponent(id)}`
 
 /** A day as people read it: 30 Nov. */
 export const day = (iso: string): string => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })

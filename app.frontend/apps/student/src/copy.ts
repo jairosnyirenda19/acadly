@@ -126,7 +126,7 @@ export const copy = {
     passwordFailed: 'The password was not changed.',
     signOut: 'Sign out',
   },
-  more: { title: 'More', registration: 'Registration', account: 'Your account', signOut: 'Sign out', week: 'This week', attendance: 'My attendance', phone: 'Attendance phone' },
+  more: { title: 'More', registration: 'Registration', account: 'Your account', signOut: 'Sign out', week: 'This week', attendance: 'My attendance', phone: 'Attendance phone', transcript: 'My transcript', award: 'My award' },
   lectures: {
     now: (from: string, to: string) => `Now · ${from} to ${to}`,
     today: 'Lectures today',
@@ -370,6 +370,84 @@ export const copy = {
       repeat: 'Not passed at the supplementary exam. You repeat the course.',
     } as Record<string, string>,
     note: 'Think a mark is wrong? Speak to your lecturer. A change is made by the board and shows here with the date.',
+    // Standing and the end-of-year decision
+    cgpa: 'Cumulative GPA',
+    standing: 'Standing',
+    standings: { good: '✓ Good standing', probation: '! Probation' } as Record<string, string>,
+    standingTones: { good: 'done', probation: 'attention' } as Record<string, 'done' | 'attention'>,
+    standingNone: 'Not yet set',
+    yearDecision: (decision: string, year: number, carried: string[]) => {
+      const list = carried.length <= 1 ? carried.join('') : `${carried.slice(0, -1).join(', ')} and ${carried[carried.length - 1] ?? ''}`
+      if (decision === 'proceed' || decision === 'carry') {
+        return carried.length > 0 ? `Proceed to Year ${year + 1}, with ${list} carried.` : `Proceed to Year ${year + 1}.`
+      }
+      if (decision === 'repeat_year') return `Repeat Year ${year}.`
+      if (decision === 'discontinue') return 'Discontinued from the programme.'
+      if (decision === 'complete') return 'Programme complete.'
+
+      return 'Decision recorded.'
+    },
+    boardOn: (date: string) => `Examiners' board, ${date}.`,
+    reason: (why: string) => `Reason: ${why}`,
+    whatMeans: 'What this means',
+    carriedRule: (codes: string[]) =>
+      codes.length === 1
+        ? `${codes[0] ?? ''} is added to your next registration as Repeat. You take it again in full: coursework and exam.`
+        : `${codes.join(', ')} are added to your next registration as Repeat. You take each again in full: coursework and exam.`,
+    probationRule: 'Bring your cumulative GPA up to good standing. If it is still under after the next semester, the board reviews your place.',
+    helpRule: 'Your head of department can help you plan the year.',
+    bySemester: 'Standing by semester',
+    cgpaOf: (cgpa: string) => `CGPA ${cgpa}`,
+    repeated: 'Repeated',
+    attempt: (n: number) => `Attempt ${n}`,
+    myTranscript: 'My transcript',
+    myAward: 'My award',
+  },
+  transcript: {
+    title: 'My transcript',
+    download: 'Download my copy (PDF)',
+    copyNote: 'Your copy shows every result released so far. It says "Student copy" and has no check code.',
+    ask: 'Ask for an official transcript',
+    sendTo: 'Send it to',
+    kinds: { self: 'Myself', organisation: 'An organisation, by email' } as Record<string, string>,
+    organisation: 'Organisation',
+    email: 'Email address',
+    purpose: 'Purpose (optional)',
+    send: 'Send the request',
+    sent: 'Request sent. The registry issues the transcript and it shows under My requests.',
+    failed: 'The request could not be sent. Check the connection and try again.',
+    requests: 'My requests',
+    noRequests: 'No requests yet.',
+    myself: 'Myself',
+    asked: (date: string) => `Asked ${date}`,
+    issuedOn: (ref: string, date: string) => `${ref} · issued ${date}`,
+    waiting: '! Waiting',
+    issued: '✓ Issued',
+    open: 'Open (PDF)',
+  },
+  award: {
+    title: 'My award',
+    entry: (klass: string) => `Class of award: ${klass}`,
+    completed: (programme: string) => `You have completed the ${programme}.`,
+    confirmedOn: (date: string) => `Confirmed by the academic board, ${date}.`,
+    confirmed: 'Confirmed by the academic board.',
+    conferred: 'Conferred at graduation.',
+    klass: 'Class of award',
+    figures: (cgpa: string, credits: number) => `Cumulative GPA ${cgpa} · ${credits} credits`,
+    graduation: 'Graduation',
+    dateToSet: 'Date to be published',
+    onTheDay: 'The award is conferred on the day',
+    conferredTag: '✓ Conferred',
+    certificate: 'Certificate',
+    givenAt: 'Given at graduation',
+    cleared: '✓ Fees cleared',
+    held: '! Held until fees are paid',
+    results: 'Results',
+    semesters: (n: number) => (n === 1 ? '1 semester' : `${n} semesters`),
+    allPassed: 'Every course passed',
+    credits: (n: number) => `${n} credits passed`,
+    open: 'Open',
+    note: 'If fees are owed, the certificate waits until they are paid. Your award and transcript do not.',
   },
   bar: {
     close: (code: string, rate: number) => `${code} attendance is ${rate}%.`,

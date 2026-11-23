@@ -536,6 +536,253 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/results/{division}/setup/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The board's rules */
+        get: operations["results.setup.rules"];
+        put?: never;
+        post: operations["results.setup.rules.save"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/results/{division}/progression": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The progression lists of the year, by programme and year of study */
+        get: operations["results.progressions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/results/{division}/progression/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One programme and year: every student's decision */
+        get: operations["results.progression"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/results/{division}/progression/choose": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["results.progression.choose"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/results/{division}/progression/decide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["results.progression.decide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/results/{division}/progression/{id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["results.progression.reopen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/results/{division}/progression/{id}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["results.progression.apply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/results/{division}/graduation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The graduation lists of the year, by programme */
+        get: operations["results.graduations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/results/{division}/graduation/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One programme's graduation list */
+        get: operations["results.graduation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/results/{division}/graduation/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["results.graduation.approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/results/{division}/graduation/{id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["results.graduation.confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/results/{division}/graduation/{id}/day": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["results.graduation.day"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/results/{division}/graduation/{id}/confer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["results.graduation.confer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/results/{division}/transcripts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Transcripts asked for and issued */
+        get: operations["results.transcripts"];
+        put?: never;
+        post: operations["results.transcripts.issue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/results/{division}/transcripts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** An issued official transcript, as a PDF */
+        get: operations["results.transcripts.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/calendar/{token}.ics": {
         parameters: {
             query?: never;
@@ -5950,6 +6197,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/student/results/transcript": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The student's own copy of the transcript: every released result, marked as a student copy */
+        get: operations["student.results.transcript.copy"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/results/transcripts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The student's requests for an official transcript, and those issued */
+        get: operations["student.results.transcripts"];
+        put?: never;
+        post: operations["student.results.transcripts.request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/student/results/transcripts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** An official transcript issued to the student, as a PDF */
+        get: operations["student.results.transcripts.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/academics/subjects": {
         parameters: {
             query?: never;
@@ -8709,6 +9007,784 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "results.setup.rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        rules: {
+                            id: string | null;
+                            good_cgpa: number;
+                            carry_credits: number;
+                            max_attempts: number;
+                            time_factor: number;
+                            classes: {
+                                diploma: {
+                                    name: string;
+                                    from: number;
+                                }[];
+                                degree: {
+                                    name: string;
+                                    from: number;
+                                }[];
+                            };
+                            hold_certificate: boolean;
+                            from_on: string | null;
+                        };
+                        standard: {
+                            id: string | null;
+                            good_cgpa: number;
+                            carry_credits: number;
+                            max_attempts: number;
+                            time_factor: number;
+                            classes: {
+                                diploma: {
+                                    name: string;
+                                    from: number;
+                                }[];
+                                degree: {
+                                    name: string;
+                                    from: number;
+                                }[];
+                            };
+                            hold_certificate: boolean;
+                            from_on: string | null;
+                        };
+                        periods: {
+                            id: string;
+                            name: string;
+                        }[];
+                        can: {
+                            setup: boolean;
+                            release: boolean;
+                            board: boolean;
+                            moderate: boolean;
+                            enter: boolean;
+                            view: boolean;
+                            award: boolean;
+                            transcripts: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "results.setup.rules.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    period_id: string;
+                    good_cgpa: number;
+                    carry_credits: number;
+                    max_attempts: number;
+                    time_factor: number;
+                    hold_certificate: boolean;
+                    classes: {
+                        name: string;
+                        from: number;
+                    }[][];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "results.progressions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        period: {
+                            id: string;
+                            name: string;
+                        };
+                        lists: {
+                            programme_id: string;
+                            year: number;
+                            label: string;
+                            name: string;
+                            students: number;
+                            state: string;
+                            list_id: string | null;
+                        }[];
+                        can: {
+                            setup: boolean;
+                            release: boolean;
+                            board: boolean;
+                            moderate: boolean;
+                            enter: boolean;
+                            view: boolean;
+                            award: boolean;
+                            transcripts: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "results.progression": {
+        parameters: {
+            query: {
+                programme: string;
+                year: number;
+            };
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        programme: {
+                            id: string;
+                            code: string;
+                            name: string;
+                            years: number;
+                        };
+                        year: number;
+                        period: string;
+                        list: {
+                            id: string;
+                            state: string;
+                        } | null;
+                        rows: {
+                            learner_id: string;
+                            name: string;
+                            number: string;
+                            cgpa: number | null;
+                            credits: number;
+                            passed: number;
+                            failed_credits: number;
+                            failed: string[];
+                            standing: string | null;
+                            proposed: string | null;
+                            fallback: string | null;
+                            why: string;
+                            choice: {
+                                decision: string;
+                                reason: string;
+                                by: string;
+                                at: string;
+                            } | null;
+                            decision: string | null;
+                        }[];
+                        summary: {
+                            proceed: number;
+                            carry: number;
+                            repeat: number;
+                            discontinue: number;
+                            open: number;
+                        };
+                        rules: {
+                            id: string | null;
+                            good_cgpa: number;
+                            carry_credits: number;
+                            max_attempts: number;
+                            time_factor: number;
+                            classes: {
+                                diploma: {
+                                    name: string;
+                                    from: number;
+                                }[];
+                                degree: {
+                                    name: string;
+                                    from: number;
+                                }[];
+                            };
+                            hold_certificate: boolean;
+                            from_on: string | null;
+                        };
+                        steps: {
+                            step: string;
+                            title: string;
+                            outcomes: {
+                                outcome: string;
+                                title: string;
+                                requires_reason: boolean;
+                            }[];
+                            permitted: boolean;
+                            blocked_reason: string | null;
+                            remedy: string | null;
+                        }[];
+                        history: {
+                            step: string;
+                            outcome: string;
+                            by: string;
+                            at: string;
+                            reason: string | null;
+                        }[];
+                        can: {
+                            setup: boolean;
+                            release: boolean;
+                            board: boolean;
+                            moderate: boolean;
+                            enter: boolean;
+                            view: boolean;
+                            award: boolean;
+                            transcripts: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "results.progression.choose": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    programme_id: string;
+                    year: number;
+                    /** Format: uuid */
+                    learner_id: string;
+                    /** @enum {string} */
+                    decision: "proceed" | "carry" | "repeat_year" | "discontinue" | "complete" | "continue";
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "results.progression.decide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    programme_id: string;
+                    year: number;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "results.progression.reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "results.progression.apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        applied: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "results.graduations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        period: string;
+                        lists: {
+                            programme_id: string;
+                            code: string;
+                            name: string;
+                            students: number;
+                            state: string;
+                            list_id: string | null;
+                            graduation_on: string | null;
+                        }[];
+                        can: {
+                            setup: boolean;
+                            release: boolean;
+                            board: boolean;
+                            moderate: boolean;
+                            enter: boolean;
+                            view: boolean;
+                            award: boolean;
+                            transcripts: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "results.graduation": {
+        parameters: {
+            query: {
+                programme: string;
+            };
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        programme: {
+                            id: string;
+                            code: string;
+                            name: string;
+                            award: string;
+                            credits: number;
+                        };
+                        list: {
+                            id: string;
+                            state: string;
+                            graduation_on: string | null;
+                        } | null;
+                        rows: {
+                            learner_id: string;
+                            name: string;
+                            number: string;
+                            cgpa: number | null;
+                            credits: number;
+                            class: string | null;
+                            complete: boolean;
+                            missing: string[];
+                            certificate: string;
+                        }[];
+                        summary: {
+                            complete: number;
+                            not_complete: number;
+                            classes: {
+                                name: string;
+                                count: number;
+                            }[];
+                        };
+                        classes: {
+                            name: string;
+                            from: number;
+                        }[];
+                        steps: {
+                            step: string;
+                            title: string;
+                            outcomes: {
+                                outcome: string;
+                                title: string;
+                                requires_reason: boolean;
+                            }[];
+                            permitted: boolean;
+                            blocked_reason: string | null;
+                            remedy: string | null;
+                        }[];
+                        history: {
+                            step: string;
+                            outcome: string;
+                            by: string;
+                            at: string;
+                            reason: string | null;
+                        }[];
+                        can: {
+                            setup: boolean;
+                            release: boolean;
+                            board: boolean;
+                            moderate: boolean;
+                            enter: boolean;
+                            view: boolean;
+                            award: boolean;
+                            transcripts: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "results.graduation.approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    programme_id: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "results.graduation.confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    confirm: boolean;
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "results.graduation.day": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: date */
+                    graduation_on: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "results.graduation.confer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        conferred: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "results.transcripts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        requests: {
+                            id: string;
+                            learner_id: string;
+                            name: string;
+                            number: string;
+                            for_kind: string;
+                            organisation: string | null;
+                            email: string | null;
+                            purpose: string | null;
+                            at: string;
+                            issued: {
+                                id: string;
+                                reference: string;
+                                at: string;
+                                by: string;
+                            } | null;
+                        }[];
+                        issued: {
+                            id: string;
+                            learner_id: string;
+                            name: string;
+                            number: string;
+                            reference: string;
+                            at: string;
+                            by: string;
+                        }[];
+                        can_issue: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "results.transcripts.issue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    learner_id: string;
+                    /** Format: uuid */
+                    request_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "results.transcripts.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                division: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            /** @description Access denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Error overview. */
+                        message: string;
+                    };
+                };
+            };
         };
     };
     "academics.calendar.feed": {
@@ -21532,6 +22608,9 @@ export interface operations {
                             division_id: string;
                             courses: {
                                 offering_id: string;
+                                course_id: string;
+                                attempt: number;
+                                counts: boolean;
                                 code: string;
                                 title: string;
                                 credits: number;
@@ -21548,13 +22627,35 @@ export interface operations {
                             credits: number;
                             earned: number;
                             gpa: number | null;
+                            cgpa: number | null;
+                            standing: string | null;
                             decision: string;
                             supplementary: number;
                             deferred: number;
                         }[];
                         cumulative: number | null;
                         credits: number;
+                        earned: number;
                         open: number;
+                        decisions: {
+                            period: string;
+                            year: number;
+                            decision: string;
+                            carried: string[];
+                            cgpa: number | null;
+                            reason: string | null;
+                            state: string;
+                            at: string;
+                        }[];
+                        award: {
+                            programme: string;
+                            class: string | null;
+                            cgpa: number | null;
+                            credits: number;
+                            state: string;
+                            graduation_on: string | null;
+                            certificate: string;
+                        } | null;
                     };
                 };
             };
@@ -21641,6 +22742,8 @@ export interface operations {
                             moderate: boolean;
                             enter: boolean;
                             view: boolean;
+                            award: boolean;
+                            transcripts: boolean;
                         };
                     };
                 };
@@ -21744,6 +22847,8 @@ export interface operations {
                             moderate: boolean;
                             enter: boolean;
                             view: boolean;
+                            award: boolean;
+                            transcripts: boolean;
                         };
                         steps: {
                             step: string;
@@ -22134,6 +23239,8 @@ export interface operations {
                             moderate: boolean;
                             enter: boolean;
                             view: boolean;
+                            award: boolean;
+                            transcripts: boolean;
                         };
                     };
                 };
@@ -22210,6 +23317,8 @@ export interface operations {
                             moderate: boolean;
                             enter: boolean;
                             view: boolean;
+                            award: boolean;
+                            transcripts: boolean;
                         };
                     };
                 };
@@ -22304,6 +23413,8 @@ export interface operations {
                             moderate: boolean;
                             enter: boolean;
                             view: boolean;
+                            award: boolean;
+                            transcripts: boolean;
                         };
                     };
                 };
@@ -22450,6 +23561,8 @@ export interface operations {
                             moderate: boolean;
                             enter: boolean;
                             view: boolean;
+                            award: boolean;
+                            transcripts: boolean;
                         };
                     };
                 };
@@ -24752,6 +25865,9 @@ export interface operations {
                             division_id: string;
                             courses: {
                                 offering_id: string;
+                                course_id: string;
+                                attempt: number;
+                                counts: boolean;
                                 code: string;
                                 title: string;
                                 credits: number;
@@ -24768,12 +25884,15 @@ export interface operations {
                             credits: number;
                             earned: number;
                             gpa: number | null;
+                            cgpa: number | null;
+                            standing: string | null;
                             decision: string;
                             supplementary: number;
                             deferred: number;
                         }[];
                         cumulative: number | null;
                         credits: number;
+                        earned: number;
                         supplementary: {
                             code: string;
                             title: string;
@@ -24781,6 +25900,25 @@ export interface operations {
                             exam_on: string | null;
                         }[];
                         slip_held: boolean;
+                        decisions: {
+                            period: string;
+                            year: number;
+                            decision: string;
+                            carried: string[];
+                            cgpa: number | null;
+                            reason: string | null;
+                            state: string;
+                            at: string;
+                        }[];
+                        award: {
+                            programme: string;
+                            class: string | null;
+                            cgpa: number | null;
+                            credits: number;
+                            state: string;
+                            graduation_on: string | null;
+                            certificate: string;
+                        } | null;
                     };
                 };
             };
@@ -24918,6 +26056,130 @@ export interface operations {
             };
             401: components["responses"]["AuthenticationException"];
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "student.results.transcript.copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "student.results.transcripts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        requests: {
+                            id: string;
+                            learner_id: string;
+                            name: string;
+                            number: string;
+                            for_kind: string;
+                            organisation: string | null;
+                            email: string | null;
+                            purpose: string | null;
+                            at: string;
+                            issued: {
+                                id: string;
+                                reference: string;
+                                at: string;
+                                by: string;
+                            } | null;
+                        }[];
+                        issued: {
+                            id: string;
+                            learner_id: string;
+                            name: string;
+                            number: string;
+                            reference: string;
+                            at: string;
+                            by: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "student.results.transcripts.request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    for_kind: "self" | "organisation";
+                    organisation?: string | null;
+                    email?: string | null;
+                    purpose?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "student.results.transcripts.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
         };
     };
     "academics.subjects.index": {

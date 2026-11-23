@@ -1,17 +1,19 @@
 import { navigate } from '@acadly/kernel'
 import { useState, type ReactNode } from 'react'
-import { resultsSlip, studentApi, type CourseResult as Course, type Me, type Results, type Semester } from './api'
+import { resultsSlip, studentApi, type CourseResult as Course, type Decision, type Me, type Results, type Semester } from './api'
 import { copy } from './copy'
 import { Line, Loading, Page, Section, Tag, Title, useAnswer } from './parts'
 
 const t = copy.results
 
-const gpa = (n: number) => n.toFixed(2)
+export const gpa = (n: number) => n.toFixed(2)
 const one = (n: number) => (Math.round(n * 10) / 10).toFixed(1)
+/** A date as the board writes it: Fri 2 Jul 2027. */
+export const longDate = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }).replace(',', '')
 const when = (iso: string) => new Date(iso).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).replace(' at ', ', ')
 
 /** A notice with its mark: teal for done, marigold for attention, red for barred or failed. */
-function Notice({ tone, mark, children }: { tone: 'done' | 'attention' | 'wrong'; mark: string; children: ReactNode }) {
+export function Notice({ tone, mark, children }: { tone: 'done' | 'attention' | 'wrong'; mark: string; children: ReactNode }) {
   const cls = { done: 'border-teal bg-teal-wash', attention: 'border-marigold bg-marigold-wash', wrong: 'border-red-pen bg-red-wash text-red-text' }[tone]
 
   return (
@@ -22,23 +24,39 @@ function Notice({ tone, mark, children }: { tone: 'done' | 'attention' | 'wrong'
   )
 }
 
-/** Two totals side by side: the first on ink, the second on the sheet. */
-function Totals({ first, second }: { first: [string, string]; second: [string, string] }) {
+/**
+ * Two totals side by side: the first on ink, the second on the sheet. A second
+ * cell that needs attention is solid marigold; a word in it is set smaller than a number.
+ */
+export function Totals({ first, second, attention = false, word = false }: { first: [string, string]; second: [string, string]; attention?: boolean; word?: boolean }) {
   return (
     <div className="grid grid-cols-2 border-2 border-ink">
       <div className="bg-ink px-3.5 py-2.5 text-sheet">
         <span className="label-caps text-on-ink-muted">{first[0]}</span>
         <div className="type-numeral text-[40px] leading-none text-accent">{first[1]}</div>
       </div>
-      <div className="border-l-2 border-ink bg-sheet px-3.5 py-2.5">
-        <span className="label-caps text-text-muted">{second[0]}</span>
-        <div className="type-numeral text-[40px] leading-none">{second[1]}</div>
+      <div className={`border-l-2 border-ink px-3.5 py-2.5 ${attention ? 'bg-marigold text-ink' : 'bg-sheet'}`}>
+        <span className={`label-caps ${attention ? 'text-ink' : 'text-text-muted'}`}>{second[0]}</span>
+        <div className={`type-numeral leading-none ${word ? 'pt-1 text-[30px]' : 'text-[40px]'}`}>{second[1]}</div>
       </div>
     </div>
   )
 }
 
-function Back({ href, children }: { href: string; children: ReactNode }) {
+/** A full-width secondary action: a 2px ink edge on the sheet. Opens a PDF in a new tab when `file` is set. */
+export function Secondary({ href, file = false, children }: { href: string; file?: boolean; children: ReactNode }) {
+  return (
+    <a
+      href={href}
+      onClick={(e) => (e.preventDefault(), file ? window.open(href, '_blank', 'noopener') : navigate(href))}
+      className="grid h-12 place-items-center border-2 border-ink bg-sheet font-extrabold text-ink no-underline hover:bg-field"
+    >
+      {children}
+    </a>
+  )
+}
+
+export function Back({ href, children }: { href: string; children: ReactNode }) {
   return (
     <a href={href} onClick={(e) => (e.preventDefault(), navigate(href))} className="min-h-11 text-[14px] font-bold text-teal">
       {children}
@@ -57,6 +75,20 @@ export function ResultsEntry() {
   return (
     <Section>
       <Line strong={t.entry} sub={sub} href="/results" right={r.supplementary.length > 0 ? <Tag tone="attention">{t.entrySupp(r.supplementary.length)}</Tag> : undefined} />
+    </Section>
+  )
+}
+
+/** The ways to My transcript and My award, on More: the award only once the board has confirmed it. */
+export function StandingEntries() {
+  const loaded = useAnswer(studentApi.results, 'results')
+  if (loaded.refused || loaded.data === undefined) return null
+  const award = loaded.data.award
+
+  return (
+    <Section>
+      <Line strong={copy.more.transcript} href="/transcript" />
+      {award !== null && <Line strong={copy.more.award} sub={award.class !== null ? copy.award.entry(award.class) : award.programme} href="/award" />}
     </Section>
   )
 }
@@ -85,9 +117,78 @@ export function ResultsPage({ me }: { me: Me }) {
       ) : r.semesters.length === 0 && r.supplementary.length === 0 ? (
         <p className="text-text-muted">{t.none}</p>
       ) : (
-        <SemesterView r={r} index={Math.min(chosen, Math.max(0, r.semesters.length - 1))} onChoose={setChosen} />
+        <>
+          <Standing r={r} />
+          <SemesterView r={r} index={Math.min(chosen, Math.max(0, r.semesters.length - 1))} onChoose={setChosen} />
+          <BySemester r={r} />
+          <Secondary href="/transcript">{t.myTranscript}</Secondary>
+        </>
       )}
     </Page>
+  )
+}
+
+const decisionLook = (d: Decision['decision']): { tone: 'done' | 'attention' | 'wrong'; mark: string } =>
+  d === 'discontinue' ? { tone: 'wrong', mark: '×' } : d === 'carry' || d === 'repeat_year' ? { tone: 'attention', mark: '!' } : { tone: 'done', mark: '✓' }
+
+/** The board's latest end-of-year decision, the standing it leaves, what it means, and the award when there is one. */
+function Standing({ r }: { r: Results }) {
+  const d = r.decisions[0]
+  const standing = r.semesters[0]?.standing ?? null
+  const carried = d !== undefined && (d.decision === 'carry' || d.decision === 'proceed') ? d.carried : []
+  const probation = standing === 'probation'
+  const look = d !== undefined ? decisionLook(d.decision) : null
+
+  return (
+    <>
+      {d !== undefined && look !== null && (
+        <Notice tone={look.tone} mark={look.mark}>
+          <strong>{t.yearDecision(d.decision, d.year, d.carried)}</strong> {t.boardOn(longDate(d.at))}
+          {d.reason !== null && d.reason !== '' && ` ${t.reason(d.reason)}`}
+        </Notice>
+      )}
+      {r.cumulative !== null && (
+        <Totals
+          first={[t.cgpa, gpa(r.cumulative)]}
+          second={[t.standing, standing !== null ? (t.standings[standing] ?? standing) : t.standingNone]}
+          attention={probation}
+          word
+        />
+      )}
+      {(carried.length > 0 || probation) && (
+        <Section title={t.whatMeans}>
+          <div className="grid gap-1.5 px-3.5 py-2.5 text-[14px]">
+            {carried.length > 0 && <span>{t.carriedRule(carried)}</span>}
+            {probation && <span>{t.probationRule}</span>}
+            <span>{t.helpRule}</span>
+          </div>
+        </Section>
+      )}
+      {r.award !== null && (
+        <Section strong>
+          <Line strong={t.myAward} sub={r.award.class !== null ? copy.award.entry(r.award.class) : r.award.programme} href="/award" right={<Tag tone="done">✓</Tag>} />
+        </Section>
+      )}
+    </>
+  )
+}
+
+/** The cumulative GPA and standing after each semester, oldest first. */
+function BySemester({ r }: { r: Results }) {
+  const rows = r.semesters.filter((s) => s.cgpa !== null).reverse()
+  if (rows.length === 0) return null
+
+  return (
+    <Section title={t.bySemester}>
+      {rows.map((s) => (
+        <Line
+          key={s.period.id}
+          strong={s.period.name}
+          sub={t.cgpaOf(gpa(s.cgpa ?? 0))}
+          right={s.standing !== null ? <Tag tone={t.standingTones[s.standing] ?? 'plain'}>{t.standings[s.standing] ?? s.standing}</Tag> : undefined}
+        />
+      ))}
+    </Section>
   )
 }
 
@@ -172,7 +273,16 @@ function SemesterView({ r, index, onChoose }: { r: Results; index: number; onCho
             <Line
               key={c.offering_id}
               strong={`${c.code} · ${c.title}`}
-              sub={[t.credits(c.credits), c.mark !== null ? String(c.mark) : null, c.sitting === 'supplementary' ? t.supplementarySitting : null, c.changed ? t.changed : null].filter((v) => v !== null).join(' · ')}
+              sub={[
+                t.credits(c.credits),
+                c.mark !== null ? String(c.mark) : null,
+                c.attempt > 1 ? t.attempt(c.attempt) : null,
+                c.counts ? null : t.repeated,
+                c.sitting === 'supplementary' ? t.supplementarySitting : null,
+                c.changed ? t.changed : null,
+              ]
+                .filter((v) => v !== null)
+                .join(' · ')}
               href={`/results/${c.offering_id}`}
               right={<CourseState c={c} />}
             />
@@ -197,13 +307,9 @@ function SemesterView({ r, index, onChoose }: { r: Results; index: number; onCho
             <p className="text-[13px] text-text-muted">{t.slipHeld}</p>
           </>
         ) : (
-          <a
-            href={resultsSlip(s.period.id)}
-            onClick={(e) => (e.preventDefault(), window.open(resultsSlip(s.period.id), '_blank', 'noopener'))}
-            className="grid h-12 place-items-center border-2 border-ink bg-sheet font-extrabold text-ink no-underline"
-          >
+          <Secondary href={resultsSlip(s.period.id)} file>
             {t.slip}
-          </a>
+          </Secondary>
         ))}
     </>
   )

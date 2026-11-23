@@ -23,7 +23,7 @@ final class CourseTeachingReader implements CourseTeaching
     {
         $rows = DB::table('programme_offerings as o')->join('programme_courses as c', 'c.id', '=', 'o.course_id')->join('programme_departments as d', 'd.id', '=', 'c.department_id')
             ->where('o.division_id', $divisionId)->where('o.period_id', $periodId)->orderBy('c.code')->orderBy('o.group_label')
-            ->get(['o.id', 'o.group_label', 'c.code', 'c.title', 'c.credits', 'd.id as department_id', 'd.name as department', 'd.head_user_id']);
+            ->get(['o.id', 'o.group_label', 'o.course_id', 'c.code', 'c.title', 'c.credits', 'd.id as department_id', 'd.name as department', 'd.head_user_id']);
         $ids = array_values(array_map(fn (object $r): string => Row::text($r, 'id'), $rows->all()));
         $taken = RegistrationChecks::taken($ids);
         $lecturers = [];
@@ -34,7 +34,7 @@ final class CourseTeachingReader implements CourseTeaching
         $out = [];
         foreach ($rows as $r) {
             $id = Row::text($r, 'id');
-            $out[] = ['id' => $id, 'code' => Row::text($r, 'code'), 'title' => Row::text($r, 'title'), 'group' => Row::text($r, 'group_label'),
+            $out[] = ['id' => $id, 'course_id' => Row::text($r, 'course_id'), 'code' => Row::text($r, 'code'), 'title' => Row::text($r, 'title'), 'group' => Row::text($r, 'group_label'),
                 'department_id' => Row::text($r, 'department_id'), 'department' => Row::text($r, 'department'), 'head_id' => Row::maybeText($r, 'head_user_id'), 'credits' => Row::int($r, 'credits'),
                 'lecturers' => $lecturers[$id] ?? [], 'taken' => $taken[$id] ?? 0];
         }

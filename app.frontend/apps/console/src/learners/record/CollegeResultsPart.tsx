@@ -1,7 +1,8 @@
-import { useLoad } from '@acadly/kernel'
-import { Button, Waiting } from '@acadly/ui'
+import { can, useAppContext, useLoad } from '@acadly/kernel'
+import { Button, slips, Waiting } from '@acadly/ui'
 import { copy } from '../../copy'
-import { RESULT_TONE, resultsApi, slipHref } from '../../results/api'
+import { firstError } from '../../programmes/api'
+import { day, RESULT_TONE, resultsApi, slipHref, transcriptHref } from '../../results/api'
 import { Tag } from '../../settings/parts'
 import type { LearnerState } from '../api'
 import { Column, Columns, InLink, LedgerFrame, SectionTitle, tabHref, Td, Th } from './ui'
@@ -45,6 +46,7 @@ export function CollegeResultsSummary({ learner }: { learner: LearnerState }) {
 /** The Results tab: each semester's courses, GPAs, decision and slip. */
 export function CollegeResultsTab({ learner }: { learner: LearnerState }) {
   const loaded = useResults(learner.id)
+  const context = useAppContext()
   const d = loaded.data
 
   if (loaded.phase === 'failed') return <p className="text-sm text-text-muted">{r.none}</p>
@@ -74,7 +76,16 @@ export function CollegeResultsTab({ learner }: { learner: LearnerState }) {
                   </div>
                 ))}
               </div>
-              <SectionTitle aside={<Tag tone={s.decision === 'pass' ? 'done' : 'attention'}>{t.board.decisions[s.decision] ?? s.decision}</Tag>}>{s.period.name}</SectionTitle>
+              <SectionTitle
+                aside={
+                  <span className="flex flex-wrap gap-2">
+                    {s.standing !== null && <Tag tone={s.standing === 'good' ? 'done' : 'attention'}>{`${t.standings[s.standing] ?? s.standing} · ${r.cgpaAfter(s.cgpa === null ? '—' : s.cgpa.toFixed(2))}`}</Tag>}
+                    <Tag tone={s.decision === 'pass' ? 'done' : 'attention'}>{t.board.decisions[s.decision] ?? s.decision}</Tag>
+                  </span>
+                }
+              >
+                {s.period.name}
+              </SectionTitle>
               <LedgerFrame label={s.period.name}>
                 <table className="w-full min-w-[640px] border-collapse">
                   <thead>
@@ -97,6 +108,8 @@ export function CollegeResultsTab({ learner }: { learner: LearnerState }) {
                           {c.sitting === 'supplementary' && <span className="block text-[13px] text-text-muted">{r.supplementary}</span>}
                           {!c.released && <span className="block text-[13px] text-text-muted">{r.notReleased}</span>}
                           {c.changed && <span className="block text-[13px] text-text-muted">{t.sheet.changed}</span>}
+                          {!c.counts && <span className="block text-[13px] text-text-muted">{r.repeated}</span>}
+                          {c.attempt > 1 && <span className="block text-[13px] text-text-muted">{r.attempt(c.attempt)}</span>}
                         </Td>
                         <Td end>{c.credits}</Td>
                         <Td end>{c.ca === null ? '—' : c.ca.toFixed(1)}</Td>
@@ -119,6 +132,49 @@ export function CollegeResultsTab({ learner }: { learner: LearnerState }) {
             </section>
           )
         })}
+        {(d.decisions.length > 0 || d.award !== null) && (
+          <section className="mb-6" aria-label={r.decisionsTitle}>
+            <SectionTitle>{r.decisionsTitle}</SectionTitle>
+            <ul className="grid gap-2">
+              {d.award !== null && (
+                <li className="flex flex-wrap justify-between gap-2 border-b border-rule pb-2">
+                  <span>
+                    <strong>{r.award}</strong> · {r.awardLine(d.award.programme, d.award.class)}
+                    <span className="block text-[13px] text-text-muted">{d.award.state === 'conferred' && d.award.graduation_on !== null ? r.conferredOn(day(d.award.graduation_on)) : r.awardConfirmed}</span>
+                  </span>
+                  <Tag tone={d.award.state === 'conferred' ? 'done' : 'attention'}>{t.graduation.stateTags[d.award.state] ?? d.award.state}</Tag>
+                </li>
+              )}
+              {d.decisions.map((x, i) => (
+                <li key={i} className="flex flex-wrap justify-between gap-2 border-b border-rule pb-2">
+                  <span>
+                    <strong>{r.decisionLine(x.period, x.year)}</strong>
+                    {x.carried.length > 0 && <span className="block text-[13px] text-text-muted">{r.carried(x.carried.join(', '))}</span>}
+                    {x.reason !== null && <span className="block text-[13px] text-text-muted">{x.reason}</span>}
+                  </span>
+                  <Tag tone={x.decision === 'proceed' || x.decision === 'complete' ? 'done' : x.decision === 'carry' ? 'attention' : 'wrong'}>{t.decisionTags[x.decision] ?? x.decision}</Tag>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {can(context, 'results.transcripts', { type: 'division', id: d.semesters[0]?.division_id ?? '' }) && (
+          <div className="mb-4">
+            <Button
+              variant="secondary"
+              onClick={async () => {
+                const division = d.semesters[0]?.division_id ?? ''
+                const result = await resultsApi.issue(division, learner.id, null)
+                if (result.kind === 'saved') {
+                  slips.done({ word: copy.slips.saved, title: r.transcriptIssued })
+                  window.open(transcriptHref(division, (result.data as { id: string }).id), '_blank', 'noopener')
+                } else slips.wrong({ word: t.notSaved, title: firstError(result, t.failed) })
+              }}
+            >
+              {r.transcript}
+            </Button>
+          </div>
+        )}
         <p className="text-sm text-text-muted">{r.note}</p>
       </Column>
     </Columns>

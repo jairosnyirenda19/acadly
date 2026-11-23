@@ -1,0 +1,113 @@
+{
+    "initial": "worked_out",
+    "kind": "journey",
+    "milestones": [],
+    "ref": "results.award@2026.1",
+    "stages": [
+        {
+            "key": "award",
+            "steps": [
+                "approve",
+                "confirm",
+                "confer"
+            ],
+            "title": "Award"
+        }
+    ],
+    "states": [
+        {
+            "id": "worked_out",
+            "label": "Worked out"
+        },
+        {
+            "id": "approved",
+            "label": "Approved by the board"
+        },
+        {
+            "id": "confirmed",
+            "label": "Confirmed by the academic board"
+        },
+        {
+            "id": "conferred",
+            "label": "Conferred"
+        }
+    ],
+    "steps": [
+        {
+            "capability": "results.board",
+            "four_eyes": null,
+            "from": [
+                "worked_out"
+            ],
+            "gates": [],
+            "id": "approve",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "approved",
+                    "requires_reason": false,
+                    "title": "Approved by the board",
+                    "to": "approved"
+                }
+            ],
+            "stage": "award",
+            "title": "Approve the list"
+        },
+        {
+            "capability": "results.award",
+            "four_eyes": null,
+            "from": [
+                "approved"
+            ],
+            "gates": [],
+            "id": "confirm",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "confirmed",
+                    "requires_reason": false,
+                    "title": "Confirmed by the academic board",
+                    "to": "confirmed"
+                },
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "returned",
+                    "requires_reason": true,
+                    "title": "Returned to the examiners' board",
+                    "to": "worked_out"
+                }
+            ],
+            "stage": "award",
+            "title": "Confirm the list"
+        },
+        {
+            "capability": "results.release",
+            "four_eyes": null,
+            "from": [
+                "confirmed"
+            ],
+            "gates": [],
+            "id": "confer",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "conferred",
+                    "requires_reason": false,
+                    "title": "Conferred",
+                    "to": "conferred"
+                }
+            ],
+            "stage": "award",
+            "title": "Confer the awards"
+        }
+    ],
+    "subject": "Acadly\\Modules\\Results\\Domain\\AwardList",
+    "terminal": [
+        "conferred"
+    ],
+    "title": "Graduation list"
+}

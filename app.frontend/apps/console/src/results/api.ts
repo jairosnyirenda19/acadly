@@ -21,6 +21,14 @@ export type ReleaseView = Get<'/v1/results/{division}/release'>
 export type ResultsSetup = Get<'/v1/results/{division}/setup'>
 export type ResultsRecord = Get<'/v1/results/learners/{learner}'>
 export type Band = ResultsSetup['scale']['bands'][number]
+export type Progressions = Get<'/v1/results/{division}/progression'>
+export type ProgressionView = Get<'/v1/results/{division}/progression/list'>
+export type ProgressionRow = ProgressionView['rows'][number]
+export type Graduations = Get<'/v1/results/{division}/graduation'>
+export type GraduationView = Get<'/v1/results/{division}/graduation/list'>
+export type TranscriptDesk = Get<'/v1/results/{division}/transcripts'>
+export type BoardRules = Get<'/v1/results/{division}/setup/rules'>
+export type RuleSet = BoardRules['rules']
 export type Sitting = 'main' | 'supplementary'
 
 const API: string = import.meta.env.VITE_API_URL ?? '/api'
@@ -61,7 +69,32 @@ export const resultsApi = {
   saveSettings: (division: string, body: { bar_percent: number; bar_days: number; hold_slip_for_fees: boolean }) =>
     settle(api.PUT('/v1/results/{division}/setup/settings', { ...pd(division), body: body as never })),
   learner: (learner: string) => read(api.GET('/v1/results/learners/{learner}', { params: { path: { learner } } })),
+  progressions: (division: string) => read(api.GET('/v1/results/{division}/progression', pd(division))),
+  progression: (division: string, programme: string, year: number) =>
+    read(api.GET('/v1/results/{division}/progression/list', { params: { path: { division }, query: { programme, year } } })),
+  choose: (division: string, body: { programme_id: string; year: number; learner_id: string; decision: string; reason: string }) =>
+    settle(api.POST('/v1/results/{division}/progression/choose', { ...pd(division), body: body as never })),
+  decideProgression: (division: string, programme: string, year: number) =>
+    settle(api.POST('/v1/results/{division}/progression/decide', { ...pd(division), body: { programme_id: programme, year } as never })),
+  reopen: (division: string, id: string, reason: string) => settle(api.POST('/v1/results/{division}/progression/{id}/reopen', { ...pi(division, id), body: { reason } as never })),
+  applyProgression: (division: string, id: string) => settle(api.POST('/v1/results/{division}/progression/{id}/apply', pi(division, id))),
+  graduations: (division: string) => read(api.GET('/v1/results/{division}/graduation', pd(division))),
+  graduation: (division: string, programme: string) => read(api.GET('/v1/results/{division}/graduation/list', { params: { path: { division }, query: { programme } } })),
+  approveAwards: (division: string, programme: string) => settle(api.POST('/v1/results/{division}/graduation/approve', { ...pd(division), body: { programme_id: programme } as never })),
+  confirmAwards: (division: string, id: string, confirm: boolean, reason: string | null) =>
+    settle(api.POST('/v1/results/{division}/graduation/{id}/confirm', { ...pi(division, id), body: { confirm, reason } as never })),
+  graduationDay: (division: string, id: string, day: string) => settle(api.PUT('/v1/results/{division}/graduation/{id}/day', { ...pi(division, id), body: { graduation_on: day } as never })),
+  confer: (division: string, id: string) => settle(api.POST('/v1/results/{division}/graduation/{id}/confer', pi(division, id))),
+  transcripts: (division: string) => read(api.GET('/v1/results/{division}/transcripts', pd(division))),
+  issue: (division: string, learner: string, request: string | null) =>
+    settle(api.POST('/v1/results/{division}/transcripts', { ...pd(division), body: { learner_id: learner, request_id: request } as never }) as Promise<{ data?: { id: string }; error?: unknown; response: Response }>),
+  rules: (division: string) => read(api.GET('/v1/results/{division}/setup/rules', pd(division))),
+  saveRules: (division: string, body: Omit<RuleSet, 'id' | 'from_on'> & { period_id: string }) =>
+    settle(api.POST('/v1/results/{division}/setup/rules', { ...pd(division), body: body as never })),
 }
+
+/** The address of an issued official transcript, opened in a new tab. */
+export const transcriptHref = (division: string, id: string) => `${API}/v1/results/${division}/transcripts/${id}`
 
 /** The address of a student's results slip for a semester, opened in a new tab. */
 export const slipHref = (learner: string, p: string) => `${API}/v1/results/learners/${learner}/slip?period=${p}`

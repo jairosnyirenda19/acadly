@@ -15,6 +15,8 @@ enum ResultsPermission: string implements Permission
     case Board = 'results.board';
     case Release = 'results.release';
     case Setup = 'results.setup';
+    case Award = 'results.award';
+    case Transcripts = 'results.transcripts';
 
     public function key(): string
     {
@@ -29,7 +31,9 @@ enum ResultsPermission: string implements Permission
             self::Moderate => 'Moderate the result sheets of a department',
             self::Board => 'Decide results as a member of the examiners\' board',
             self::Release => 'Release results to students',
-            self::Setup => 'Set the grading scale and the attendance bar',
+            self::Setup => "Set the grading scale, the attendance bar and the board's rules",
+            self::Award => 'Confirm the graduation list as the academic board',
+            self::Transcripts => 'Issue official transcripts',
         };
     }
 
@@ -41,7 +45,9 @@ enum ResultsPermission: string implements Permission
             self::Moderate => 'Check a course\'s marks and grade spread, change a mark with a reason, lift an attendance bar, and pass the sheet to the board or return it. Usually the head of department.',
             self::Board => 'Approve the results of each programme and year, accept an absence so the exam is deferred, and decide any change after release, with a reason.',
             self::Release => 'Release approved results to students in the portal and by text message, and prepare the supplementary sitting. Usually the registrar.',
-            self::Setup => 'Set the grading scale from a semester on, the attendance bar, and whether the results slip waits for fees.',
+            self::Setup => "Set the grading scale and the board's rules (standing, carried credits, attempts, classes of award) from a semester on, the attendance bar, and whether the results slip and the certificate wait for fees.",
+            self::Award => "Confirm the graduation list the examiners' board approved, as the academic board. Usually the principal or the senate's secretary.",
+            self::Transcripts => "Issue official transcripts with a check code, on a student's request or for the college's own use. Usually the registry.",
         };
     }
 

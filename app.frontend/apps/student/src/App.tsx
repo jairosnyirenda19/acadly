@@ -5,13 +5,14 @@ import { studentApi, type Me } from './api'
 import { CoursePage, TaskPage } from './Classroom'
 import { AttendancePage, PhonePage, ScanPage, WeekPage } from './Lectures'
 import { CourseResultPage, ResultsPage } from './Results'
+import { AwardPage, TranscriptPage } from './Transcript'
 import { AccountPage, ArticlePage, CoursesPage, FeesPage, MorePage, NewsPage, RegistrationPage, TodayPage } from './Pages'
 import { SignIn } from './SignIn'
 
 /**
  * The student portal (D-101, the approved boards). Phone first: the student
  * signs in with their student number and a password of their own, and sees
- * only their own records: today, courses, results, registration, fees and documents,
+ * only their own records: today, courses, results, transcript and award, registration, fees and documents,
  * news, and their account.
  */
 export function App() {
@@ -68,6 +69,8 @@ export function App() {
   if (task !== undefined) return <TaskPage key={task} me={me} id={task} />
   if (path === '/results') return <ResultsPage me={me} />
   if (result !== undefined) return <CourseResultPage key={result} me={me} id={result} />
+  if (path === '/transcript') return <TranscriptPage me={me} />
+  if (path === '/award') return <AwardPage me={me} />
 
   return <TodayPage me={me} />
 }

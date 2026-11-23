@@ -30,7 +30,7 @@ final class ResultsController
     /**
      * The courses of a semester with their result sheets.
      *
-     * @response array{period: array{id: string, name: string}, periods: list<array{id: string, name: string}>, courses: list<array{id: string, code: string, title: string, group: string, credits: int, department: string, lecturers: list<string>, students: int, teaches: bool, main: array{id: string, state: string}|null, supplementary: array{id: string, state: string}|null}>, can: array{setup: bool, release: bool, board: bool, moderate: bool, enter: bool, view: bool}}
+     * @response array{period: array{id: string, name: string}, periods: list<array{id: string, name: string}>, courses: list<array{id: string, code: string, title: string, group: string, credits: int, department: string, lecturers: list<string>, students: int, teaches: bool, main: array{id: string, state: string}|null, supplementary: array{id: string, state: string}|null}>, can: array{setup: bool, release: bool, board: bool, moderate: bool, enter: bool, view: bool, award: bool, transcripts: bool}}
      */
     public function courses(Request $request, string $division, ResultsViews $views): JsonResponse
     {
@@ -43,7 +43,7 @@ final class ResultsController
     /**
      * One course's result sheet for a sitting.
      *
-     * @response array{course: array{id: string, code: string, title: string, group: string, credits: int, department: string, period: string, period_id: string, lecturers: list<string>}, sheet: array{id: string, state: string, sitting: string, exam_on: string|null, released_at: string|null}|null, sitting: string, share: int, unreleased: int, bar_percent: int, scale: array{label: string, pass_mark: int, bands: list<array{grade: string, min: int, max: int, points: float}>}, lines: list<array{learner_id: string, name: string, number: string, ca: float, share: int, held: int, attended: int, rate: int|null, barred: bool, lifted: string|null, exam: float|null, absence: string|null, mark: int|null, grade: string|null, points: float|null, result: string, kind: string, changed: bool, change: array{stage: string, was: float|null, reason: string|null, by: string}|null}>, spread: array{bands: list<array{grade: string, count: int}>, average: float|null, passed: int, sat: int}, teaches: bool, can: array{setup: bool, release: bool, board: bool, moderate: bool, enter: bool, view: bool}, steps: list<array{step: string, title: string, outcomes: list<array{outcome: string, title: string, requires_reason: bool}>, permitted: bool, blocked_reason: string|null, remedy: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>}
+     * @response array{course: array{id: string, code: string, title: string, group: string, credits: int, department: string, period: string, period_id: string, lecturers: list<string>}, sheet: array{id: string, state: string, sitting: string, exam_on: string|null, released_at: string|null}|null, sitting: string, share: int, unreleased: int, bar_percent: int, scale: array{label: string, pass_mark: int, bands: list<array{grade: string, min: int, max: int, points: float}>}, lines: list<array{learner_id: string, name: string, number: string, ca: float, share: int, held: int, attended: int, rate: int|null, barred: bool, lifted: string|null, exam: float|null, absence: string|null, mark: int|null, grade: string|null, points: float|null, result: string, kind: string, changed: bool, change: array{stage: string, was: float|null, reason: string|null, by: string}|null}>, spread: array{bands: list<array{grade: string, count: int}>, average: float|null, passed: int, sat: int}, teaches: bool, can: array{setup: bool, release: bool, board: bool, moderate: bool, enter: bool, view: bool, award: bool, transcripts: bool}, steps: list<array{step: string, title: string, outcomes: list<array{outcome: string, title: string, requires_reason: bool}>, permitted: bool, blocked_reason: string|null, remedy: string|null}>, history: list<array{step: string, outcome: string, by: string, at: string, reason: string|null}>}
      */
     public function sheet(Request $request, string $division, string $id, ResultsViews $views): JsonResponse
     {
@@ -157,7 +157,7 @@ final class ResultsController
     /**
      * The examiners' board: each programme and year.
      *
-     * @response array{period: array{id: string, name: string}, cohorts: list<array{id: string, label: string, courses: int, states: array<string, int>}>, can: array{setup: bool, release: bool, board: bool, moderate: bool, enter: bool, view: bool}}
+     * @response array{period: array{id: string, name: string}, cohorts: list<array{id: string, label: string, courses: int, states: array<string, int>}>, can: array{setup: bool, release: bool, board: bool, moderate: bool, enter: bool, view: bool, award: bool, transcripts: bool}}
      */
     public function board(Request $request, string $division, ResultsViews $views): JsonResponse
     {
@@ -170,7 +170,7 @@ final class ResultsController
     /**
      * One programme and year at the board: every student's grades, GPAs and decision.
      *
-     * @response array{period: array{id: string, name: string}, cohort: array{id: string, label: string}, courses: list<array{offering_id: string, code: string, title: string, credits: int, sheet_id: string|null, state: string}>, students: list<array{learner_id: string, name: string, number: string, courses: array<string, array{mark: int|null, grade: string|null, result: string}>, gpa: float|null, cumulative: float|null, decision: string, supplementary: int, deferred: int}>, summary: array{students: int, passed: int, supplementary: int, deferred: int, average_gpa: float|null}, waiting: int, can: array{setup: bool, release: bool, board: bool, moderate: bool, enter: bool, view: bool}}
+     * @response array{period: array{id: string, name: string}, cohort: array{id: string, label: string}, courses: list<array{offering_id: string, code: string, title: string, credits: int, sheet_id: string|null, state: string}>, students: list<array{learner_id: string, name: string, number: string, courses: array<string, array{mark: int|null, grade: string|null, result: string}>, gpa: float|null, cumulative: float|null, decision: string, supplementary: int, deferred: int}>, summary: array{students: int, passed: int, supplementary: int, deferred: int, average_gpa: float|null}, waiting: int, can: array{setup: bool, release: bool, board: bool, moderate: bool, enter: bool, view: bool, award: bool, transcripts: bool}}
      */
     public function cohort(Request $request, string $division, ResultsViews $views): JsonResponse
     {
@@ -192,7 +192,7 @@ final class ResultsController
     /**
      * Release: each sitting's progress and the releases made.
      *
-     * @response array{period: array{id: string, name: string}, sittings: list<array{sitting: string, states: array<string, int>, waiting: list<array{code: string, title: string, state: string}>}>, releases: list<array{sitting: string, sheets: int, sms: bool, by: string, at: string}>, supplementary: array{sheets: int, candidates: int, exam_on: string|null}, can: array{setup: bool, release: bool, board: bool, moderate: bool, enter: bool, view: bool}}
+     * @response array{period: array{id: string, name: string}, sittings: list<array{sitting: string, states: array<string, int>, waiting: list<array{code: string, title: string, state: string}>}>, releases: list<array{sitting: string, sheets: int, sms: bool, by: string, at: string}>, supplementary: array{sheets: int, candidates: int, exam_on: string|null}, can: array{setup: bool, release: bool, board: bool, moderate: bool, enter: bool, view: bool, award: bool, transcripts: bool}}
      */
     public function releasePage(Request $request, string $division, ResultsViews $views): JsonResponse
     {
@@ -224,7 +224,7 @@ final class ResultsController
     /**
      * The grading scale and settings.
      *
-     * @response array{scale: array{id: string|null, label: string, pass_mark: int, bands: list<array{grade: string, min: int, max: int, points: float}>, from_on: string|null}, saved: list<array{id: string|null, label: string, pass_mark: int, bands: list<array{grade: string, min: int, max: int, points: float}>, from_on: string|null}>, standard: array{id: string|null, label: string, pass_mark: int, bands: list<array{grade: string, min: int, max: int, points: float}>, from_on: string|null}, settings: array{bar_percent: int, bar_days: int, hold_slip_for_fees: bool}, periods: list<array{id: string, name: string}>, can: array{setup: bool, release: bool, board: bool, moderate: bool, enter: bool, view: bool}}
+     * @response array{scale: array{id: string|null, label: string, pass_mark: int, bands: list<array{grade: string, min: int, max: int, points: float}>, from_on: string|null}, saved: list<array{id: string|null, label: string, pass_mark: int, bands: list<array{grade: string, min: int, max: int, points: float}>, from_on: string|null}>, standard: array{id: string|null, label: string, pass_mark: int, bands: list<array{grade: string, min: int, max: int, points: float}>, from_on: string|null}, settings: array{bar_percent: int, bar_days: int, hold_slip_for_fees: bool}, periods: list<array{id: string, name: string}>, can: array{setup: bool, release: bool, board: bool, moderate: bool, enter: bool, view: bool, award: bool, transcripts: bool}}
      */
     public function setup(Request $request, string $division, ResultsViews $views): JsonResponse
     {
@@ -263,7 +263,7 @@ final class ResultsController
     /**
      * The Results tab of the learner record.
      *
-     * @response array{semesters: list<array{period: array{id: string, name: string, starts_on: string}, division_id: string, courses: list<array{offering_id: string, code: string, title: string, credits: int, ca: float|null, exam: float|null, mark: int|null, grade: string|null, points: float|null, result: string, sitting: string, released: bool, changed: bool}>, credits: int, earned: int, gpa: float|null, decision: string, supplementary: int, deferred: int}>, cumulative: float|null, credits: int, open: int}
+     * @response array{semesters: list<array{period: array{id: string, name: string, starts_on: string}, division_id: string, courses: list<array{offering_id: string, course_id: string, attempt: int, counts: bool, code: string, title: string, credits: int, ca: float|null, exam: float|null, mark: int|null, grade: string|null, points: float|null, result: string, sitting: string, released: bool, changed: bool}>, credits: int, earned: int, gpa: float|null, cgpa: float|null, standing: string|null, decision: string, supplementary: int, deferred: int}>, cumulative: float|null, credits: int, earned: int, open: int, decisions: list<array{period: string, year: int, decision: string, carried: list<string>, cgpa: float|null, reason: string|null, state: string, at: string}>, award: array{programme: string, class: string|null, cgpa: float|null, credits: int, state: string, graduation_on: string|null, certificate: string}|null}
      */
     public function learner(Request $request, string $learner, ResultsParts $parts): JsonResponse
     {

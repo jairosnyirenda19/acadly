@@ -1,0 +1,107 @@
+{
+    "initial": "worked_out",
+    "kind": "journey",
+    "milestones": [],
+    "ref": "results.progression@2026.1",
+    "stages": [
+        {
+            "key": "progression",
+            "steps": [
+                "decide",
+                "reopen",
+                "apply"
+            ],
+            "title": "Progression"
+        }
+    ],
+    "states": [
+        {
+            "id": "worked_out",
+            "label": "Worked out"
+        },
+        {
+            "id": "decided",
+            "label": "Decided by the board"
+        },
+        {
+            "id": "applied",
+            "label": "Applied"
+        }
+    ],
+    "steps": [
+        {
+            "capability": "results.board",
+            "four_eyes": null,
+            "from": [
+                "worked_out"
+            ],
+            "gates": [
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Modules\\Results\\Journeys\\Progression\\EveryStudentDecided"
+                }
+            ],
+            "id": "decide",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "decided",
+                    "requires_reason": false,
+                    "title": "Decided by the board",
+                    "to": "decided"
+                }
+            ],
+            "stage": "progression",
+            "title": "Decide these progressions"
+        },
+        {
+            "capability": "results.board",
+            "four_eyes": null,
+            "from": [
+                "decided"
+            ],
+            "gates": [],
+            "id": "reopen",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "reopened",
+                    "requires_reason": true,
+                    "title": "Reopened",
+                    "to": "worked_out"
+                }
+            ],
+            "stage": "progression",
+            "title": "Reopen the decisions"
+        },
+        {
+            "capability": "results.release",
+            "four_eyes": null,
+            "from": [
+                "decided"
+            ],
+            "gates": [],
+            "id": "apply",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "applied",
+                    "requires_reason": false,
+                    "title": "Applied",
+                    "to": "applied"
+                }
+            ],
+            "stage": "progression",
+            "title": "Apply the decisions"
+        }
+    ],
+    "subject": "Acadly\\Modules\\Results\\Domain\\ProgressionList",
+    "terminal": [
+        "applied"
+    ],
+    "title": "End-of-year progression"
+}

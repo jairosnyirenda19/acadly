@@ -27,6 +27,7 @@ final class StudentResults
     public function __construct(
         private readonly Sheets $sheets,
         private readonly Standing $standing,
+        private readonly Awards $awards,
         private readonly CourseTeaching $teaching,
         private readonly ModuleActivation $modules,
         private readonly Container $container,
@@ -52,7 +53,8 @@ final class StudentResults
             }
         }
 
-        return [...$history, 'supplementary' => $sitting, 'slip_held' => $this->slipHeld($s)];
+        return [...$history, 'supplementary' => $sitting, 'slip_held' => $this->slipHeld($s), 'decisions' => Progression::decisionsOf($s['learner_id']),
+            'award' => $this->awards->of($s['learner_id'])];
     }
 
     /** @return array<string, mixed> */

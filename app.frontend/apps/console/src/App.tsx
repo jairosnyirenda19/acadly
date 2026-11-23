@@ -64,6 +64,7 @@ import { AssessmentScreen as ClassroomAssessmentScreen, HandInsScreen, MarkingSc
 import { ReleaseScreen as ResultsReleaseScreen, SetupScreen as ResultsSetupScreen } from './results/AdminScreens'
 import { BarScreen as ResultsBarScreen, BoardScreen as ResultsBoardScreen, CohortScreen as ResultsCohortScreen } from './results/BoardScreens'
 import { ResultsCoursesScreen } from './results/CoursesScreen'
+import { GraduationListScreen, GraduationsScreen, ProgressionListScreen, ProgressionsScreen, TranscriptsScreen } from './results/EndOfYearScreens'
 import { SheetScreen as ResultsSheetScreen } from './results/SheetScreen'
 import { CoverScreen } from './lectures/CoverScreen'
 import { LectureScreen } from './lectures/LectureScreen'
@@ -150,6 +151,8 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const resultsSheet = /^\/results\/c\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const results = seesResults(context)
   const board = seesResults(context, ['results.view', 'results.moderate', 'results.board', 'results.release'])
+  const graduation = seesResults(context, ['results.view', 'results.moderate', 'results.board', 'results.release', 'results.award'])
+  const transcripts = seesResults(context, ['results.view', 'results.moderate', 'results.board', 'results.release', 'results.transcripts'])
   const lecture = /^\/lectures\/l\/([0-9a-f-]{36})\/(\d{4}-\d{2}-\d{2})$/.exec(path)
 
   useEffect(() => {
@@ -196,6 +199,13 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
     const cohort = new URLSearchParams(window.location.search).get('c') ?? ''
     page = <ResultsCohortScreen key={cohort} cohort={cohort} />
   } else if (path === '/results/release' && board) page = <ResultsReleaseScreen />
+  else if (path === '/results/progression' && board) page = <ProgressionsScreen />
+  else if (path === '/results/progression/list' && board) {
+    const q = new URLSearchParams(window.location.search)
+    page = <ProgressionListScreen key={window.location.search} programme={q.get('p') ?? ''} year={Number(q.get('y') ?? '1')} />
+  } else if (path === '/results/graduation' && graduation) page = <GraduationsScreen />
+  else if (path === '/results/graduation/list' && graduation) page = <GraduationListScreen key={window.location.search} programme={new URLSearchParams(window.location.search).get('p') ?? ''} />
+  else if (path === '/results/transcripts' && transcripts) page = <TranscriptsScreen />
   else if (path === '/lectures/my-day' && seesLectures(context, ['lectures.teach'])) page = <MyLecturesScreen />
   else if (path === '/lectures/timetable' && seesLectures(context, ['lectures.view', 'lectures.timetable', 'lectures.teach', 'lectures.cover'])) page = <LectureTimetableScreen />
   else if (path === '/lectures/rooms' && seesLectures(context, ['lectures.view', 'lectures.timetable'])) page = <RoomsScreen />

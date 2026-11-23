@@ -69,7 +69,7 @@ final class ResultsModule implements Module
 
     public function journeys(): array
     {
-        return ['results.sheet'];
+        return ['results.sheet', 'results.progression', 'results.award'];
     }
 
     public function topics(): array

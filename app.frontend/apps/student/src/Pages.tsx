@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { day, money, studentApi, type Me, type Registration } from './api'
 import { CoursePages, DueSoon } from './Classroom'
 import { LecturesNow } from './Lectures'
-import { BarWarning, ResultsEntry } from './Results'
+import { BarWarning, ResultsEntry, StandingEntries } from './Results'
 import { copy } from './copy'
 import { Field, Line, Loading, Page, Primary, Section, Tag, Title, useAnswer } from './parts'
 
@@ -340,6 +340,7 @@ export function MorePage({ me, onSignedOut }: { me: Me; onSignedOut: () => void 
         <Line strong={t.account} href="/account" />
       </Section>
       <ResultsEntry />
+      <StandingEntries />
       <button type="button" className="h-11 border-2 border-ink font-extrabold" onClick={() => void signOut().then(onSignedOut)}>
         {t.signOut}
       </button>

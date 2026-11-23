@@ -7,14 +7,14 @@ import { Input, Select } from '../setup/parts'
 
 const t = copy.results
 
-export type ResultsTab = 'courses' | 'bar' | 'board' | 'release' | 'setup'
+export type ResultsTab = 'courses' | 'bar' | 'board' | 'progression' | 'release' | 'setup'
 type Can = { setup: boolean; release: boolean; board: boolean; moderate: boolean; enter: boolean; view: boolean }
 
-const TAB_PATHS: Record<ResultsTab, string> = { courses: '/results', bar: '/results/bar', board: '/results/board', release: '/results/release', setup: '/results/setup' }
+const TAB_PATHS: Record<ResultsTab, string> = { courses: '/results', bar: '/results/bar', board: '/results/board', progression: '/results/progression', release: '/results/release', setup: '/results/setup' }
 
 /** The Results tabs a person may open. */
 export function ResultsTabs({ current, can }: { current: ResultsTab; can: Can }) {
-  const shown: ResultsTab[] = ['courses', 'bar', ...(can.view ? (['board', 'release'] as const) : []), 'setup']
+  const shown: ResultsTab[] = ['courses', 'bar', ...(can.view ? (['board', 'progression', 'release'] as const) : []), 'setup']
 
   return (
     <nav aria-label={t.title} className="flex overflow-x-auto border-b-2 border-ink">
@@ -33,22 +33,22 @@ export function ResultsTabs({ current, can }: { current: ResultsTab; can: Can })
   )
 }
 
-const LADDER = ['entered', 'submitted', 'moderated', 'approved', 'released'] as const
+const LADDER = ['entered', 'submitted', 'moderated', 'approved', 'released']
 
-/** Where a result sheet stands on its way to release: done steps ticked, the current one marked. */
-export function Ladder({ state }: { state: string }) {
-  const at = LADDER.indexOf(state as (typeof LADDER)[number])
+/** Where a result sheet (or a list) stands: done steps ticked, the current one marked. */
+export function Ladder({ state, steps = LADDER, labels = t.states }: { state: string; steps?: string[]; labels?: Record<string, string> }) {
+  const at = steps.indexOf(state)
 
   return (
-    <ol className="flex flex-wrap border-2 border-ink" aria-label={t.states[state] ?? state}>
-      {LADDER.map((s, i) => (
+    <ol className="flex flex-wrap border-2 border-ink" aria-label={labels[state] ?? state}>
+      {steps.map((s, i) => (
         <li
           key={s}
           aria-current={i === at ? 'step' : undefined}
           className={`flex min-h-10 flex-1 items-center gap-2 px-3 py-2 text-[14px] whitespace-nowrap ${i > 0 ? 'border-l-2 border-ink' : ''} ${i === at ? 'bg-ink font-extrabold text-sheet' : i < at ? 'bg-sheet' : 'bg-paper text-text-muted'}`}
         >
           <span aria-hidden="true">{i < at ? '✓' : i === at ? '●' : ''}</span>
-          {t.states[s]}
+          {labels[s] ?? s}
         </li>
       ))}
     </ol>

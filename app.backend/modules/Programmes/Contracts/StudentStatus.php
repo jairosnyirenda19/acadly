@@ -11,6 +11,7 @@ enum StudentStatus: string
     case Leave = 'leave';
     case Withdrawn = 'withdrawn';
     case Completed = 'completed';
+    case Discontinued = 'discontinued';
 
     public function label(): string
     {
@@ -19,6 +20,7 @@ enum StudentStatus: string
             self::Leave => 'Leave of absence',
             self::Withdrawn => 'Withdrawn',
             self::Completed => 'Curriculum completed',
+            self::Discontinued => 'Discontinued',
         };
     }
 }

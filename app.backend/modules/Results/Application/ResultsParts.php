@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * @phpstan-import-type Semester from Standing
  *
- * @phpstan-type Record array{semesters: list<Semester>, cumulative: float|null, credits: int, open: int}
+ * @phpstan-type Record array{semesters: list<Semester>, cumulative: float|null, credits: int, earned: int, open: int, decisions: list<array{period: string, year: int, decision: string, carried: list<string>, cgpa: float|null, reason: string|null, state: string, at: string}>, award: array{programme: string, class: string|null, cgpa: float|null, credits: int, state: string, graduation_on: string|null, certificate: string}|null}
  */
 final class ResultsParts implements LearnerRecordPart
 {
@@ -28,6 +28,7 @@ final class ResultsParts implements LearnerRecordPart
         private readonly EnrolmentDirectory $learners,
         private readonly Sheets $sheets,
         private readonly Standing $standing,
+        private readonly Awards $awards,
     ) {}
 
     public function key(): string
@@ -83,6 +84,6 @@ final class ResultsParts implements LearnerRecordPart
             }
         }
 
-        return $this->seen[$key] = [...$h, 'open' => $open];
+        return $this->seen[$key] = [...$h, 'open' => $open, 'decisions' => Progression::decisionsOf($learnerId), 'award' => $this->awards->of($learnerId)];
     }
 }

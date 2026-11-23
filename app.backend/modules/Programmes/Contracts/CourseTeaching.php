@@ -11,7 +11,7 @@ namespace Acadly\Modules\Programmes\Contracts;
  * A student holds a place while their registration is submitted, approved
  * or registered.
  *
- * @phpstan-type Offering array{id: string, code: string, title: string, group: string, department_id: string, department: string, head_id: string|null, credits: int, lecturers: list<array{id: string, name: string}>, taken: int}
+ * @phpstan-type Offering array{id: string, course_id: string, code: string, title: string, group: string, department_id: string, department: string, head_id: string|null, credits: int, lecturers: list<array{id: string, name: string}>, taken: int}
  * @phpstan-type StudentFile array{learner_id: string, name: string, number: string, programme_id: string, programme_code: string, programme: string, award: string, year_of_study: int, division_id: string}
  * @phpstan-type Student array{learner_id: string, name: string, number: string, user_id: string|null, phone: string|null}
  */

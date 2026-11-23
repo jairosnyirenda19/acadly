@@ -18,6 +18,12 @@ enum ResultsAudit: string implements AuditAction
     case Released = 'results.released';
     case Corrected = 'results.corrected';
     case SupplementaryPrepared = 'results.supplementary_prepared';
+    case RulesSaved = 'results.rules_saved';
+    case ProgressionChosen = 'results.progression_chosen';
+    case ProgressionApplied = 'results.progression_applied';
+    case AwardsConferred = 'results.awards_conferred';
+    case TranscriptRequested = 'results.transcript_requested';
+    case TranscriptIssued = 'results.transcript_issued';
 
     public function key(): string
     {
@@ -36,11 +42,17 @@ enum ResultsAudit: string implements AuditAction
             self::Released => 'Released results to students.',
             self::Corrected => 'Changed a released result.',
             self::SupplementaryPrepared => 'Prepared the supplementary sitting.',
+            self::RulesSaved => 'Saved the rules for standing, progression and awards.',
+            self::ProgressionChosen => "Chose a student's progression decision.",
+            self::ProgressionApplied => 'Applied the progression decisions of a programme and year.',
+            self::AwardsConferred => 'Conferred the awards of a graduation list.',
+            self::TranscriptRequested => 'Asked for an official transcript.',
+            self::TranscriptIssued => 'Issued an official transcript.',
         };
     }
 
     public function requiresReason(): bool
     {
-        return in_array($this, [self::MarkModerated, self::BarLifted, self::Deferred, self::Corrected], true);
+        return in_array($this, [self::MarkModerated, self::BarLifted, self::Deferred, self::Corrected, self::ProgressionChosen], true);
     }
 }

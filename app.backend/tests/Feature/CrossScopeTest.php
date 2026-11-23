@@ -72,6 +72,7 @@ it('refuses every place-bound route to an account that holds everything, but onl
     DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'programmes', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
     DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'lectures', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
     DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'classroom', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
+    DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'results', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
     $school = TwoCampusSchool::make();
 
     $everything = Role::query()->create(['key' => 'everything_at_a', 'name' => 'Everything at campus A']);
@@ -141,6 +142,7 @@ it('refuses every place-bound route to an account that holds everything, but onl
         'news.' => ['division' => $school->id('secondary'), 'id' => $learner],
         'lectures.' => ['division' => $school->id('secondary'), 'id' => $learner, 'learner' => $learner, 'period' => $term, 'action' => 'away'],
         'classroom.' => ['division' => $school->id('secondary'), 'id' => $learner, 'learner' => $learner],
+        'results.' => ['division' => $school->id('secondary'), 'id' => $learner, 'learner' => $learner],
         'student.' => ['id' => $learner],
         'fees.' => ['id' => $learner, 'period' => $term, 'division' => $school->id('secondary'), 'day' => '2026-10-01'],
     ];

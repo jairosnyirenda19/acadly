@@ -22,8 +22,10 @@ use Acadly\Modules\Programmes\Application\Actions\StructureActions;
 use Acadly\Modules\Programmes\Application\Actions\StudentActions;
 use Acadly\Modules\Programmes\Application\ProgrammesViews;
 use Acadly\Modules\Programmes\Contracts\Award;
+use Acadly\Modules\Programmes\Contracts\CourseTeaching;
 use Acadly\Modules\Programmes\Contracts\StudyMode;
 use Acadly\Modules\Programmes\Journeys\Registration\State;
+use Acadly\Modules\Results\Application\Actions\SheetActions;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -69,6 +71,7 @@ final class DevelopmentCollegeSeeder extends Seeder
             $this->students($clock, $calendar, $offerings, $admit, $students, $registration);
             $this->lectures($clock, $calendar);
             $this->classroom($clock, $calendar);
+            $this->results($clock, $calendar);
 
             return;
         }
@@ -141,6 +144,7 @@ final class DevelopmentCollegeSeeder extends Seeder
         $this->students($clock, $calendar, $offerings, $admit, $students, $registration);
         $this->lectures($clock, $calendar);
         $this->classroom($clock, $calendar);
+        $this->results($clock, $calendar);
     }
 
     /** D-104: the ACC 101 course page, run by the administrator. */
@@ -172,6 +176,32 @@ final class DevelopmentCollegeSeeder extends Seeder
             'shows_at' => $now->subDays(2)->format('Y-m-d H:i'), 'due_at' => $now->addDays(5)->setTime(23, 59)->format('Y-m-d H:i'), 'late_until' => null,
             'out_of' => 50, 'weight' => 10, 'accepts' => ['pdf', 'word'], 'max_files' => 2, 'max_mb' => 20]);
         $this->command?->getOutput()->writeln('  Development college: the ACC 101 course page, with an assignment.');
+    }
+
+    /** D-105: Results on, and the ACC 101 exam marks entered for every student but one, by the administrator as its lecturer. */
+    private function results(Clock $clock, AcademicCalendar $calendar): void
+    {
+        $period = $calendar->currentYear()['terms'][$this->division][0] ?? null;
+        $acc = DB::table('programme_courses')->where('division_id', $this->division)->where('code', 'ACC 101')->value('id');
+        $offering = $period === null || ! is_string($acc) ? null : DB::table('programme_offerings')->where('period_id', $period['id'])->where('course_id', $acc)->value('id');
+        if (! is_string($offering) || DB::table('results_sheets')->where('offering_id', $offering)->exists()) {
+            return;
+        }
+        $last = DB::table('module_switches')->where('module_key', 'results')->orderByDesc('switched_at')->first();
+        if ($last === null || ! (bool) ($last->enabled ?? false)) {
+            DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'results', 'enabled' => true, 'reason' => 'Development college.',
+                'switched_by' => $this->by->id, 'switched_at' => $clock->now()]);
+            app()->forgetScopedInstances();
+        }
+        $marks = [];
+        foreach (app(CourseTeaching::class)->students($offering) as $i => $student) {
+            if ($i === 0) {
+                continue;
+            }
+            $marks[] = ['learner_id' => $student['learner_id'], 'exam' => $i === 3 ? null : (float) (38 + ($i * 17) % 55), 'absent' => $i === 3];
+        }
+        app(SheetActions::class)->enter($this->by, $this->division, $offering, 'main', $marks, $clock->now()->addDays(14)->toDateString());
+        $this->command?->getOutput()->writeln('  Development college: ACC 101 exam marks entered, one still to enter.');
     }
 
     /** D-102: rooms, the campus area and the semester's lecture timetable, published. The administrator gives ACC 101 and STA 101. */

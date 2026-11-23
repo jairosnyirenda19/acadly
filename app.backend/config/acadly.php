@@ -16,6 +16,7 @@ use Acadly\Modules\Fees\FeesModule;
 use Acadly\Modules\Lectures\LecturesModule;
 use Acadly\Modules\News\NewsModule;
 use Acadly\Modules\Programmes\ProgrammesModule;
+use Acadly\Modules\Results\ResultsModule;
 use Acadly\Modules\SafeRelease\SafeReleaseModule;
 use Acadly\Modules\Support\SupportModule;
 
@@ -162,6 +163,7 @@ return [
         ProgrammesModule::class,
         LecturesModule::class,
         ClassroomModule::class,
+        ResultsModule::class,
     ],
 
     /*

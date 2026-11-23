@@ -61,6 +61,10 @@ import { NewsScreen } from './news/NewsScreen'
 import { CoursesScreen as ClassroomCoursesScreen } from './classroom/CoursesScreen'
 import { CourseScreen as ClassroomCourseScreen } from './classroom/CourseScreen'
 import { AssessmentScreen as ClassroomAssessmentScreen, HandInsScreen, MarkingScreen, TaskFormScreen } from './classroom/TaskScreens'
+import { ReleaseScreen as ResultsReleaseScreen, SetupScreen as ResultsSetupScreen } from './results/AdminScreens'
+import { BarScreen as ResultsBarScreen, BoardScreen as ResultsBoardScreen, CohortScreen as ResultsCohortScreen } from './results/BoardScreens'
+import { ResultsCoursesScreen } from './results/CoursesScreen'
+import { SheetScreen as ResultsSheetScreen } from './results/SheetScreen'
 import { CoverScreen } from './lectures/CoverScreen'
 import { LectureScreen } from './lectures/LectureScreen'
 import { MyLecturesScreen } from './lectures/MyLecturesScreen'
@@ -102,7 +106,7 @@ import { ApprovalScreen, ApprovalsScreen } from './approvals/ApprovalsScreen'
 import { ApprovalSettingsScreen } from './approvals/ApprovalSettingsScreen'
 import { SetupWizard } from './setup/SetupWizard'
 import { ConsoleShell, holdsAnywhere, settingsHome } from './shell/ConsoleShell'
-import { keepsGrading, observes, seesClassroom, seesLectures, seesMarks, seesObservations, seesPickup, seesProgrammes, seesRegisters, takesRegisters } from './shell/navigation'
+import { keepsGrading, observes, seesClassroom, seesLectures, seesResults, seesMarks, seesObservations, seesPickup, seesProgrammes, seesRegisters, takesRegisters } from './shell/navigation'
 import { WorkInProvider } from './shell/WorkIn'
 import { SignInScreen } from './sign-in/SignInScreen'
 import { StatusScreen } from './StatusScreen'
@@ -143,6 +147,9 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   const classTask = /^\/classroom\/t\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const classWork = /^\/classroom\/t\/([0-9a-f-]{36})\/w\/([0-9a-f-]{36})$/.exec(path)
   const classroom = seesClassroom(context)
+  const resultsSheet = /^\/results\/c\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const results = seesResults(context)
+  const board = seesResults(context, ['results.view', 'results.moderate', 'results.board', 'results.release'])
   const lecture = /^\/lectures\/l\/([0-9a-f-]{36})\/(\d{4}-\d{2}-\d{2})$/.exec(path)
 
   useEffect(() => {
@@ -178,6 +185,17 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (classAssessment !== undefined && classroom) page = <ClassroomAssessmentScreen key={path} course={classAssessment} />
   else if (classTask !== undefined && classroom) page = <HandInsScreen key={path} task={classTask} />
   else if (classWork !== null && classroom) page = <MarkingScreen key={path} task={classWork[1] ?? ''} learner={classWork[2] ?? ''} />
+  else if (path === '/results' && results) page = <ResultsCoursesScreen />
+  else if (resultsSheet !== undefined && results) {
+    const sitting = new URLSearchParams(window.location.search).get('sitting')
+    page = <ResultsSheetScreen key={path + (sitting ?? '')} course={resultsSheet} sitting={sitting === 'supplementary' ? 'supplementary' : 'main'} />
+  } else if (path === '/results/bar' && results) page = <ResultsBarScreen />
+  else if (path === '/results/setup' && results) page = <ResultsSetupScreen />
+  else if (path === '/results/board' && board) page = <ResultsBoardScreen />
+  else if (path === '/results/board/cohort' && board) {
+    const cohort = new URLSearchParams(window.location.search).get('c') ?? ''
+    page = <ResultsCohortScreen key={cohort} cohort={cohort} />
+  } else if (path === '/results/release' && board) page = <ResultsReleaseScreen />
   else if (path === '/lectures/my-day' && seesLectures(context, ['lectures.teach'])) page = <MyLecturesScreen />
   else if (path === '/lectures/timetable' && seesLectures(context, ['lectures.view', 'lectures.timetable', 'lectures.teach', 'lectures.cover'])) page = <LectureTimetableScreen />
   else if (path === '/lectures/rooms' && seesLectures(context, ['lectures.view', 'lectures.timetable'])) page = <RoomsScreen />

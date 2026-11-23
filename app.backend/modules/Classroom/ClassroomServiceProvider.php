@@ -7,9 +7,11 @@ namespace Acadly\Modules\Classroom;
 use Acadly\Core\Enrolment\Contracts\LearnerRecordPart;
 use Acadly\Core\Institution\Contracts\DashboardPanels;
 use Acadly\Core\Institution\Contracts\TodayItems;
+use Acadly\Modules\Classroom\Application\AssessmentReader;
 use Acadly\Modules\Classroom\Application\ClassroomDashboard;
 use Acadly\Modules\Classroom\Application\ClassroomParts;
 use Acadly\Modules\Classroom\Application\ClassroomToday;
+use Acadly\Modules\Classroom\Contracts\ContinuousAssessment;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -18,6 +20,7 @@ final class ClassroomServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(ContinuousAssessment::class, AssessmentReader::class);
         $this->app->scoped(ClassroomParts::class);
         $this->app->tag([ClassroomParts::class], LearnerRecordPart::TAG);
         $this->app->tag([ClassroomToday::class], TodayItems::TAG);

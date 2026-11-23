@@ -18,6 +18,11 @@ export type ClassCourse = paths['/v1/student/classroom/courses/{id}']['get']['re
 export type ClassTask = paths['/v1/student/classroom/tasks/{id}']['get']['responses'][200]['content']['application/json']
 export type Due = paths['/v1/student/classroom/due']['get']['responses'][200]['content']['application/json']
 
+export type Results = paths['/v1/student/results']['get']['responses'][200]['content']['application/json']
+export type Semester = Results['semesters'][number]
+export type CourseResult = paths['/v1/student/results/courses/{id}']['get']['responses'][200]['content']['application/json']
+export type BarAttendance = paths['/v1/student/results/attendance']['get']['responses'][200]['content']['application/json']
+
 export type Answer<T> = T | 'refused' | null
 
 async function read<T>(request: Promise<{ data?: T; response: Response }>): Promise<Answer<T>> {
@@ -94,6 +99,9 @@ export const studentApi = {
 
     return save(api.POST('/v1/student/classroom/tasks/{id}/hand-in', { params: { path: { id } }, body: form as never, bodySerializer: (body: unknown) => body as FormData }))
   },
+  results: () => read(api.GET('/v1/student/results')),
+  courseResult: (id: string) => read(api.GET('/v1/student/results/courses/{id}', { params: { path: { id } } })),
+  barAttendance: () => read(api.GET('/v1/student/results/attendance')),
   password: (current: string, next: string) =>
     save(api.POST('/v1/me/account/password', { body: { current_password: current, password: next, password_confirmation: next } })),
 }
@@ -105,6 +113,9 @@ export const money = (minor: number): string => `MK ${kwacha.format(Math.trunc(m
 
 /** Where a file of the student's courses opens. */
 export const classFile = (id: string): string => `/api/v1/student/classroom/files/${id}`
+
+/** Where the results slip of a semester opens (PDF). */
+export const resultsSlip = (periodId: string): string => `/api/v1/student/results/slip?period=${encodeURIComponent(periodId)}`
 
 /** A day as people read it: 30 Nov. */
 export const day = (iso: string): string => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })

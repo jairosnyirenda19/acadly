@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react'
 import { studentApi, type Me } from './api'
 import { CoursePage, TaskPage } from './Classroom'
 import { AttendancePage, PhonePage, ScanPage, WeekPage } from './Lectures'
+import { CourseResultPage, ResultsPage } from './Results'
 import { AccountPage, ArticlePage, CoursesPage, FeesPage, MorePage, NewsPage, RegistrationPage, TodayPage } from './Pages'
 import { SignIn } from './SignIn'
 
 /**
  * The student portal (D-101, the approved boards). Phone first: the student
  * signs in with their student number and a password of their own, and sees
- * only their own records: today, courses, registration, fees and documents,
+ * only their own records: today, courses, results, registration, fees and documents,
  * news, and their account.
  */
 export function App() {
@@ -50,6 +51,7 @@ export function App() {
   const article = /^\/news\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const course = /^\/course\/([0-9a-f-]{36})$/.exec(path)?.[1]
   const task = /^\/task\/([0-9a-f-]{36})$/.exec(path)?.[1]
+  const result = /^\/results\/([0-9a-f-]{36})$/.exec(path)?.[1]
 
   if (path === '/courses') return <CoursesPage me={me} />
   if (path === '/registration') return <RegistrationPage me={me} />
@@ -64,6 +66,8 @@ export function App() {
   if (path === '/scan') return <ScanPage />
   if (course !== undefined) return <CoursePage key={course} me={me} id={course} />
   if (task !== undefined) return <TaskPage key={task} me={me} id={task} />
+  if (path === '/results') return <ResultsPage me={me} />
+  if (result !== undefined) return <CourseResultPage key={result} me={me} id={result} />
 
   return <TodayPage me={me} />
 }

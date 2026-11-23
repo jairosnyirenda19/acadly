@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { day, money, studentApi, type Me, type Registration } from './api'
 import { CoursePages, DueSoon } from './Classroom'
 import { LecturesNow } from './Lectures'
+import { BarWarning, ResultsEntry } from './Results'
 import { copy } from './copy'
 import { Field, Line, Loading, Page, Primary, Section, Tag, Title, useAnswer } from './parts'
 
@@ -21,6 +22,7 @@ export function TodayPage({ me }: { me: Me }) {
   return (
     <Page me={me} tab="today">
       <Title>{t.title(longDay(new Date()))}</Title>
+      <BarWarning />
       <LecturesNow />
       <DueSoon />
       {r !== null && (
@@ -92,6 +94,7 @@ export function CoursesPage({ me }: { me: Me }) {
             ))}
           </Section>
           <CoursePages />
+          <ResultsEntry />
           <Section>
             <Line strong={copy.more.attendance} href="/attendance" />
           </Section>
@@ -336,6 +339,7 @@ export function MorePage({ me, onSignedOut }: { me: Me; onSignedOut: () => void 
         <Line strong={t.phone} href="/phone" />
         <Line strong={t.account} href="/account" />
       </Section>
+      <ResultsEntry />
       <button type="button" className="h-11 border-2 border-ink font-extrabold" onClick={() => void signOut().then(onSignedOut)}>
         {t.signOut}
       </button>

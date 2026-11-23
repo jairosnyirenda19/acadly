@@ -14,6 +14,7 @@ use Acadly\Modules\Fees\FeesServiceProvider;
 use Acadly\Modules\Lectures\LecturesServiceProvider;
 use Acadly\Modules\News\NewsServiceProvider;
 use Acadly\Modules\Programmes\ProgrammesServiceProvider;
+use Acadly\Modules\Results\ResultsServiceProvider;
 use Acadly\Modules\SafeRelease\SafeReleaseServiceProvider;
 use Acadly\Modules\Support\SupportServiceProvider;
 use App\Providers\AppServiceProvider;
@@ -36,4 +37,5 @@ return [
     ProgrammesServiceProvider::class,
     LecturesServiceProvider::class,
     ClassroomServiceProvider::class,
+    ResultsServiceProvider::class,
 ];

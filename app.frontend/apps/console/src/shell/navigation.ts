@@ -101,6 +101,8 @@ export const GROUPS: NavGroup[] = [
       { key: 'programmes-students', where: 'division', module: 'programmes', label: t.nav.programmesStudents, path: '/programmes/students', icon: 'learners', show: (c) => seesProgrammes(c), lights: under('/programmes/students') },
       { key: 'programmes-accounts', where: 'division', module: 'programmes', label: t.nav.studentAccounts, path: '/programmes/accounts', icon: 'learners', show: (c) => holdsAnywhere(c, 'programmes.accounts'), lights: under('/programmes/accounts') },
       { key: 'classroom', where: 'division', module: 'classroom', label: t.nav.classroom, path: '/classroom', icon: 'assessment', show: (c) => seesClassroom(c), lights: (p) => p === '/classroom' || p.startsWith('/classroom/') },
+      { key: 'results', where: 'division', module: 'results', label: t.nav.results, path: '/results', icon: 'marks', show: (c) => seesResults(c), lights: (p) => p === '/results' || p.startsWith('/results/c/') || p === '/results/bar' || p === '/results/setup' },
+      { key: 'results-board', where: 'division', module: 'results', label: t.nav.examBoard, path: '/results/board', icon: 'approvals', show: (c) => seesResults(c, ['results.view', 'results.moderate', 'results.board', 'results.release']), lights: (p) => p.startsWith('/results/board') || p === '/results/release' },
       { key: 'lectures-mine', where: 'division', module: 'lectures', label: t.nav.myLectures, path: '/lectures/my-day', icon: 'today', show: (c) => seesLectures(c, ['lectures.teach']), lights: (p) => p === '/lectures/my-day' || p.startsWith('/lectures/l/') },
       { key: 'lectures-timetable', where: 'division', module: 'lectures', label: t.nav.lectureTimetable, path: '/lectures/timetable', icon: 'timetable', show: (c) => seesLectures(c, ['lectures.view', 'lectures.timetable']), lights: under('/lectures/timetable') },
       { key: 'lectures-rooms', where: 'division', module: 'lectures', label: t.nav.lectureRooms, path: '/lectures/rooms', icon: 'room', show: (c) => seesLectures(c, ['lectures.view', 'lectures.timetable']), lights: under('/lectures/rooms') },
@@ -295,4 +297,14 @@ export function settingsHome(context: AppContext): string | null {
 /** The group of the rail that holds a page, with what this account sees of it: the tabs over a School or Settings page. */
 export function groupOf(context: AppContext, path: string): NavGroup | undefined {
   return visibleGroups(context).find((g) => (g.key === 'school' || g.key === 'settings' || g.key === 'programmes') && g.items.some((item) => item.lights(path)))
+}
+
+/** Whether the account may open Results in a college division of this view (D-105), with the module on. */
+export function seesResults(context: AppContext, permissions: string[] = ['results.view', 'results.enter', 'results.moderate', 'results.board', 'results.release', 'results.setup']): boolean {
+  return (
+    moduleOn(context, 'results') &&
+    context.divisions.some(
+      (d) => (d.bindings as Record<string, string | undefined>)['programmes.shape'] === 'programmes' && permissions.some((p) => can(context, p, { type: 'division', id: d.id })),
+    )
+  )
 }

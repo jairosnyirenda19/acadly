@@ -23,7 +23,7 @@ final class CourseTeachingReader implements CourseTeaching
     {
         $rows = DB::table('programme_offerings as o')->join('programme_courses as c', 'c.id', '=', 'o.course_id')->join('programme_departments as d', 'd.id', '=', 'c.department_id')
             ->where('o.division_id', $divisionId)->where('o.period_id', $periodId)->orderBy('c.code')->orderBy('o.group_label')
-            ->get(['o.id', 'o.group_label', 'c.code', 'c.title', 'd.id as department_id', 'd.name as department', 'd.head_user_id']);
+            ->get(['o.id', 'o.group_label', 'c.code', 'c.title', 'c.credits', 'd.id as department_id', 'd.name as department', 'd.head_user_id']);
         $ids = array_values(array_map(fn (object $r): string => Row::text($r, 'id'), $rows->all()));
         $taken = RegistrationChecks::taken($ids);
         $lecturers = [];
@@ -35,7 +35,7 @@ final class CourseTeachingReader implements CourseTeaching
         foreach ($rows as $r) {
             $id = Row::text($r, 'id');
             $out[] = ['id' => $id, 'code' => Row::text($r, 'code'), 'title' => Row::text($r, 'title'), 'group' => Row::text($r, 'group_label'),
-                'department_id' => Row::text($r, 'department_id'), 'department' => Row::text($r, 'department'), 'head_id' => Row::maybeText($r, 'head_user_id'),
+                'department_id' => Row::text($r, 'department_id'), 'department' => Row::text($r, 'department'), 'head_id' => Row::maybeText($r, 'head_user_id'), 'credits' => Row::int($r, 'credits'),
                 'lecturers' => $lecturers[$id] ?? [], 'taken' => $taken[$id] ?? 0];
         }
 
@@ -102,6 +102,19 @@ final class CourseTeachingReader implements CourseTeaching
         }
 
         return $out;
+    }
+
+    public function studentFile(string $learnerId): ?array
+    {
+        $row = DB::table('programme_students as s')->join('programmes as p', 'p.id', '=', 's.programme_id')->where('s.learner_id', $learnerId)
+            ->orderByRaw('s.ended_at is null desc')->orderByDesc('s.created_at')->first(['s.division_id', 's.programme_id', 's.year_of_study', 'p.code', 'p.name', 'p.award']);
+        if ($row === null) {
+            return null;
+        }
+
+        return ['learner_id' => $learnerId, 'name' => $this->learners->names([$learnerId])[$learnerId] ?? '', 'number' => StudentAccountDirectory::numberOf($learnerId),
+            'programme_id' => Row::text($row, 'programme_id'), 'programme_code' => Row::text($row, 'code'), 'programme' => Row::text($row, 'name'), 'award' => Row::text($row, 'award'),
+            'year_of_study' => Row::int($row, 'year_of_study'), 'division_id' => Row::text($row, 'division_id')];
     }
 
     /** The courses of every registration that holds a place, at its version in force. */

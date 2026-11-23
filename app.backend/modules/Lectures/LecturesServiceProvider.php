@@ -7,10 +7,12 @@ namespace Acadly\Modules\Lectures;
 use Acadly\Core\Enrolment\Contracts\LearnerRecordPart;
 use Acadly\Core\Institution\Contracts\DashboardPanels;
 use Acadly\Core\Institution\Contracts\TodayItems;
+use Acadly\Modules\Lectures\Application\AttendanceReader;
 use Acadly\Modules\Lectures\Application\LectureRecord;
 use Acadly\Modules\Lectures\Application\LecturesDashboard;
 use Acadly\Modules\Lectures\Application\LecturesToday;
 use Acadly\Modules\Lectures\Console\CloseLectures;
+use Acadly\Modules\Lectures\Contracts\LectureAttendance;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -20,6 +22,7 @@ final class LecturesServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(LectureAttendance::class, AttendanceReader::class);
         $this->app->scoped(LectureRecord::class);
         $this->app->tag([LectureRecord::class], LearnerRecordPart::TAG);
         $this->app->tag([LecturesDashboard::class], DashboardPanels::TAG);

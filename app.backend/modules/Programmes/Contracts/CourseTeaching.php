@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Acadly\Modules\Programmes\Contracts;
 
 /**
- * What the lecture timetable needs from Programmes (D-102): the offerings of
+ * What the lecture timetable, Classroom and Results need from Programmes (D-102): the offerings of
  * a semester with their lecturers, the students holding a place in each,
  * and the groups of students that study together (a programme and year).
  * A student holds a place while their registration is submitted, approved
  * or registered.
  *
- * @phpstan-type Offering array{id: string, code: string, title: string, group: string, department_id: string, department: string, head_id: string|null, lecturers: list<array{id: string, name: string}>, taken: int}
+ * @phpstan-type Offering array{id: string, code: string, title: string, group: string, department_id: string, department: string, head_id: string|null, credits: int, lecturers: list<array{id: string, name: string}>, taken: int}
+ * @phpstan-type StudentFile array{learner_id: string, name: string, number: string, programme_id: string, programme_code: string, programme: string, award: string, year_of_study: int, division_id: string}
  * @phpstan-type Student array{learner_id: string, name: string, number: string, user_id: string|null, phone: string|null}
  */
 interface CourseTeaching
@@ -50,4 +51,11 @@ interface CourseTeaching
      * @return list<array{id: string, label: string, offerings: list<string>}>
      */
     public function cohorts(string $divisionId, string $periodId): array;
+
+    /**
+     * A student's programme now, for results and slips (D-105), or null when the learner is not a student.
+     *
+     * @return StudentFile|null
+     */
+    public function studentFile(string $learnerId): ?array;
 }

@@ -1,0 +1,153 @@
+{
+    "initial": "entered",
+    "kind": "journey",
+    "milestones": [],
+    "ref": "results.sheet@2026.1",
+    "stages": [
+        {
+            "key": "results",
+            "steps": [
+                "submit",
+                "moderate",
+                "approve",
+                "release"
+            ],
+            "title": "Results"
+        }
+    ],
+    "states": [
+        {
+            "id": "entered",
+            "label": "Marks being entered"
+        },
+        {
+            "id": "submitted",
+            "label": "Waiting for moderation"
+        },
+        {
+            "id": "moderated",
+            "label": "Waiting for the board"
+        },
+        {
+            "id": "approved",
+            "label": "Approved by the board"
+        },
+        {
+            "id": "released",
+            "label": "Released"
+        }
+    ],
+    "steps": [
+        {
+            "capability": "results.enter",
+            "four_eyes": null,
+            "from": [
+                "entered"
+            ],
+            "gates": [
+                {
+                    "args": [],
+                    "args_class": null,
+                    "class": "Acadly\\Modules\\Results\\Journeys\\Sheet\\MarksComplete"
+                }
+            ],
+            "id": "submit",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "submitted",
+                    "requires_reason": false,
+                    "title": "Sent for moderation",
+                    "to": "submitted"
+                }
+            ],
+            "stage": "results",
+            "title": "Send for moderation"
+        },
+        {
+            "capability": "results.moderate",
+            "four_eyes": null,
+            "from": [
+                "submitted"
+            ],
+            "gates": [],
+            "id": "moderate",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "moderated",
+                    "requires_reason": false,
+                    "title": "Moderated",
+                    "to": "moderated"
+                },
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "returned",
+                    "requires_reason": true,
+                    "title": "Returned to the lecturer",
+                    "to": "entered"
+                }
+            ],
+            "stage": "results",
+            "title": "Moderate the marks"
+        },
+        {
+            "capability": "results.board",
+            "four_eyes": null,
+            "from": [
+                "moderated"
+            ],
+            "gates": [],
+            "id": "approve",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "approved",
+                    "requires_reason": false,
+                    "title": "Approved by the board",
+                    "to": "approved"
+                },
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "returned",
+                    "requires_reason": true,
+                    "title": "Returned for moderation",
+                    "to": "submitted"
+                }
+            ],
+            "stage": "results",
+            "title": "Approve at the board"
+        },
+        {
+            "capability": "results.release",
+            "four_eyes": null,
+            "from": [
+                "approved"
+            ],
+            "gates": [],
+            "id": "release",
+            "outcomes": [
+                {
+                    "effects": [],
+                    "emits": [],
+                    "id": "released",
+                    "requires_reason": false,
+                    "title": "Released",
+                    "to": "released"
+                }
+            ],
+            "stage": "results",
+            "title": "Release to students"
+        }
+    ],
+    "subject": "Acadly\\Modules\\Results\\Domain\\Sheet",
+    "terminal": [
+        "released"
+    ],
+    "title": "Course results"
+}

@@ -46,7 +46,7 @@ function leakAround(string $content, string $word): string
 
 beforeEach(function (): void {
     $this->artisan('acadly:sync')->assertSuccessful();
-    foreach (['attendance', 'assessment', 'fees', 'conduct', 'support', 'saferelease', 'programmes', 'lectures', 'classroom'] as $module) {
+    foreach (['attendance', 'assessment', 'fees', 'conduct', 'support', 'saferelease', 'programmes', 'lectures', 'classroom', 'results'] as $module) {
         DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => $module, 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
     }
     app()->forgetScopedInstances();
@@ -157,6 +157,7 @@ it('refuses every route pointed at Secondary, and keeps every list to Primary, f
         'news.' => ['division' => $school->id('secondary'), 'id' => $this->outside],
         'lectures.' => ['division' => $school->id('secondary'), 'id' => $this->outside, 'learner' => $this->outside, 'period' => $this->term, 'action' => 'away'],
         'classroom.' => ['division' => $school->id('secondary'), 'id' => $this->outside, 'learner' => $this->outside],
+        'results.' => ['division' => $school->id('secondary'), 'id' => $this->outside, 'learner' => $this->outside],
         'student.' => ['id' => $this->outside],
         'fees.' => ['id' => $this->outside, 'period' => $this->term, 'division' => $school->id('secondary'), 'day' => '2026-10-01'],
         // Each record route at a real record of Secondary.

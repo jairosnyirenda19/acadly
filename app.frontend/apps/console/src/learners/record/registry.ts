@@ -7,6 +7,7 @@ import { SupportSummary, SupportTab } from './SupportPart'
 import { ProgrammeSummary, ProgrammeTab } from './ProgrammePart'
 import { LecturesSummary, LecturesTab } from './LecturesPart'
 import { ClassroomSummary, ClassroomTab } from './ClassroomPart'
+import { CollegeResultsSummary, CollegeResultsTab } from './CollegeResultsPart'
 import { AssessmentSummary, AssessmentTab, PickupSummary, PickupTab } from './EarlyParts'
 
 /**
@@ -32,4 +33,5 @@ export const PART_VIEWS: Partial<Record<string, PartView>> = {
   programmes: { Summary: ProgrammeSummary, Tab: ProgrammeTab },
   lectures: { Summary: LecturesSummary, Tab: LecturesTab },
   classroom: { Summary: ClassroomSummary, Tab: ClassroomTab },
+  results: { Summary: CollegeResultsSummary, Tab: CollegeResultsTab },
 }

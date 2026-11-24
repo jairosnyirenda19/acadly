@@ -1,4 +1,4 @@
-import { api, type paths } from '@acadly/kernel'
+import { api, getContext, type paths } from '@acadly/kernel'
 
 type Json<P extends keyof paths, M extends 'get' | 'post'> = paths[P][M] extends { responses: { 200: { content: { 'application/json': infer T } } } } ? T : never
 
@@ -10,6 +10,19 @@ export type CardState = Json<'/v1/portal/children/{id}/card', 'get'>
 export type MessagesState = Json<'/v1/portal/children/{id}/messages', 'get'>
 export type ReviewState = Json<'/v1/portal/children/{id}/review', 'get'>
 export type PickupState = Json<'/v1/portal/children/{id}/pickup', 'get'>
+export type FamilyFeesState = Json<'/v1/portal/fees', 'get'>
+export type FeesState = Json<'/v1/portal/children/{id}/fees', 'get'>
+export type FeeInstalment = FeesState['instalments'][number]
+export type FeePayment = FeesState['payments'][number]
+
+/** Someone named to collect today: the code, and the phone it was sent to when the school sent it. */
+export interface Collecting {
+  id: string
+  code: string
+  sent_to: string | null
+}
+
+const API: string = import.meta.env.VITE_API_URL ?? '/api'
 
 /** The data, 'refused' when the parent may not see it (or is signed out), or null when it could not be read. */
 async function read<T>(request: Promise<{ data?: T; response: Response }>): Promise<T | 'refused' | null> {
@@ -53,13 +66,24 @@ export const portalApi = {
   messages: (id: string) => read(api.GET('/v1/portal/children/{id}/messages', { params: { path: { id } } })),
   review: (id: string) => read(api.GET('/v1/portal/children/{id}/review', { params: { path: { id } } })),
   pickup: (id: string) => read(api.GET('/v1/portal/children/{id}/pickup', { params: { path: { id } } })),
+  /** The family's fees at a glance; 'refused' when the school shows no fees to families. */
+  familyFees: () => read(api.GET('/v1/portal/fees')),
+  fees: (id: string) => read(api.GET('/v1/portal/children/{id}/fees', { params: { path: { id } } })),
+  /** The fee statement and a receipt as PDFs: the same documents the fees office gives. */
+  statementPdf: (id: string) => `${API}/v1/portal/children/${id}/fees/statement`,
+  receiptPdf: (id: string, receipt: string) => `${API}/v1/portal/children/${id}/receipts/${receipt}`,
+  /** The child's newest report card and the shared progress review as PDFs, with their check codes (D-107). */
+  cardPdf: (id: string) => `${API}/v1/portal/children/${id}/card/pdf`,
+  reviewPdf: (id: string) => `${API}/v1/portal/children/${id}/review/pdf`,
+  /** The school's short name, as its text messages begin; null when it cannot be read. */
+  shortName: async (): Promise<string | null> => (await getContext())?.school.short_name ?? null,
   /** Name someone to collect the child today; the code to give them, or null when it was not saved. */
-  collectToday: async (id: string, name: string, relationship: string, phone: string): Promise<{ id: string; code: string } | null> => {
+  collectToday: async (id: string, name: string, relationship: string, phone: string, sendCode: boolean): Promise<Collecting | null> => {
     try {
       await api.GET('/v1/auth/csrf-cookie')
-      const { data } = await api.POST('/v1/portal/children/{id}/collectors', { params: { path: { id } }, body: { name, relationship, phone } as never })
+      const { data } = await api.POST('/v1/portal/children/{id}/collectors', { params: { path: { id } }, body: { name, relationship, phone, send_code: sendCode } as never })
 
-      return (data as { id: string; code: string } | undefined) ?? null
+      return (data as Collecting | undefined) ?? null
     } catch {
       return null
     }

@@ -11,8 +11,10 @@ use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Identity\Jobs\SendSignInCodeText;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Ids;
+use Acadly\Modules\Assessment\Application\Observations;
 use Acadly\Modules\Assessment\Contracts\AssessmentPermission;
 use Acadly\Modules\SafeRelease\Contracts\SafeReleasePermission;
+use Acadly\Modules\SafeRelease\Jobs\SendCollectorCodeText;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -202,6 +204,25 @@ describe('progress reviews', function (): void {
 
         // Another family's child is not found.
         $this->actingAs($parent)->getJson("/api/v1/portal/children/{$this->wana}/review")->assertNotFound();
+
+        // D-107: the shared review as a PDF with its check code; another family's child is not found.
+        $pdf = $this->actingAs($parent)->get("/api/v1/portal/children/{$this->thoko}/review/pdf")->assertOk();
+        expect($pdf->headers->get('Content-Type'))->toBe('application/pdf')->and(substr((string) $pdf->getContent(), 0, 4))->toBe('%PDF')
+            ->and(DB::table('document_checks')->where('kind', 'assessment.progress_review')->count())->toBe(1);
+        $this->actingAs($parent)->get("/api/v1/portal/children/{$this->wana}/review/pdf")->assertNotFound();
+    });
+
+    it('uses the school\'s words for the steps, saved by someone who plans, and keeps the strokes', function (): void {
+        $words = ['en' => ['starting' => 'Beginning', 'growing' => 'Getting there', 'can_do' => 'Can do it'], 'ny' => ['starting' => 'Akuyamba', 'growing' => '', 'can_do' => '']];
+        $this->actingAs($this->caregiver)->putJson('/api/v1/assessment/step-words', $words)->assertForbidden();
+        $this->actingAs($this->admin)->putJson('/api/v1/assessment/step-words', ['en' => ['starting' => 'Same', 'growing' => 'Same', 'can_do' => 'Done']])->assertUnprocessable();
+        $this->actingAs($this->admin)->putJson('/api/v1/assessment/step-words', $words)->assertOk();
+        $this->actingAs($this->caregiver)->getJson('/api/v1/assessment/step-words')->assertForbidden();
+        expect($this->actingAs($this->admin)->getJson('/api/v1/assessment/step-words')->assertOk()->json())->toMatchArray(['en' => $words['en']])
+            ->and(DB::table('observation_step_words')->count())->toBe(1);
+        // The caregiver's screens and the family see the school's words; the strokes are the same.
+        $shared = Observations::steps();
+        expect(collect($shared)->firstWhere('key', 'starting'))->toMatchArray(['label' => 'Beginning', 'strokes' => 1]);
     });
 
     it('may not be checked by the person who sent it to be checked', function (): void {
@@ -227,6 +248,37 @@ describe('progress reviews', function (): void {
 });
 
 describe('safe pick-up', function (): void {
+    it('sends the one-day code only to the phone the family gave, never as a kept message', function (): void {
+        Queue::fake();
+        $parent = nurseryParent($this, '0884 771 900');
+        $added = $this->actingAs($parent)->postJson("/api/v1/portal/children/{$this->thoko}/collectors", ['name' => 'Grace Phiri', 'relationship' => 'Aunt',
+            'phone' => '0991 234 567', 'send_code' => true])->assertCreated()->json();
+        expect($added['sent_to'])->toBe('0991 234 567')->and(DB::table('notification_deliveries')->where('body', 'like', '%'.$added['code'].'%')->count())->toBe(0);
+        Queue::assertPushed(SendCollectorCodeText::class,
+            fn ($job): bool => $job->phone === '0991 234 567' && str_contains($job->text, $added['code']) && str_contains($job->text, 'Thokozani'));
+
+        // Without a phone, or without asking, nothing is sent.
+        $none = $this->actingAs($parent)->postJson("/api/v1/portal/children/{$this->thoko}/collectors", ['name' => 'John Phiri', 'relationship' => 'Uncle', 'send_code' => true])->assertCreated()->json();
+        expect($none['sent_to'])->toBeNull();
+        Queue::assertPushed(SendCollectorCodeText::class, 1);
+    });
+
+    it('shows who the gate marked as arrived, and releases that arrival at the desk', function (): void {
+        $child = $this->actingAs($this->caregiver)->getJson("/api/v1/pickup/learners/{$this->thoko}")->assertOk()->json();
+        $mother = collect($child['may_collect'])->firstWhere('name', 'Esther Phiri');
+
+        $this->actingAs($this->caregiver)->postJson("/api/v1/pickup/learners/{$this->thoko}/arrive", ['kind' => 'contact', 'collector_id' => $mother['id']])->assertCreated();
+        $this->actingAs($this->caregiver)->postJson("/api/v1/pickup/learners/{$this->thoko}/arrive", ['kind' => 'contact', 'collector_id' => $mother['id']])->assertUnprocessable();
+        $desk = $this->actingAs($this->caregiver)->getJson('/api/v1/pickup')->assertOk()->json();
+        expect($desk['totals']['at_gate'])->toBe(1)->and($desk['at_gate'][0])->toMatchArray(['child' => 'Thokozani Phiri', 'name' => 'Esther Phiri', 'needs_code' => false])
+            ->and(DB::table('pickups')->where('learner_id', $this->thoko)->value('state'))->toBe('announced');
+
+        $this->actingAs($this->caregiver)->postJson("/api/v1/pickup/learners/{$this->thoko}/release", ['kind' => 'contact', 'collector_id' => $mother['id']])->assertOk();
+        expect(DB::table('pickups')->where('learner_id', $this->thoko)->count())->toBe(1)
+            ->and(DB::table('pickups')->where('learner_id', $this->thoko)->value('state'))->toBe('released')
+            ->and($this->actingAs($this->caregiver)->getJson('/api/v1/pickup')->json('totals.at_gate'))->toBe(0);
+    });
+
     it('releases a child to a contact, records it and tells the family', function (): void {
         $child = $this->actingAs($this->caregiver)->getJson("/api/v1/pickup/learners/{$this->thoko}")->assertOk()->json();
         $mother = collect($child['may_collect'])->firstWhere('name', 'Esther Phiri');
@@ -234,12 +286,22 @@ describe('safe pick-up', function (): void {
         $this->actingAs($this->caregiver)->postJson("/api/v1/pickup/learners/{$this->thoko}/release", ['kind' => 'contact', 'collector_id' => $mother['id']])->assertOk();
 
         $desk = $this->actingAs($this->caregiver)->getJson('/api/v1/pickup')->assertOk()->json();
-        expect($desk['totals'])->toBe(['children' => 2, 'collected' => 1, 'here' => 1])
+        expect($desk['totals'])->toBe(['children' => 2, 'collected' => 1, 'here' => 1, 'at_gate' => 0])
             ->and(collect($desk['children'])->firstWhere('id', $this->thoko)['collected']['name'])->toBe('Esther Phiri')
             ->and(DB::table('notification_requests')->where('topic_key', 'saferelease.released')->count())->toBe(1);
 
         // Once collected, not again.
         $this->actingAs($this->caregiver)->postJson("/api/v1/pickup/learners/{$this->thoko}/release", ['kind' => 'contact', 'collector_id' => $mother['id']])->assertUnprocessable();
+    });
+
+    it('closes the arrival the gate marked when the desk refuses the person', function (): void {
+        $mother = collect($this->actingAs($this->caregiver)->getJson("/api/v1/pickup/learners/{$this->thoko}")->json('may_collect'))->firstWhere('name', 'Esther Phiri');
+        $this->actingAs($this->caregiver)->postJson("/api/v1/pickup/learners/{$this->thoko}/arrive", ['kind' => 'contact', 'collector_id' => $mother['id']])->assertCreated();
+        $this->actingAs($this->caregiver)->postJson("/api/v1/pickup/learners/{$this->thoko}/refuse", ['name' => 'Esther Phiri', 'note' => 'Did not look like the photo on file.'])->assertOk();
+
+        expect(DB::table('pickups')->where('learner_id', $this->thoko)->count())->toBe(1)
+            ->and(DB::table('pickups')->where('learner_id', $this->thoko)->value('state'))->toBe('disputed')
+            ->and($this->actingAs($this->caregiver)->getJson('/api/v1/pickup')->json('totals.at_gate'))->toBe(0);
     });
 
     it('records a refusal for someone not on the list and tells the family', function (): void {

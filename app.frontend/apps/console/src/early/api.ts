@@ -41,6 +41,9 @@ export const earlyApi = {
   child: (learnerId: string) => read(api.GET('/v1/pickup/learners/{id}', { params: { path: { id: learnerId } } })),
   release: (learnerId: string, kind: 'contact' | 'collector', collectorId: string, code: string) =>
     settle(api.POST('/v1/pickup/learners/{id}/release', { params: { path: { id: learnerId } }, body: { kind, collector_id: collectorId, code } as never }) as Done<{ id: string }>),
+  /** The gate marks someone on the list as arrived (D-109). It releases nobody. */
+  arrive: (learnerId: string, kind: 'contact' | 'collector', collectorId: string) =>
+    settle(api.POST('/v1/pickup/learners/{id}/arrive', { params: { path: { id: learnerId } }, body: { kind, collector_id: collectorId } as never }) as Done<{ id: string }>),
   refuse: (learnerId: string, name: string, note: string) =>
     settle(api.POST('/v1/pickup/learners/{id}/refuse', { params: { path: { id: learnerId } }, body: { name, note } as never }) as Done<{ id: string }>),
   addCollector: (learnerId: string, body: { name: string; relationship: string; phone: string; today_only: boolean }) =>

@@ -13,6 +13,7 @@ enum SafeReleaseAudit: string implements AuditAction
     case CollectorEnded = 'saferelease.collector_ended';
     case Barred = 'saferelease.barred';
     case BarEnded = 'saferelease.bar_ended';
+    case Arrived = 'saferelease.arrived';
 
     public function key(): string
     {
@@ -26,6 +27,7 @@ enum SafeReleaseAudit: string implements AuditAction
             self::CollectorEnded => 'Ended someone\'s right to collect a child.',
             self::Barred => 'Recorded a family member who must not collect a child.',
             self::BarEnded => 'Ended a record that a family member must not collect a child.',
+            self::Arrived => 'Marked someone at the gate to collect a child.',
         };
     }
 

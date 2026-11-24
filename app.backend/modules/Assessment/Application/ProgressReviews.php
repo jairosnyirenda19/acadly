@@ -191,7 +191,7 @@ final class ProgressReviews
     /**
      * The newest review shared with the family, as the family sees it.
      *
-     * @return array{period: string, room: string, shared_at: string, areas: list<array{name: string, step: string, label: string, strokes: int}>, family_note: string, home_note: string|null}|null
+     * @return array{id: string, period: string, room: string, shared_at: string, areas: list<array{name: string, step: string, label: string, label_ny: string, strokes: int}>, family_note: string, home_note: string|null}|null
      */
     public function shared(string $learnerId): ?array
     {
@@ -211,11 +211,12 @@ final class ProgressReviews
             $s = ObservationStep::tryFrom($step);
 
             if ($s !== null && isset($subjects[$subjectId])) {
-                $areas[] = ['name' => $subjects[$subjectId]['name'], 'step' => $s->value, 'label' => $s->label(), 'strokes' => $s->strokes()];
+                $areas[] = ['name' => $subjects[$subjectId]['name'], 'step' => $s->value, 'label' => StepWords::label($s), 'label_ny' => StepWords::chichewa($s), 'strokes' => $s->strokes()];
             }
         }
 
         return [
+            'id' => $review->id,
             'period' => $period['name'] ?? '',
             'room' => $room,
             'shared_at' => $review->shared_at?->toIso8601String() ?? '',

@@ -307,6 +307,21 @@ def build(doc: dict) -> bytes:
     return out.getvalue()
 
 
+def build_many(docs: list) -> bytes:
+    """Several documents, each drawn on its own pages, joined into one PDF (a class's report cards)."""
+    import pypdfium2 as pdfium
+
+    joined = pdfium.PdfDocument.new()
+    for d in docs:
+        joined.import_pages(pdfium.PdfDocument(build(d)))
+    out = io.BytesIO()
+    joined.save(out)
+    return out.getvalue()
+
+
 if __name__ == '__main__':
     instruction = json.loads(sys.stdin.buffer.read().decode('utf-8'))
-    sys.stdout.buffer.write(build(instruction))
+    if 'documents' in instruction:
+        sys.stdout.buffer.write(build_many(instruction['documents']))
+    else:
+        sys.stdout.buffer.write(build(instruction))

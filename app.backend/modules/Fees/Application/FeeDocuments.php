@@ -36,7 +36,21 @@ final class FeeDocuments
     /** @return array{name: string, pdf: string} */
     public function receipt(User $viewer, string $paymentId): array
     {
-        $r = $this->views->receipt($viewer, $paymentId);
+        $this->views->receipt($viewer, $paymentId);
+
+        return $this->receiptOf($viewer, $paymentId);
+    }
+
+    /**
+     * A receipt, drawn without a check: for a caller that has proved the person may see it
+     * (the parent portal proves the receipt includes their child). The same paper and the
+     * same check code as the fees desk gives.
+     *
+     * @return array{name: string, pdf: string}
+     */
+    public function receiptOf(User $viewer, string $paymentId): array
+    {
+        $r = $this->views->receiptRecord($paymentId);
         $code = $this->checks->codeFor(self::RECEIPT, $r['number'], substr($r['received_on'], 0, 10), $viewer->id);
         $rows = [];
         $total = 0;

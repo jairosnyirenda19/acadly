@@ -12,7 +12,9 @@ use Illuminate\Support\Facades\Route;
 
 // The parent portal: a parent's own child. No permission: the active link is the rule.
 Route::middleware(['auth:sanctum', 'module:assessment'])->get('/portal/children/{id}/card', FamilyCardController::class)->whereUuid('id')->name('portal.card');
+Route::middleware(['auth:sanctum', 'module:assessment'])->get('/portal/children/{id}/card/pdf', [FamilyCardController::class, 'pdf'])->whereUuid('id')->name('portal.card.pdf');
 Route::middleware(['auth:sanctum', 'module:assessment'])->get('/portal/children/{id}/review', [ObservationController::class, 'family'])->whereUuid('id')->name('portal.review');
+Route::middleware(['auth:sanctum', 'module:assessment'])->get('/portal/children/{id}/review/pdf', [ObservationController::class, 'familyPdf'])->whereUuid('id')->name('portal.review.pdf');
 
 Route::middleware(['auth:sanctum', 'module:assessment'])->prefix('assessment')->name('assessment.')->group(function (): void {
     Route::get('/scales', [SettingsController::class, 'scales'])->name('scales.index');
@@ -45,6 +47,8 @@ Route::middleware(['auth:sanctum', 'module:assessment'])->prefix('assessment')->
     Route::get('/rooms/{id}/observations', [ObservationController::class, 'day'])->whereUuid('id')->name('rooms.observations');
     Route::post('/rooms/{id}/observations', [ObservationController::class, 'record'])->whereUuid('id')->name('rooms.observe');
     Route::get('/reviews', [ObservationController::class, 'reviews'])->name('reviews');
+    Route::get('/step-words', [ObservationController::class, 'stepWords'])->name('step-words');
+    Route::put('/step-words', [ObservationController::class, 'saveStepWords'])->name('step-words.save');
     Route::post('/reviews/share', [ObservationController::class, 'share'])->name('reviews.share');
     Route::get('/reviews/learner/{id}', [ObservationController::class, 'review'])->whereUuid('id')->name('reviews.learner');
     Route::put('/reviews/learner/{id}', [ObservationController::class, 'save'])->whereUuid('id')->name('reviews.save');
@@ -58,4 +62,5 @@ Route::middleware(['auth:sanctum', 'module:assessment'])->prefix('assessment')->
     Route::get('/comments', [PublishController::class, 'comments'])->name('comments');
     Route::put('/comments', [PublishController::class, 'comment'])->name('comments.write');
     Route::get('/cards/{id}', [PublishController::class, 'cards'])->whereUuid('id')->name('cards');
+    Route::get('/cards/{id}/pdf', [PublishController::class, 'pdf'])->whereUuid('id')->name('cards.pdf');
 });

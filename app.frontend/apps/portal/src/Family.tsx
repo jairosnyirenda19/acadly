@@ -1,7 +1,7 @@
 import { useLoad } from '@acadly/kernel'
 import { Button, Notice } from '@acadly/ui'
 import { useState } from 'react'
-import { portalApi, type Child, type FamilyState, type Proposed } from './api'
+import { portalApi, type Child, type FamilyFeesState, type FamilyState, type Proposed } from './api'
 import { Badge, Bar, go, Loading, Mark, Screen, Tile, useWords, type Tone, Note } from './parts'
 
 /** The family, loaded once and shared by every screen of the portal. */
@@ -9,10 +9,37 @@ export function useFamily() {
   return useLoad('portal:family', () => portalApi.family())
 }
 
+/** The family's fees at a glance, shared by home and each child's page. Undefined while loading or when the school shows no fees. */
+export function useFamilyFees(): FamilyFeesState | undefined {
+  const loaded = useLoad('portal:fees', () => portalApi.familyFees())
+
+  return loaded.phase === 'refused' ? undefined : loaded.data
+}
+
+/** Dates as the fees pages say them: Mon 9 Feb. */
+export const feeDay = (iso: string) => new Date(`${iso.slice(0, 10)}T12:00:00`).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+
+/** The family's total left to pay and the next date due (the approved design). */
+function FamilyFeesBox({ fees }: { fees: FamilyFeesState }) {
+  const f = useWords().fees
+
+  if (fees.children.length === 0 || fees.left <= 0) return null
+  const next = fees.next
+
+  return (
+    <div className="mt-3.5 border-2 border-ink bg-marigold-wash px-3.5 py-3">
+      <span className="label-caps text-[10px]">{f.family}</span>
+      <div className="type-display text-[32px] leading-none">{f.money(fees.left)}</div>
+      {next !== null && <div className="text-sm">{next.overdue ? f.familyOverdue(feeDay(next.on), next.first_name) : f.familyNext(feeDay(next.on), next.first_name)}</div>}
+    </div>
+  )
+}
+
 /** Home: the children to confirm first, then every child at a glance. */
 export function Home({ onSignOut }: { onSignOut: () => void }) {
   const t = useWords()
   const loaded = useFamily()
+  const fees = useFamilyFees()
   const data = loaded.data
 
   if (data === undefined) {
@@ -32,8 +59,9 @@ export function Home({ onSignOut }: { onSignOut: () => void }) {
           </Note>
         )}
         {data.children.map((c) => (
-          <ChildCard key={c.id} child={c} />
+          <ChildCard key={c.id} child={c} fees={fees?.children.find((x) => x.id === c.id)} />
         ))}
+        {fees !== undefined && <FamilyFeesBox fees={fees} />}
         <button type="button" onClick={onSignOut} className="mt-4 min-h-11 text-[15px] font-extrabold underline underline-offset-[3px]">
           {t.home.signOut}
         </button>
@@ -42,7 +70,7 @@ export function Home({ onSignOut }: { onSignOut: () => void }) {
   )
 }
 
-function ChildCard({ child }: { child: Child }) {
+function ChildCard({ child, fees }: { child: Child; fees: FamilyFeesState['children'][number] | undefined }) {
   const t = useWords()
   const href = `/child/${child.id}`
   const today = child.lines.find((l) => l.key === 'today')
@@ -88,6 +116,12 @@ function ChildCard({ child }: { child: Child }) {
         <span className="flex items-center gap-2.5 border-t border-rule px-3.5 py-2.5">
           <Mark tone={pickup.tone as Tone} />
           <span className="text-base font-bold">{pickup.word === 'collected' ? t.pickup.collected(pickup.label ?? '') : t.pickup.refused(pickup.label ?? '')}</span>
+        </span>
+      )}
+      {fees !== undefined && child.state !== 'suspended' && (
+        <span className="flex items-center gap-2.5 border-t border-rule px-3.5 py-2.5">
+          <Mark tone={fees.left > 0 ? 'attention' : 'done'} />
+          <span className="text-base font-bold">{fees.left > 0 ? t.fees.left(t.fees.money(fees.left)) : t.fees.allPaid}</span>
         </span>
       )}
     </a>
@@ -199,6 +233,7 @@ function Confirm({ family, onDone }: { family: FamilyState; onDone: (next: Famil
 export function ChildScreen({ id }: { id: string }) {
   const t = useWords()
   const loaded = useFamily()
+  const familyFees = useFamilyFees()
   const data = loaded.data
   const child = data?.children.find((c) => c.id === id && c.state === 'active')
 
@@ -222,6 +257,15 @@ export function ChildScreen({ id }: { id: string }) {
   const review = child.lines.find((l) => l.key === 'review')
   const pickup = child.lines.find((l) => l.key === 'pickup')
   const base = `/child/${child.id}`
+  const fees = familyFees?.children.find((x) => x.id === child.id)
+  const feesNote =
+    fees === undefined
+      ? ''
+      : fees.left <= 0
+        ? t.fees.allPaid
+        : [t.fees.left(t.fees.money(fees.left)), fees.next_due !== null ? (fees.next_due.overdue ? t.fees.overdueSince(feeDay(fees.next_due.on)) : t.fees.nextDue(feeDay(fees.next_due.on))) : null]
+            .filter((s): s is string => s !== null)
+            .join(' · ')
 
   return (
     <Screen bar={<Bar school={data.school.name} back={{ to: '/', label: t.home.title }} />}>
@@ -259,6 +303,7 @@ export function ChildScreen({ id }: { id: string }) {
             href={`${base}/pickup`}
           />
         )}
+        {fees !== undefined && <Tile icon="fees" title={t.fees.door} note={feesNote} fresh={fees.next_due?.overdue === true} href={`${base}/fees`} />}
         <Tile icon="cal" title={t.child.attendance} note={t.child.seeTerm} href={`${base}/attendance`} />
         <Tile icon="bell" title={t.child.messages} note={t.child.seeMessages} href={`${base}/messages`} />
         {data.school.phone !== null && <Tile icon="call" title={t.child.call} note={data.school.phone} href={`tel:${data.school.phone.replace(/\s/g, '')}`} />}

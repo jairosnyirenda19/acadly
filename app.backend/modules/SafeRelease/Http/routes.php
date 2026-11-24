@@ -15,6 +15,7 @@ Route::middleware(['auth:sanctum', 'module:saferelease'])->prefix('pickup')->nam
     Route::get('/', [PickupController::class, 'desk'])->name('desk');
     Route::get('/learners/{id}', [PickupController::class, 'child'])->whereUuid('id')->name('child');
     Route::post('/learners/{id}/release', [PickupController::class, 'release'])->whereUuid('id')->name('release');
+    Route::post('/learners/{id}/arrive', [PickupController::class, 'arrive'])->whereUuid('id')->name('arrive');
     Route::post('/learners/{id}/refuse', [PickupController::class, 'refuse'])->whereUuid('id')->name('refuse');
     Route::post('/learners/{id}/collectors', [PickupController::class, 'addCollector'])->whereUuid('id')->name('collectors.store');
     Route::post('/collectors/{id}/end', [PickupController::class, 'endCollector'])->whereUuid('id')->name('collectors.end');

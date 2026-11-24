@@ -7,10 +7,13 @@ namespace Acadly\Modules\Assessment\Http;
 use Acadly\Kernel\Identity\User;
 use Acadly\Modules\Assessment\Application\Actions\PublishResults;
 use Acadly\Modules\Assessment\Application\Actions\ReportCardActions;
+use Acadly\Modules\Assessment\Application\CardDocuments;
 use Acadly\Modules\Assessment\Application\Publishing;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 
 /** Publishing results and report cards (the approved designs, D-080). */
 final class PublishController
@@ -92,6 +95,29 @@ final class PublishController
         $learner = self::text($request, 'learner_id');
 
         return response()->json($this->publishing->cards(self::user($request), $id, $learner !== '' ? $learner : null));
+    }
+
+    /** The published report cards as one PDF, the class or one learner (`?learner_id=`), with check codes (D-107). */
+    public function pdf(Request $request, string $id, CardDocuments $documents): Response
+    {
+        $who = self::user($request);
+        $learner = self::text($request, 'learner_id');
+        $data = $this->publishing->cards($who, $id, $learner !== '' ? $learner : null);
+        $pub = is_array($data['publication'] ?? null) ? $data['publication'] : [];
+        $cards = array_values(array_filter(is_array($data['cards'] ?? null) ? $data['cards'] : [], 'is_array'));
+        $first = $cards[0] ?? [];
+        $class = is_array($first['class'] ?? null) && is_string($first['class']['name'] ?? null) ? $first['class']['name'] : '';
+        $period = is_array($first['period'] ?? null) && is_string($first['period']['name'] ?? null) ? $first['period']['name'] : '';
+        $version = is_int($pub['version'] ?? null) ? $pub['version'] : 1;
+        $one = $learner !== '' && count($cards) === 1;
+        $name = $one && is_array($first['learner'] ?? null) && is_string($first['learner']['name'] ?? null)
+            ? 'Report card '.$first['learner']['name'].' '.(is_string($first['reference'] ?? null) ? $first['reference'] : '')
+            : 'Report cards '.$class.' '.$period.' version '.$version;
+        $doc = $documents->cards($who, $cards, is_string($pub['published_at'] ?? null) ? $pub['published_at'] : 'now', $version, $name);
+        $documents->downloaded($who, CardDocuments::CARD, $one && is_string($first['reference'] ?? null) ? $first['reference'] : $id, $one && is_array($first['learner'] ?? null) && is_string($first['learner']['id'] ?? null) ? $first['learner']['id'] : null, count($cards));
+
+        return new Response($doc['pdf'], 200, ['Content-Type' => 'application/pdf',
+            'Content-Disposition' => HeaderUtils::makeDisposition(HeaderUtils::DISPOSITION_ATTACHMENT, $doc['name'], 'report-cards.pdf'), 'Cache-Control' => 'no-store']);
     }
 
     private static function text(Request $request, string $key): string

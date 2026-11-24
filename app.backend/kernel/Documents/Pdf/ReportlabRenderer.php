@@ -25,6 +25,22 @@ final class ReportlabRenderer implements PdfRenderer
 
     public function render(array $instruction): string
     {
+        return $this->draw($this->dress($instruction), 60.0);
+    }
+
+    public function renderMany(array $instructions): string
+    {
+        return $this->draw(['documents' => array_map(fn (array $i): array => $this->dress($i), $instructions)], 60.0 + 2.0 * count($instructions));
+    }
+
+    /**
+     * The school's letterhead and the time drawn, added to an instruction.
+     *
+     * @param  array<string, mixed>  $instruction
+     * @return array<string, mixed>
+     */
+    private function dress(array $instruction): array
+    {
         $letterhead = $this->school->letterhead();
         $instruction['brand'] = [
             'name' => $letterhead['name'],
@@ -34,10 +50,16 @@ final class ReportlabRenderer implements PdfRenderer
         ];
         $instruction['generated'] ??= CarbonImmutable::parse($this->clock->now())->setTimezone($letterhead['timezone'])->format('j M Y, H:i');
 
+        return $instruction;
+    }
+
+    /** @param  array<string, mixed>  $instruction */
+    private function draw(array $instruction, float $timeout): string
+    {
         $python = config('acadly.pdf.python');
         $process = new Process([is_string($python) && $python !== '' ? $python : 'python3', '-I', base_path('workers/acadly_pdf.py')]);
         $process->setInput(json_encode($instruction, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
-        $process->setTimeout(is_numeric(config('acadly.pdf.timeout')) ? (float) config('acadly.pdf.timeout') : 60.0);
+        $process->setTimeout(is_numeric(config('acadly.pdf.timeout')) ? max((float) config('acadly.pdf.timeout'), $timeout) : $timeout);
         $process->run();
 
         $pdf = $process->getOutput();

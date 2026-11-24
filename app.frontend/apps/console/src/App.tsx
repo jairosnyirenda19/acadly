@@ -29,6 +29,7 @@ import { ReportCardScreen } from './assessment/ReportCardScreen'
 import { ResultsScreen } from './assessment/ResultsScreen'
 import { SheetScreen } from './assessment/SheetScreen'
 import { AssessmentSettingsScreen } from './settings/AssessmentSettingsScreen'
+import { ReviewStepsScreen } from './settings/ReviewStepsScreen'
 import { LearnerImportScreen } from './learners/LearnerImportScreen'
 import { LearnerScreen } from './learners/LearnerScreen'
 import { FamiliesScreen } from './learners/FamiliesScreen'
@@ -107,7 +108,7 @@ import { ApprovalScreen, ApprovalsScreen } from './approvals/ApprovalsScreen'
 import { ApprovalSettingsScreen } from './approvals/ApprovalSettingsScreen'
 import { SetupWizard } from './setup/SetupWizard'
 import { ConsoleShell, holdsAnywhere, settingsHome } from './shell/ConsoleShell'
-import { keepsGrading, observes, seesClassroom, seesLectures, seesResults, seesMarks, seesObservations, seesPickup, seesProgrammes, seesRegisters, takesRegisters } from './shell/navigation'
+import { keepsGrading, namesSteps, observes, seesClassroom, seesLectures, seesResults, seesMarks, seesObservations, seesPickup, seesProgrammes, seesRegisters, takesRegisters } from './shell/navigation'
 import { WorkInProvider } from './shell/WorkIn'
 import { SignInScreen } from './sign-in/SignInScreen'
 import { StatusScreen } from './StatusScreen'
@@ -259,6 +260,7 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/marks/comments' && marks) page = <CommentsScreen />
   else if (sheet !== undefined && marks) page = <SheetScreen key={sheet} id={sheet} />
   else if (path === '/settings/assessment' && keepsGrading(context)) page = <AssessmentSettingsScreen view="plans" />
+  else if (path === '/settings/review-steps' && namesSteps(context)) page = <ReviewStepsScreen />
   else if (path === '/settings/assessment/scales' && keepsGrading(context)) page = <AssessmentSettingsScreen view="scales" />
   else if (path === '/settings/approvals' && can(context, 'access.approvals.manage')) page = <ApprovalSettingsScreen />
   else if (path === '/approvals') page = <ApprovalsScreen />
@@ -267,8 +269,8 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   // Anyone signed in may open an export; the server shows each person only their own.
   else if (exported !== undefined) page = <ExportScreen key={exported} id={exported} />
 
-  // A report card is a printed page: no console around it. The server decides who may read it.
-  if (cards !== undefined && marks) return <ReportCardScreen key={cards} id={cards} />
+  // The published report cards and their PDFs (D-107). The server decides who may read them.
+  if (cards !== undefined && marks) page = <ReportCardScreen key={cards} id={cards} />
 
   if (page !== undefined) {
     return (

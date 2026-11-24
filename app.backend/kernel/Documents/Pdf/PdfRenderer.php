@@ -19,4 +19,12 @@ interface PdfRenderer
      * @return string the PDF's bytes
      */
     public function render(array $instruction): string;
+
+    /**
+     * Several documents joined into one PDF, each on its own pages (D-107).
+     *
+     * @param  list<array<string, mixed>>  $instructions
+     * @return string the PDF's bytes
+     */
+    public function renderMany(array $instructions): string;
 }

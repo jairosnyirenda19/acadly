@@ -10,6 +10,7 @@ use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Ids;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route as Router;
@@ -140,6 +141,8 @@ beforeEach(function (): void {
 });
 
 it('refuses every route pointed at Secondary, and keeps every list to Primary, for an account that holds everything', function (): void {
+    // The walk calls every route once; rate limits are not what it tests, and their counter is shared by the account.
+    $this->withoutMiddleware(ThrottleRequests::class);
     $school = $this->school;
     $own = [
         'people.' => ['id' => $this->atSecondary->id, 'assignment' => $this->held->id],
@@ -148,7 +151,7 @@ it('refuses every route pointed at Secondary, and keeps every list to Primary, f
         'registers.' => ['id' => $school->id('class_secondary_b'), 'register' => $school->id('class_secondary_b'), 'learner' => $this->outside, 'slot' => $this->slot],
         'assessment.' => ['id' => $this->assessment],
         'assessment.learner' => ['id' => $this->outside],
-        'portal.' => ['id' => $this->outside, 'day' => '2026-10-01'],
+        'portal.' => ['id' => $this->outside, 'day' => '2026-10-01', 'receipt' => $this->payment],
         'year-end.' => ['division' => $school->id('secondary'), 'id' => $this->outside],
         'conduct.' => ['id' => $this->outside, 'step' => 'take-up'],
         'support.' => ['id' => $this->outside, 'what' => 'agree'],

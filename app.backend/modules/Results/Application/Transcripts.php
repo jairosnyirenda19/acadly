@@ -132,6 +132,9 @@ final class Transcripts
         $sections[] = ['kind' => 'text', 'text' => 'GPA = grade points × credits ÷ credits. A supplementary pass is recorded at the pass mark. A repeated course shows each attempt; the latest counts.'];
         if ($reference === null) {
             $sections[] = ['kind' => 'text', 'text' => 'Student copy. This is not an official transcript; the registry issues official transcripts with a check code.'];
+        } else {
+            // The check code and its picture are drawn with the signature (D-107).
+            $sections[] = ['kind' => 'signatures', 'signed_by' => 'Registrar'];
         }
         $instruction = ['title' => $reference === null ? 'Transcript · student copy' : 'Official transcript', 'reference' => $reference ?? $file['number'],
             'status' => $reference === null ? 'Student copy' : 'Issued '.$issued->format('j F Y'), 'sections' => $sections,

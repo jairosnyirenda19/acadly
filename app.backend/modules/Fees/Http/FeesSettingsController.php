@@ -12,8 +12,10 @@ use Acadly\Kernel\Grid\Grids;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Row;
 use Acadly\Modules\Fees\Application\Actions\DeskActions;
+use Acadly\Modules\Fees\Application\Actions\FamilyFeeActions;
 use Acadly\Modules\Fees\Application\Actions\OfficeActions;
 use Acadly\Modules\Fees\Application\Actions\TermFeeActions;
+use Acadly\Modules\Fees\Application\FamilyFees;
 use Acadly\Modules\Fees\Application\FeeOffices;
 use Acadly\Modules\Fees\Application\FeesReach;
 use Acadly\Modules\Fees\Application\FeesViews;
@@ -290,6 +292,32 @@ final class FeesSettingsController
             'Content-Disposition' => 'attachment; filename="fees-'.$from.'-to-'.$to.'.csv"',
             'Cache-Control' => 'private, no-store',
         ]);
+    }
+
+    /**
+     * Fees in the parent portal (D-108): whether the confirmed parents of each child see the child's fees, and how to pay.
+     *
+     * @response array{show_to_families: bool, how_to_pay: string, updated_at: string|null, max: int}
+     */
+    public function portal(Request $request, Access $access, FamilyFees $fees): JsonResponse
+    {
+        $access->check(self::user($request), FeesPermission::Manage);
+
+        return response()->json([...$fees->settings(), 'max' => FamilyFeeActions::HOW_TO_PAY_MAX]);
+    }
+
+    /**
+     * Saves fees in the parent portal. How to pay: up to 600 characters, no links.
+     *
+     * @response array{show_to_families: bool, how_to_pay: string, updated_at: string|null, max: int}
+     */
+    public function savePortal(Request $request, Access $access, FamilyFeeActions $actions, FamilyFees $fees): JsonResponse
+    {
+        $access->check(self::user($request), FeesPermission::Manage);
+        $request->validate(['show_to_families' => ['required', 'boolean'], 'how_to_pay' => ['present', 'nullable', 'string', 'max:'.FamilyFeeActions::HOW_TO_PAY_MAX]]);
+        $actions->saveSettings(self::user($request), $request->boolean('show_to_families'), $request->string('how_to_pay')->toString());
+
+        return response()->json([...$fees->settings(), 'max' => FamilyFeeActions::HOW_TO_PAY_MAX]);
     }
 
     /** @return list<array{id: string, name: string, optional: bool, retired: bool}> */

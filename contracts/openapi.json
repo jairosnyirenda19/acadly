@@ -17545,6 +17545,515 @@
                 }
             }
         },
+        "/v1/portal/children/{id}/card/pdf": {
+            "get": {
+                "operationId": "portal.card.pdf",
+                "summary": "The child's newest report card as a PDF, with its check code (D-107)",
+                "tags": [
+                    "FamilyCard"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "no-store"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    }
+                }
+            }
+        },
+        "/v1/portal/fees": {
+            "get": {
+                "operationId": "portal.fees.family",
+                "description": "Each child with fees shown (what is left and the next instalment due), and\nthe family's total left with the next date due across the children.",
+                "summary": "The family's fees at a glance",
+                "tags": [
+                    "FamilyFees"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "children": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "billed": {
+                                                        "type": "integer"
+                                                    },
+                                                    "left": {
+                                                        "type": "integer"
+                                                    },
+                                                    "next_due": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "on": {
+                                                                "type": "string"
+                                                            },
+                                                            "amount": {
+                                                                "type": "integer"
+                                                            },
+                                                            "overdue": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "on",
+                                                            "amount",
+                                                            "overdue"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "billed",
+                                                    "left",
+                                                    "next_due"
+                                                ]
+                                            }
+                                        },
+                                        "left": {
+                                            "type": "integer"
+                                        },
+                                        "next": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "on": {
+                                                    "type": "string"
+                                                },
+                                                "amount": {
+                                                    "type": "integer"
+                                                },
+                                                "overdue": {
+                                                    "type": "boolean"
+                                                },
+                                                "child_id": {
+                                                    "type": "string"
+                                                },
+                                                "first_name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "on",
+                                                "amount",
+                                                "overdue",
+                                                "child_id",
+                                                "first_name"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "children",
+                                        "left",
+                                        "next"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/portal/children/{id}/fees": {
+            "get": {
+                "operationId": "portal.fees",
+                "description": "The term's instalments with their state, any instalment still owed from\nbefore, the payments with the child's own part, and how to pay.",
+                "summary": "A child's fees",
+                "tags": [
+                    "FamilyFees"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "child": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "first_name": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "class": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "first_name",
+                                                "name",
+                                                "class"
+                                            ]
+                                        },
+                                        "term": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "year": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "year"
+                                            ]
+                                        },
+                                        "billed": {
+                                            "type": "integer"
+                                        },
+                                        "paid": {
+                                            "type": "integer"
+                                        },
+                                        "left": {
+                                            "type": "integer"
+                                        },
+                                        "credit": {
+                                            "type": "integer"
+                                        },
+                                        "next_due": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "on": {
+                                                    "type": "string"
+                                                },
+                                                "amount": {
+                                                    "type": "integer"
+                                                },
+                                                "overdue": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "on",
+                                                "amount",
+                                                "overdue"
+                                            ]
+                                        },
+                                        "instalments": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "charge": {
+                                                        "type": "string"
+                                                    },
+                                                    "due_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "amount": {
+                                                        "type": "integer"
+                                                    },
+                                                    "paid": {
+                                                        "type": "integer"
+                                                    },
+                                                    "left": {
+                                                        "type": "integer"
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "paid",
+                                                            "overdue",
+                                                            "due",
+                                                            "not_due"
+                                                        ]
+                                                    },
+                                                    "this_term": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "label",
+                                                    "charge",
+                                                    "due_on",
+                                                    "amount",
+                                                    "paid",
+                                                    "left",
+                                                    "state",
+                                                    "this_term"
+                                                ]
+                                            }
+                                        },
+                                        "payments": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "number": {
+                                                        "type": "string"
+                                                    },
+                                                    "received_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "method": {
+                                                        "type": "string"
+                                                    },
+                                                    "amount": {
+                                                        "type": "integer"
+                                                    },
+                                                    "cancelled": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "shared": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "receipt": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "this_term": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "period": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "number",
+                                                    "received_on",
+                                                    "method",
+                                                    "amount",
+                                                    "cancelled",
+                                                    "shared",
+                                                    "receipt",
+                                                    "this_term",
+                                                    "period"
+                                                ]
+                                            }
+                                        },
+                                        "how_to_pay": {
+                                            "type": "string"
+                                        },
+                                        "school_phone": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "child",
+                                        "term",
+                                        "billed",
+                                        "paid",
+                                        "left",
+                                        "credit",
+                                        "next_due",
+                                        "instalments",
+                                        "payments",
+                                        "how_to_pay",
+                                        "school_phone"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/portal/children/{id}/fees/statement": {
+            "get": {
+                "operationId": "portal.fees.statement",
+                "summary": "A child's fee statement as a PDF: the same document the fees desk gives, with its check code",
+                "tags": [
+                    "FamilyFees"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "no-store"
+                                }
+                            },
+                            "X-Content-Type-Options": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "nosniff"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/portal/children/{id}/receipts/{receipt}": {
+            "get": {
+                "operationId": "portal.fees.receipt",
+                "summary": "A receipt that includes the child, as a PDF: the same receipt the fees desk gives, with its check code",
+                "tags": [
+                    "FamilyFees"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "receipt",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "no-store"
+                                }
+                            },
+                            "X-Content-Type-Options": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "nosniff"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/fees/learners/{id}": {
             "get": {
                 "operationId": "fees.learner",
@@ -20056,6 +20565,133 @@
                                     },
                                     "required": [
                                         "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/fees/portal": {
+            "get": {
+                "operationId": "fees.portal",
+                "summary": "Fees in the parent portal (D-108): whether the confirmed parents of each child see the child's fees, and how to pay",
+                "tags": [
+                    "FeesSettings"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "show_to_families": {
+                                            "type": "boolean"
+                                        },
+                                        "how_to_pay": {
+                                            "type": "string"
+                                        },
+                                        "updated_at": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "max": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "show_to_families",
+                                        "how_to_pay",
+                                        "updated_at",
+                                        "max"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "fees.portal.save",
+                "summary": "Saves fees in the parent portal. How to pay: up to 600 characters, no links",
+                "tags": [
+                    "FeesSettings"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "show_to_families": {
+                                        "type": "boolean"
+                                    },
+                                    "how_to_pay": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 600
+                                    }
+                                },
+                                "required": [
+                                    "show_to_families",
+                                    "how_to_pay"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "show_to_families": {
+                                            "type": "boolean"
+                                        },
+                                        "how_to_pay": {
+                                            "type": "string"
+                                        },
+                                        "updated_at": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "max": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "show_to_families",
+                                        "how_to_pay",
+                                        "updated_at",
+                                        "max"
                                     ]
                                 }
                             }
@@ -35396,6 +36032,9 @@
                                                             "label": {
                                                                 "type": "string"
                                                             },
+                                                            "label_ny": {
+                                                                "type": "string"
+                                                            },
                                                             "strokes": {
                                                                 "type": "integer"
                                                             }
@@ -35404,6 +36043,7 @@
                                                             "name",
                                                             "step",
                                                             "label",
+                                                            "label_ny",
                                                             "strokes"
                                                         ]
                                                     }
@@ -35432,6 +36072,56 @@
                                         "child",
                                         "review"
                                     ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/portal/children/{id}/review/pdf": {
+            "get": {
+                "operationId": "portal.review.pdf",
+                "summary": "The progress review shared with the family, as a PDF with its check code (D-107)",
+                "tags": [
+                    "Observation"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "no-store"
                                 }
                             }
                         }
@@ -36103,6 +36793,196 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/assessment/step-words": {
+            "get": {
+                "operationId": "assessment.step-words",
+                "summary": "The school's words for the review steps (D-108), and whether the viewer may change them",
+                "tags": [
+                    "Observation"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "en": {
+                                            "type": "object",
+                                            "properties": {
+                                                "starting": {
+                                                    "type": "string"
+                                                },
+                                                "growing": {
+                                                    "type": "string"
+                                                },
+                                                "can_do": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "starting",
+                                                "growing",
+                                                "can_do"
+                                            ]
+                                        },
+                                        "ny": {
+                                            "type": "object",
+                                            "properties": {
+                                                "starting": {
+                                                    "type": "string"
+                                                },
+                                                "growing": {
+                                                    "type": "string"
+                                                },
+                                                "can_do": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "starting",
+                                                "growing",
+                                                "can_do"
+                                            ]
+                                        },
+                                        "saved_at": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "saved_by": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "can_change": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "en",
+                                        "ny",
+                                        "saved_at",
+                                        "saved_by",
+                                        "can_change"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "assessment.step-words.save",
+                "tags": [
+                    "Observation"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "en": {
+                                        "type": "object",
+                                        "properties": {
+                                            "starting": {
+                                                "type": "string",
+                                                "maxLength": 24
+                                            },
+                                            "growing": {
+                                                "type": "string",
+                                                "maxLength": 24
+                                            },
+                                            "can_do": {
+                                                "type": "string",
+                                                "maxLength": 24
+                                            }
+                                        },
+                                        "required": [
+                                            "starting",
+                                            "growing",
+                                            "can_do"
+                                        ]
+                                    },
+                                    "ny": {
+                                        "type": [
+                                            "object",
+                                            "null"
+                                        ],
+                                        "properties": {
+                                            "starting": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ],
+                                                "maxLength": 24
+                                            },
+                                            "growing": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ],
+                                                "maxLength": 24
+                                            },
+                                            "can_do": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ],
+                                                "maxLength": 24
+                                            }
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "en"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "saved": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "required": [
+                                        "saved"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -39398,6 +40278,12 @@
                                             "null"
                                         ],
                                         "maxLength": 30
+                                    },
+                                    "send_code": {
+                                        "type": [
+                                            "boolean",
+                                            "null"
+                                        ]
                                     }
                                 },
                                 "required": [
@@ -39562,6 +40448,58 @@
                                                 ]
                                             }
                                         },
+                                        "at_gate": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "pickup_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "learner_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "child": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "relationship": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "ref": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "needs_code": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "at": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "pickup_id",
+                                                    "learner_id",
+                                                    "child",
+                                                    "name",
+                                                    "relationship",
+                                                    "kind",
+                                                    "ref",
+                                                    "needs_code",
+                                                    "at"
+                                                ]
+                                            }
+                                        },
                                         "totals": {
                                             "type": "object",
                                             "properties": {
@@ -39573,12 +40511,16 @@
                                                 },
                                                 "here": {
                                                     "type": "integer"
+                                                },
+                                                "at_gate": {
+                                                    "type": "integer"
                                                 }
                                             },
                                             "required": [
                                                 "children",
                                                 "collected",
-                                                "here"
+                                                "here",
+                                                "at_gate"
                                             ]
                                         },
                                         "can_release": {
@@ -39590,6 +40532,7 @@
                                         "rooms",
                                         "room",
                                         "children",
+                                        "at_gate",
                                         "totals",
                                         "can_release"
                                     ]
@@ -39936,6 +40879,68 @@
                                     "required": [
                                         "id"
                                     ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/pickup/learners/{id}/arrive": {
+            "post": {
+                "operationId": "pickup.arrive",
+                "summary": "The gate marks that someone on the list has come for the child (D-108). It releases nobody",
+                "tags": [
+                    "Pickup"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "kind": {
+                                        "type": "string",
+                                        "maxLength": 20
+                                    },
+                                    "collector_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                },
+                                "required": [
+                                    "kind",
+                                    "collector_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
                                 }
                             }
                         }
@@ -45065,6 +46070,53 @@
                                         "publication",
                                         "cards"
                                     ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/assessment/cards/{id}/pdf": {
+            "get": {
+                "operationId": "assessment.cards.pdf",
+                "summary": "The published report cards as one PDF, the class or one learner (`?learner_id=`), with check codes (D-107)",
+                "tags": [
+                    "Publish"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "no-store"
                                 }
                             }
                         }

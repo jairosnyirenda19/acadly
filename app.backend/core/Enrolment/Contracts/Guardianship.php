@@ -23,4 +23,11 @@ interface Guardianship
      * @return array{id: string, first_name: string, name: string, class_id: string|null, class: string}|null
      */
     public function child(User $parent, string $learnerId): ?array;
+
+    /**
+     * Every child this parent sees now (an active link), as `child()` shows each.
+     *
+     * @return list<array{id: string, first_name: string, name: string, class_id: string|null, class: string}>
+     */
+    public function children(User $parent): array;
 }

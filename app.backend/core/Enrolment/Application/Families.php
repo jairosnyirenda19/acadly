@@ -70,6 +70,21 @@ final class Families implements Guardianship, PhoneHolders
         return $this->sees($parent, $learnerId) ? $this->learnerCard($learnerId) : null;
     }
 
+    public function children(User $parent): array
+    {
+        $out = [];
+
+        foreach ($this->linksOf($parent) as $learnerId => $link) {
+            $card = $link['state'] === State::Active->value ? $this->learnerCard((string) $learnerId) : null;
+
+            if ($card !== null) {
+                $out[] = $card;
+            }
+        }
+
+        return $out;
+    }
+
     /**
      * What the parent portal shows a signed-in parent: the children they see,
      * and the children the school's contact list proposes for them to confirm.

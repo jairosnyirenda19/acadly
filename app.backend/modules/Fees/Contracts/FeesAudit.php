@@ -23,6 +23,8 @@ enum FeesAudit: string implements AuditAction
     case Exported = 'fees.exported';
     case OfficesSaved = 'fees.offices_saved';
     case OfficeStaffChanged = 'fees.office_staff_changed';
+    case PortalSettingsSaved = 'fees.portal_settings_saved';
+    case FamilyDownloaded = 'fees.family_downloaded';
 
     public function key(): string
     {
@@ -47,6 +49,8 @@ enum FeesAudit: string implements AuditAction
             self::Exported => 'Downloaded fee payments and bills.',
             self::OfficesSaved => 'Saved the finance offices.',
             self::OfficeStaffChanged => 'Changed who works in a finance office.',
+            self::PortalSettingsSaved => 'Saved what families see about fees in the parent portal.',
+            self::FamilyDownloaded => 'Downloaded a fee receipt or statement in the parent portal.',
         };
     }
 

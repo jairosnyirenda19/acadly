@@ -7,7 +7,7 @@ import { PageHead } from '../settings/parts'
 import { Input, Select } from '../setup/parts'
 import { earlyApi, firstError, type RoomDay, type StepKey } from './api'
 import { RoomPicker } from './MyRoomScreen'
-import { ALL_STEPS, isStep, StepLegend, StepMark } from './steps'
+import { ALL_STEPS, isStep, StepLegend, StepMark, stepWords } from './steps'
 
 const t = copy.early
 
@@ -49,6 +49,7 @@ function Form({ data, onArea, onDay }: { data: RoomDay; onArea: (a: string) => v
   const [busy, setBusy] = useState(false)
   const chosen = Object.keys(steps).length
   const seen = Object.values(steps).filter((s) => s !== 'not_seen').length
+  const words = stepWords(data.steps)
 
   const save = async () => {
     if (chosen === 0) {
@@ -102,7 +103,7 @@ function Form({ data, onArea, onDay }: { data: RoomDay; onArea: (a: string) => v
                         className={`flex min-h-11 items-center gap-2 px-2.5 text-[13px] font-bold ${on ? 'border-[3px] border-ink' : 'border border-rule'} bg-sheet text-ink`}
                       >
                         <StepMark step={s} wide="w-9" decorative />
-                        <span>{t.steps[s]}</span>
+                        <span>{words[s]}</span>
                       </button>
                     )
                   })}
@@ -128,7 +129,7 @@ function Form({ data, onArea, onDay }: { data: RoomDay; onArea: (a: string) => v
       <aside className="grid content-start gap-4">
         <section className="border-2 border-ink bg-sheet p-4">
           <h2 className="type-display mb-2 text-[26px] leading-none">{t.stepsTitle}</h2>
-          <StepLegend />
+          <StepLegend words={words} />
           <p className="mt-3 text-[13px] text-text-muted">{t.stepsHelp.not_seen}</p>
         </section>
       </aside>

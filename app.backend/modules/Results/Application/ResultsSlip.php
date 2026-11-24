@@ -74,6 +74,8 @@ final class ResultsSlip
                     ['label' => 'Credits earned', 'value' => $sem['earned'].' of '.array_sum(array_column($sem['courses'], 'credits'))],
                 ]],
                 ['kind' => 'text', 'text' => 'These results were approved by the examiners\' board and released on '.$issued->format('j F Y').'. A change after release issues a new version of this slip.'],
+                // The check code and its picture are drawn with the signature (D-107).
+                ['kind' => 'signatures', 'signed_by' => 'Registrar'],
             ],
             'check' => ['code' => $code, 'url' => self::checkUrl()],
             'footer' => $this->school->name().' · Results slip '.$reference,

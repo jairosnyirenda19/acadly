@@ -2,10 +2,20 @@
 
 declare(strict_types=1);
 
+use Acadly\Modules\Fees\Http\FamilyFeesController;
 use Acadly\Modules\Fees\Http\FeesController;
 use Acadly\Modules\Fees\Http\FeesSettingsController;
 use Acadly\Modules\Fees\Http\SchoolLedgerController;
 use Illuminate\Support\Facades\Route;
+
+// The parent portal (D-108): a parent's own children. No permission: the active link is the rule.
+// Fees off, or not shown to families, answers not found: the portal shows no fees.
+Route::middleware(['auth:sanctum'])->group(function (): void {
+    Route::get('/portal/fees', [FamilyFeesController::class, 'family'])->name('portal.fees.family');
+    Route::get('/portal/children/{id}/fees', [FamilyFeesController::class, 'child'])->whereUuid('id')->name('portal.fees');
+    Route::get('/portal/children/{id}/fees/statement', [FamilyFeesController::class, 'statement'])->whereUuid('id')->middleware('throttle:60,1')->name('portal.fees.statement');
+    Route::get('/portal/children/{id}/receipts/{receipt}', [FamilyFeesController::class, 'receipt'])->whereUuid(['id', 'receipt'])->middleware('throttle:60,1')->name('portal.fees.receipt');
+});
 
 Route::middleware(['auth:sanctum', 'module:fees'])->prefix('fees')->name('fees.')->group(function (): void {
     Route::get('/desk', [FeesSettingsController::class, 'desk'])->name('desk');
@@ -34,6 +44,8 @@ Route::middleware(['auth:sanctum', 'module:fees'])->prefix('fees')->name('fees.'
     Route::put('/items', [FeesSettingsController::class, 'saveItems'])->name('items.save');
     Route::get('/offices', [FeesSettingsController::class, 'offices'])->name('offices');
     Route::put('/offices', [FeesSettingsController::class, 'saveOffices'])->name('offices.save');
+    Route::get('/portal', [FeesSettingsController::class, 'portal'])->name('portal');
+    Route::put('/portal', [FeesSettingsController::class, 'savePortal'])->name('portal.save');
     Route::get('/terms', [FeesSettingsController::class, 'terms'])->name('terms.index');
     Route::get('/terms/{period}/{division}', [FeesSettingsController::class, 'term'])->whereUuid(['period', 'division'])->name('terms.show');
     Route::put('/terms/{period}/{division}', [FeesSettingsController::class, 'saveTerm'])->whereUuid(['period', 'division'])->name('terms.save');

@@ -51,9 +51,12 @@ export function CardPage({ id }: { id: string }) {
       onRetry={loaded.reload}
       foot={
         published !== null ? (
-          <Button className="h-14 w-full text-lg" onClick={() => window.print()}>
-            {c.save}
-          </Button>
+          <div className="grid gap-2">
+            <a href={portalApi.cardPdf(id)} target="_blank" rel="noopener" className="flex h-14 items-center justify-center bg-teal text-lg font-extrabold text-sheet no-underline">
+              {c.download}
+            </a>
+            <p className="text-[13px] text-text-muted">{c.downloadNote}</p>
+          </div>
         ) : undefined
       }
     >

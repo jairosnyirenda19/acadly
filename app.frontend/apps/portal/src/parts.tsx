@@ -114,6 +114,13 @@ const ICONS = {
       <path d="M8 13h5" />
     </>
   ),
+  fees: (
+    <>
+      <rect x="3" y="6" width="18" height="12" />
+      <path d="M3 10h18" />
+      <path d="M7 15h4" />
+    </>
+  ),
   gate: (
     <>
       <path d="M4 20V4h9l7 7v9z" />

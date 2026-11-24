@@ -1682,6 +1682,99 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/portal/children/{id}/card/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The child's newest report card as a PDF, with its check code (D-107) */
+        get: operations["portal.card.pdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portal/fees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The family's fees at a glance
+         * @description Each child with fees shown (what is left and the next instalment due), and
+         *     the family's total left with the next date due across the children.
+         */
+        get: operations["portal.fees.family"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portal/children/{id}/fees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A child's fees
+         * @description The term's instalments with their state, any instalment still owed from
+         *     before, the payments with the child's own part, and how to pay.
+         */
+        get: operations["portal.fees"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portal/children/{id}/fees/statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A child's fee statement as a PDF: the same document the fees desk gives, with its check code */
+        get: operations["portal.fees.statement"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portal/children/{id}/receipts/{receipt}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A receipt that includes the child, as a PDF: the same receipt the fees desk gives, with its check code */
+        get: operations["portal.fees.receipt"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/fees/learners/{id}": {
         parameters: {
             query?: never;
@@ -2001,6 +2094,24 @@ export interface paths {
         get: operations["fees.offices"];
         /** Saves the named finance offices. None: one office for the whole school */
         put: operations["fees.offices.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/fees/portal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fees in the parent portal (D-108): whether the confirmed parents of each child see the child's fees, and how to pay */
+        get: operations["fees.portal"];
+        /** Saves fees in the parent portal. How to pay: up to 600 characters, no links */
+        put: operations["fees.portal.save"];
         post?: never;
         delete?: never;
         options?: never;
@@ -3560,6 +3671,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/portal/children/{id}/review/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The progress review shared with the family, as a PDF with its check code (D-107) */
+        get: operations["portal.review.pdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/assessment/rooms": {
         parameters: {
             query?: never;
@@ -3622,6 +3750,23 @@ export interface paths {
         /** Every child of the rooms the account sees, with this term's review */
         get: operations["assessment.reviews"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/step-words": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The school's words for the review steps (D-108), and whether the viewer may change them */
+        get: operations["assessment.step-words"];
+        put: operations["assessment.step-words.save"];
         post?: never;
         delete?: never;
         options?: never;
@@ -4082,6 +4227,23 @@ export interface paths {
         put?: never;
         /** Releases a child to someone on the list */
         post: operations["pickup.release"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/pickup/learners/{id}/arrive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The gate marks that someone on the list has come for the child (D-108). It releases nobody */
+        post: operations["pickup.arrive"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4579,6 +4741,23 @@ export interface paths {
         };
         /** The report cards of a published version, or one learner's: `?learner_id=` */
         get: operations["assessment.cards"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/cards/{id}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The published report cards as one PDF, the class or one learner (`?learner_id=`), with check codes (D-107) */
+        get: operations["assessment.cards.pdf"];
         put?: never;
         post?: never;
         delete?: never;
@@ -12063,6 +12242,188 @@ export interface operations {
             404: components["responses"]["NotFoundHttpException"];
         };
     };
+    "portal.card.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "portal.fees.family": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        children: {
+                            id: string;
+                            billed: number;
+                            left: number;
+                            next_due: {
+                                on: string;
+                                amount: number;
+                                overdue: boolean;
+                            } | null;
+                        }[];
+                        left: number;
+                        next: {
+                            on: string;
+                            amount: number;
+                            overdue: boolean;
+                            child_id: string;
+                            first_name: string;
+                        } | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "portal.fees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        child: {
+                            id: string;
+                            first_name: string;
+                            name: string;
+                            class: string;
+                        };
+                        term: {
+                            name: string;
+                            year: string;
+                        } | null;
+                        billed: number;
+                        paid: number;
+                        left: number;
+                        credit: number;
+                        next_due: {
+                            on: string;
+                            amount: number;
+                            overdue: boolean;
+                        } | null;
+                        instalments: {
+                            label: string;
+                            charge: string;
+                            due_on: string;
+                            amount: number;
+                            paid: number;
+                            left: number;
+                            /** @enum {string} */
+                            state: "paid" | "overdue" | "due" | "not_due";
+                            this_term: boolean;
+                        }[];
+                        payments: {
+                            id: string;
+                            number: string;
+                            received_on: string;
+                            method: string;
+                            amount: number;
+                            cancelled: boolean;
+                            shared: boolean;
+                            receipt: boolean;
+                            this_term: boolean;
+                            period: string | null;
+                        }[];
+                        how_to_pay: string;
+                        school_phone: string | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "portal.fees.statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    "Cache-Control"?: "no-store";
+                    "X-Content-Type-Options"?: "nosniff";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "portal.fees.receipt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                receipt: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    "Cache-Control"?: "no-store";
+                    "X-Content-Type-Options"?: "nosniff";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "fees.learner": {
         parameters: {
             query?: never;
@@ -12955,6 +13316,66 @@ export interface operations {
                 content: {
                     "application/json": {
                         saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "fees.portal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        show_to_families: boolean;
+                        how_to_pay: string;
+                        updated_at: string | null;
+                        max: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "fees.portal.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    show_to_families: boolean;
+                    how_to_pay: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        show_to_families: boolean;
+                        how_to_pay: string;
+                        updated_at: string | null;
+                        max: number;
                     };
                 };
             };
@@ -17822,12 +18243,38 @@ export interface operations {
                                 name: string;
                                 step: string;
                                 label: string;
+                                label_ny: string;
                                 strokes: number;
                             }[];
                             family_note: string;
                             home_note: string | null;
                         } | null;
                     };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            404: components["responses"]["NotFoundHttpException"];
+        };
+    };
+    "portal.review.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
                 };
             };
             401: components["responses"]["AuthenticationException"];
@@ -18055,6 +18502,80 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.step-words": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        en: {
+                            starting: string;
+                            growing: string;
+                            can_do: string;
+                        };
+                        ny: {
+                            starting: string;
+                            growing: string;
+                            can_do: string;
+                        };
+                        saved_at: string | null;
+                        saved_by: string | null;
+                        can_change: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "assessment.step-words.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    en: {
+                        starting: string;
+                        growing: string;
+                        can_do: string;
+                    };
+                    ny?: {
+                        starting?: string | null;
+                        growing?: string | null;
+                        can_do?: string | null;
+                    } | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        saved: boolean;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "assessment.reviews.share": {
@@ -19135,6 +19656,7 @@ export interface operations {
                     name: string;
                     relationship: string;
                     phone?: string | null;
+                    send_code?: boolean | null;
                 };
             };
         };
@@ -19192,10 +19714,22 @@ export interface operations {
                             } | null;
                             refused: number;
                         }[];
+                        at_gate: {
+                            pickup_id: string;
+                            learner_id: string;
+                            child: string;
+                            name: string;
+                            relationship: string | null;
+                            kind: string;
+                            ref: string | null;
+                            needs_code: boolean;
+                            at: string;
+                        }[];
                         totals: {
                             children: number;
                             collected: number;
                             here: number;
+                            at_gate: number;
                         };
                         can_release: boolean;
                     };
@@ -19306,6 +19840,37 @@ export interface operations {
                     "application/json": {
                         id: string;
                     };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "pickup.arrive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    kind: string;
+                    /** Format: uuid */
+                    collector_id: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
                 };
             };
             401: components["responses"]["AuthenticationException"];
@@ -20913,6 +21478,30 @@ export interface operations {
                             next_term: string | null;
                         }[];
                     };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "assessment.cards.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    "Cache-Control"?: "no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
                 };
             };
             401: components["responses"]["AuthenticationException"];

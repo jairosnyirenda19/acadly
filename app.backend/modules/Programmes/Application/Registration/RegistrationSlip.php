@@ -70,6 +70,8 @@ final class RegistrationSlip
                     $r->late ? ['label' => 'Registration', 'value' => 'Late'] : null,
                 ]))],
                 ['kind' => 'text', 'text' => 'A change of courses issues a new version of this slip. Earlier versions stay on the student\'s record and are marked as replaced.'],
+                // The check code and its picture are drawn with the signature (D-107).
+                ['kind' => 'signatures', 'signed_by' => 'Registry'],
             ],
             'check' => ['code' => $code, 'url' => self::checkUrl()],
             'footer' => $this->school->name().' · Registration slip '.$reference,

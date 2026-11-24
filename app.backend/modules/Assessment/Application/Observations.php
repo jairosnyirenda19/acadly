@@ -238,6 +238,6 @@ final class Observations
     /** @return list<array{key: string, label: string, strokes: int}> */
     public static function steps(): array
     {
-        return array_map(fn (ObservationStep $s): array => ['key' => $s->value, 'label' => $s->label(), 'strokes' => $s->strokes()], ObservationStep::cases());
+        return array_map(fn (ObservationStep $s): array => ['key' => $s->value, 'label' => StepWords::label($s), 'strokes' => $s->strokes()], ObservationStep::cases());
     }
 }

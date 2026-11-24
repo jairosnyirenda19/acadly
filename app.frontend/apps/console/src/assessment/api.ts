@@ -4,6 +4,8 @@ import { copy } from '../copy'
 import { read, settle } from '../setup/api'
 
 type Json<P extends keyof paths, M extends 'get' | 'post' | 'put'> = paths[P][M] extends { responses: { 200: { content: { 'application/json': infer T } } } } ? T : never
+const API: string = import.meta.env.VITE_API_URL ?? '/api'
+
 type Done<T> = Promise<{ data?: T; error?: unknown; response: Response }>
 
 export type MineState = Json<'/v1/assessment/mine', 'get'>
@@ -28,6 +30,8 @@ export type PlanPart = Plan['parts'][number]
 export type PublishingState = Json<'/v1/assessment/publishing', 'get'>
 export type PublishRow = PublishingState['classes'][number]
 export type CommentsState = Json<'/v1/assessment/comments', 'get'>
+export type StepWordsState = Json<'/v1/assessment/step-words', 'get'>
+export type StepWordSet = StepWordsState['en']
 export type CommentRow = CommentsState['learners'][number]
 export type CardsState = Json<'/v1/assessment/cards/{id}', 'get'>
 export type Card = CardsState['cards'][number]
@@ -80,6 +84,12 @@ export const assessmentApi = {
     settle(api.PUT('/v1/assessment/comments', { body: body as never }) as Done<CommentsState>),
   cards: (publicationId: string, learnerId: string | null) =>
     read(api.GET('/v1/assessment/cards/{id}', { params: { path: { id: publicationId }, query: (learnerId !== null ? { learner_id: learnerId } : {}) as never } })),
+  /** The published cards as one PDF with their check codes (D-107): the class, or one learner. Opened in a new tab. */
+  cardsPdf: (publicationId: string, learnerId: string | null = null) =>
+    `${API}/v1/assessment/cards/${publicationId}/pdf${learnerId !== null ? `?learner_id=${learnerId}` : ''}`,
+  /** The school's words for the review steps (D-109); refused without assessment.plan. */
+  stepWords: () => read(api.GET('/v1/assessment/step-words')),
+  saveStepWords: (body: { en: StepWordSet; ny: StepWordSet }) => settle(api.PUT('/v1/assessment/step-words', { body: body as never }) as Done<{ saved: boolean }>),
 
   scales: () => read(api.GET('/v1/assessment/scales')),
   addScale: (body: { name: string; overall: Overall; pass_from: string | null; track: string; bands: Band[] }) =>

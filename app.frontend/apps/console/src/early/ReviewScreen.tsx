@@ -7,11 +7,9 @@ import { PageHead } from '../settings/parts'
 import { TextArea } from '../setup/parts'
 import { earlyApi, firstError, type Review } from './api'
 import { ReviewState } from './ReviewsScreen'
-import { isStep, REACHED, StepMark } from './steps'
+import { isStep, REACHED, StepMark, stepWords } from './steps'
 
 const t = copy.early
-
-const stepWord = (step: string | undefined): string => (isStep(step) ? t.steps[step] : '')
 
 /** One child's progress review (the approved design): the step in each area beside the term's observations, and two notes. */
 export function ReviewScreen({ learnerId }: { learnerId: string }) {
@@ -31,6 +29,8 @@ function Draft({ data, onChanged }: { data: Review; onChanged: () => void }) {
   const [returning, setReturning] = useState(false)
   const [busy, setBusy] = useState('')
   const edit = data.can.edit
+  const words = stepWords(data.steps)
+  const stepWord = (step: string | undefined): string => (isStep(step) ? words[step] : '')
 
   const save = async (): Promise<string | null> => {
     const result = await earlyApi.save(data.learner.id, { steps, family_note: family, home_note: home })
@@ -104,7 +104,7 @@ function Draft({ data, onChanged }: { data: Review; onChanged: () => void }) {
                           className={`flex min-h-11 items-center gap-1.5 px-2 text-[13px] font-bold ${on ? 'border-[3px] border-ink' : 'border border-rule'} bg-sheet text-ink disabled:cursor-default`}
                         >
                           <StepMark step={s} wide="w-9" decorative />
-                          <span>{t.steps[s]}</span>
+                          <span>{words[s]}</span>
                         </button>
                       )
                     })}
@@ -117,7 +117,7 @@ function Draft({ data, onChanged }: { data: Review; onChanged: () => void }) {
                     {a.trail.map((o, i) => (
                       <li key={i} className="flex flex-wrap items-center gap-2 text-[13px]">
                         <span className="w-16 font-mono text-text-muted">{day(o.observed_on)}</span>
-                        <StepMark step={isStep(o.step) ? o.step : null} word wide="w-9" />
+                        <StepMark step={isStep(o.step) ? o.step : null} word wide="w-9" words={words} />
                         {o.focus !== null && <span className="text-text-muted">{o.focus}</span>}
                         {o.note !== null && <span>{o.note}</span>}
                       </li>
@@ -180,7 +180,7 @@ function Draft({ data, onChanged }: { data: Review; onChanged: () => void }) {
             <ul>
               {data.areas.map((a) => (
                 <li key={a.id} className="flex items-center gap-2.5 border-b border-rule px-4 py-2">
-                  <StepMark step={steps[a.id] ?? null} wide="w-10" />
+                  <StepMark step={steps[a.id] ?? null} wide="w-10" words={words} />
                   <span className="flex-1 text-[13px] font-bold">{a.name}</span>
                   <span className="text-xs text-text-muted">{stepWord(steps[a.id])}</span>
                 </li>

@@ -23,7 +23,7 @@ final class PickupController
     /**
      * The pick-up desk: the rooms the account sees and each child of the chosen room today.
      *
-     * @response array{day: string, rooms: list<array{id: string, name: string}>, room: array{id: string, name: string}|null, children: list<array{id: string, name: string, collected: array{id: string, state: string, state_label: string, name: string, relationship: string|null, at: string, note: string|null}|null, refused: int}>, totals: array{children: int, collected: int, here: int}, can_release: bool}
+     * @response array{day: string, rooms: list<array{id: string, name: string}>, room: array{id: string, name: string}|null, children: list<array{id: string, name: string, collected: array{id: string, state: string, state_label: string, name: string, relationship: string|null, at: string, note: string|null}|null, refused: int}>, at_gate: list<array{pickup_id: string, learner_id: string, child: string, name: string, relationship: string|null, kind: string, ref: string|null, needs_code: bool, at: string}>, totals: array{children: int, collected: int, here: int, at_gate: int}, can_release: bool}
      */
     public function desk(Request $request, PickupViews $views, Access $access): JsonResponse
     {
@@ -135,16 +135,32 @@ final class PickupController
     /**
      * A parent names someone to collect the child today. The code is given once.
      *
-     * @response 201 array{id: string, code: string}
+     * @response 201 array{id: string, code: string, sent_to: string|null}
      */
     public function addForToday(Request $request, string $id, Guardianship $guardianship, PickupActions $actions): JsonResponse
     {
         $parent = self::user($request);
         $guardianship->child($parent, $id) ?? throw new NotFoundHttpException;
-        $request->validate(['name' => ['required', 'string', 'max:120'], 'relationship' => ['required', 'string', 'max:60'], 'phone' => ['nullable', 'string', 'max:30']]);
+        $request->validate(['name' => ['required', 'string', 'max:120'], 'relationship' => ['required', 'string', 'max:60'], 'phone' => ['nullable', 'string', 'max:30'],
+            'send_code' => ['nullable', 'boolean']]);
         $phone = $request->string('phone')->toString();
 
-        return response()->json($actions->addForToday($parent, $guardianship, $id, $request->string('name')->toString(), $request->string('relationship')->toString(), $phone !== '' ? $phone : null), 201);
+        return response()->json($actions->addForToday($parent, $guardianship, $id, $request->string('name')->toString(), $request->string('relationship')->toString(),
+            $phone !== '' ? $phone : null, $request->boolean('send_code')), 201);
+    }
+
+    /**
+     * The gate marks that someone on the list has come for the child (D-108). It releases nobody.
+     *
+     * @response 201 array{id: string}
+     */
+    public function arrive(Request $request, string $id, PickupActions $actions, PickupReach $reach): JsonResponse
+    {
+        $who = self::user($request);
+        $reach->learner($who, $id, SafeReleasePermission::Release);
+        $request->validate(['kind' => ['required', 'string', 'max:20'], 'collector_id' => ['required', 'uuid']]);
+
+        return response()->json(['id' => $actions->arrive($who, $id, $request->string('kind')->toString(), $request->string('collector_id')->toString())->id], 201);
     }
 
     private static function holdsAny(Access $access, User $who): bool

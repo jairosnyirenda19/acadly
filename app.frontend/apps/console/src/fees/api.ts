@@ -23,6 +23,7 @@ export const paymentsGrid = (query: GridQuery) => read(api.GET('/v1/fees/payment
 export type TermList = Get<'/v1/fees/terms'>
 export type TermFees = Get<'/v1/fees/terms/{period}/{division}'>
 export type FeeItem = TermFees['items'][number]
+export type PortalFees = Get<'/v1/fees/portal'>
 export type ShopList = Get<'/v1/fees/shop'>
 export type ShopItem = ShopList['items'][number]
 export type Method = 'cash' | 'bank' | 'airtel_money' | 'mpamba' | 'cheque'
@@ -57,6 +58,8 @@ export const feesApi = {
   saveTerm: (period: string, division: string, body: { amounts: { item_id: string; level_code: string; amount: number }[]; plan: { label: string; due_on: string; share_bp: number }[] }) =>
     settle(api.PUT('/v1/fees/terms/{period}/{division}', { params: { path: { period, division } }, body: body as never }) as Done<{ saved: boolean }>),
   bill: (period: string, division: string) => settle(api.POST('/v1/fees/terms/{period}/{division}/bill', { params: { path: { period, division } } }) as Done<{ learners: number; total: number }>),
+  portal: () => read(api.GET('/v1/fees/portal')),
+  savePortal: (body: { show_to_families: boolean; how_to_pay: string }) => settle(api.PUT('/v1/fees/portal', { body: body as never }) as Done<PortalFees>),
   saveItems: (items: { id: string | null; name: string; optional: boolean; retired: boolean }[]) => settle(api.PUT('/v1/fees/items', { body: { items } as never }) as Done<{ items: FeeItem[] }>),
   saveShop: (items: { id: string | null; name: string; size: string | null; price: number; retired: boolean }[]) =>
     settle(api.PUT('/v1/fees/shop', { body: { items } as never }) as Done<{ saved: boolean }>),

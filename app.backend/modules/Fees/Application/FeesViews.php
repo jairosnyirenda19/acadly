@@ -87,15 +87,13 @@ final class FeesViews
     /** @return array{id: string, number: string, received_on: string, recorded_at: string, method: string, method_label: string, reference: string|null, payer: string, amount: int, received_by: string|null, void: array{number: string, reason: string, on: string}|null, shares: list<array{learner_id: string, name: string, class: string, amount: int, applied: list<array{label: string, amount: int}>, balance_after: int}>, can_cancel: bool} */
     public function receipt(User $viewer, string $paymentId): array
     {
-        $p = DB::table('fee_payments as p')->leftJoin('users as u', 'u.id', '=', 'p.received_by')->leftJoin('fee_payment_voids as v', 'v.payment_id', '=', 'p.id')
-            ->where('p.id', $paymentId)->first(['p.id', 'p.number', 'p.received_on', 'p.created_at', 'p.method', 'p.reference', 'p.payer_name', 'p.payer_phone', 'p.amount_minor',
-                'u.name as received_by', 'v.number as void_number', 'v.reason as void_reason', 'v.voided_on']);
+        $p = DB::table('fee_payments as p')->leftJoin('fee_payment_voids as v', 'v.payment_id', '=', 'p.id')->where('p.id', $paymentId)->first(['p.id', 'v.number as void_number']);
 
         if ($p === null) {
             throw new NotFoundHttpException;
         }
 
-        $shares = DB::table('fee_payment_shares')->where('payment_id', $paymentId)->get(['id', 'learner_id', 'amount_minor', 'applied', 'balance_after_minor']);
+        $shares = DB::table('fee_payment_shares')->where('payment_id', $paymentId)->get(['learner_id']);
         $seen = false;
 
         foreach ($shares as $s) {
@@ -107,6 +105,27 @@ final class FeesViews
             throw new NotFoundHttpException;
         }
 
+        return [...$this->receiptRecord($paymentId),
+            'can_cancel' => Row::maybeText($p, 'void_number') === null && $shares->every(fn (object $s): bool => $this->reach->may($viewer, FeesPermission::Adjust, Row::text($s, 'learner_id')))];
+    }
+
+    /**
+     * A receipt as it was given, read without a check: for a caller that has proved the
+     * person may see it (the parent portal proves the receipt includes their child).
+     *
+     * @return array{id: string, number: string, received_on: string, recorded_at: string, method: string, method_label: string, reference: string|null, payer: string, amount: int, received_by: string|null, void: array{number: string, reason: string, on: string}|null, shares: list<array{learner_id: string, name: string, class: string, amount: int, applied: list<array{label: string, amount: int}>, balance_after: int}>}
+     */
+    public function receiptRecord(string $paymentId): array
+    {
+        $p = DB::table('fee_payments as p')->leftJoin('users as u', 'u.id', '=', 'p.received_by')->leftJoin('fee_payment_voids as v', 'v.payment_id', '=', 'p.id')
+            ->where('p.id', $paymentId)->first(['p.id', 'p.number', 'p.received_on', 'p.created_at', 'p.method', 'p.reference', 'p.payer_name', 'p.payer_phone', 'p.amount_minor',
+                'u.name as received_by', 'v.number as void_number', 'v.reason as void_reason', 'v.voided_on']);
+
+        if ($p === null) {
+            throw new NotFoundHttpException;
+        }
+
+        $shares = DB::table('fee_payment_shares')->where('payment_id', $paymentId)->get(['id', 'learner_id', 'amount_minor', 'applied', 'balance_after_minor']);
         $names = $this->directory->names(array_values(array_map(fn (object $s): string => Row::text($s, 'learner_id'), $shares->all())));
 
         return [
@@ -129,7 +148,6 @@ final class FeesViews
                 'applied' => self::lines(Row::text($s, 'applied')),
                 'balance_after' => Row::int($s, 'balance_after_minor'),
             ], $shares->all())),
-            'can_cancel' => Row::maybeText($p, 'void_number') === null && $shares->every(fn (object $s): bool => $this->reach->may($viewer, FeesPermission::Adjust, Row::text($s, 'learner_id'))),
         ];
     }
 

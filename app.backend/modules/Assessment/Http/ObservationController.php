@@ -9,13 +9,18 @@ use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Identity\User;
 use Acadly\Modules\Assessment\Application\Actions\ObservationActions;
 use Acadly\Modules\Assessment\Application\Actions\ReviewActions;
+use Acadly\Modules\Assessment\Application\Actions\StepWordActions;
+use Acadly\Modules\Assessment\Application\CardDocuments;
 use Acadly\Modules\Assessment\Application\Observations;
 use Acadly\Modules\Assessment\Application\ProgressReviews;
 use Acadly\Modules\Assessment\Application\Reach;
+use Acadly\Modules\Assessment\Application\StepWords;
 use Acadly\Modules\Assessment\Contracts\AssessmentPermission;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /** Observations and progress reviews, for levels that record observations (D-094). */
@@ -179,13 +184,53 @@ final class ObservationController
      *
      * Only steps and words. `review` is null until a review is shared.
      *
-     * @response array{child: array{id: string, first_name: string, name: string, class_id: string|null, class: string}, review: array{period: string, room: string, shared_at: string, areas: list<array{name: string, step: string, label: string, strokes: int}>, family_note: string, home_note: string|null}|null}
+     * @response array{child: array{id: string, first_name: string, name: string, class_id: string|null, class: string}, review: array{period: string, room: string, shared_at: string, areas: list<array{name: string, step: string, label: string, label_ny: string, strokes: int}>, family_note: string, home_note: string|null}|null}
      */
     public function family(Request $request, string $id, Guardianship $guardianship, ProgressReviews $reviews): JsonResponse
     {
         $child = $guardianship->child(self::user($request), $id) ?? throw new NotFoundHttpException;
 
         return response()->json(['child' => $child, 'review' => $reviews->shared($id)]);
+    }
+
+    /**
+     * The school's words for the review steps (D-108), and whether the viewer may change them.
+     *
+     * @response array{en: array{starting: string, growing: string, can_do: string}, ny: array{starting: string, growing: string, can_do: string}, saved_at: string|null, saved_by: string|null, can_change: bool}
+     */
+    public function stepWords(Request $request, Access $access): JsonResponse
+    {
+        $who = self::user($request);
+        // A whole-school setting, for those who plan; the observation screens carry the words in their own answers.
+        $access->check($who, AssessmentPermission::Plan);
+
+        return response()->json([...StepWords::current(), 'can_change' => true]);
+    }
+
+    /** @response array{saved: bool} */
+    public function saveStepWords(Request $request, StepWordActions $actions, Access $access): JsonResponse
+    {
+        $access->check(self::user($request), AssessmentPermission::Plan);
+        $request->validate(['en' => ['required', 'array'], 'ny' => ['nullable', 'array'], 'en.starting' => ['required', 'string', 'max:24'], 'en.growing' => ['required', 'string', 'max:24'],
+            'en.can_do' => ['required', 'string', 'max:24'], 'ny.starting' => ['nullable', 'string', 'max:24'], 'ny.growing' => ['nullable', 'string', 'max:24'], 'ny.can_do' => ['nullable', 'string', 'max:24']]);
+        $word = fn (string $key): string => is_string($v = $request->input($key)) ? $v : '';
+        $actions->save(self::user($request), ['starting' => $word('en.starting'), 'growing' => $word('en.growing'), 'can_do' => $word('en.can_do')],
+            ['starting' => $word('ny.starting'), 'growing' => $word('ny.growing'), 'can_do' => $word('ny.can_do')]);
+
+        return response()->json(['saved' => true]);
+    }
+
+    /** The progress review shared with the family, as a PDF with its check code (D-107). */
+    public function familyPdf(Request $request, string $id, Guardianship $guardianship, ProgressReviews $reviews, CardDocuments $documents): Response
+    {
+        $parent = self::user($request);
+        $child = $guardianship->child($parent, $id) ?? throw new NotFoundHttpException;
+        $review = $reviews->shared($id) ?? throw new NotFoundHttpException;
+        $doc = $documents->review($parent, $child['name'], $review['id'], $review);
+        $documents->downloaded($parent, CardDocuments::REVIEW, $review['id'], $id);
+
+        return new Response($doc['pdf'], 200, ['Content-Type' => 'application/pdf',
+            'Content-Disposition' => HeaderUtils::makeDisposition(HeaderUtils::DISPOSITION_ATTACHMENT, $doc['name'], 'progress-review.pdf'), 'Cache-Control' => 'no-store']);
     }
 
     private static function holdsAnywhere(Access $access, User $who): bool

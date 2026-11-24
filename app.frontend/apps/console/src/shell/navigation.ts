@@ -135,6 +135,7 @@ export const GROUPS: NavGroup[] = [
       { key: 'document-types', where: 'school', label: t.nav.documentTypes, path: '/settings/learner-documents', icon: 'learners', show: (c) => can(c, 'enrolment.manage'), lights: under('/settings/learner-documents') },
       { key: 'messages', where: 'school', label: t.nav.messages, path: '/settings/messages', icon: 'messages', show: (c) => can(c, 'notify.manage'), lights: under('/settings/messages') },
       { key: 'assessment', where: 'school', label: t.nav.assessment, path: '/settings/assessment', icon: 'assessment', show: (c) => keepsGrading(c), lights: under('/settings/assessment') },
+      { key: 'review-steps', where: 'school', module: 'assessment', label: t.nav.reviewSteps, path: '/settings/review-steps', icon: 'reviews', show: (c) => namesSteps(c), lights: under('/settings/review-steps') },
       { key: 'approvals', where: 'school', label: t.nav.approvals, path: '/settings/approvals', icon: 'roles', show: (c) => can(c, 'access.approvals.manage'), lights: under('/settings/approvals') },
       { key: 'modules', where: 'school', label: t.nav.modules, path: '/settings/modules', icon: 'modules', show: (c) => can(c, 'modules.manage'), lights: under('/settings/modules') },
     ],
@@ -175,6 +176,11 @@ export function takesMarks(context: AppContext): boolean {
 /** Whether some level of the school records observations instead of marks, with the module on. */
 export function observes(context: AppContext): boolean {
   return moduleOn(context, 'assessment') && context.divisions.some((d) => modelOf(d) === 'observational')
+}
+
+/** Whether the account names the review steps (D-109): a level records observations, and the account plans assessment. */
+export function namesSteps(context: AppContext): boolean {
+  return observes(context) && holdsAnywhere(context, 'assessment.plan')
 }
 
 /** Whether the account works with observations or progress reviews anywhere. */

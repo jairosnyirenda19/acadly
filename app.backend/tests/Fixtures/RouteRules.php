@@ -18,7 +18,7 @@ final class RouteRules
     ];
 
     /** Routes about the account itself, not about a place. */
-    public const array OWN_ROUTES = ['auth.sign-out', 'me', 'me.context', 'me.account', 'me.account.notices', 'me.account.password', 'me.account.two-step', 'me.account.two-step.confirm', 'me.account.two-step.off', 'me.calendar', 'me.calendar.on', 'me.calendar.off', 'me.teaching', 'search', 'search.places', 'me.phone.code', 'me.phone.confirm', 'me.phone.remove', 'me.notifications', 'me.notifications.read', 'view-as.leave', 'approvals.waiting', 'portal.family', 'portal.confirm'];
+    public const array OWN_ROUTES = ['auth.sign-out', 'me', 'me.context', 'me.account', 'me.account.notices', 'me.account.password', 'me.account.two-step', 'me.account.two-step.confirm', 'me.account.two-step.off', 'me.calendar', 'me.calendar.on', 'me.calendar.off', 'me.teaching', 'search', 'search.places', 'me.phone.code', 'me.phone.confirm', 'me.phone.remove', 'me.notifications', 'me.notifications.read', 'view-as.leave', 'approvals.waiting', 'portal.family', 'portal.confirm', 'portal.fees.family'];
 
     /** Routes decided per record by the owning domain, and proved in its own tests. */
     public const array RECORD_ROUTES = [
@@ -60,7 +60,7 @@ final class RouteRules
         'messages.channels.sms', 'messages.channels.email', 'messages.limits', 'messages.test', 'messages.notice.save', 'messages.notice.reset',
         'modules.update', 'roles.store', 'roles.update', 'roles.destroy', 'approvals.topic.save',
         'assessment.publishing.settings', 'assessment.scales.store', 'assessment.scales.update', 'conduct.kinds.save', 'conduct.watch.save', 'support.rules.save',
-        'fees.items.save', 'fees.shop.save', 'learner-document-types.store', 'learner-document-types.update', 'learner-document-types.retire',
+        'fees.items.save', 'fees.shop.save', 'fees.portal.save', 'assessment.step-words', 'assessment.step-words.save', 'learner-document-types.store', 'learner-document-types.update', 'learner-document-types.retire',
     ];
 
     /**

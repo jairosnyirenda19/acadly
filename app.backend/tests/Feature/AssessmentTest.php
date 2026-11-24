@@ -552,6 +552,15 @@ it('publishes a ready class as a version with report cards, tells families, and 
         ->and(array_column($alinafe['subjects'], 'percent'))->toEqual([80, 50]);
     $this->actingAs($this->people['stranger'])->getJson("/api/v1/assessment/cards/{$publication}")->assertNotFound();
 
+    // D-107: the class's cards as one PDF, and one learner's, each with a check code; a stranger gets nothing.
+    $class = $this->actingAs($martha)->get("/api/v1/assessment/cards/{$publication}/pdf")->assertOk();
+    expect($class->headers->get('Content-Type'))->toBe('application/pdf')->and(substr((string) $class->getContent(), 0, 4))->toBe('%PDF');
+    $learners = count($cards->json('cards'));
+    expect(DB::table('document_checks')->where('kind', 'assessment.report_card')->count())->toBe($learners);
+    $one = $cards->json('cards.0.learner.id');
+    $this->actingAs($martha)->get("/api/v1/assessment/cards/{$publication}/pdf?learner_id={$one}")->assertOk();
+    $this->actingAs($this->people['stranger'])->get("/api/v1/assessment/cards/{$publication}/pdf")->assertNotFound();
+
     // Nothing changed: nothing to publish again.
     $this->actingAs($martha)->postJson('/api/v1/assessment/publishing', ['class_ids' => [$this->class]])->assertUnprocessable();
 

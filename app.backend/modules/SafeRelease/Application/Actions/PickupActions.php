@@ -13,6 +13,7 @@ use Acadly\Kernel\Blueprint\Blueprints;
 use Acadly\Kernel\Blueprint\Engine\JourneyEngine;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Notify\Notifier;
+use Acadly\Kernel\School\SchoolProfile;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Modules\SafeRelease\Application\Collectors;
@@ -20,6 +21,7 @@ use Acadly\Modules\SafeRelease\Application\PickupReach;
 use Acadly\Modules\SafeRelease\Contracts\SafeReleaseAudit;
 use Acadly\Modules\SafeRelease\Contracts\SafeReleasePermission;
 use Acadly\Modules\SafeRelease\Domain\Pickup;
+use Acadly\Modules\SafeRelease\Jobs\SendCollectorCodeText;
 use Acadly\Modules\SafeRelease\Journeys\Pickup\OutcomeId;
 use Acadly\Modules\SafeRelease\Journeys\Pickup\State;
 use Acadly\Modules\SafeRelease\Journeys\Pickup\StepId;
@@ -49,6 +51,7 @@ final class PickupActions
         private readonly Notifier $notifier,
         private readonly Audit $audit,
         private readonly Clock $clock,
+        private readonly SchoolProfile $school,
     ) {}
 
     /** Releases a child to someone on the list: a contact or a collector, with today's code where one is needed. */
@@ -84,13 +87,52 @@ final class PickupActions
         }
 
         return DB::transaction(function () use ($by, $learnerId, $at, $today, $person, $codeOk): Pickup {
-            $pickup = $this->start($by, $learnerId, $at, $today, $person['kind'], $person['id'], $person['name'], $person['relationship'], $codeOk, null);
+            // D-108: the arrival the gate marked for this person is the pick-up released; otherwise a new one starts.
+            $pickup = Pickup::query()->where('learner_id', $learnerId)->where('day', $today)->where('state', State::Announced->value)
+                ->where('collector_kind', $person['kind'])->where('collector_ref', $person['id'])->first();
+            if ($pickup instanceof Pickup) {
+                $pickup->forceFill(['code_checked' => $codeOk])->save();
+            } else {
+                $pickup = $this->start($by, $learnerId, $at, $today, $person['kind'], $person['id'], $person['name'], $person['relationship'], $codeOk, null);
+            }
             $this->engine->perform($pickup, $by, StepId::Verify, OutcomeId::Verified);
             $this->engine->perform($pickup, $by, StepId::Release, OutcomeId::Released);
             $now = $this->clock->now();
             DB::table('pickups')->where('id', $pickup->id)->update(['released_at' => $now, 'updated_at' => $now]);
             $this->notifier->send(new ChildReleased($pickup->id, $learnerId, (string) $at->id, CarbonImmutable::parse($now)->format('H:i'),
                 $person['name'].' ('.$person['relationship'].')'), $by);
+
+            return $pickup;
+        });
+    }
+
+    /**
+     * The gate marks that someone on the list has come for a child (D-108). It releases nobody:
+     * the room brings the child and releases them at the desk, with the code where one is needed.
+     */
+    public function arrive(User $by, string $learnerId, string $kind, string $id): Pickup
+    {
+        $at = $this->reach->learner($by, $learnerId, SafeReleasePermission::Release);
+        $today = $this->clock->today();
+        $person = null;
+        foreach ($this->collectors->mayCollect($learnerId, $today) as $c) {
+            if ($c['kind'] === $kind && $c['id'] === $id) {
+                $person = $c;
+            }
+        }
+        if ($person === null) {
+            throw ValidationException::withMessages(['collector' => ['This person is not on the list. Do not let them in. Call the room or the office.']]);
+        }
+        if ($this->collectedToday($learnerId)) {
+            throw ValidationException::withMessages(['collector' => ['The child was already collected today.']]);
+        }
+        if (Pickup::query()->where('learner_id', $learnerId)->where('day', $today)->where('state', State::Announced->value)->exists()) {
+            throw ValidationException::withMessages(['collector' => ['Someone is already marked at the gate for this child.']]);
+        }
+
+        return DB::transaction(function () use ($by, $learnerId, $at, $today, $person): Pickup {
+            $pickup = $this->start($by, $learnerId, $at, $today, $person['kind'], $person['id'], $person['name'], $person['relationship'], false, null);
+            $this->audit->record(SafeReleaseAudit::Arrived, actor: $this->audit->actorFor($by), at: $at, aboutPersonId: $learnerId, meta: ['pickup' => $pickup->id]);
 
             return $pickup;
         });
@@ -107,7 +149,13 @@ final class PickupActions
         }
 
         return DB::transaction(function () use ($by, $learnerId, $at, $name, $note): Pickup {
-            $pickup = $this->start($by, $learnerId, $at, $this->clock->today(), Pickup::UNKNOWN, null, mb_substr($name, 0, 120), null, false, trim($note) !== '' ? mb_substr(trim($note), 0, 2000) : null);
+            // D-109: a refusal at the desk closes the arrival the gate marked, if there is one.
+            $pickup = Pickup::query()->where('learner_id', $learnerId)->where('day', $this->clock->today())->where('state', State::Announced->value)->first();
+            if ($pickup instanceof Pickup) {
+                $pickup->forceFill(['note' => trim($note) !== '' ? mb_substr(trim($note), 0, 2000) : null])->save();
+            } else {
+                $pickup = $this->start($by, $learnerId, $at, $this->clock->today(), Pickup::UNKNOWN, null, mb_substr($name, 0, 120), null, false, trim($note) !== '' ? mb_substr(trim($note), 0, 2000) : null);
+            }
             $this->engine->perform($pickup, $by, StepId::Dispute, OutcomeId::NotOnTheList, ['reason' => trim($note) !== '' ? trim($note) : $name]);
             $this->notifier->send(new ReleaseRefused($pickup->id, $learnerId, (string) $at->id, CarbonImmutable::parse($this->clock->now())->format('H:i'), $pickup->collector_name), $by);
 
@@ -135,9 +183,9 @@ final class PickupActions
      * A parent adds someone to collect their child today. The code is shown
      * once, for the parent to pass on; only its hash is kept.
      *
-     * @return array{id: string, code: string}
+     * @return array{id: string, code: string, sent_to: string|null}
      */
-    public function addForToday(User $parent, Guardianship $guardianship, string $learnerId, string $name, string $relationship, ?string $phone): array
+    public function addForToday(User $parent, Guardianship $guardianship, string $learnerId, string $name, string $relationship, ?string $phone, bool $sendCode = false): array
     {
         $child = $guardianship->child($parent, $learnerId) ?? throw new NotFoundHttpException;
         $place = $this->directory->placeOf($learnerId);
@@ -156,14 +204,19 @@ final class PickupActions
         $id = Ids::next();
         $code = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
 
-        DB::transaction(function () use ($parent, $learnerId, $place, $id, $name, $relationship, $phone, $today, $code): void {
+        $send = $sendCode && $phone !== null;
+        DB::transaction(function () use ($parent, $learnerId, $place, $id, $name, $relationship, $phone, $today, $code, $send, $child): void {
             DB::table('release_collectors')->insert(['id' => $id, 'learner_id' => $learnerId, 'name' => $name, 'relationship' => $relationship, 'phone' => $phone,
                 'valid_on' => $today, 'code_hash' => Collectors::codeHash($id, $code), 'added_as' => 'family', 'added_by' => $parent->id, 'created_at' => $this->clock->now()]);
             $this->audit->record(SafeReleaseAudit::CollectorAdded, actor: $this->audit->actorFor($parent), at: ScopeRef::of(ScopeType::ClassGroup, $place['class_id']),
-                aboutPersonId: $learnerId, meta: ['collector' => $id, 'today_only' => true, 'by_family' => true]);
+                aboutPersonId: $learnerId, meta: ['collector' => $id, 'today_only' => true, 'by_family' => true, 'code_sent' => $send]);
+            if ($send) {
+                // D-108: the code goes only to the phone the family typed; it is not a notice and is never kept in the messages sent.
+                SendCollectorCodeText::dispatch($id, $today, $phone, "{$this->school->shortName()}: you may collect {$child['first_name']} today. Show this code at the gate: {$code}. It works today only.");
+            }
         });
 
-        return ['id' => $id, 'code' => $code];
+        return ['id' => $id, 'code' => $code, 'sent_to' => $send ? $phone : null];
     }
 
     public function endCollector(User $by, string $collectorId): void

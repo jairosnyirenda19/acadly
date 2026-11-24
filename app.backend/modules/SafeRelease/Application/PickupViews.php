@@ -31,7 +31,7 @@ final class PickupViews
     /**
      * The rooms the account sees and, for the chosen room, each child today.
      *
-     * @return array{day: string, rooms: list<array{id: string, name: string}>, room: array{id: string, name: string}|null, children: list<array{id: string, name: string, collected: PickupRow|null, refused: int}>, totals: array{children: int, collected: int, here: int}, can_release: bool}
+     * @return array{day: string, rooms: list<array{id: string, name: string}>, room: array{id: string, name: string}|null, children: list<array{id: string, name: string, collected: PickupRow|null, refused: int}>, at_gate: list<array{pickup_id: string, learner_id: string, child: string, name: string, relationship: string|null, kind: string, ref: string|null, needs_code: bool, at: string}>, totals: array{children: int, collected: int, here: int, at_gate: int}, can_release: bool}
      */
     public function desk(User $who, ?string $classId): array
     {
@@ -56,6 +56,28 @@ final class PickupViews
 
         $rows = [];
         $collected = 0;
+        $names = [];
+        foreach ($children as $c) {
+            $names[$c['id']] = $c['name'];
+        }
+        // D-108: who the gate marked as arrived, waiting for the room to bring the child.
+        $atGate = [];
+        foreach ($byChild as $learnerId => $list) {
+            foreach ($list as $p) {
+                if ($p->state !== State::Announced->value) {
+                    continue;
+                }
+                $needs = false;
+                foreach ($this->collectors->mayCollect((string) $learnerId, $today) as $m) {
+                    if ($m['kind'] === $p->collector_kind && $m['id'] === $p->collector_ref) {
+                        $needs = $m['needs_code'];
+                    }
+                }
+                $atGate[] = ['pickup_id' => $p->id, 'learner_id' => (string) $learnerId, 'child' => $names[$learnerId] ?? '', 'name' => $p->collector_name,
+                    'relationship' => $p->collector_relationship, 'kind' => $p->collector_kind, 'ref' => $p->collector_ref, 'needs_code' => $needs,
+                    'at' => $p->created_at->toIso8601String()];
+            }
+        }
 
         foreach ($children as $c) {
             $done = null;
@@ -77,7 +99,8 @@ final class PickupViews
             'rooms' => array_map(fn (array $r): array => ['id' => $r['id'], 'name' => $r['name']], $rooms),
             'room' => $room === null ? null : ['id' => $room['id'], 'name' => $room['name']],
             'children' => $rows,
-            'totals' => ['children' => count($rows), 'collected' => $collected, 'here' => count($rows) - $collected],
+            'at_gate' => $atGate,
+            'totals' => ['children' => count($rows), 'collected' => $collected, 'here' => count($rows) - $collected, 'at_gate' => count($atGate)],
             'can_release' => $room !== null && $this->reach->may($who, SafeReleasePermission::Release, $room['id']),
         ];
     }

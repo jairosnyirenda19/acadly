@@ -3,6 +3,7 @@ import { applyLook } from '@acadly/ui'
 import { useEffect, useState } from 'react'
 import { AttendancePage, CardPage, MessagesPage, ReasonPage } from './ChildPages'
 import { PickupPage, ReviewPage } from './EarlyPages'
+import { FeesPage, PaymentsPage } from './FeesPages'
 import type { Language } from './copy'
 import { ChildScreen, Home } from './Family'
 import { keepLanguage, LanguageContext, savedLanguage } from './parts'
@@ -36,7 +37,7 @@ export function App() {
   }
 
   let screen
-  const child = /^\/child\/([0-9a-f-]{36})(?:\/(card|attendance|messages|reason|review|pickup)(?:\/(\d{4}-\d{2}-\d{2}))?)?$/.exec(path)
+  const child = /^\/child\/([0-9a-f-]{36})(?:\/(card|attendance|messages|reason|review|pickup|fees|payments)(?:\/(\d{4}-\d{2}-\d{2}))?)?$/.exec(path)
 
   if (account === undefined) screen = <div className="min-h-screen bg-paper" />
   else if (account === null) {
@@ -60,6 +61,10 @@ export function App() {
         <MessagesPage id={id} />
       ) : child[2] === 'review' ? (
         <ReviewPage id={id} />
+      ) : child[2] === 'fees' ? (
+        <FeesPage id={id} />
+      ) : child[2] === 'payments' ? (
+        <PaymentsPage id={id} />
       ) : child[2] === 'pickup' ? (
         <PickupPage id={id} />
       ) : child[2] === 'reason' ? (

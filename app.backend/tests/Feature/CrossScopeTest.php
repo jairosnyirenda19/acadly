@@ -9,6 +9,7 @@ use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Ids;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route as Router;
@@ -62,6 +63,8 @@ it('lists only routes that exist, and every open route needs no sign-in', functi
 });
 
 it('refuses every place-bound route to an account that holds everything, but only at another campus', function (): void {
+    // The walk calls every route once; rate limits are not what it tests, and their counter is shared by the account.
+    $this->withoutMiddleware(ThrottleRequests::class);
     $this->artisan('acadly:sync')->assertSuccessful();
     DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'attendance', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
     DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'assessment', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()]);
@@ -133,7 +136,7 @@ it('refuses every place-bound route to an account that holds everything, but onl
         'registers.' => ['id' => $school->id('class_secondary_b'), 'register' => $school->id('class_secondary_b'), 'learner' => $learner, 'slot' => $slot],
         'assessment.' => ['id' => $assessment],
         'assessment.learner' => ['id' => $learner],
-        'portal.' => ['id' => $learner, 'day' => '2026-10-01'],
+        'portal.' => ['id' => $learner, 'day' => '2026-10-01', 'receipt' => $learner],
         'year-end.' => ['division' => $school->id('secondary'), 'id' => $learner],
         'conduct.' => ['id' => $learner, 'step' => 'take-up'],
         'support.' => ['id' => $learner, 'what' => 'agree'],

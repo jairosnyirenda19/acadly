@@ -70,6 +70,7 @@ export function PlanScreen({ id }: { id: string }) {
             </section>
             <Goals plan={p} onAdd={(g) => run('goals', g)} />
             <Actions plan={p} onAdd={(a) => run('actions', a)} />
+            <ForTheFamily plan={p} onSaved={loaded.reload} />
             {p.reviews.length > 0 && (
               <section className="border-2 border-ink bg-sheet px-4 py-3">
                 <h2 className="type-display mb-2 text-[26px] leading-none">{t.reviews}</h2>
@@ -111,6 +112,71 @@ export function PlanScreen({ id }: { id: string }) {
         </div>
       </div>
     </>
+  )
+}
+
+/** The part written for the family (D-110): what the school does and what the family can do at home, shown in the portal when ticked. */
+function ForTheFamily({ plan, onSaved }: { plan: Plan; onSaved: () => void }) {
+  const f = t.family
+  const [school, setSchool] = useState(plan.family.school ?? '')
+  const [home, setHome] = useState(plan.family.home ?? '')
+  const [shown, setShown] = useState(plan.family.shown)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const changed = school !== (plan.family.school ?? '') || home !== (plan.family.home ?? '') || shown !== plan.family.shown
+
+  const save = async () => {
+    setBusy(true)
+    setError(null)
+    const result = await supportApi.family(plan.id, { school, home, shown })
+    setBusy(false)
+    if (result.kind === 'saved') {
+      onSaved()
+      slips.done({ word: copy.slips.saved, title: f.saved })
+    } else setError(result.kind === 'invalid' ? (Object.values(result.errors)[0]?.[0] ?? t.failed) : t.failed)
+  }
+
+  if (plan.confidential) {
+    return (
+      <section className="border-2 border-ink bg-sheet px-4 py-3" aria-label={f.title}>
+        <h2 className="type-display mb-2 text-[26px] leading-none">{f.title}</h2>
+        <p className="text-sm">■ {f.confidential}</p>
+      </section>
+    )
+  }
+
+  return (
+    <section className="grid gap-3 border-2 border-ink bg-sheet px-4 py-3" aria-label={f.title}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="type-display text-[26px] leading-none">{f.title}</h2>
+        {plan.family.shown ? <Tag tone="done">✓ {f.shownTag}</Tag> : <Tag tone="plain">{f.notShownTag}</Tag>}
+      </div>
+      {plan.can.family ? (
+        <>
+          <TextArea label={f.school} value={school} onChange={(e) => setSchool(e.target.value)} maxLength={600} rows={3} />
+          <TextArea label={f.home} value={home} onChange={(e) => setHome(e.target.value)} maxLength={600} rows={3} />
+          <label className="flex items-center gap-2.5 text-[15px] font-extrabold">
+            <input type="checkbox" checked={shown} onChange={(e) => setShown(e.target.checked)} className="size-5 accent-ink" />
+            {f.show}
+          </label>
+          <p className="text-[13px] text-text-muted">{f.note}</p>
+          {error !== null && <p className="text-sm font-bold text-red-text">✕ {error}</p>}
+          <div>
+            <Button busy={busy} disabled={!changed} onClick={() => void save()}>
+              {f.save}
+            </Button>
+          </div>
+        </>
+      ) : (
+        <dl className="grid gap-2 text-sm">
+          <dt className="label-caps text-text-muted">{f.school}</dt>
+          <dd>{plan.family.school ?? '–'}</dd>
+          <dt className="label-caps text-text-muted">{f.home}</dt>
+          <dd>{plan.family.home ?? '–'}</dd>
+        </dl>
+      )}
+      <p className="border-t border-rule pt-2 text-[13px] text-text-muted">{f.staysInSchool}</p>
+    </section>
   )
 }
 

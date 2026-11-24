@@ -125,7 +125,7 @@ export function LearnerScreen({ id }: { id: string }) {
     const waiting = <Waiting phase={loaded.phase} what={t.title} labels={copy.loading} rows={6} onRetry={loaded.reload} />
 
     // Not in the place worked in (D-099): offer the division the learner is in, when the account works there too.
-    return loaded.phase === 'failed' || loaded.phase === 'refused' ? <Elsewhere id={id} fallback={waiting} /> : waiting
+    return loaded.phase === 'failed' || loaded.phase === 'refused' || loaded.phase === 'missing' ? <Elsewhere id={id} fallback={waiting} /> : waiting
   }
 
   const word = record.word.toLowerCase()

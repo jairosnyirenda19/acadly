@@ -34,6 +34,9 @@ use Illuminate\Support\Carbon;
  * @property string|null $outcome
  * @property string|null $closing_note
  * @property string $opened_by
+ * @property string|null $family_school
+ * @property string|null $family_home
+ * @property bool $family_shown
  * @property Carbon $created_at
  */
 final class SupportPlan extends Model implements Auditable, JourneySubject
@@ -42,7 +45,7 @@ final class SupportPlan extends Model implements Auditable, JourneySubject
 
     protected $table = 'support_plans';
 
-    protected $fillable = ['learner_id', 'class_id', 'title', 'concern', 'signals', 'lead_by', 'confidential', 'tell_family', 'review_days', 'next_review_on',
+    protected $fillable = ['family_school', 'family_home', 'family_shown', 'learner_id', 'class_id', 'title', 'concern', 'signals', 'lead_by', 'confidential', 'tell_family', 'review_days', 'next_review_on',
         'state', 'journey_ref', 'outcome', 'closing_note', 'opened_by'];
 
     protected function casts(): array

@@ -83,14 +83,18 @@ function TakeRegister({ state, onDone }: { state: RegisterState; onDone: (next: 
     const kept = readDraft(key)
     const ids = new Set(state.learners.map((l) => l.id))
 
-    return Object.fromEntries(Object.entries(kept).filter(([id, m]) => ids.has(id) && MARKS.includes(m.status)))
+    // A decision sets the mark of a suspended learner (D-111): Excused, and locked.
+    const decided = Object.fromEntries(state.learners.filter((l) => l.decided !== null).map((l) => [l.id, { status: 'excused' as MarkValue, note: '' }]))
+
+    return { ...Object.fromEntries(Object.entries(kept).filter(([id, m]) => ids.has(id) && MARKS.includes(m.status))), ...decided }
   })
+  const locked = new Set(state.learners.filter((l) => l.decided !== null).map((l) => l.id))
   const [working, setWorking] = useState(false)
   const [failed, setFailed] = useState<string | null>(null)
 
   useEffect(() => writeDraft(key, Object.keys(draft).length > 0 ? draft : null), [key, draft])
 
-  const set = (id: string, status: MarkValue) => setDraft((d) => ({ ...d, [id]: { status, note: d[id]?.note ?? '' } }))
+  const set = (id: string, status: MarkValue) => !locked.has(id) && setDraft((d) => ({ ...d, [id]: { status, note: d[id]?.note ?? '' } }))
   const note = (id: string, text: string) => setDraft((d) => (d[id] !== undefined ? { ...d, [id]: { ...d[id], note: text } } : d))
   const cycle = (id: string) => {
     const now = draft[id]?.status
@@ -200,6 +204,19 @@ function TakeRegister({ state, onDone }: { state: RegisterState; onDone: (next: 
                 <span className="hidden md:block">
                   <History learner={l} days={state.days_before} />
                 </span>
+                {l.decided !== null ? (
+                  <>
+                    <span className="flex flex-col items-end gap-0.5 md:items-start">
+                      <Tag tone="plain">■ {t.suspended}</Tag>
+                      <span className="text-[13px] text-text-muted md:hidden">{t.setByDecision}</span>
+                    </span>
+                    <span className="hidden text-[13px] md:block">
+                      <b>{t.decidedLine(shortDay(l.decided.from), shortDay(l.decided.to), l.decided.reference)}</b>
+                      <span className="block text-text-muted">{t.setByDecision}</span>
+                    </span>
+                  </>
+                ) : (
+                <>
                 <span role="radiogroup" aria-label={l.name} className="hidden gap-1 md:flex">
                   {MARKS.map((m) => (
                     <button
@@ -234,10 +251,13 @@ function TakeRegister({ state, onDone }: { state: RegisterState; onDone: (next: 
                     <span className="text-[13px] text-text-muted">{mark === null ? t.notMarked : ''}</span>
                   )}
                 </span>
+                </>
+                )}
               </div>
             )
           })}
         </div>
+        {locked.size > 0 && <p className="mt-2.5 text-[13px] font-bold">! {t.suspendedNote}</p>}
         <p className="mt-2.5 text-[13px] text-text-muted">{t.draftKept}</p>
         {state.late && (
           <div className="mt-3 grid max-w-[640px] gap-2 border-l-[6px] border-marigold bg-marigold-wash px-3.5 py-3 text-sm">
@@ -360,7 +380,8 @@ function SubmittedRegister({ state, onChange }: { state: RegisterState; onChange
                         </>
                       ) : (
                         state.can_request &&
-                        l.mark !== null && (
+                        l.mark !== null &&
+                        l.decided === null && (
                           <SmallButton onClick={() => setAsking(asking === l.id ? null : l.id)}>{t.requestChange}</SmallButton>
                         )
                       )}

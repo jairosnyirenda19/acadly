@@ -67,17 +67,24 @@ final class KindActions
         });
     }
 
-    public function saveWatch(User $by, int $incidents, int $days, bool $openSerious): void
+    /**
+     * @param  array{incidents: int, days: int, open_serious: bool, missed_incidents: int, missed_lessons: int, missed_days: int, portal: bool}  $rules
+     */
+    public function saveWatch(User $by, array $rules): void
     {
         $this->access->check($by, ConductPermission::Manage);
 
-        if ($incidents < 1 || $incidents > 50 || $days < 1 || $days > 365) {
+        if ($rules['incidents'] < 1 || $rules['incidents'] > 50 || $rules['days'] < 1 || $rules['days'] > 365) {
             throw ValidationException::withMessages(['watch' => ['Give from 1 to 50 incidents in from 1 to 365 days.']]);
         }
+        if ($rules['missed_incidents'] < 0 || $rules['missed_incidents'] > 50 || $rules['missed_lessons'] < 1 || $rules['missed_lessons'] > 200
+            || $rules['missed_days'] < 1 || $rules['missed_days'] > 90) {
+            throw ValidationException::withMessages(['missed' => ['Give from 0 to 50 incidents, from 1 to 200 missed lessons, and from 1 to 90 days. 0 incidents turns the rule off.']]);
+        }
 
-        DB::transaction(function () use ($by, $incidents, $days, $openSerious): void {
-            DB::table('conduct_watch')->updateOrInsert(['id' => 1], ['incidents' => $incidents, 'days' => $days, 'open_serious' => $openSerious, 'updated_at' => $this->clock->now()]);
-            $this->audit->record(ConductAudit::WatchSaved, actor: $this->audit->actorFor($by), meta: ['incidents' => $incidents, 'days' => $days, 'open_serious' => $openSerious]);
+        DB::transaction(function () use ($by, $rules): void {
+            DB::table('conduct_watch')->updateOrInsert(['id' => 1], [...$rules, 'updated_at' => $this->clock->now()]);
+            $this->audit->record(ConductAudit::WatchSaved, actor: $this->audit->actorFor($by), meta: $rules);
         });
     }
 }

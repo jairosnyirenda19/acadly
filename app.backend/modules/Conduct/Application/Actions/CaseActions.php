@@ -12,6 +12,7 @@ use Acadly\Kernel\Notify\Notifier;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Kernel\Support\Row;
+use Acadly\Modules\Conduct\Application\Suspensions;
 use Acadly\Modules\Conduct\Contracts\ConductAudit;
 use Acadly\Modules\Conduct\Contracts\ConductPermission;
 use Acadly\Modules\Conduct\Domain\ConductCase;
@@ -175,6 +176,38 @@ final class CaseActions
         }
 
         return $out;
+    }
+
+    /**
+     * Ends a learner's suspension early (D-111): it covers no day after
+     * yesterday, so today's register opens again. With a reason.
+     */
+    public function endSuspension(User $by, string $id, string $learnerId, string $reason): void
+    {
+        $case = $this->find($by, $id);
+        $this->access->check($by, ConductPermission::FollowUp, $case->journeyScope());
+        $reason = trim($reason);
+        $outcome = self::latestOutcomes($case->id)[$learnerId] ?? null;
+
+        if ($outcome === null || Row::text($outcome, 'outcome') !== Sanction::Suspension->value || ! in_array($case->state, Suspensions::DECIDED, true)) {
+            throw ValidationException::withMessages(['learner_id' => ['This learner has no decided suspension in this incident.']]);
+        }
+        if (Suspensions::endsOf([Row::text($outcome, 'id')]) !== []) {
+            throw ValidationException::withMessages(['learner_id' => ['This suspension has already been ended.']]);
+        }
+        if ($reason === '') {
+            throw ValidationException::withMessages(['reason' => ['Say why.']]);
+        }
+
+        $yesterday = CarbonImmutable::parse($this->clock->today())->subDay()->toDateString();
+
+        DB::transaction(function () use ($by, $case, $outcome, $learnerId, $reason, $yesterday): void {
+            DB::table('conduct_suspension_ends')->insert(['id' => Ids::next(), 'outcome_id' => Row::text($outcome, 'id'), 'ended_after' => $yesterday,
+                'reason' => mb_substr($reason, 0, 2000), 'ended_by' => $by->id, 'created_at' => $this->clock->now()]);
+            $this->note($by, $case, 'Ended a suspension early.');
+            $this->audit->record(ConductAudit::SuspensionEnded, subject: $case, actor: $this->audit->actorFor($by), at: $case->journeyScope(), reason: $reason,
+                meta: ['learner' => $learnerId]);
+        });
     }
 
     /** "Suspension: 3 school days from 19 Nov". */

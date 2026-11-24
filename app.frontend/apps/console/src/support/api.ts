@@ -28,6 +28,8 @@ export const supportApi = {
     settle(api.POST('/v1/support/plans', { body: body as never }) as Done<{ id: string }>),
   change: (id: string, what: 'goals' | 'actions' | 'agree' | 'reviews' | 'close', body: Record<string, unknown> = {}) =>
     settle(api.POST('/v1/support/plans/{id}/{what}', { params: { path: { id, what } }, body: body as never }) as Done<{ id: string }>),
+  family: (id: string, body: { school: string; home: string; shown: boolean }) =>
+    settle(api.PUT('/v1/support/plans/{id}/family', { params: { path: { id } }, body: body as never }) as Done<{ id: string }>),
   setAside: (learnerId: string, until: string, reason: string) =>
     settle(api.POST('/v1/support/learners/{id}/set-aside', { params: { path: { id: learnerId } }, body: { until, reason } as never }) as Done<{ set_aside: boolean }>),
   saveRules: (values: Record<string, number>) => settle(api.PUT('/v1/support/rules', { body: { values } as never }) as Done<{ saved: boolean }>),

@@ -30,7 +30,7 @@ export function RecordConductScreen() {
 
   const add = (id: string) => {
     void learnersApi.record(id).then((r) => {
-      if (r !== null && r !== 'refused' && !learners.some((l) => l.id === id)) setLearners((now) => [...now, { id, name: r.name }])
+      if (r !== null && r !== 'refused' && r !== 'missing' && !learners.some((l) => l.id === id)) setLearners((now) => [...now, { id, name: r.name }])
     })
     setAdding(false)
   }

@@ -7,6 +7,7 @@ namespace Acadly\Core\Enrolment;
 use Acadly\Core\Enrolment\Application\Actions\FamilyActions;
 use Acadly\Core\Enrolment\Application\DetailsApproval;
 use Acadly\Core\Enrolment\Application\Directory;
+use Acadly\Core\Enrolment\Application\DocumentsFamilyLine;
 use Acadly\Core\Enrolment\Application\EnrolmentDashboard;
 use Acadly\Core\Enrolment\Application\Families;
 use Acadly\Core\Enrolment\Application\LearnerFigures;
@@ -46,6 +47,7 @@ final class EnrolmentServiceProvider extends ServiceProvider
         $this->app->bind(PhoneHolders::class, Families::class);
         $this->app->bind(FamilyAccounts::class, FamilyActions::class);
         $this->app->tag([LearnersGrid::class], Grids::TAG);
+        $this->app->tag([DocumentsFamilyLine::class], FamilyLine::TAG);
         $this->app->tag([LearnerFigures::class], DivisionFigures::TAG);
         $this->app->tag([EnrolmentDashboard::class], DashboardPanels::TAG);
         $this->app->tag([DetailsApproval::class], ApprovalTopic::TAG);

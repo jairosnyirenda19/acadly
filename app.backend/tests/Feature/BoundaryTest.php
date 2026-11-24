@@ -151,7 +151,7 @@ it('refuses every route pointed at Secondary, and keeps every list to Primary, f
         'registers.' => ['id' => $school->id('class_secondary_b'), 'register' => $school->id('class_secondary_b'), 'learner' => $this->outside, 'slot' => $this->slot],
         'assessment.' => ['id' => $this->assessment],
         'assessment.learner' => ['id' => $this->outside],
-        'portal.' => ['id' => $this->outside, 'day' => '2026-10-01', 'receipt' => $this->payment],
+        'portal.' => ['id' => $this->outside, 'day' => '2026-10-01', 'receipt' => $this->payment, 'document' => $this->outside],
         'year-end.' => ['division' => $school->id('secondary'), 'id' => $this->outside],
         'conduct.' => ['id' => $this->outside, 'step' => 'take-up'],
         'support.' => ['id' => $this->outside, 'what' => 'agree'],
@@ -164,7 +164,7 @@ it('refuses every route pointed at Secondary, and keeps every list to Primary, f
         'student.' => ['id' => $this->outside],
         'fees.' => ['id' => $this->outside, 'period' => $this->term, 'division' => $school->id('secondary'), 'day' => '2026-10-01'],
         // Each record route at a real record of Secondary.
-        'conduct.incidents.' => ['id' => $this->case, 'step' => 'take-up'],
+        'conduct.incidents.' => ['id' => $this->case, 'step' => 'take-up', 'learner' => $this->outside],
         'conduct.entries.' => ['id' => $this->entry],
         'support.plans.' => ['id' => $this->plan, 'what' => 'agree'],
         'fees.payments.' => ['id' => $this->payment],

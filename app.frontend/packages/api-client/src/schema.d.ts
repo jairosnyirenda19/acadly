@@ -1223,6 +1223,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/conduct/incidents/{id}/learners/{learner}/end-suspension": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ends a learner's suspension early, with a reason. Today's register opens again */
+        post: operations["conduct.incidents.end-suspension"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/conduct/incidents/{id}/{step}": {
         parameters: {
             query?: never;
@@ -1699,6 +1716,65 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/portal/children/{id}/conduct": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A child's conduct, as the family was told it
+         * @description This term's counts, the serious incidents still open with their stage
+         *     and decision, and the entries of the school year: the date and the kind.
+         */
+        get: operations["portal.conduct"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portal/children/{id}/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The documents the school shows to the family
+         * @description Copies of the documents of the types the school shares with families,
+         *     newest first. Not found when there is none.
+         */
+        get: operations["portal.documents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portal/children/{id}/documents/{document}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One shared document, to open, save or print. Each opening is recorded */
+        get: operations["portal.documents.content"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/portal/fees": {
         parameters: {
             query?: never;
@@ -1767,6 +1843,28 @@ export interface paths {
         };
         /** A receipt that includes the child, as a PDF: the same receipt the fees desk gives, with its check code */
         get: operations["portal.fees.receipt"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portal/children/{id}/support": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A child's support plans, as the family sees them
+         * @description The open plans the school shows to the family: the title, who leads it,
+         *     the next review, and the part written for the family. Not found when
+         *     there is none.
+         */
+        get: operations["portal.support"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6615,6 +6713,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/support/plans/{id}/family": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Saves the part of a plan written for the family, and whether the family sees it */
+        put: operations["support.plans.family"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/support/plans/{id}/{what}": {
         parameters: {
             query?: never;
@@ -10789,6 +10904,10 @@ export interface operations {
                             incidents: number;
                             days: number;
                             open_serious: boolean;
+                            missed_incidents: number;
+                            missed_lessons: number;
+                            missed_days: number;
+                            portal: boolean;
                         };
                     };
                 };
@@ -10823,6 +10942,10 @@ export interface operations {
                             incidents: number;
                             days: number;
                             open_serious: boolean;
+                            missed_incidents: number;
+                            missed_lessons: number;
+                            missed_days: number;
+                            portal: boolean;
                         };
                     };
                 };
@@ -10881,6 +11004,10 @@ export interface operations {
                     incidents: number;
                     days: number;
                     open_serious: boolean;
+                    missed_incidents: number;
+                    missed_lessons: number;
+                    missed_days: number;
+                    portal: boolean;
                 };
             };
         };
@@ -11078,6 +11205,8 @@ export interface operations {
                                 outcome: string;
                                 text: string;
                                 reason: string;
+                                ended_after: string | null;
+                                can_end: boolean;
                             } | null;
                         }[];
                         notes: {
@@ -11163,6 +11292,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "conduct.incidents.end-suspension": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                learner: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
                 };
             };
             401: components["responses"]["AuthenticationException"];
@@ -12267,6 +12428,114 @@ export interface operations {
             404: components["responses"]["NotFoundHttpException"];
         };
     };
+    "portal.conduct": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        child: {
+                            id: string;
+                            first_name: string;
+                            name: string;
+                        };
+                        term: string | null;
+                        commendations: number;
+                        incidents: number;
+                        serious: {
+                            id: string;
+                            kind: string;
+                            happened_on: string;
+                            stage: string;
+                            decision: string | null;
+                            meeting: boolean;
+                        }[];
+                        entries: {
+                            id: string;
+                            kind: string;
+                            commendation: boolean;
+                            serious: boolean;
+                            happened_on: string;
+                            this_term: boolean;
+                        }[];
+                        school_phone: string | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "portal.documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        child: {
+                            id: string;
+                            first_name: string;
+                            name: string;
+                        };
+                        documents: {
+                            id: string;
+                            title: string;
+                            type: string;
+                            date: string | null;
+                            added_on: string;
+                            file_type: string;
+                        }[];
+                        school_phone: string | null;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "portal.documents.content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                document: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "portal.fees.family": {
         parameters: {
             query?: never;
@@ -12419,6 +12688,45 @@ export interface operations {
                 };
                 content: {
                     "application/pdf": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "portal.support": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        child: {
+                            id: string;
+                            first_name: string;
+                            name: string;
+                        };
+                        plans: {
+                            id: string;
+                            title: string;
+                            lead: string;
+                            opened_on: string;
+                            next_review_on: string;
+                            state: string;
+                            school: string;
+                            home: string;
+                        }[];
+                        school_phone: string | null;
+                    };
                 };
             };
             401: components["responses"]["AuthenticationException"];
@@ -14325,6 +14633,7 @@ export interface operations {
                             name: string;
                             access: string;
                             expected: boolean;
+                            families: boolean;
                             retired: boolean;
                             on_file: number;
                         }[];
@@ -16693,6 +17002,12 @@ export interface operations {
                             morning: string | null;
                             earlier: string | null;
                             before: string | null;
+                            decided: {
+                                label: string;
+                                reference: string;
+                                from: string;
+                                to: string;
+                            } | null;
                             mark: {
                                 status: string;
                                 note: string | null;
@@ -21620,6 +21935,12 @@ export interface operations {
                             name: string;
                             admission_number: string | null;
                             history: (string | null)[];
+                            decided: {
+                                label: string;
+                                reference: string;
+                                from: string;
+                                to: string;
+                            } | null;
                             mark: {
                                 status: string;
                                 note: string | null;
@@ -27266,7 +27587,13 @@ export interface operations {
                             of: number;
                         }[];
                         closing_note: string | null;
+                        family: {
+                            school: string | null;
+                            home: string | null;
+                            shown: boolean;
+                        };
                         can: {
+                            family: boolean;
                             lead: boolean;
                             agree: boolean;
                             review: boolean;
@@ -27276,6 +27603,39 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "support.plans.family": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    school?: string | null;
+                    home?: string | null;
+                    shown: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "support.plans.change": {

@@ -16,9 +16,12 @@ export interface WaitingLabels {
   retry: string
   refusedTitle: string
   refusedText: string
+  /** Not found, or outside the place the user works in. */
+  missingTitle?: string
+  missingText?: string
 }
 
-type Phase = 'quiet' | 'waiting' | 'slow' | 'ready' | 'refused' | 'failed'
+type Phase = 'quiet' | 'waiting' | 'slow' | 'ready' | 'refused' | 'missing' | 'failed'
 
 const dashed = 'border-2 border-dashed border-rule-dashed'
 
@@ -77,11 +80,14 @@ function Line({ tone, title, children }: { tone: 'attention' | 'wrong'; title: s
 export function Waiting({ phase, what, labels, band, rows = 5, onRetry }: { phase: Phase; what: string; labels: WaitingLabels; band?: string[] | undefined; rows?: number; onRetry?: () => void }) {
   if (phase === 'ready') return null
 
-  if (phase === 'failed' || phase === 'refused') {
+  if (phase === 'failed' || phase === 'refused' || phase === 'missing') {
+    const title = phase === 'failed' ? labels.failedTitle : phase === 'refused' ? labels.refusedTitle : (labels.missingTitle ?? labels.refusedTitle)
+    const text = phase === 'failed' ? labels.failedText : phase === 'refused' ? labels.refusedText : (labels.missingText ?? labels.refusedText)
+
     return (
       <div className="px-[clamp(16px,3vw,40px)] py-6">
-        <Line tone="wrong" title={phase === 'failed' ? labels.failedTitle : labels.refusedTitle}>
-          {phase === 'failed' ? labels.failedText : labels.refusedText}
+        <Line tone="wrong" title={title}>
+          {text}
           {phase === 'failed' && onRetry !== undefined && (
             <span className="mt-2.5 block">
               <button type="button" onClick={onRetry} className="h-9 border-2 border-ink bg-sheet px-3 text-sm font-extrabold hover:bg-field">

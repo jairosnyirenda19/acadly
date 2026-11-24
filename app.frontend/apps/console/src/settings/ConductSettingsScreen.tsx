@@ -21,7 +21,16 @@ export function ConductSettingsScreen() {
 
 function Editor({ data, onSaved }: { data: KindList; onSaved: () => void }) {
   const [kinds, setKinds] = useState(() => data.kinds.map((k) => ({ ...k, id: k.id as string | null, level: k.level as Level | null })))
-  const [watch, setWatch] = useState({ incidents: String(data.watch.incidents), days: String(data.watch.days), open: data.watch.open_serious })
+  const [watch, setWatch] = useState({
+    incidents: String(data.watch.incidents),
+    days: String(data.watch.days),
+    open: data.watch.open_serious,
+    missedOn: data.watch.missed_incidents > 0,
+    missedIncidents: String(Math.max(1, data.watch.missed_incidents)),
+    missedLessons: String(data.watch.missed_lessons),
+    missedDays: String(data.watch.missed_days),
+    portal: data.watch.portal,
+  })
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
   const set = (i: number, patch: Partial<(typeof kinds)[number]>) => setKinds(kinds.map((k, j) => (j === i ? { ...k, ...patch } : k)))
@@ -39,7 +48,15 @@ function Editor({ data, onSaved }: { data: KindList; onSaved: () => void }) {
 
   const saveWatch = async () => {
     setBusy(true)
-    const result = await conductApi.saveWatch({ incidents: Number(watch.incidents), days: Number(watch.days), open_serious: watch.open })
+    const result = await conductApi.saveWatch({
+      incidents: Number(watch.incidents),
+      days: Number(watch.days),
+      open_serious: watch.open,
+      missed_incidents: watch.missedOn ? Number(watch.missedIncidents) : 0,
+      missed_lessons: Number(watch.missedLessons),
+      missed_days: Number(watch.missedDays),
+      portal: watch.portal,
+    })
     setBusy(false)
     if (result.kind === 'saved') slips.done({ word: copy.slips.saved, title: t.saved })
     else slips.wrong({ word: t.notSaved, title: result.kind === 'invalid' ? (Object.values(result.errors)[0]?.[0] ?? t.failed) : t.failed })
@@ -126,7 +143,39 @@ function Editor({ data, onSaved }: { data: KindList; onSaved: () => void }) {
               <input type="checkbox" className="size-5 accent-ink" checked={watch.open} onChange={(e) => setWatch({ ...watch, open: e.target.checked })} />
               {t.openSerious}
             </label>
+            <fieldset className="grid gap-2 border-t border-rule pt-2.5">
+              <legend className="sr-only">{t.missedTitle}</legend>
+              <label className="flex items-center gap-2 text-[15px] font-extrabold">
+                <input type="checkbox" className="size-5 accent-ink" checked={watch.missedOn} onChange={(e) => setWatch({ ...watch, missedOn: e.target.checked })} />
+                {t.missedTitle}
+              </label>
+              {watch.missedOn && (
+                <div className="flex flex-wrap items-end gap-2 text-[15px]">
+                  <div className="w-20">
+                    <Input label={c.incidents} inputMode="numeric" value={watch.missedIncidents} onChange={(e) => setWatch({ ...watch, missedIncidents: e.target.value })} />
+                  </div>
+                  <span className="pb-3">{t.missedAnd}</span>
+                  <div className="w-20">
+                    <Input label={t.missedLessons} inputMode="numeric" value={watch.missedLessons} onChange={(e) => setWatch({ ...watch, missedLessons: e.target.value })} />
+                  </div>
+                  <span className="pb-3">{t.missedIn}</span>
+                  <div className="w-20">
+                    <Input label={t.daysWord} inputMode="numeric" value={watch.missedDays} onChange={(e) => setWatch({ ...watch, missedDays: e.target.value })} />
+                  </div>
+                  <span className="pb-3">{t.daysWord}</span>
+                </div>
+              )}
+              <p className="text-[13px] text-text-muted">{t.missedNote}</p>
+            </fieldset>
             <p className="text-[13px] text-text-muted">{t.watchNote}</p>
+            <div className="grid gap-1.5 border-t border-rule pt-2.5">
+              <h3 className="text-[15px] font-extrabold">{t.portalTitle}</h3>
+              <label className="flex items-center gap-2 text-[15px]">
+                <input type="checkbox" className="size-5 accent-ink" checked={watch.portal} onChange={(e) => setWatch({ ...watch, portal: e.target.checked })} />
+                {t.portalField}
+              </label>
+              <p className="text-[13px] text-text-muted">{t.portalNote}</p>
+            </div>
             <div>
               <Button variant="secondary" busy={busy} onClick={() => void saveWatch()}>
                 {t.saveWatch}

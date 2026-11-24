@@ -121,6 +121,21 @@ const ICONS = {
       <path d="M7 15h4" />
     </>
   ),
+  star: <path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z" />,
+  plan: (
+    <>
+      <path d="M4 5h16" />
+      <path d="M4 12h10" />
+      <path d="M4 19h13" />
+      <path d="M17 9l3 3-3 3" />
+    </>
+  ),
+  doc: (
+    <>
+      <path d="M6 3h8l4 4v14H6z" />
+      <path d="M14 3v4h4" />
+    </>
+  ),
   gate: (
     <>
       <path d="M4 20V4h9l7 7v9z" />

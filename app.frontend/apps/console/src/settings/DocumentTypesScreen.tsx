@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { copy } from '../copy'
 import { AccessTag } from '../learners/documents/DocumentsTab'
 import { documentsApi, type DocumentAccess, type TypesState } from '../learners/documents/api'
-import { Input } from '../setup/parts'
+import { Attention, Input } from '../setup/parts'
 import { PageHead, Tag, SettingsTabs } from './parts'
 
 const t = copy.settings.documentTypes
@@ -27,16 +27,17 @@ export function DocumentTypesScreen() {
       <PageHead kicker={t.kicker} title={t.title} intro={t.intro} />
       <div className={`grid items-start gap-x-8 gap-y-6 px-[clamp(16px,3vw,40px)] pb-8 ${editing !== null ? "xl:grid-cols-[minmax(0,1fr)_400px]" : "max-w-[1100px]"}`}>
         <section aria-label={t.title} className="@container border-2 border-ink bg-sheet px-4 pt-2 pb-4 md:px-5">
-          <div className="label-caps hidden grid-cols-[minmax(0,1fr)_210px_170px_60px_80px] gap-3 border-b-2 border-ink py-2 text-text-muted @2xl:grid">
+          <div className="label-caps hidden grid-cols-[minmax(0,1fr)_200px_150px_150px_60px_80px] gap-3 border-b-2 border-ink py-2 text-text-muted @2xl:grid">
             <span>{t.cols.type}</span>
             <span>{t.cols.access}</span>
             <span>{t.cols.admission}</span>
+            <span>{t.cols.families}</span>
             <span className="text-right">{t.cols.onFile}</span>
             <span />
           </div>
           <ul>
             {data.types.map((x) => (
-              <li key={x.id} className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5 border-b border-rule py-3 @2xl:grid-cols-[minmax(0,1fr)_210px_170px_60px_80px] ${x.retired ? 'opacity-75' : ''}`}>
+              <li key={x.id} className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5 border-b border-rule py-3 @2xl:grid-cols-[minmax(0,1fr)_200px_150px_150px_60px_80px] ${x.retired ? 'opacity-75' : ''}`}>
                 <span className="text-base font-extrabold break-words">
                   {x.name} {x.retired && <Tag tone="plain">{t.retired}</Tag>}
                 </span>
@@ -44,6 +45,15 @@ export function DocumentTypesScreen() {
                   <AccessTag access={x.access} />
                 </span>
                 <span className="text-sm @max-2xl:col-start-1">{x.expected ? `✓ ${t.expected}` : <span className="text-text-muted">{t.notExpected}</span>}</span>
+                <span className="text-sm @max-2xl:col-start-1">
+                  {x.access !== 'staff' ? (
+                    <span className="text-text-muted">{t.never((d.access[x.access] ?? '').toLowerCase())}</span>
+                  ) : x.families ? (
+                    `✓ ${t.shown}`
+                  ) : (
+                    <span className="text-text-muted">{t.notShown}</span>
+                  )}
+                </span>
                 <span className="ref text-sm @2xl:text-right @max-2xl:col-start-2 @max-2xl:row-start-1">{t.count(x.on_file)}</span>
                 <span className="@2xl:text-right @max-2xl:col-start-2 @max-2xl:row-start-2">
                   {!x.retired && (
@@ -81,6 +91,7 @@ function TypeForm({ row, onDone, onCancel }: { row: TypeRow | null; onDone: (tit
   const [name, setName] = useState(row?.name ?? '')
   const [access, setAccess] = useState<DocumentAccess>((row?.access as DocumentAccess | undefined) ?? 'office')
   const [expected, setExpected] = useState(row?.expected ?? false)
+  const [families, setFamilies] = useState(row?.families ?? false)
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [problem, setProblem] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -89,7 +100,7 @@ function TypeForm({ row, onDone, onCancel }: { row: TypeRow | null; onDone: (tit
     setBusy(true)
     setErrors({})
     setProblem(null)
-    const result = await documentsApi.saveType(row?.id ?? null, { name: name.trim(), access, expected })
+    const result = await documentsApi.saveType(row?.id ?? null, { name: name.trim(), access, expected, families: families && access === 'staff' })
     setBusy(false)
     if (result.kind === 'saved') onDone(t.saved)
     else if (result.kind === 'invalid') setErrors(result.errors)
@@ -132,6 +143,17 @@ function TypeForm({ row, onDone, onCancel }: { row: TypeRow | null; onDone: (tit
         {t.expectedField}
       </label>
       <p className="-mt-2 text-[13px] text-text-muted">{t.expectedNote}</p>
+      <label className={`flex items-center gap-2.5 text-[15px] ${access !== 'staff' ? 'text-text-muted' : ''}`}>
+        <input type="checkbox" checked={families && access === 'staff'} disabled={access !== 'staff'} onChange={(e) => setFamilies(e.target.checked)} className="size-5 accent-ink" />
+        {t.familiesField}
+      </label>
+      {access === 'staff' ? (
+        families && (
+          <Attention title={t.familiesField}>{t.familiesNote}</Attention>
+        )
+      ) : (
+        <p className="-mt-2 text-[13px] text-text-muted">{t.familiesStaffOnly}</p>
+      )}
       <div className="flex flex-wrap gap-2">
         <Button busy={busy} disabled={name.trim() === ''} onClick={() => void save()}>
           {t.save}

@@ -13168,12 +13168,28 @@
                                                 },
                                                 "open_serious": {
                                                     "type": "boolean"
+                                                },
+                                                "missed_incidents": {
+                                                    "type": "integer"
+                                                },
+                                                "missed_lessons": {
+                                                    "type": "integer"
+                                                },
+                                                "missed_days": {
+                                                    "type": "integer"
+                                                },
+                                                "portal": {
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "required": [
                                                 "incidents",
                                                 "days",
-                                                "open_serious"
+                                                "open_serious",
+                                                "missed_incidents",
+                                                "missed_lessons",
+                                                "missed_days",
+                                                "portal"
                                             ]
                                         }
                                     },
@@ -13260,12 +13276,28 @@
                                                 },
                                                 "open_serious": {
                                                     "type": "boolean"
+                                                },
+                                                "missed_incidents": {
+                                                    "type": "integer"
+                                                },
+                                                "missed_lessons": {
+                                                    "type": "integer"
+                                                },
+                                                "missed_days": {
+                                                    "type": "integer"
+                                                },
+                                                "portal": {
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "required": [
                                                 "incidents",
                                                 "days",
-                                                "open_serious"
+                                                "open_serious",
+                                                "missed_incidents",
+                                                "missed_lessons",
+                                                "missed_days",
+                                                "portal"
                                             ]
                                         }
                                     },
@@ -13402,12 +13434,28 @@
                                     },
                                     "open_serious": {
                                         "type": "boolean"
+                                    },
+                                    "missed_incidents": {
+                                        "type": "integer"
+                                    },
+                                    "missed_lessons": {
+                                        "type": "integer"
+                                    },
+                                    "missed_days": {
+                                        "type": "integer"
+                                    },
+                                    "portal": {
+                                        "type": "boolean"
                                     }
                                 },
                                 "required": [
                                     "incidents",
                                     "days",
-                                    "open_serious"
+                                    "open_serious",
+                                    "missed_incidents",
+                                    "missed_lessons",
+                                    "missed_days",
+                                    "portal"
                                 ]
                             }
                         }
@@ -14008,12 +14056,23 @@
                                                             },
                                                             "reason": {
                                                                 "type": "string"
+                                                            },
+                                                            "ended_after": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "can_end": {
+                                                                "type": "boolean"
                                                             }
                                                         },
                                                         "required": [
                                                             "outcome",
                                                             "text",
-                                                            "reason"
+                                                            "reason",
+                                                            "ended_after",
+                                                            "can_end"
                                                         ]
                                                     }
                                                 },
@@ -14253,6 +14312,78 @@
                                 "schema": {
                                     "type": "integer",
                                     "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/conduct/incidents/{id}/learners/{learner}/end-suspension": {
+            "post": {
+                "operationId": "conduct.incidents.end-suspension",
+                "summary": "Ends a learner's suspension early, with a reason. Today's register opens again",
+                "tags": [
+                    "Conduct"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "learner",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 2000
+                                    }
+                                },
+                                "required": [
+                                    "reason"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id"
+                                    ]
                                 }
                             }
                         }
@@ -17595,6 +17726,306 @@
                 }
             }
         },
+        "/v1/portal/children/{id}/conduct": {
+            "get": {
+                "operationId": "portal.conduct",
+                "description": "This term's counts, the serious incidents still open with their stage\nand decision, and the entries of the school year: the date and the kind.",
+                "summary": "A child's conduct, as the family was told it",
+                "tags": [
+                    "FamilyConduct"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "child": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "first_name": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "first_name",
+                                                "name"
+                                            ]
+                                        },
+                                        "term": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "commendations": {
+                                            "type": "integer"
+                                        },
+                                        "incidents": {
+                                            "type": "integer"
+                                        },
+                                        "serious": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "happened_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "stage": {
+                                                        "type": "string"
+                                                    },
+                                                    "decision": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "meeting": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "kind",
+                                                    "happened_on",
+                                                    "stage",
+                                                    "decision",
+                                                    "meeting"
+                                                ]
+                                            }
+                                        },
+                                        "entries": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "kind": {
+                                                        "type": "string"
+                                                    },
+                                                    "commendation": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "serious": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "happened_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "this_term": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "kind",
+                                                    "commendation",
+                                                    "serious",
+                                                    "happened_on",
+                                                    "this_term"
+                                                ]
+                                            }
+                                        },
+                                        "school_phone": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "child",
+                                        "term",
+                                        "commendations",
+                                        "incidents",
+                                        "serious",
+                                        "entries",
+                                        "school_phone"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/portal/children/{id}/documents": {
+            "get": {
+                "operationId": "portal.documents",
+                "description": "Copies of the documents of the types the school shares with families,\nnewest first. Not found when there is none.",
+                "summary": "The documents the school shows to the family",
+                "tags": [
+                    "FamilyDocuments"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "child": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "first_name": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "first_name",
+                                                "name"
+                                            ]
+                                        },
+                                        "documents": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": {
+                                                        "type": "string"
+                                                    },
+                                                    "date": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "added_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "file_type": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "title",
+                                                    "type",
+                                                    "date",
+                                                    "added_on",
+                                                    "file_type"
+                                                ]
+                                            }
+                                        },
+                                        "school_phone": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "child",
+                                        "documents",
+                                        "school_phone"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/portal/children/{id}/documents/{document}": {
+            "get": {
+                "operationId": "portal.documents.content",
+                "summary": "One shared document, to open, save or print. Each opening is recorded",
+                "tags": [
+                    "FamilyDocuments"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "document",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/portal/fees": {
             "get": {
                 "operationId": "portal.fees.family",
@@ -18044,6 +18475,115 @@
                                 "schema": {
                                     "type": "string",
                                     "const": "nosniff"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/portal/children/{id}/support": {
+            "get": {
+                "operationId": "portal.support",
+                "description": "The open plans the school shows to the family: the title, who leads it,\nthe next review, and the part written for the family. Not found when\nthere is none.",
+                "summary": "A child's support plans, as the family sees them",
+                "tags": [
+                    "FamilySupport"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "child": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "first_name": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "first_name",
+                                                "name"
+                                            ]
+                                        },
+                                        "plans": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "lead": {
+                                                        "type": "string"
+                                                    },
+                                                    "opened_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "next_review_on": {
+                                                        "type": "string"
+                                                    },
+                                                    "state": {
+                                                        "type": "string"
+                                                    },
+                                                    "school": {
+                                                        "type": "string"
+                                                    },
+                                                    "home": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "title",
+                                                    "lead",
+                                                    "opened_on",
+                                                    "next_review_on",
+                                                    "state",
+                                                    "school",
+                                                    "home"
+                                                ]
+                                            }
+                                        },
+                                        "school_phone": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "child",
+                                        "plans",
+                                        "school_phone"
+                                    ]
                                 }
                             }
                         }
@@ -23320,6 +23860,9 @@
                                                     "expected": {
                                                         "type": "boolean"
                                                     },
+                                                    "families": {
+                                                        "type": "boolean"
+                                                    },
                                                     "retired": {
                                                         "type": "boolean"
                                                     },
@@ -23332,6 +23875,7 @@
                                                     "name",
                                                     "access",
                                                     "expected",
+                                                    "families",
                                                     "retired",
                                                     "on_file"
                                                 ]
@@ -31099,6 +31643,32 @@
                                                             "null"
                                                         ]
                                                     },
+                                                    "decided": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "reference": {
+                                                                "type": "string"
+                                                            },
+                                                            "from": {
+                                                                "type": "string"
+                                                            },
+                                                            "to": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "label",
+                                                            "reference",
+                                                            "from",
+                                                            "to"
+                                                        ]
+                                                    },
                                                     "mark": {
                                                         "type": [
                                                             "object",
@@ -31181,6 +31751,7 @@
                                                     "morning",
                                                     "earlier",
                                                     "before",
+                                                    "decided",
                                                     "mark",
                                                     "correction"
                                                 ]
@@ -46447,6 +47018,32 @@
                                                             ]
                                                         }
                                                     },
+                                                    "decided": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "reference": {
+                                                                "type": "string"
+                                                            },
+                                                            "from": {
+                                                                "type": "string"
+                                                            },
+                                                            "to": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "label",
+                                                            "reference",
+                                                            "from",
+                                                            "to"
+                                                        ]
+                                                    },
                                                     "mark": {
                                                         "type": [
                                                             "object",
@@ -46657,6 +47254,7 @@
                                                     "name",
                                                     "admission_number",
                                                     "history",
+                                                    "decided",
                                                     "mark",
                                                     "correction",
                                                     "absence"
@@ -64611,9 +65209,37 @@
                                                 "null"
                                             ]
                                         },
+                                        "family": {
+                                            "type": "object",
+                                            "properties": {
+                                                "school": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "home": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "shown": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "school",
+                                                "home",
+                                                "shown"
+                                            ]
+                                        },
                                         "can": {
                                             "type": "object",
                                             "properties": {
+                                                "family": {
+                                                    "type": "boolean"
+                                                },
                                                 "lead": {
                                                     "type": "boolean"
                                                 },
@@ -64628,6 +65254,7 @@
                                                 }
                                             },
                                             "required": [
+                                                "family",
                                                 "lead",
                                                 "agree",
                                                 "review",
@@ -64655,11 +65282,89 @@
                                         "actions",
                                         "reviews",
                                         "closing_note",
+                                        "family",
                                         "can"
                                     ]
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/support/plans/{id}/family": {
+            "put": {
+                "operationId": "support.plans.family",
+                "summary": "Saves the part of a plan written for the family, and whether the family sees it",
+                "tags": [
+                    "Support"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "school": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 600
+                                    },
+                                    "home": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 600
+                                    },
+                                    "shown": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "shown"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"

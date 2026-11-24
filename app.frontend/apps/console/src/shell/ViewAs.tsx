@@ -91,7 +91,7 @@ function ViewAsPanel({ onClose }: { onClose: () => void }) {
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      void read(api.GET('/v1/view-as/people', { params: { query: { search } as never } })).then((r) => setFound(r !== null && r !== 'refused' ? r : { people: [], total: 0 }))
+      void read(api.GET('/v1/view-as/people', { params: { query: { search } as never } })).then((r) => setFound(r !== null && r !== 'refused' && r !== 'missing' ? r : { people: [], total: 0 }))
     }, 200)
 
     return () => window.clearTimeout(timer)

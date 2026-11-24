@@ -34,7 +34,7 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas as pdfcanvas
-from reportlab.platypus import Flowable, Image, KeepTogether, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import Flowable, Image, KeepTogether, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 from xml.sax.saxutils import escape
 
 FONTS = Path(__file__).parent / 'fonts'
@@ -214,12 +214,32 @@ def signatures(sec: dict, check: dict | None) -> Table:
     return t
 
 
+LOGO_PIXELS = 240  # the logo prints at 34 pt: 240 px is sharp at over 400 dpi
+
+
+def small_logo(raw: bytes) -> io.BytesIO:
+    """The school's logo at print size, so a document does not carry the full upload on every page."""
+    try:
+        from PIL import Image as PILImage
+
+        img = PILImage.open(io.BytesIO(raw))
+        if max(img.size) <= LOGO_PIXELS:
+            return io.BytesIO(raw)
+        img.thumbnail((LOGO_PIXELS, LOGO_PIXELS), PILImage.LANCZOS)
+        out = io.BytesIO()
+        img.save(out, format='PNG', optimize=True)
+        out.seek(0)
+        return out
+    except Exception:  # without the imaging library, or with an odd file, the logo goes in as it came
+        return io.BytesIO(raw)
+
+
 def letterhead(doc: dict, main) -> Table:
     brand = doc['brand']
     logo = None
     if brand.get('logo'):
         try:
-            data = io.BytesIO(base64.b64decode(brand['logo']))
+            data = small_logo(base64.b64decode(brand['logo']))
             reader = ImageReader(data)
             w, h = reader.getSize()
             scale = min(34 / w, 34 / h)
@@ -244,26 +264,37 @@ def letterhead(doc: dict, main) -> Table:
 
 
 class Numbered(pdfcanvas.Canvas):
-    """Draws the rule, the footer and Page X of Y once the page count is known."""
+    """Draws the rule, the footer and Page X of Y once the page count is known.
 
-    def __init__(self, *args, doc: dict, main, **kwargs):
+    With several documents in one file, each page belongs to the document that
+    started on or before it (see `Starts`), and is numbered within it.
+    """
+
+    def __init__(self, *args, docs: list, main, **kwargs):
         super().__init__(*args, **kwargs)
         self._pages = []
-        self._instr, self._main = doc, main
+        self._docs, self._main = docs, main
+        self._acadly_doc = 0
 
     def showPage(self):
         self._pages.append(dict(self.__dict__))
         self._startPage()
 
     def save(self):
-        total = len(self._pages)
+        totals: dict = {}
         for state in self._pages:
+            totals[state['_acadly_doc']] = totals.get(state['_acadly_doc'], 0) + 1
+        seen: dict = {}
+        for state in self._pages:
+            which = state['_acadly_doc']
+            seen[which] = seen.get(which, 0) + 1
             self.__dict__.update(state)
-            self._decorate(total)
+            self._instr = self._docs[which]
+            self._decorate(seen[which], totals[which])
             super().showPage()
         super().save()
 
-    def _decorate(self, total: int):
+    def _decorate(self, number: int, total: int):
         self.setFillColor(self._main)
         self.rect(0, PAGE_H - 4, PAGE_W, 4, stroke=0, fill=1)
         self.setStrokeColor(RULE)
@@ -272,7 +303,7 @@ class Numbered(pdfcanvas.Canvas):
         self.setFont('Body', 7)
         self.setFillColor(MUTED)
         self.drawString(MARGIN, 10 * mm, self._instr.get('footer', ''))
-        self.drawRightString(PAGE_W - MARGIN, 10 * mm, f'Page {self._pageNumber} of {total}')
+        self.drawRightString(PAGE_W - MARGIN, 10 * mm, f'Page {number} of {total}')
         if self._instr.get('status') == 'Cancelled':
             self.saveState()
             self.setFillColor(RED, alpha=0.12)
@@ -283,8 +314,21 @@ class Numbered(pdfcanvas.Canvas):
             self.restoreState()
 
 
-def build(doc: dict) -> bytes:
-    main = colors.HexColor(doc['brand'].get('main') or '#0C2340')
+class Starts(Flowable):
+    """Marks where a document starts, so the pages after it carry its footer and numbers."""
+
+    def __init__(self, index: int):
+        super().__init__()
+        self.index = index
+
+    def wrap(self, *_):
+        return 0, 0
+
+    def draw(self):
+        self.canv._acadly_doc = self.index
+
+
+def story_of(doc: dict, main) -> list:
     story = [letterhead(doc, main)]
     for sec in doc.get('sections', []):
         kind = sec.get('kind')
@@ -300,23 +344,32 @@ def build(doc: dict) -> bytes:
             story += [Spacer(1, 10), p(sec['text'], sec.get('style', 'muted'))]
         elif kind == 'signatures':
             story += [Spacer(1, 26), KeepTogether([signatures(sec, doc.get('check'))])]
+    return story
+
+
+def draw(docs: list, title: str) -> bytes:
+    main = colors.HexColor(docs[0]['brand'].get('main') or '#0C2340')
+    story: list = []
+    for i, d in enumerate(docs):
+        if i > 0:
+            story.append(PageBreak())
+        story += [Starts(i)] + story_of(d, main)
     out = io.BytesIO()
     pdf = SimpleDocTemplate(out, pagesize=A4, leftMargin=MARGIN, rightMargin=MARGIN, topMargin=14 * mm, bottomMargin=20 * mm,
-                            title=f'{doc["title"]} {doc["reference"]}', author=doc['brand']['name'], creator='Acadly IQ-X')
-    pdf.build(story, canvasmaker=lambda *a, **k: Numbered(*a, doc=doc, main=main, **k))
+                            title=title, author=docs[0]['brand']['name'], creator='Acadly IQ-X')
+    pdf.build(story, canvasmaker=lambda *a, **k: Numbered(*a, docs=docs, main=main, **k))
     return out.getvalue()
+
+
+def build(doc: dict) -> bytes:
+    return draw([doc], f'{doc["title"]} {doc["reference"]}')
 
 
 def build_many(docs: list) -> bytes:
-    """Several documents, each drawn on its own pages, joined into one PDF (a class's report cards)."""
-    import pypdfium2 as pdfium
+    """Several documents in one PDF, each starting on a new page and numbered on its own (a class's report cards).
 
-    joined = pdfium.PdfDocument.new()
-    for d in docs:
-        joined.import_pages(pdfium.PdfDocument(build(d)))
-    out = io.BytesIO()
-    joined.save(out)
-    return out.getvalue()
+    One file shares the fonts and the logo, so a class stays small."""
+    return draw(docs, docs[0]['title'] if docs else 'Documents')
 
 
 if __name__ == '__main__':

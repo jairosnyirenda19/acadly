@@ -177,7 +177,8 @@ final class SupportViews
             'actions' => $actions,
             'reviews' => $reviews,
             'closing_note' => $plan->closing_note,
-            'can' => ['lead' => $lead, 'agree' => $lead && $plan->state === State::Raised->value, 'review' => $lead && $plan->state === State::Reviewing->value, 'close' => $lead],
+            'family' => ['school' => $plan->family_school, 'home' => $plan->family_home, 'shown' => $plan->family_shown],
+            'can' => ['family' => $lead && ! $plan->confidential, 'lead' => $lead, 'agree' => $lead && $plan->state === State::Raised->value, 'review' => $lead && $plan->state === State::Reviewing->value, 'close' => $lead],
         ];
     }
 

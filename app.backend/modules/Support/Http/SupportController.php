@@ -82,7 +82,7 @@ final class SupportController
     /**
      * A support plan.
      *
-     * @response array{id: string, title: string, state: string, state_label: string, lead: string, confidential: bool, tell_family: bool, next_review_on: string, opened_on: string, outcome: string|null, outcome_label: string|null, concern: string, signals: list<string>, learner: array{id: string, name: string, class: string}, opened_by: string, goals: list<array{id: string, text: string, measure: string|null, by_when: string|null, state: string|null}>, actions: list<array{id: string, who: string, what: string, when: string|null}>, reviews: list<array{id: string, notes: string|null, at: string, by: string|null, met: int, of: int}>, closing_note: string|null, can: array{lead: bool, agree: bool, review: bool, close: bool}}
+     * @response array{id: string, title: string, state: string, state_label: string, lead: string, confidential: bool, tell_family: bool, next_review_on: string, opened_on: string, outcome: string|null, outcome_label: string|null, concern: string, signals: list<string>, learner: array{id: string, name: string, class: string}, opened_by: string, goals: list<array{id: string, text: string, measure: string|null, by_when: string|null, state: string|null}>, actions: list<array{id: string, who: string, what: string, when: string|null}>, reviews: list<array{id: string, notes: string|null, at: string, by: string|null, met: int, of: int}>, closing_note: string|null, family: array{school: string|null, home: string|null, shown: bool}, can: array{family: bool, lead: bool, agree: bool, review: bool, close: bool}}
      */
     public function plan(Request $request, string $id, SupportViews $views): JsonResponse
     {
@@ -106,6 +106,21 @@ final class SupportController
             'reviews' => $plans->review($who, $id, self::states($request), $request->string('notes')->toString(), $request->string('next_review_on')->toString()),
             default => $plans->close($who, $id, $this->outcome($request), $request->string('note')->toString()),
         };
+
+        return response()->json(['id' => $id]);
+    }
+
+    /**
+     * Saves the part of a plan written for the family, and whether the family sees it.
+     *
+     * @response array{id: string}
+     */
+    public function family(Request $request, string $id, PlanActions $plans, SupportReach $reach): JsonResponse
+    {
+        $who = self::user($request);
+        $reach->plan($who, $id);
+        $request->validate(['school' => ['nullable', 'string', 'max:600'], 'home' => ['nullable', 'string', 'max:600'], 'shown' => ['required', 'boolean']]);
+        $plans->saveFamily($who, $id, $request->string('school')->toString(), $request->string('home')->toString(), $request->boolean('shown'));
 
         return response()->json(['id' => $id]);
     }

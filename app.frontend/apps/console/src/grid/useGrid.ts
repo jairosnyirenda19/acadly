@@ -47,7 +47,7 @@ export function gridAddress(path: string, query: GridQuery, extra: Record<string
  * One page of a list, loaded for the address. The last page stays on screen
  * while the next loads; after a short wait only the rows show as waiting.
  */
-export function useGridPage<Row>(key: string, query: GridQuery, fetch: (query: GridQuery) => Promise<GridPage<Row> | 'refused' | null>) {
+export function useGridPage<Row>(key: string, query: GridQuery, fetch: (query: GridQuery) => Promise<GridPage<Row> | 'refused' | 'missing' | null>) {
   const address = writeGridQuery(query)
   const [page, setPage] = useState<GridPage<Row> | undefined>(undefined)
   const [phase, setPhase] = useState<GridPhase>('ready')
@@ -65,7 +65,7 @@ export function useGridPage<Row>(key: string, query: GridQuery, fetch: (query: G
       .then((answer) => {
         if (!live) return
         if (answer === 'refused') setPhase('refused')
-        else if (answer === null) setPhase('failed')
+        else if (answer === null || answer === 'missing') setPhase('failed')
         else {
           setPage(answer)
           setPhase('ready')

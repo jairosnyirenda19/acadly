@@ -62,7 +62,7 @@ final class LearnerDocumentsController
     /**
      * The school's learner document types, with how many documents each has.
      *
-     * @response array{types: list<array{id: string, name: string, access: string, expected: bool, retired: bool, on_file: int}>}
+     * @response array{types: list<array{id: string, name: string, access: string, expected: bool, families: bool, retired: bool, on_file: int}>}
      */
     public function types(Request $request, Access $access): JsonResponse
     {
@@ -118,10 +118,11 @@ final class LearnerDocumentsController
             'name' => ['required', 'string', 'max:80'],
             'access' => ['required', Rule::enum(LearnerDocumentAccess::class)],
             'expected' => ['required', 'boolean'],
+            'families' => ['sometimes', 'boolean'],
         ]);
 
         return $actions->saveType(self::user($request), $id, $request->string('name')->toString(),
-            LearnerDocumentAccess::from($request->string('access')->toString()), $request->boolean('expected'));
+            LearnerDocumentAccess::from($request->string('access')->toString()), $request->boolean('expected'), $request->boolean('families'));
     }
 
     private static function user(Request $request): User

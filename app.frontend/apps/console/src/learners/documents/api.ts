@@ -47,7 +47,7 @@ export const documentsApi = {
   trash: (id: string, reason: string) => settle(api.DELETE('/v1/documents/{id}', { params: { path: { id }, query: { reason } } }) as Done<{ batch: string }>),
 
   types: () => read(api.GET('/v1/learner-document-types')),
-  saveType: (id: string | null, body: { name: string; access: DocumentAccess; expected: boolean }) =>
+  saveType: (id: string | null, body: { name: string; access: DocumentAccess; expected: boolean; families: boolean }) =>
     id === null
       ? settle(api.POST('/v1/learner-document-types', { body: body as never }) as Done<{ id: string }>)
       : settle(api.PUT('/v1/learner-document-types/{id}', { params: { path: { id } }, body: body as never }) as Done<{ id: string }>),

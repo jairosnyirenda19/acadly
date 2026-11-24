@@ -13,6 +13,7 @@ enum SupportAudit: string implements AuditAction
     case Reviewed = 'support.reviewed';
     case SetAside = 'support.set_aside';
     case RulesSaved = 'support.rules_saved';
+    case FamilyPartSaved = 'support.family_part_saved';
 
     public function key(): string
     {
@@ -27,6 +28,7 @@ enum SupportAudit: string implements AuditAction
             self::Reviewed => 'Reviewed a support plan.',
             self::SetAside => 'Set a learner\'s signals aside.',
             self::RulesSaved => 'Saved the support rules.',
+            self::FamilyPartSaved => 'Saved the part of a support plan written for the family.',
         };
     }
 

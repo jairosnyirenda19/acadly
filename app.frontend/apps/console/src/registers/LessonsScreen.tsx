@@ -271,7 +271,7 @@ function AskPanel({ lesson, day, onDone }: { lesson: AwayPerson['lessons'][numbe
       <div className="label-caps text-text-muted">{t.askTitle(lesson.period, lesson.class, lesson.subject)}</div>
       <p className="mt-1 mb-2 text-[13px]">{t.freeAt(lesson.starts)}</p>
       {loaded.data === undefined ? (
-        <p className="text-[13px] text-text-muted">{loaded.phase === 'failed' || loaded.phase === 'refused' ? s.loadFailed : t.freeLoading}</p>
+        <p className="text-[13px] text-text-muted">{loaded.phase === 'failed' || loaded.phase === 'refused' || loaded.phase === 'missing' ? s.loadFailed : t.freeLoading}</p>
       ) : free.length === 0 ? (
         <p className="text-[13px] text-text-muted">{t.nobodyFree}</p>
       ) : (

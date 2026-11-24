@@ -75,7 +75,7 @@ export function PickupScreen() {
   const { query } = useLocation()
   const room = query.get('room') ?? ''
   // Each answer keeps the time it was read, so the page says when it last updated.
-  const loaded = useLoad(`pickup:queue:${room}`, () => earlyApi.desk(room).then((r) => (r !== null && r !== 'refused' ? { ...r, readAt: new Date() } : r)))
+  const loaded = useLoad(`pickup:queue:${room}`, () => earlyApi.desk(room).then((r) => (r !== null && r !== 'refused' && r !== 'missing' ? { ...r, readAt: new Date() } : r)))
   const [open, setOpen] = useState<{ id: string; refuse?: string } | null>(null)
   const [gate, setGate] = useState(false)
   const [tone, setTone] = useState(savedTone)

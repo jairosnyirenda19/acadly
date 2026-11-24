@@ -89,7 +89,12 @@ export function OverviewScreen() {
                   </li>
                 ))}
               </ul>
-              <p className="mt-2 text-[13px] text-text-muted">{t.rulesLine(o.rules.incidents, o.rules.days, o.rules.open_serious)}</p>
+              <p className="mt-2 text-[13px] text-text-muted">{t.rulesLine(
+                  o.rules.incidents,
+                  o.rules.days,
+                  o.rules.open_serious,
+                  o.rules.missed_incidents > 0 ? { incidents: o.rules.missed_incidents, lessons: o.rules.missed_lessons, days: o.rules.missed_days } : null,
+                )}</p>
             </section>
           </div>
 

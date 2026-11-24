@@ -28,7 +28,7 @@ export function ProgrammeSummary({ learner }: { learner: LearnerState }) {
   return (
     <Column edge grow="flex-[1_1_260px]" label={titleOf(learner)}>
       <SectionTitle>{titleOf(learner)}</SectionTitle>
-      {loaded.phase === 'failed' ? (
+      {(loaded.phase === 'failed' || loaded.phase === 'missing') ? (
         <p className="text-sm text-text-muted">{p.none}</p>
       ) : data === undefined ? (
         <Waiting phase={loaded.phase} what={titleOf(learner)} labels={copy.loading} rows={2} onRetry={loaded.reload} />
@@ -56,7 +56,7 @@ export function ProgrammeTab({ learner }: { learner: LearnerState }) {
   const loaded = useProgramme(learner.id)
   const data = loaded.data
 
-  if (loaded.phase === 'failed') return <p className="text-sm text-text-muted">{p.none}</p>
+  if ((loaded.phase === 'failed' || loaded.phase === 'missing')) return <p className="text-sm text-text-muted">{p.none}</p>
   if (data === undefined) return <Waiting phase={loaded.phase} what={titleOf(learner)} labels={copy.loading} rows={6} onRetry={loaded.reload} />
 
   return (

@@ -58,6 +58,7 @@ final class Lessons
         private readonly MessageSettings $messages,
         private readonly AbsenceReasons $reasons,
         private readonly Clock $clock,
+        private readonly DecidedAbsences $decided,
     ) {}
 
     /** @param Lesson $lesson */
@@ -286,6 +287,7 @@ final class Lessons
         }
 
         $learners = $this->learners->learnersIn($class['id'], $day);
+        $decided = $this->decided->on(array_column($learners, 'id'), $day);
         $registerId = $register !== null ? Row::text($register, 'id') : null;
         $morningId = DB::table('attendance_registers')->where('class_id', $class['id'])->where('day', $day)->where('kind', SubmitRegister::KIND)->value('id');
         $earlier = DB::table('attendance_registers')->where('class_id', $class['id'])->where('day', $day)->where('kind', SubmitLessonRegister::KIND)
@@ -329,6 +331,7 @@ final class Lessons
                 'morning' => $morning[$l['id']]['status'] ?? null,
                 'earlier' => $before[$l['id']]['status'] ?? null,
                 'before' => $lastMarks[$l['id']]['status'] ?? null,
+                'decided' => isset($decided[$l['id']]) ? ['label' => $decided[$l['id']]['label'], 'reference' => $decided[$l['id']]['reference'], 'from' => $decided[$l['id']]['from'], 'to' => $decided[$l['id']]['to']] : null,
                 'mark' => $marks[$l['id']] ?? null,
                 'correction' => $corrections[$l['id']] ?? null,
             ], $learners),

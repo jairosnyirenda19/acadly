@@ -117,7 +117,7 @@ final class LearnerDocumentActions
     }
 
     /** Adds a type, or changes one. A change of who may open it applies to its documents at once. */
-    public function saveType(User $by, ?string $id, string $name, LearnerDocumentAccess $access, bool $expected): string
+    public function saveType(User $by, ?string $id, string $name, LearnerDocumentAccess $access, bool $expected, bool $families = false): string
     {
         $this->access->check($by, EnrolmentPermission::Manage);
         $name = trim($name);
@@ -133,16 +133,19 @@ final class LearnerDocumentActions
             throw ValidationException::withMessages(['name' => ['The school already has a type with this name.']]);
         }
 
-        return DB::transaction(function () use ($by, $id, $name, $access, $expected): string {
+        // Families see only a type every staff member who sees the learner may open (D-110).
+        $families = $families && $access === LearnerDocumentAccess::Staff;
+
+        return DB::transaction(function () use ($by, $id, $name, $access, $expected, $families): string {
             $now = $this->clock->now();
 
             if ($id === null) {
                 $id = Ids::next();
                 $position = DB::table('learner_document_types')->max('position');
-                DB::table('learner_document_types')->insert(['id' => $id, 'name' => $name, 'access' => $access->value, 'expected' => $expected,
+                DB::table('learner_document_types')->insert(['id' => $id, 'name' => $name, 'access' => $access->value, 'expected' => $expected, 'families' => $families,
                     'position' => (is_numeric($position) ? (int) $position : 0) + 1, 'created_at' => $now, 'updated_at' => $now]);
                 $this->audit->record(EnrolmentAudit::DocumentTypeSaved, actor: $this->audit->actorFor($by),
-                    meta: ['type_id' => $id, 'name' => $name, 'access' => $access->value, 'expected' => $expected]);
+                    meta: ['type_id' => $id, 'name' => $name, 'access' => $access->value, 'expected' => $expected, 'families' => $families]);
 
                 return $id;
             }
@@ -162,9 +165,9 @@ final class LearnerDocumentActions
                     ->update(['kind' => $kind->key(), 'classification' => $kind->classification()->value, 'updated_at' => $now]);
             }
 
-            DB::table('learner_document_types')->where('id', $id)->update(['name' => $name, 'access' => $access->value, 'expected' => $expected, 'updated_at' => $now]);
+            DB::table('learner_document_types')->where('id', $id)->update(['name' => $name, 'access' => $access->value, 'expected' => $expected, 'families' => $families, 'updated_at' => $now]);
             $this->audit->record(EnrolmentAudit::DocumentTypeSaved, actor: $this->audit->actorFor($by),
-                meta: ['type_id' => $id, 'name' => $name, 'access' => $access->value, 'access_was' => $was->value, 'expected' => $expected, 'documents_moved' => $moved]);
+                meta: ['type_id' => $id, 'name' => $name, 'access' => $access->value, 'access_was' => $was->value, 'expected' => $expected, 'families' => $families, 'documents_moved' => $moved]);
 
             return $id;
         });

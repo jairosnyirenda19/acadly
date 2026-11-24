@@ -32,7 +32,7 @@ final class LearnerDocuments
 
     /**
      * @return array{
-     *     types: list<array{id: string, name: string, access: string, expected: bool, retired: bool}>,
+     *     types: list<array{id: string, name: string, access: string, expected: bool, families: bool, retired: bool}>,
      *     documents: list<array{id: string, title: string, type_id: string, access: string, date: string|null, file_type: string, size: int, versions: int, added_at: string, added_by: string|null, thumbnail: bool}>,
      *     missing: list<array{type_id: string, name: string}>,
      *     can_add: list<string>
@@ -99,17 +99,18 @@ final class LearnerDocuments
         return ['types' => $types, 'documents' => $out, 'missing' => $missing, 'can_add' => $canAdd];
     }
 
-    /** @return list<array{id: string, name: string, access: string, expected: bool, retired: bool}> */
+    /** @return list<array{id: string, name: string, access: string, expected: bool, families: bool, retired: bool}> */
     public static function types(): array
     {
         $types = [];
 
-        foreach (DB::table('learner_document_types')->orderBy('position')->get(['id', 'name', 'access', 'expected', 'retired_at']) as $t) {
+        foreach (DB::table('learner_document_types')->orderBy('position')->get(['id', 'name', 'access', 'expected', 'families', 'retired_at']) as $t) {
             $types[] = [
                 'id' => Row::text($t, 'id'),
                 'name' => Row::text($t, 'name'),
                 'access' => Row::text($t, 'access'),
                 'expected' => (bool) ($t->expected ?? false),
+                'families' => (bool) ($t->families ?? false),
                 'retired' => ($t->retired_at ?? null) !== null,
             ];
         }

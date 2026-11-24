@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { copy } from '../copy'
 import { Attention, nn, Total, TotalsBand } from '../setup/parts'
 import { PageHead, SmallButton, Tag } from '../settings/parts'
-import { clock, lessonsApi, longDay, markLook, MARKS, type LessonLearner, type LessonState, type MarkValue } from './api'
+import { clock, lessonsApi, longDay, markLook, MARKS, shortDay, type LessonLearner, type LessonState, type MarkValue } from './api'
 import { AskForm, DecideCard, Glyph } from './parts'
 import { readDraft, writeDraft, type Draft } from './RegisterScreen'
 
@@ -74,7 +74,7 @@ const awayBefore = (status: string | null) => status === 'absent' || status === 
  */
 function startOf(state: LessonState): Draft {
   return Object.fromEntries(
-    state.learners.map((l) => [l.id, { status: (awayBefore(l.before) ? l.before : 'present') as MarkValue, note: '' }]),
+    state.learners.map((l) => [l.id, { status: (l.decided !== null ? 'excused' : awayBefore(l.before) ? l.before : 'present') as MarkValue, note: '' }]),
   )
 }
 
@@ -98,15 +98,19 @@ function TakeLesson({ state, back, onDone }: { state: LessonState; back: { path:
         ? startOf(state)
         : Object.fromEntries(state.learners.filter((l) => l.morning === 'absent').map((l) => [l.id, { status: 'absent' as MarkValue, note: '' }]))
 
-    return { ...start, ...kept }
+    // A decision sets the mark of a suspended learner (D-111): Excused, and locked.
+    const decided = Object.fromEntries(state.learners.filter((l) => l.decided !== null).map((l) => [l.id, { status: 'excused' as MarkValue, note: '' }]))
+
+    return { ...start, ...kept, ...decided }
   })
+  const locked = new Set(state.learners.filter((l) => l.decided !== null).map((l) => l.id))
   const [showAll, setShowAll] = useState(false)
   const [working, setWorking] = useState(false)
   const [failed, setFailed] = useState<string | null>(null)
 
   useEffect(() => writeDraft(key, Object.keys(draft).length > 0 ? draft : null), [key, draft])
 
-  const set = (id: string, status: MarkValue) => setDraft((d) => ({ ...d, [id]: { status, note: d[id]?.note ?? '' } }))
+  const set = (id: string, status: MarkValue) => !locked.has(id) && setDraft((d) => ({ ...d, [id]: { status, note: d[id]?.note ?? '' } }))
   const note = (id: string, text: string) => setDraft((d) => (d[id] !== undefined ? { ...d, [id]: { ...d[id], note: text } } : d))
   const cycle = (id: string) => {
     const now = draft[id]?.status
@@ -278,6 +282,19 @@ function TakeLesson({ state, back, onDone }: { state: LessonState; back: { path:
                     <Glyph mark={l.earlier} size="size-7 text-sm" />
                   </span>
                 )}
+                {l.decided !== null ? (
+                  <>
+                    <span className="flex flex-col items-end gap-0.5 md:items-start">
+                      <Tag tone="plain">■ {t.suspended}</Tag>
+                      <span className="text-[13px] text-text-muted md:hidden">{t.setByDecision}</span>
+                    </span>
+                    <span className="hidden text-[13px] md:block">
+                      <b>{t.decidedLine(shortDay(l.decided.from), shortDay(l.decided.to), l.decided.reference)}</b>
+                      <span className="block text-text-muted">{t.setByDecision}</span>
+                    </span>
+                  </>
+                ) : (
+                <>
                 <span role="radiogroup" aria-label={l.name} className="hidden gap-1 md:flex">
                   {MARKS.map((m) => (
                     <button
@@ -312,6 +329,8 @@ function TakeLesson({ state, back, onDone }: { state: LessonState; back: { path:
                     <span className="text-[13px] text-text-muted">{mark === null ? t.notMarked : ''}</span>
                   )}
                 </span>
+                </>
+                )}
               </div>
             )
           })}

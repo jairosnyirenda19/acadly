@@ -181,6 +181,33 @@ final class PlanActions
         });
     }
 
+    /**
+     * The part written for the family (D-110): what the school is doing and
+     * what the family can do at home, and whether the family sees it. A
+     * confidential plan is never shown to the family.
+     */
+    public function saveFamily(User $by, string $planId, string $school, string $home, bool $shown): void
+    {
+        $plan = $this->leads($by, $planId);
+        $school = trim($school);
+        $home = trim($home);
+
+        if (mb_strlen($school) > 600 || mb_strlen($home) > 600) {
+            throw ValidationException::withMessages(['family' => ['Write up to 600 characters in each part.']]);
+        }
+        if ($shown && $plan->confidential) {
+            throw ValidationException::withMessages(['shown' => ['A confidential plan cannot be shown to the family.']]);
+        }
+        if ($shown && ($school === '' || $home === '')) {
+            throw ValidationException::withMessages(['shown' => ['Write both parts before you show the plan to the family.']]);
+        }
+
+        DB::transaction(function () use ($by, $plan, $school, $home, $shown): void {
+            $plan->update(['family_school' => $school !== '' ? $school : null, 'family_home' => $home !== '' ? $home : null, 'family_shown' => $shown]);
+            $this->audit->record(SupportAudit::FamilyPartSaved, subject: $plan, actor: $this->audit->actorFor($by), at: $plan->journeyScope(), meta: ['shown' => $shown]);
+        });
+    }
+
     private function leads(User $by, string $planId): SupportPlan
     {
         $plan = $this->reach->plan($by, $planId);

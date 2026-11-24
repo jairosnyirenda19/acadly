@@ -14,6 +14,7 @@ enum ConductAudit: string implements AuditAction
     case OutcomeGiven = 'conduct.outcome_given';
     case KindsSaved = 'conduct.kinds_saved';
     case WatchSaved = 'conduct.watch_saved';
+    case SuspensionEnded = 'conduct.suspension_ended';
 
     public function key(): string
     {
@@ -29,11 +30,12 @@ enum ConductAudit: string implements AuditAction
             self::OutcomeGiven => 'Gave the outcome of a serious incident for a learner.',
             self::KindsSaved => 'Saved the kinds of incident and commendation.',
             self::WatchSaved => 'Saved the rules for learners to watch.',
+            self::SuspensionEnded => 'Ended a suspension early.',
         };
     }
 
     public function requiresReason(): bool
     {
-        return in_array($this, [self::Withdrawn, self::OutcomeGiven], true);
+        return in_array($this, [self::Withdrawn, self::OutcomeGiven, self::SuspensionEnded], true);
     }
 }

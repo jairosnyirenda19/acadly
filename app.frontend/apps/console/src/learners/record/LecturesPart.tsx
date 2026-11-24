@@ -24,7 +24,7 @@ export function LecturesSummary({ learner }: { learner: LearnerState }) {
   return (
     <Column edge grow="flex-[1_1_260px]" label={titleOf(learner)}>
       <SectionTitle>{titleOf(learner)}</SectionTitle>
-      {loaded.phase === 'failed' ? (
+      {(loaded.phase === 'failed' || loaded.phase === 'missing') ? (
         <p className="text-sm text-text-muted">{r.none}</p>
       ) : d === undefined ? (
         <Waiting phase={loaded.phase} what={titleOf(learner)} labels={copy.loading} rows={2} onRetry={loaded.reload} />
@@ -51,7 +51,7 @@ export function LecturesTab({ learner }: { learner: LearnerState }) {
   const loaded = useLectures(learner.id)
   const d = loaded.data
 
-  if (loaded.phase === 'failed') return <p className="text-sm text-text-muted">{r.none}</p>
+  if ((loaded.phase === 'failed' || loaded.phase === 'missing')) return <p className="text-sm text-text-muted">{r.none}</p>
   if (d === undefined) return <Waiting phase={loaded.phase} what={titleOf(learner)} labels={copy.loading} rows={6} onRetry={loaded.reload} />
   const below = d.courses.filter((c) => c.rate !== null && c.rate < 80).length
   const reset = async () => {

@@ -14,6 +14,9 @@ export type FamilyFeesState = Json<'/v1/portal/fees', 'get'>
 export type FeesState = Json<'/v1/portal/children/{id}/fees', 'get'>
 export type FeeInstalment = FeesState['instalments'][number]
 export type FeePayment = FeesState['payments'][number]
+export type ConductState = Json<'/v1/portal/children/{id}/conduct', 'get'>
+export type SupportState = Json<'/v1/portal/children/{id}/support', 'get'>
+export type DocumentsState = Json<'/v1/portal/children/{id}/documents', 'get'>
 
 /** Someone named to collect today: the code, and the phone it was sent to when the school sent it. */
 export interface Collecting {
@@ -75,6 +78,11 @@ export const portalApi = {
   /** The child's newest report card and the shared progress review as PDFs, with their check codes (D-107). */
   cardPdf: (id: string) => `${API}/v1/portal/children/${id}/card/pdf`,
   reviewPdf: (id: string) => `${API}/v1/portal/children/${id}/review/pdf`,
+  /** Conduct, support plans and documents the school shares with families (D-110); 'refused' when none is shown. */
+  conduct: (id: string) => read(api.GET('/v1/portal/children/{id}/conduct', { params: { path: { id } } })),
+  support: (id: string) => read(api.GET('/v1/portal/children/{id}/support', { params: { path: { id } } })),
+  documents: (id: string) => read(api.GET('/v1/portal/children/{id}/documents', { params: { path: { id } } })),
+  documentUrl: (id: string, document: string) => `${API}/v1/portal/children/${id}/documents/${document}`,
   /** The school's short name, as its text messages begin; null when it cannot be read. */
   shortName: async (): Promise<string | null> => (await getContext())?.school.short_name ?? null,
   /** Name someone to collect the child today; the code to give them, or null when it was not saved. */

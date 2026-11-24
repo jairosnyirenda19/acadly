@@ -7,18 +7,18 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from '
  *  - quiet:   under 0.2 s nothing changes, so nothing flashes;
  *  - waiting: after 0.2 s the page draws its dashed sheet;
  *  - slow:    after 8 s a line says the connection is slow;
- *  - ready, refused, failed: the answer.
+ *  - ready, refused, missing, failed: the answer (missing: not there, or outside the place).
  *
  * A page seen before shows what it had at once and updates in place. While
  * anything loads, the console's teal rule shows (see `useLoading`).
  */
-export type LoadPhase = 'quiet' | 'waiting' | 'slow' | 'ready' | 'refused' | 'failed'
+export type LoadPhase = 'quiet' | 'waiting' | 'slow' | 'ready' | 'refused' | 'missing' | 'failed'
 
 export const WAIT_AFTER = 200
 export const SLOW_AFTER = 8000
 
-/** What the fetch gave: the data, 'refused', or null when it could not be read. */
-type Answer<T> = T | 'refused' | null
+/** What the fetch gave: the data, 'refused', 'missing' (not found), or null when it could not be read. */
+type Answer<T> = T | 'refused' | 'missing' | null
 
 const cache = new Map<string, unknown>()
 
@@ -87,6 +87,7 @@ export function useLoad<T>(key: string, fetch: () => Promise<Answer<T>>): Load<T
       .then((answer) => {
         if (!live) return
         if (answer === 'refused') setPhase('refused')
+        else if (answer === 'missing') setPhase('missing')
         else if (answer === null) setPhase(had ? 'ready' : 'failed')
         else {
           cache.set(key, answer)

@@ -90,7 +90,17 @@ export function IncidentScreen({ id }: { id: string }) {
                   <li key={l.id} className="grid gap-x-3 gap-y-1 border-b border-rule py-2.5 sm:grid-cols-[minmax(0,1fr)_130px_minmax(0,1.3fr)]">
                     <b className="text-[15px]">{l.name}</b>
                     <span className="text-sm text-text-muted">{l.class}</span>
-                    <span className="text-sm">{l.outcome !== null ? <><b>{l.outcome.text}</b> · {l.outcome.reason}</> : <span className="text-text-muted">{t.noOutcome}</span>}</span>
+                    <span className="text-sm">
+                      {l.outcome !== null ? (
+                        <>
+                          <b>{l.outcome.text}</b> · {l.outcome.reason}
+                          {l.outcome.ended_after !== null && <span className="block font-bold">{t.endedEarly(day(l.outcome.ended_after))}</span>}
+                          {l.outcome.can_end && <EndEarly caseId={c.id} learner={l.id} name={l.name} onDone={loaded.reload} />}
+                        </>
+                      ) : (
+                        <span className="text-text-muted">{t.noOutcome}</span>
+                      )}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -119,18 +129,7 @@ export function IncidentScreen({ id }: { id: string }) {
                   </div>
                 </div>
               )}
-              {c.can.follow_up && (
-                <div className="mt-4">
-                  <div className="label-caps mb-1 text-text-muted">{t.statements}</div>
-                  {c.documents.length === 0 ? <p className="text-sm text-text-muted">{t.noStatements}</p> : (
-                    <ul className="text-sm">
-                      {c.documents.map((d) => (
-                        <li key={d.id}>{d.title}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )}
+              {c.can.follow_up && <Statements incident={c} onAdded={loaded.reload} />}
             </section>
           </div>
 
@@ -187,6 +186,115 @@ export function IncidentScreen({ id }: { id: string }) {
         </div>
       </div>
     </>
+  )
+}
+
+/** Ends a suspension early (D-111), with a reason: today's register opens again. */
+function EndEarly({ caseId, learner, name, onDone }: { caseId: string; learner: string; name: string; onDone: () => void }) {
+  const [open, setOpen] = useState(false)
+  const [reason, setReason] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  if (!open) {
+    return (
+      <button type="button" onClick={() => setOpen(true)} className="mt-1 block min-h-11 text-[15px] font-extrabold underline underline-offset-[3px]">
+        {t.endEarly}
+      </button>
+    )
+  }
+
+  const save = async () => {
+    setBusy(true)
+    const result = await conductApi.endSuspension(caseId, learner, reason.trim())
+    setBusy(false)
+    if (result.kind === 'saved') {
+      slips.done({ word: copy.slips.saved, title: t.endedDone(name) })
+      onDone()
+    } else slips.wrong({ word: t.notSaved, title: result.kind === 'invalid' ? (Object.values(result.errors)[0]?.[0] ?? t.failed) : t.failed })
+  }
+
+  return (
+    <div className="mt-2 grid gap-2">
+      <TextArea label={t.endReason} value={reason} onChange={(e) => setReason(e.target.value)} hint={t.endNote} required />
+      <div className="flex gap-2">
+        <Button busy={busy} disabled={reason.trim() === ''} onClick={() => void save()}>
+          {t.endEarly}
+        </Button>
+        <Button variant="secondary" onClick={() => setOpen(false)}>
+          {t.cancel}
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+/** The written statements of a serious incident (D-111): secret, each opening recorded. */
+function Statements({ incident, onAdded }: { incident: Incident; onAdded: () => void }) {
+  const people = incident.learners.map((l) => l.name)
+  const [of, setOf] = useState(people[0] ?? '')
+  const [given, setGiven] = useState(today())
+  const [file, setFile] = useState<File | null>(null)
+  const [picker, setPicker] = useState(0)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const closed = ['closed', 'withdrawn'].includes(incident.state)
+
+  const add = async () => {
+    if (file === null) return
+    setBusy(true)
+    setError(null)
+    const result = await conductApi.addStatement(incident.id, t.statementTitle(of.trim(), day(given)), file)
+    setBusy(false)
+    if (result.kind === 'saved') {
+      setFile(null)
+      setPicker((n) => n + 1)
+      slips.done({ word: copy.slips.saved, title: t.statementAdded })
+      onAdded()
+    } else setError(result.kind === 'invalid' ? (Object.values(result.errors)[0]?.[0] ?? t.failed) : t.failed)
+  }
+
+  return (
+    <div className="mt-4 grid gap-2">
+      <div className="label-caps text-text-muted">{t.statements}</div>
+      {incident.documents.length === 0 ? (
+        <p className="text-sm text-text-muted">{t.noStatements}</p>
+      ) : (
+        <ul className="text-sm">
+          {incident.documents.map((d) => (
+            <li key={d.id} className="flex min-h-11 items-center justify-between gap-3 border-b border-rule">
+              <span>{d.title}</span>
+              <a href={conductApi.statementUrl(d.id)} target="_blank" rel="noopener" className="font-extrabold underline underline-offset-[3px]">
+                {t.open}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+      {!closed && (
+        <div className="grid gap-2 border border-rule p-3">
+          <h3 className="text-[15px] font-extrabold">{t.addStatement}</h3>
+          <Input label={t.statementOf} value={of} onChange={(e) => setOf(e.target.value)} list="statement-people" maxLength={120} required />
+          <datalist id="statement-people">
+            {people.map((p) => (
+              <option key={p} value={p} />
+            ))}
+          </datalist>
+          <Input label={t.statementGiven} type="date" value={given} max={today()} onChange={(e) => setGiven(e.target.value)} />
+          <label className="grid gap-1 text-[15px] font-extrabold">
+            {t.statementFile}
+            <input key={picker} type="file" accept="application/pdf,image/jpeg,image/png" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="text-sm font-normal" />
+          </label>
+          <p className="text-[13px] text-text-muted">{t.statementFileNote}</p>
+          {error !== null && <p className="text-sm font-bold text-red-text">✕ {error}</p>}
+          <div>
+            <Button busy={busy} disabled={file === null || of.trim() === ''} onClick={() => void add()}>
+              {t.addStatement}
+            </Button>
+          </div>
+        </div>
+      )}
+      <p className="text-[13px] font-bold">■ {t.statementsSecret}</p>
+    </div>
   )
 }
 

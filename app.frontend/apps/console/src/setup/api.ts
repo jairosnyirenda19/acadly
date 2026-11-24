@@ -27,12 +27,14 @@ export async function settle<T>(request: Promise<{ data?: T; error?: unknown; re
   }
 }
 
-export async function read<T>(request: Promise<{ data?: T; response: Response }>): Promise<T | 'refused' | null> {
+export async function read<T>(request: Promise<{ data?: T; response: Response }>): Promise<T | 'refused' | 'missing' | null> {
   try {
     const { data, response } = await request
 
     if (data !== undefined) return data
     if (response.status === 403 || response.status === 401) return 'refused'
+    // Not there, or outside the place the user works in (D-099): not a fault of the service.
+    if (response.status === 404) return 'missing'
 
     return null
   } catch {

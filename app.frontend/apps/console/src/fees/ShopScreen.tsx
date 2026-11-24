@@ -25,7 +25,7 @@ export function ShopScreen() {
   useEffect(() => {
     if (picked === null) return
     void learnersApi.record(picked).then((r) => {
-      if (r !== null && r !== 'refused') {
+      if (r !== null && r !== 'refused' && r !== 'missing') {
         setLearner({ id: r.id, name: r.name, className: r.class?.name ?? '' })
         setPayer(r.contacts.find((c) => c.main)?.name ?? r.contacts[0]?.name ?? '')
       }

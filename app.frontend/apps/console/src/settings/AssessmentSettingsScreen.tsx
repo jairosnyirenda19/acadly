@@ -650,7 +650,7 @@ function PlanEditor({
             waitingFor={data.waiting.waiting_for}
             requestId={data.waiting.id}
             mine={data.waiting.mine}
-            onWithdrawn={() => void assessmentApi.plans(q).then((next) => next !== null && next !== 'refused' && onSaved(next))}
+            onWithdrawn={() => void assessmentApi.plans(q).then((next) => next !== null && next !== 'refused' && next !== 'missing' && onSaved(next))}
           >
             <span className="text-[13px]">“{data.waiting.reason}”</span>
           </WaitingFor>

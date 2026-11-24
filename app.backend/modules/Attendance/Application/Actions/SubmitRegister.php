@@ -17,6 +17,7 @@ use Acadly\Kernel\Notify\Notifier;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Kernel\Support\Row;
+use Acadly\Modules\Attendance\Application\DecidedAbsences;
 use Acadly\Modules\Attendance\Application\LateRegisterApproval;
 use Acadly\Modules\Attendance\Application\Marks;
 use Acadly\Modules\Attendance\Application\MarkSheet;
@@ -52,6 +53,7 @@ final class SubmitRegister
         private readonly Audit $audit,
         private readonly Notifier $notifier,
         private readonly Clock $clock,
+        private readonly DecidedAbsences $decided,
         private readonly Reach $reach,
         private readonly Approvals $approvals,
         private readonly ApprovalActions $asks,
@@ -83,7 +85,8 @@ final class SubmitRegister
             throw ValidationException::withMessages(['day' => ['This is not a school day: it is a weekend or outside the terms.']]);
         }
 
-        $given = MarkSheet::check(array_column($this->learners->learnersIn($classId, $day), 'name', 'id'), $marks);
+        $given = MarkSheet::check($expected = array_column($this->learners->learnersIn($classId, $day), 'name', 'id'), $marks,
+            array_map(fn (array $d): string => $d['note'], $this->decided->on(array_map(strval(...), array_keys($expected)), $day)));
 
         if ($approvedBy === null && $day < $this->clock->today() && $this->approvals->needed(LateRegisterApproval::KEY)) {
             $this->askLate($by, $classId, $day, $given, trim((string) $reason));

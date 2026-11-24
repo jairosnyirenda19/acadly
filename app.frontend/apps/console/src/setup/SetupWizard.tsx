@@ -41,7 +41,7 @@ export function SetupWizard({ onOpened, onSignedOut }: { onOpened: () => void; o
     const [institution, academics, setup] = await Promise.all([setupApi.institution(), setupApi.academics(), setupApi.setup()])
 
     if (institution === 'refused' || academics === 'refused' || setup === 'refused') return 'refused' as const
-    if (institution === null || academics === null || setup === null) return null
+    if (institution === null || academics === null || setup === null || institution === 'missing' || academics === 'missing' || setup === 'missing') return null
 
     return { institution, academics, setup }
   }, [])

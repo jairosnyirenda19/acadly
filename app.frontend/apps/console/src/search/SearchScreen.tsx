@@ -64,7 +64,7 @@ export function SearchScreen() {
   const [picked, setPicked] = useState(0)
 
   useEffect(() => {
-    void read(api.GET('/v1/search/places')).then((p) => setPlaces(p !== null && p !== 'refused' ? p.places : []))
+    void read(api.GET('/v1/search/places')).then((p) => setPlaces(p !== null && p !== 'refused' && p !== 'missing' ? p.places : []))
   }, [])
 
   useEffect(() => {

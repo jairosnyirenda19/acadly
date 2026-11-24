@@ -16,6 +16,7 @@ use Acadly\Kernel\Notify\Notifier;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Ids;
 use Acadly\Kernel\Support\Row;
+use Acadly\Modules\Attendance\Application\DecidedAbsences;
 use Acadly\Modules\Attendance\Application\Lessons;
 use Acadly\Modules\Attendance\Application\Marks;
 use Acadly\Modules\Attendance\Application\MarkSheet;
@@ -53,6 +54,7 @@ final class SubmitLessonRegister
         private readonly Audit $audit,
         private readonly Notifier $notifier,
         private readonly Clock $clock,
+        private readonly DecidedAbsences $decided,
     ) {}
 
     /**
@@ -85,7 +87,8 @@ final class SubmitLessonRegister
             throw ValidationException::withMessages(['day' => ['A lesson register can be taken from 15 minutes before the lesson starts.']]);
         }
 
-        $given = MarkSheet::check(array_column($this->learners->learnersIn($class['id'], $day), 'name', 'id'), $marks);
+        $given = MarkSheet::check($expected = array_column($this->learners->learnersIn($class['id'], $day), 'name', 'id'), $marks,
+            array_map(fn (array $d): string => $d['note'], $this->decided->on(array_map(strval(...), array_keys($expected)), $day)));
 
         return DB::transaction(function () use ($by, $lesson, $class, $day, $given, $at): string {
             $existing = DB::table('attendance_registers')->where('slot_id', $lesson['slot_id'])->where('day', $day)->where('kind', self::KIND)->lockForUpdate()->first(['id']);

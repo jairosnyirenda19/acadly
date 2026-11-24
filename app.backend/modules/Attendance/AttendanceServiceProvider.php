@@ -23,6 +23,8 @@ use Acadly\Modules\Attendance\Application\AttendanceYearEnd;
 use Acadly\Modules\Attendance\Application\CorrectionApproval;
 use Acadly\Modules\Attendance\Application\LateRegisterApproval;
 use Acadly\Modules\Attendance\Application\LearnerAttendance;
+use Acadly\Modules\Attendance\Application\UnexplainedLessons;
+use Acadly\Modules\Attendance\Contracts\MissedLessons;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -32,6 +34,7 @@ final class AttendanceServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->scoped(LearnerAttendance::class);
+        $this->app->bind(MissedLessons::class, UnexplainedLessons::class);
         $this->app->tag([LearnerAttendance::class], LearnerRecordPart::TAG);
         $this->app->tag([AttendanceSignals::class], LearnerSignals::TAG);
         $this->app->tag([CorrectionApproval::class, LateRegisterApproval::class], ApprovalTopic::TAG);

@@ -3,6 +3,7 @@ import { applyLook } from '@acadly/ui'
 import { useEffect, useState } from 'react'
 import { AttendancePage, CardPage, MessagesPage, ReasonPage } from './ChildPages'
 import { PickupPage, ReviewPage } from './EarlyPages'
+import { ConductPage, DocumentsPage, PlanPage } from './FamilyPages'
 import { FeesPage, PaymentsPage } from './FeesPages'
 import type { Language } from './copy'
 import { ChildScreen, Home } from './Family'
@@ -37,7 +38,7 @@ export function App() {
   }
 
   let screen
-  const child = /^\/child\/([0-9a-f-]{36})(?:\/(card|attendance|messages|reason|review|pickup|fees|payments)(?:\/(\d{4}-\d{2}-\d{2}))?)?$/.exec(path)
+  const child = /^\/child\/([0-9a-f-]{36})(?:\/(card|attendance|messages|reason|review|pickup|fees|payments|conduct|plan|documents)(?:\/(\d{4}-\d{2}-\d{2}))?)?$/.exec(path)
 
   if (account === undefined) screen = <div className="min-h-screen bg-paper" />
   else if (account === null) {
@@ -65,6 +66,12 @@ export function App() {
         <FeesPage id={id} />
       ) : child[2] === 'payments' ? (
         <PaymentsPage id={id} />
+      ) : child[2] === 'conduct' ? (
+        <ConductPage id={id} />
+      ) : child[2] === 'plan' ? (
+        <PlanPage id={id} />
+      ) : child[2] === 'documents' ? (
+        <DocumentsPage id={id} />
       ) : child[2] === 'pickup' ? (
         <PickupPage id={id} />
       ) : child[2] === 'reason' ? (

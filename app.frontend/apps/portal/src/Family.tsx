@@ -2,7 +2,7 @@ import { useLoad } from '@acadly/kernel'
 import { Button, Notice } from '@acadly/ui'
 import { useState } from 'react'
 import { portalApi, type Child, type FamilyFeesState, type FamilyState, type Proposed } from './api'
-import { Badge, Bar, go, Loading, Mark, Screen, Tile, useWords, type Tone, Note } from './parts'
+import { Badge, Bar, go, Loading, Mark, Screen, shortDay, Tile, useWords, type Tone, Note } from './parts'
 
 /** The family, loaded once and shared by every screen of the portal. */
 export function useFamily() {
@@ -256,6 +256,11 @@ export function ChildScreen({ id }: { id: string }) {
   const card = child.lines.find((l) => l.key === 'card')
   const review = child.lines.find((l) => l.key === 'review')
   const pickup = child.lines.find((l) => l.key === 'pickup')
+  const conduct = child.lines.find((l) => l.key === 'conduct')
+  const plan = child.lines.find((l) => l.key === 'plan')
+  const documents = child.lines.find((l) => l.key === 'documents')
+  // The doors' labels (D-110): "3 2" (commendations, incidents), "2027-02-20 Reading support", "3".
+  const [commendations = 0, incidents = 0] = (conduct?.label ?? '').split(' ').map(Number)
   const base = `/child/${child.id}`
   const fees = familyFees?.children.find((x) => x.id === child.id)
   const feesNote =
@@ -305,6 +310,9 @@ export function ChildScreen({ id }: { id: string }) {
         )}
         {fees !== undefined && <Tile icon="fees" title={t.fees.door} note={feesNote} fresh={fees.next_due?.overdue === true} href={`${base}/fees`} />}
         <Tile icon="cal" title={t.child.attendance} note={t.child.seeTerm} href={`${base}/attendance`} />
+        {conduct !== undefined && <Tile icon="star" title={t.conduct.door} note={t.conduct.doorNote(commendations, incidents)} href={`${base}/conduct`} />}
+        {plan?.label != null && <Tile icon="plan" title={t.plan.door} note={t.plan.doorNote(plan.label.slice(11), shortDay(plan.label.slice(0, 10)))} href={`${base}/plan`} />}
+        {documents !== undefined && <Tile icon="doc" title={t.documents.door} note={t.documents.doorNote(Number(documents.label ?? 0))} href={`${base}/documents`} />}
         <Tile icon="bell" title={t.child.messages} note={t.child.seeMessages} href={`${base}/messages`} />
         {data.school.phone !== null && <Tile icon="call" title={t.child.call} note={data.school.phone} href={`tel:${data.school.phone.replace(/\s/g, '')}`} />}
       </div>

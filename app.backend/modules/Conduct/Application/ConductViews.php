@@ -13,9 +13,11 @@ use Acadly\Kernel\Documents\DocumentReader;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Row;
+use Acadly\Modules\Attendance\Contracts\MissedLessons;
 use Acadly\Modules\Conduct\Application\Actions\CaseActions;
 use Acadly\Modules\Conduct\Contracts\ConductPermission;
 use Acadly\Modules\Conduct\Domain\ConductCase;
+use Acadly\Modules\Conduct\Domain\Sanction;
 use Acadly\Modules\Conduct\Journeys\SeriousIncident\State;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -37,6 +39,7 @@ final class ConductViews
         private readonly DocumentReader $documents,
         private readonly CaseActions $cases,
         private readonly Clock $clock,
+        private readonly MissedLessons $missed,
     ) {}
 
     /** @return array<string, mixed> */
@@ -76,13 +79,17 @@ final class ConductViews
         $entry = $this->entries(null, $case->entry_id)[0] ?? null;
         $followUp = $this->access->allows($viewer, ConductPermission::FollowUp, $case->journeyScope());
         $outcomes = CaseActions::latestOutcomes($case->id);
+        $ends = Suspensions::endsOf(array_values(array_map(fn (object $o): string => Row::text($o, 'id'), $outcomes)));
+        $decided = in_array($case->state, Suspensions::DECIDED, true);
         $learners = [];
 
         foreach (DB::table('conduct_entry_learners')->where('entry_id', $case->entry_id)->get(['learner_id', 'class_id']) as $l) {
             $id = Row::text($l, 'learner_id');
             $o = $outcomes[$id] ?? null;
             $learners[] = ['id' => $id, 'name' => $this->directory->names([$id])[$id] ?? '', 'class' => $this->className(Row::text($l, 'class_id')),
-                'outcome' => $o === null ? null : ['outcome' => Row::text($o, 'outcome'), 'text' => CaseActions::describe($o), 'reason' => Row::text($o, 'reason')]];
+                'outcome' => $o === null ? null : ['outcome' => Row::text($o, 'outcome'), 'text' => CaseActions::describe($o), 'reason' => Row::text($o, 'reason'),
+                    'ended_after' => $ends[Row::text($o, 'id')] ?? null,
+                    'can_end' => $followUp && $decided && Row::text($o, 'outcome') === Sanction::Suspension->value && ! isset($ends[Row::text($o, 'id')])]];
         }
 
         $notes = [];
@@ -211,6 +218,30 @@ final class ConductViews
             }
         }
 
+        // Incidents and missed lessons in the same days (D-111): lessons missed with no accepted reason.
+        if ($rules['missed_incidents'] > 0 && $learnerIds !== []) {
+            $today = $this->clock->today();
+            $from = CarbonImmutable::parse($today)->subDays($rules['missed_days'] - 1)->toDateString();
+            $recent = [];
+
+            foreach (DB::table('conduct_entry_learners as l')->join('conduct_entries as e', 'e.id', '=', 'l.entry_id')
+                ->leftJoin('conduct_withdrawals as w', 'w.entry_id', '=', 'e.id')->whereNull('w.entry_id')->where('e.commendation', false)
+                ->whereIn('l.learner_id', $learnerIds)->whereBetween('e.happened_on', [$from, $today])->get(['l.learner_id']) as $r) {
+                $recent[Row::text($r, 'learner_id')] = ($recent[Row::text($r, 'learner_id')] ?? 0) + 1;
+            }
+
+            $enough = array_keys(array_filter($recent, fn (int $n): bool => $n >= $rules['missed_incidents']));
+            $missed = $this->missed->byDay(array_map(strval(...), $enough), $from, $today);
+
+            foreach ($enough as $learner) {
+                $lessons = array_sum($missed[$learner] ?? []);
+
+                if ($lessons >= $rules['missed_lessons']) {
+                    $out[$learner][] = "{$recent[$learner]} incidents and {$lessons} unexplained missed lessons in {$rules['missed_days']} days.";
+                }
+            }
+        }
+
         if ($rules['open_serious'] && $learnerIds !== []) {
             foreach (DB::table('conduct_cases as c')->join('conduct_entry_learners as l', 'l.entry_id', '=', 'c.entry_id')->whereIn('c.state', self::OPEN)
                 ->whereIn('l.learner_id', $learnerIds)->distinct()->pluck('l.learner_id') as $learner) {
@@ -223,13 +254,15 @@ final class ConductViews
         return $out;
     }
 
-    /** @return array{incidents: int, days: int, open_serious: bool} */
+    /** @return array{incidents: int, days: int, open_serious: bool, missed_incidents: int, missed_lessons: int, missed_days: int, portal: bool} */
     public static function rules(): array
     {
-        $row = DB::table('conduct_watch')->where('id', 1)->first(['incidents', 'days', 'open_serious']);
+        $row = DB::table('conduct_watch')->where('id', 1)->first();
 
-        return $row === null ? ['incidents' => 3, 'days' => 30, 'open_serious' => true]
-            : ['incidents' => Row::int($row, 'incidents'), 'days' => Row::int($row, 'days'), 'open_serious' => (bool) $row->open_serious];
+        return $row === null ? ['incidents' => 3, 'days' => 30, 'open_serious' => true, 'missed_incidents' => 2, 'missed_lessons' => 4, 'missed_days' => 14, 'portal' => true]
+            : ['incidents' => Row::int($row, 'incidents'), 'days' => Row::int($row, 'days'), 'open_serious' => (bool) $row->open_serious,
+                'missed_incidents' => Row::int($row, 'missed_incidents'), 'missed_lessons' => Row::int($row, 'missed_lessons'), 'missed_days' => Row::int($row, 'missed_days'),
+                'portal' => (bool) $row->portal];
     }
 
     /**

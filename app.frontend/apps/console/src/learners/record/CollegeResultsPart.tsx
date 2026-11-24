@@ -25,7 +25,7 @@ export function CollegeResultsSummary({ learner }: { learner: LearnerState }) {
   return (
     <Column edge grow="flex-[1_1_260px]" label={titleOf(learner)}>
       <SectionTitle>{titleOf(learner)}</SectionTitle>
-      {loaded.phase === 'failed' ? (
+      {(loaded.phase === 'failed' || loaded.phase === 'missing') ? (
         <p className="text-sm text-text-muted">{r.none}</p>
       ) : d === undefined ? (
         <Waiting phase={loaded.phase} what={titleOf(learner)} labels={copy.loading} rows={2} onRetry={loaded.reload} />
@@ -49,7 +49,7 @@ export function CollegeResultsTab({ learner }: { learner: LearnerState }) {
   const context = useAppContext()
   const d = loaded.data
 
-  if (loaded.phase === 'failed') return <p className="text-sm text-text-muted">{r.none}</p>
+  if ((loaded.phase === 'failed' || loaded.phase === 'missing')) return <p className="text-sm text-text-muted">{r.none}</p>
   if (d === undefined) return <Waiting phase={loaded.phase} what={titleOf(learner)} labels={copy.loading} rows={6} onRetry={loaded.reload} />
   if (d.semesters.length === 0) return <p className="text-sm text-text-muted">{r.none}</p>
 

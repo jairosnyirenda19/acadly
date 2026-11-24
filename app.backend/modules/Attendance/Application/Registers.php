@@ -43,6 +43,7 @@ final class Registers
         private readonly Deliveries $deliveries,
         private readonly AbsenceReasons $reasons,
         private readonly Clock $clock,
+        private readonly DecidedAbsences $decided,
         private readonly ApprovalRequests $approvals,
         private readonly Approvals $chains,
     ) {}
@@ -146,6 +147,7 @@ final class Registers
         }
 
         $learners = $this->learners->learnersIn($classId, $day);
+        $decided = $this->decided->on(array_column($learners, 'id'), $day);
         $ids = array_column($learners, 'id');
         $register = DB::table('attendance_registers')->where('class_id', $classId)->where('day', $day)->where('kind', SubmitRegister::KIND)
             ->first(['id', 'submitted_at', 'submitted_by']);
@@ -174,6 +176,7 @@ final class Registers
             'learners' => array_map(fn (array $l): array => [
                 ...$l,
                 'history' => array_map(fn (string $d): ?string => $history[$l['id']][$d] ?? null, $before),
+                'decided' => isset($decided[$l['id']]) ? ['label' => $decided[$l['id']]['label'], 'reference' => $decided[$l['id']]['reference'], 'from' => $decided[$l['id']]['from'], 'to' => $decided[$l['id']]['to']] : null,
                 'mark' => $marks[$l['id']] ?? null,
                 'correction' => $corrections[$l['id']] ?? null,
                 'absence' => isset($absences[$l['id']]) ? [...$absences[$l['id']], 'can_follow_up' => $mayFollow] : null,

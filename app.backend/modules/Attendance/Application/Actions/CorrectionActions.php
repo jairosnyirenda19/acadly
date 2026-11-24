@@ -11,6 +11,7 @@ use Acadly\Kernel\Blueprint\Engine\JourneyEngine;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Row;
 use Acadly\Modules\Attendance\Application\CorrectionApproval;
+use Acadly\Modules\Attendance\Application\DecidedAbsences;
 use Acadly\Modules\Attendance\Application\Marks;
 use Acadly\Modules\Attendance\Application\Reach;
 use Acadly\Modules\Attendance\Contracts\Mark;
@@ -37,14 +38,20 @@ final class CorrectionActions
         private readonly Marks $marks,
         private readonly Reach $reach,
         private readonly ApprovalActions $approvals,
+        private readonly DecidedAbsences $decided,
     ) {}
 
     public function request(User $by, string $registerId, string $learnerId, string $to, string $reason): Correction
     {
-        $register = DB::table('attendance_registers')->where('id', $registerId)->first(['id', 'class_id']);
+        $register = DB::table('attendance_registers')->where('id', $registerId)->first(['id', 'class_id', 'day']);
 
         if ($register === null || ! $this->reach->sees($by, Row::text($register, 'class_id'))) {
             throw (new ModelNotFoundException)->setModel(Correction::class);
+        }
+
+        // A decision sets the mark (D-111). The person who leads it ends it early instead.
+        if ($this->decided->on([$learnerId], Row::text($register, 'day')) !== []) {
+            throw ValidationException::withMessages(['learner_id' => ['A decision sets this mark. To change it, the person who leads the incident ends the suspension early.']]);
         }
 
         $from = $this->marks->current($registerId, $learnerId);

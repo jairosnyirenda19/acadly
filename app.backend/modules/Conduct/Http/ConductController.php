@@ -27,7 +27,7 @@ final class ConductController
     /**
      * The kinds of incident and commendation, and the rules for learners to watch.
      *
-     * @response array{kinds: list<array{id: string, name: string, commendation: bool, level: string|null, always: bool, retired: bool}>, watch: array{incidents: int, days: int, open_serious: bool}}
+     * @response array{kinds: list<array{id: string, name: string, commendation: bool, level: string|null, always: bool, retired: bool}>, watch: array{incidents: int, days: int, open_serious: bool, missed_incidents: int, missed_lessons: int, missed_days: int, portal: bool}}
      */
     public function kinds(Request $request, Access $access): JsonResponse
     {
@@ -77,8 +77,11 @@ final class ConductController
     public function saveWatch(Request $request, Access $access, KindActions $actions): JsonResponse
     {
         $access->check(self::user($request), ConductPermission::Manage);
-        $request->validate(['incidents' => ['required', 'integer'], 'days' => ['required', 'integer'], 'open_serious' => ['required', 'boolean']]);
-        $actions->saveWatch(self::user($request), $request->integer('incidents'), $request->integer('days'), $request->boolean('open_serious'));
+        $request->validate(['incidents' => ['required', 'integer'], 'days' => ['required', 'integer'], 'open_serious' => ['required', 'boolean'],
+            'missed_incidents' => ['required', 'integer'], 'missed_lessons' => ['required', 'integer'], 'missed_days' => ['required', 'integer'], 'portal' => ['required', 'boolean']]);
+        $actions->saveWatch(self::user($request), ['incidents' => $request->integer('incidents'), 'days' => $request->integer('days'), 'open_serious' => $request->boolean('open_serious'),
+            'missed_incidents' => $request->integer('missed_incidents'), 'missed_lessons' => $request->integer('missed_lessons'), 'missed_days' => $request->integer('missed_days'),
+            'portal' => $request->boolean('portal')]);
 
         return response()->json(['saved' => true]);
     }
@@ -143,7 +146,7 @@ final class ConductController
     /**
      * The school's overview: open serious incidents, learners to watch, by kind.
      *
-     * @response array{commendations: int, commendations_before: int, incidents: int, levels: array<string, int>, open_cases: list<array{id: string, number: string, state: string, state_label: string, kind: string, happened_on: string, learners: string, lead: string|null, days: int}>, watch: list<array{id: string, name: string, class: string, reasons: list<string>}>, kinds: list<array{name: string, commendation: bool, now: int, before: int}>, rules: array{incidents: int, days: int, open_serious: bool}}
+     * @response array{commendations: int, commendations_before: int, incidents: int, levels: array<string, int>, open_cases: list<array{id: string, number: string, state: string, state_label: string, kind: string, happened_on: string, learners: string, lead: string|null, days: int}>, watch: list<array{id: string, name: string, class: string, reasons: list<string>}>, kinds: list<array{name: string, commendation: bool, now: int, before: int}>, rules: array{incidents: int, days: int, open_serious: bool, missed_incidents: int, missed_lessons: int, missed_days: int, portal: bool}}
      */
     public function overview(Request $request, ConductViews $views): JsonResponse
     {
@@ -153,7 +156,7 @@ final class ConductController
     /**
      * A serious incident.
      *
-     * @response array{id: string, number: string, state: string, state_label: string, entry: array{id: string, kind: string, commendation: bool, level: string|null, happened_on: string, place: string|null, what: string, action: string|null, told_family: bool, recorded_by: string|null, recorded_by_id: string, withdrawn: array{reason: string, by: string|null}|null, case: array{id: string, number: string, state: string, state_label: string}|null, others: list<array{id: string, name: string}>}|null, lead: string|null, learners: list<array{id: string, name: string, class: string, outcome: array{outcome: string, text: string, reason: string}|null}>, notes: list<array{id: string, text: string, at: string, by: string|null}>, documents: list<array{id: string, title: string}>, can: array{follow_up: bool, take_up: bool, decide: bool, meet: bool, close: bool, withdraw: bool, reporter: bool}}
+     * @response array{id: string, number: string, state: string, state_label: string, entry: array{id: string, kind: string, commendation: bool, level: string|null, happened_on: string, place: string|null, what: string, action: string|null, told_family: bool, recorded_by: string|null, recorded_by_id: string, withdrawn: array{reason: string, by: string|null}|null, case: array{id: string, number: string, state: string, state_label: string}|null, others: list<array{id: string, name: string}>}|null, lead: string|null, learners: list<array{id: string, name: string, class: string, outcome: array{outcome: string, text: string, reason: string, ended_after: string|null, can_end: bool}|null}>, notes: list<array{id: string, text: string, at: string, by: string|null}>, documents: list<array{id: string, title: string}>, can: array{follow_up: bool, take_up: bool, decide: bool, meet: bool, close: bool, withdraw: bool, reporter: bool}}
      */
     public function incident(Request $request, string $id, ConductViews $views): JsonResponse
     {
@@ -212,6 +215,20 @@ final class ConductController
             $starts !== '' ? $starts : null, $request->filled('days') ? $request->integer('days') : null, $request->string('reason')->toString());
 
         return response()->json(['id' => $id], 201);
+    }
+
+    /**
+     * Ends a learner's suspension early, with a reason. Today's register opens again.
+     *
+     * @response array{id: string}
+     */
+    public function endSuspension(Request $request, string $id, string $learner, CaseActions $cases): JsonResponse
+    {
+        $cases->find(self::user($request), $id);
+        $request->validate(['reason' => ['required', 'string', 'max:2000']]);
+        $cases->endSuspension(self::user($request), $id, $learner, $request->string('reason')->toString());
+
+        return response()->json(['id' => $id]);
     }
 
     /** @return list<array<mixed>> */

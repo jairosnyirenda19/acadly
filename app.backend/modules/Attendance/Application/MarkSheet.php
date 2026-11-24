@@ -13,9 +13,10 @@ final class MarkSheet
     /**
      * @param  array<string, string>  $expected  learner id => name
      * @param  list<array{learner_id: string, status: string, note: string|null}>  $marks
+     * @param  array<string, string>  $decided  learner id => the decision that keeps them out that day (D-111)
      * @return array<string, array{status: string, note: string|null}> learner id => mark
      */
-    public static function check(array $expected, array $marks): array
+    public static function check(array $expected, array $marks, array $decided = []): array
     {
         $given = [];
 
@@ -39,6 +40,13 @@ final class MarkSheet
             }
 
             $given[$mark['learner_id']] = ['status' => $mark['status'], 'note' => $note !== '' ? $note : null];
+        }
+
+        // A decision sets the mark: Excused, naming it. The teacher cannot change it.
+        foreach ($decided as $learner => $note) {
+            if (isset($expected[$learner])) {
+                $given[$learner] = ['status' => Mark::Excused->value, 'note' => $note];
+            }
         }
 
         $missing = count(array_diff_key($expected, $given));

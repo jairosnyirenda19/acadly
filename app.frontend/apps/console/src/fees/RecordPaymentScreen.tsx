@@ -74,7 +74,7 @@ export function RecordPaymentScreen() {
   useEffect(() => {
     if (learnerId === null) return
     setFees('loading')
-    void feesApi.learner(learnerId).then((answer) => setFees(answer === null || answer === 'refused' ? null : answer))
+    void feesApi.learner(learnerId).then((answer) => setFees(answer === null || answer === 'refused' || answer === 'missing' ? null : answer))
   }, [learnerId])
 
   return (
@@ -116,7 +116,7 @@ function PaymentForm({ learnerId, fees, onOther }: { learnerId: string; fees: Le
   useEffect(() => {
     let live = true
     void learnersApi.record(learnerId).then((r) => {
-      if (live && r !== null && r !== 'refused') setLearner({ name: r.name, className: r.class?.name ?? '' })
+      if (live && r !== null && r !== 'refused' && r !== 'missing') setLearner({ name: r.name, className: r.class?.name ?? '' })
     })
 
     return () => {

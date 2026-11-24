@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Acadly\Core\Enrolment\Http\DivisionsController;
 use Acadly\Core\Enrolment\Http\FamiliesController;
+use Acadly\Core\Enrolment\Http\FamilyDocumentsController;
 use Acadly\Core\Enrolment\Http\LearnerDocumentsController;
 use Acadly\Core\Enrolment\Http\LearnerImportController;
 use Acadly\Core\Enrolment\Http\LearnersController;
@@ -23,6 +24,9 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/portal/family', [FamiliesController::class, 'family'])->name('portal.family');
     Route::post('/portal/family/confirm', [FamiliesController::class, 'confirm'])->name('portal.confirm');
     Route::get('/portal/children/{id}/messages', [FamiliesController::class, 'messages'])->whereUuid('id')->name('portal.messages');
+    // The documents the school shows to families (D-110). None shown answers not found.
+    Route::get('/portal/children/{id}/documents', [FamilyDocumentsController::class, 'index'])->whereUuid('id')->name('portal.documents');
+    Route::get('/portal/children/{id}/documents/{document}', [FamilyDocumentsController::class, 'content'])->whereUuid(['id', 'document'])->middleware('throttle:60,1')->name('portal.documents.content');
 });
 
 // The year-end run (D-088).

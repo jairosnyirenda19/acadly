@@ -311,6 +311,14 @@ it('takes lecture attendance by scan-in with the attendance phone, on campus, an
     expect($tab['rate'])->toBe(100)->and($tab['courses'][0]['late'])->toBe(1)->and($tab['phone']['set'])->toBeTrue()->and($tab['can_reset'])->toBeTrue();
     $mine = $this->actingAs($first)->getJson('/api/v1/student/lectures/attendance')->assertOk()->json();
     expect($mine['rate'])->toBe(100)->and($mine['held'])->toBe(1)->and($mine['courses'][0]['code'])->toBe('ACC 101');
+
+    // The attendance bar is the division's own (D-113): none while Results is off, then what Results settings say.
+    expect($mine['bar'])->toBeNull()->and($tab['bar'])->toBeNull();
+    DB::table('module_switches')->insert(['id' => Ids::next(), 'module_key' => 'results', 'enabled' => true, 'reason' => 'Test setup.', 'switched_at' => now()->subYear()]);
+    DB::table('results_settings')->insert(['division_id' => $this->college, 'bar_percent' => 75, 'bar_days' => 14, 'hold_slip_for_fees' => false,
+        'updated_by' => $this->admin->id, 'updated_at' => now()]);
+    app()->forgetScopedInstances();
+    expect($this->actingAs($first)->getJson('/api/v1/student/lectures/attendance')->assertOk()->json('bar'))->toBe(75);
     $third = $this->actingAs($this->admin)->getJson("/api/v1/lectures/learners/{$this->learners[2]}")->json();
     expect($third['marks'][0]['was'])->toBe('absent')->and($third['marks'][0]['mark'])->toBe('present');
 

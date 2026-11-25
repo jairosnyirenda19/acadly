@@ -15724,6 +15724,7 @@ export interface operations {
                         rate: number | null;
                         held: number;
                         missed: number;
+                        bar: number | null;
                         courses: {
                             code: string;
                             title: string;
@@ -26278,6 +26279,7 @@ export interface operations {
                         rate: number | null;
                         held: number;
                         missed: number;
+                        bar: number | null;
                         courses: {
                             code: string;
                             title: string;

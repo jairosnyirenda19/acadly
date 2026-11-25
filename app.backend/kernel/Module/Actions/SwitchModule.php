@@ -59,7 +59,7 @@ final class SwitchModule
         }
 
         if (! $this->modules->has($key)) {
-            throw ValidationException::withMessages(['module' => ['The module is not part of this build.']]);
+            throw ValidationException::withMessages(['module' => ['This module is not available for this school.']]);
         }
 
         $module = $this->modules->get($key);

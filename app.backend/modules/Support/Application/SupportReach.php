@@ -64,6 +64,12 @@ final class SupportReach
         return $plan instanceof SupportPlan && $this->seesPlan($who, $plan) ? $plan : throw new NotFoundHttpException;
     }
 
+    /** Whether the person holds the permission at a class: for lists that already know each learner's class. */
+    public function mayAtClass(User $who, SupportPermission $permission, string $classId): bool
+    {
+        return $this->access->allows($who, $permission, ScopeRef::of(ScopeType::ClassGroup, $classId));
+    }
+
     public function classOf(string $learnerId): ?string
     {
         return $this->directory->placeOf($learnerId)['class_id'] ?? null;

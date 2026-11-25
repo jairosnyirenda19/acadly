@@ -49,6 +49,23 @@ interface EnrolmentDirectory
     public function classOn(string $learnerId, string $day): ?string;
 
     /**
+     * Where each of some learners is now, as placeOf() says, in one read (D-113).
+     * A learner never placed is left out.
+     *
+     * @param  list<string>  $learnerIds
+     * @return array<string, array{class_id: string, division_id: string, campus_id: string, year_id: string, open: bool, since: string}>
+     */
+    public function placesOf(array $learnerIds): array;
+
+    /**
+     * The class each of some learners was placed in on a day, as classOn() says, in one read (D-113).
+     *
+     * @param  list<string>  $learnerIds
+     * @return array<string, string> learner id => class id
+     */
+    public function classesOn(array $learnerIds, string $day): array;
+
+    /**
      * Every learner with an open placement now.
      *
      * @return list<string> learner ids

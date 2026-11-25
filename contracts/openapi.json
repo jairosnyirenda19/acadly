@@ -27369,6 +27369,12 @@
                                         "missed": {
                                             "type": "integer"
                                         },
+                                        "bar": {
+                                            "type": [
+                                                "integer",
+                                                "null"
+                                            ]
+                                        },
                                         "courses": {
                                             "type": "array",
                                             "items": {
@@ -27484,6 +27490,7 @@
                                         "rate",
                                         "held",
                                         "missed",
+                                        "bar",
                                         "courses",
                                         "marks",
                                         "phone",
@@ -61477,6 +61484,12 @@
                                         "missed": {
                                             "type": "integer"
                                         },
+                                        "bar": {
+                                            "type": [
+                                                "integer",
+                                                "null"
+                                            ]
+                                        },
                                         "courses": {
                                             "type": "array",
                                             "items": {
@@ -61571,6 +61584,7 @@
                                         "rate",
                                         "held",
                                         "missed",
+                                        "bar",
                                         "courses",
                                         "marks"
                                     ]

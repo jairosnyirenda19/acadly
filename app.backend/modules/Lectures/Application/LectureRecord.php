@@ -11,6 +11,7 @@ use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
+use Acadly\Modules\Lectures\Contracts\AttendanceBar;
 use Acadly\Modules\Lectures\Contracts\LecturesPermission;
 use Acadly\Modules\Programmes\Contracts\CourseTeaching;
 use Illuminate\Support\Facades\DB;
@@ -19,15 +20,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * The Lecture attendance part of the learner record (D-102): the student's
  * rate this semester, course by course, the lectures missed or marked by
- * hand, and their attendance phone. A course below 80% needs attention.
+ * hand, and their attendance phone. A course below the division's attendance bar needs attention.
  *
- * @phpstan-type Record array{semester: string, rate: int|null, held: int, missed: int, courses: list<array{code: string, title: string, held: int, missed: int, late: int, rate: int|null}>, marks: list<array{day: string, code: string, kind: string, mark: string, source: string, reason: string|null, by: string|null, was: string|null}>}
+ * @phpstan-type Record array{semester: string, rate: int|null, held: int, missed: int, bar: int|null, courses: list<array{code: string, title: string, held: int, missed: int, late: int, rate: int|null}>, marks: list<array{day: string, code: string, kind: string, mark: string, source: string, reason: string|null, by: string|null, was: string|null}>}
  */
 final class LectureRecord implements LearnerRecordPart
 {
     /** A course attended less than this, in per cent, is marked. */
-    public const int BELOW = 80;
-
     /** @var array<string, Record|null> */
     private array $seen = [];
 
@@ -37,6 +36,7 @@ final class LectureRecord implements LearnerRecordPart
         private readonly LectureDays $days,
         private readonly CourseTeaching $teaching,
         private readonly Clock $clock,
+        private readonly AttendanceBar $bar,
     ) {}
 
     public function key(): string
@@ -57,7 +57,7 @@ final class LectureRecord implements LearnerRecordPart
         }
         $below = $this->below($s);
 
-        return [['label' => 'Lectures', 'value' => $s['rate'].'%', 'note' => $below === 0 ? $s['held'].' held this semester.' : ($below === 1 ? 'Below 80% in 1 course.' : "Below 80% in {$below} courses."),
+        return [['label' => 'Lectures', 'value' => $s['rate'].'%', 'note' => $below === 0 ? $s['held'].' held this semester.' : ($below === 1 ? "Below {$s['bar']}% in 1 course." : "Below {$s['bar']}% in {$below} courses."),
             'tone' => $below === 0 ? 'plain' : 'attention']];
     }
 
@@ -97,7 +97,7 @@ final class LectureRecord implements LearnerRecordPart
             return $this->seen[$key] = null;
         }
 
-        return $this->seen[$key] = ['semester' => $period['name'], ...StudentLectures::summary($learnerId, $division, $period['id'], $this->teaching)];
+        return $this->seen[$key] = ['semester' => $period['name'], ...StudentLectures::summary($learnerId, $division, $period['id'], $this->teaching, $this->bar)];
     }
 
     /** @param  Record  $s */
@@ -105,7 +105,7 @@ final class LectureRecord implements LearnerRecordPart
     {
         $n = 0;
         foreach ($s['courses'] as $c) {
-            if ($c['rate'] !== null && $c['rate'] < self::BELOW) {
+            if ($s['bar'] !== null && $c['rate'] !== null && $c['rate'] < $s['bar']) {
                 $n++;
             }
         }

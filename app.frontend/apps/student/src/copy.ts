@@ -158,7 +158,7 @@ export const copy = {
     missedOf: (missed: number, held: number) => `${missed} of ${held}`,
     byCourse: 'By course',
     attended: (rate: number) => `${rate}% attended`,
-    below: '! Below 80%',
+    below: (bar: number) => `! Below ${bar}%`,
     ok: '✓',
     marks: 'Missed or marked by hand',
     none: 'Nothing missed.',

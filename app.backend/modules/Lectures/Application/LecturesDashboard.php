@@ -8,6 +8,7 @@ use Acadly\Core\Institution\Contracts\DashboardPanels;
 use Acadly\Core\Institution\Contracts\DashboardScope;
 use Acadly\Core\Institution\Contracts\Panels;
 use Acadly\Kernel\Support\Row;
+use Acadly\Modules\Lectures\Contracts\AttendanceBar;
 use Acadly\Modules\Lectures\Contracts\LecturesPermission;
 use Acadly\Modules\Programmes\Contracts\CourseTeaching;
 use Carbon\CarbonImmutable;
@@ -26,6 +27,7 @@ final class LecturesDashboard implements DashboardPanels
     public function __construct(
         private readonly LectureDays $days,
         private readonly CourseTeaching $teaching,
+        private readonly AttendanceBar $bar,
     ) {}
 
     public function key(): string
@@ -70,10 +72,11 @@ final class LecturesDashboard implements DashboardPanels
                 continue;
             }
             $rows = [];
+            $bar = $this->bar->percent($d);
             foreach ($this->byCourse($d, $period['id']) as $r) {
                 $rate = Panels::percent($r['attended'], $r['held']);
                 $rows[] = ['name' => $r['code'], 'division_id' => $d, 'value' => $rate ?? 0, 'whole' => 100, 'note' => "{$r['attended']} of {$r['held']}",
-                    'tone' => $rate !== null && $rate < LectureRecord::BELOW ? 'attention' : 'plain'];
+                    'tone' => $bar > 0 && $rate !== null && $rate < $bar ? 'attention' : 'plain'];
             }
             if ($rows !== []) {
                 usort($rows, fn (array $a, array $b): int => $a['value'] <=> $b['value']);

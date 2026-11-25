@@ -7,6 +7,7 @@ namespace Acadly\Modules\Lectures\Application;
 use Acadly\Kernel\Identity\User;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Row;
+use Acadly\Modules\Lectures\Contracts\AttendanceBar;
 use Acadly\Modules\Programmes\Contracts\CourseTeaching;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * @phpstan-import-type Lecture from LectureDays
  *
- * @phpstan-type Summary array{rate: int|null, held: int, missed: int, courses: list<array{code: string, title: string, held: int, missed: int, late: int, rate: int|null}>, marks: list<array{day: string, code: string, kind: string, mark: string, source: string, reason: string|null, by: string|null, was: string|null}>}
+ * @phpstan-type Summary array{rate: int|null, held: int, missed: int, bar: int|null, courses: list<array{code: string, title: string, held: int, missed: int, late: int, rate: int|null}>, marks: list<array{day: string, code: string, kind: string, mark: string, source: string, reason: string|null, by: string|null, was: string|null}>}
  * @phpstan-type StudentLecture array{slot_id: string, day: string, held_on: string, starts: string, ends: string, room: string, kind: string, code: string, title: string, state: string, lecturer: string, cover: string|null, moved: array{day: string, starts: string, ends: string, room: string}|null, mark: string|null, scan: array{open: bool, until: string}|null}
  */
 final class StudentLectures
@@ -29,6 +30,7 @@ final class StudentLectures
         private readonly CourseTeaching $teaching,
         private readonly LectureViews $views,
         private readonly Clock $clock,
+        private readonly AttendanceBar $bar,
     ) {}
 
     /**
@@ -83,10 +85,10 @@ final class StudentLectures
         $me = $this->me($user);
         $period = $this->days->period($me['division_id'], $this->clock->today());
         if ($period === null) {
-            return ['semester' => null, 'rate' => null, 'held' => 0, 'missed' => 0, 'courses' => [], 'marks' => []];
+            return ['semester' => null, 'rate' => null, 'held' => 0, 'missed' => 0, 'bar' => null, 'courses' => [], 'marks' => []];
         }
 
-        return ['semester' => $period['name'], ...self::summary($me['learner_id'], $me['division_id'], $period['id'], $this->teaching)];
+        return ['semester' => $period['name'], ...self::summary($me['learner_id'], $me['division_id'], $period['id'], $this->teaching, $this->bar)];
     }
 
     /**
@@ -94,7 +96,7 @@ final class StudentLectures
      *
      * @return Summary
      */
-    public static function summary(string $learnerId, string $divisionId, string $periodId, CourseTeaching $teaching): array
+    public static function summary(string $learnerId, string $divisionId, string $periodId, CourseTeaching $teaching, AttendanceBar $bar): array
     {
         $titles = [];
         foreach ($teaching->offerings($divisionId, $periodId) as $o) {
@@ -116,7 +118,9 @@ final class StudentLectures
                 'mark' => $x['mark'], 'source' => $x['source'], 'reason' => $x['reason'], 'by' => $x['by'], 'was' => $x['was']];
         }
 
-        return ['rate' => Marks::percent($attended, $held), 'held' => $held, 'missed' => $held - $attended, 'courses' => $courses, 'marks' => $marks];
+        $percent = $bar->percent($divisionId);
+
+        return ['rate' => Marks::percent($attended, $held), 'held' => $held, 'missed' => $held - $attended, 'bar' => $percent > 0 ? $percent : null, 'courses' => $courses, 'marks' => $marks];
     }
 
     /**

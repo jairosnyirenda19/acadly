@@ -168,12 +168,41 @@ final class Ledger
             $shares->push((object) ['learner_id' => $learner, 'charge_id' => $share['charge_id'], 'amount_minor' => $share['amount']]);
         }
 
+        // Each list by learner, once, in its own order: each learner then reads only their own rows.
+        $instalmentsOf = [];
+
+        foreach ($instalments as $i) {
+            $charge = $charges->get(Row::text($i, 'charge_id'));
+
+            if ($charge !== null) {
+                $instalmentsOf[Row::text($charge, 'learner_id')][] = $i;
+            }
+        }
+
+        $adjustmentsOf = [];
+
+        foreach ($adjustments as $a) {
+            $adjustmentsOf[Row::text($a, 'learner_id')][] = $a;
+        }
+
+        $sharesOf = [];
+
+        foreach ($shares as $s) {
+            $sharesOf[Row::text($s, 'learner_id')][] = $s;
+        }
+
+        $chargesOf = [];
+
+        foreach ($charges as $c) {
+            $chargesOf[Row::text($c, 'learner_id')][] = $c;
+        }
+
         $out = [];
 
         foreach ($ids as $id) {
             $mine = [];
 
-            foreach ($instalments as $i) {
+            foreach ($instalmentsOf[$id] ?? [] as $i) {
                 $charge = $charges->get(Row::text($i, 'charge_id'));
 
                 if ($charge !== null && Row::text($charge, 'learner_id') === $id) {
@@ -208,7 +237,7 @@ final class Ledger
                 return $amount;
             };
 
-            foreach ($adjustments as $a) {
+            foreach ($adjustmentsOf[$id] ?? [] as $a) {
                 if ($a->learner_id === $id) {
                     $reduced += Row::int($a, 'amount_minor');
                     $left = $apply(Row::int($a, 'amount_minor'), Row::text($a, 'charge_id'));
@@ -218,7 +247,7 @@ final class Ledger
 
             // A payment for a named charge pays it first, wherever it falls in time.
             foreach ([true, false] as $directed) {
-                foreach ($shares as $s) {
+                foreach ($sharesOf[$id] ?? [] as $s) {
                     if ($s->learner_id !== $id || ($s->charge_id !== null) !== $directed) {
                         continue;
                     }
@@ -231,7 +260,7 @@ final class Ledger
 
             $charged = 0;
 
-            foreach ($charges as $c) {
+            foreach ($chargesOf[$id] ?? [] as $c) {
                 if ($c->learner_id === $id) {
                     $charged += Row::int($c, 'total_minor');
                 }

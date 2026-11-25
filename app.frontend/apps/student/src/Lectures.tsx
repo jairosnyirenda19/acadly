@@ -156,7 +156,7 @@ export function AttendancePage({ me }: { me: Me }) {
                 key={c.code}
                 strong={`${c.code} · ${c.title}`}
                 sub={a.attended(c.rate ?? 0)}
-                right={c.rate !== null && c.rate < 80 ? <Tag tone="attention">{a.below}</Tag> : <Tag tone="done">{a.ok}</Tag>}
+                right={d.bar !== null && c.rate !== null && c.rate < d.bar ? <Tag tone="attention">{a.below(d.bar)}</Tag> : <Tag tone="done">{a.ok}</Tag>}
               />
             ))}
           </Section>

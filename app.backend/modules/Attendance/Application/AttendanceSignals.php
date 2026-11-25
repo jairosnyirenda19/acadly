@@ -57,9 +57,12 @@ final class AttendanceSignals implements LearnerSignals
         $out = [];
         $byTerm = [];
 
+        $places = $this->directory->placesOf($learnerIds);
+        $periods = [];
+
         foreach ($learnerIds as $id) {
-            $place = $this->directory->placeOf($id);
-            $term = $place === null ? null : $this->teaching->periodOn($place['division_id'], $today);
+            $place = $places[$id] ?? null;
+            $term = $place === null ? null : ($periods[$place['division_id']] ??= [$this->teaching->periodOn($place['division_id'], $today)])[0];
 
             if ($term !== null) {
                 $byTerm[$term['id']]['term'] = $term;

@@ -168,7 +168,7 @@ final class MessageActions
         $this->access->check($by, NotifyPermission::Manage);
 
         if (! $this->catalogue->has($key)) {
-            throw ValidationException::withMessages(['notice' => ['This notice is not part of this build.']]);
+            throw ValidationException::withMessages(['notice' => ['This notice is not available.']]);
         }
 
         $notice = $this->catalogue->notice($key);

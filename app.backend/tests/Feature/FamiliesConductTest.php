@@ -255,3 +255,12 @@ it('shows a family the documents of the types the school ticks, records each ope
     $this->actingAs($this->ruth)->getJson($portal)->assertNotFound();
     $this->actingAs($this->ruth)->get("{$portal}/{$doc}")->assertNotFound();
 });
+
+it('says in plain words why an entry is refused, without the field\'s internal name (D-113)', function (): void {
+    $rules = ['incidents' => 3, 'days' => 30, 'open_serious' => true, 'missed_incidents' => 2, 'missed_lessons' => 'four', 'missed_days' => 14];
+    $refused = $this->actingAs($this->admin)->putJson('/api/v1/conduct/watch', $rules)->assertUnprocessable();
+
+    expect($refused->json('errors.missed_lessons.0'))->toBe('Enter a whole number.')
+        ->and($refused->json('errors.portal.0'))->toBe('This is required.')
+        ->and((string) $refused->getContent())->not->toContain('missed_lessons field')->not->toContain('UUID');
+});

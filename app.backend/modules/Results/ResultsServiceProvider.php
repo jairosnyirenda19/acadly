@@ -7,6 +7,8 @@ namespace Acadly\Modules\Results;
 use Acadly\Core\Enrolment\Contracts\LearnerRecordPart;
 use Acadly\Core\Institution\Contracts\DashboardPanels;
 use Acadly\Core\Institution\Contracts\TodayItems;
+use Acadly\Modules\Lectures\Contracts\AttendanceBar;
+use Acadly\Modules\Results\Application\ResultsAttendanceBar;
 use Acadly\Modules\Results\Application\ResultsDashboard;
 use Acadly\Modules\Results\Application\ResultsParts;
 use Acadly\Modules\Results\Application\ResultsToday;
@@ -18,6 +20,7 @@ final class ResultsServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(AttendanceBar::class, ResultsAttendanceBar::class);
         $this->app->scoped(ResultsParts::class);
         $this->app->tag([ResultsParts::class], LearnerRecordPart::TAG);
         $this->app->tag([ResultsToday::class], TodayItems::TAG);

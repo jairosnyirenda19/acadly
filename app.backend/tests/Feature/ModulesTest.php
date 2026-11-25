@@ -128,7 +128,7 @@ it('refuses to switch without a reason, a core function, or a module not in the 
     $this->actingAs($admin)->putJson('/api/v1/modules/institution', ['enabled' => false, 'reason' => 'Test.'])
         ->assertUnprocessable()->assertJsonPath('errors.module.0', 'Core functions are always on.');
     $this->actingAs($admin)->putJson('/api/v1/modules/library', ['enabled' => true, 'reason' => 'Test.'])
-        ->assertUnprocessable()->assertJsonPath('errors.module.0', 'The module is not part of this build.');
+        ->assertUnprocessable()->assertJsonPath('errors.module.0', 'This module is not available for this school.');
 });
 
 it('refuses switching to someone without the permission', function (): void {

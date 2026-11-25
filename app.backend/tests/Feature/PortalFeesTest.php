@@ -110,7 +110,9 @@ it('shows a parent each child\'s fees, with each child\'s part of a shared payme
 
 it('gives a parent the statement and a receipt that includes the child, and keeps a record of each download', function (): void {
     $statement = $this->actingAs($this->esther)->get("/api/v1/portal/children/{$this->alinafe}/fees/statement")->assertOk();
-    expect($statement->headers->get('Content-Type'))->toBe('application/pdf')->and(substr((string) $statement->getContent(), 0, 4))->toBe('%PDF');
+    expect($statement->headers->get('Content-Type'))->toBe('application/pdf')->and(substr((string) $statement->getContent(), 0, 4))->toBe('%PDF')
+        // The file's details name the product, never the library that drew it (D-113).
+        ->and((string) $statement->getContent())->toContain('/Producer (Acadly IQ-X)')->not->toContain('ReportLab');
 
     $receipt = $this->actingAs($this->esther)->get("/api/v1/portal/children/{$this->chikondi}/receipts/{$this->both}")->assertOk();
     expect($receipt->headers->get('Content-Type'))->toBe('application/pdf');

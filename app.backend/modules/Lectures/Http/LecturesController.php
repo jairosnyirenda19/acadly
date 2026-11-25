@@ -233,7 +233,7 @@ final class LecturesController
     /**
      * The Lecture attendance tab of the learner record.
      *
-     * @response array{semester: string|null, rate: int|null, held: int, missed: int, courses: list<array{code: string, title: string, held: int, missed: int, late: int, rate: int|null}>, marks: list<array{day: string, code: string, kind: string, mark: string, source: string, reason: string|null, by: string|null, was: string|null}>, phone: array{set: bool, set_on: string|null}, can_reset: bool}
+     * @response array{semester: string|null, rate: int|null, held: int, missed: int, bar: int|null, courses: list<array{code: string, title: string, held: int, missed: int, late: int, rate: int|null}>, marks: list<array{day: string, code: string, kind: string, mark: string, source: string, reason: string|null, by: string|null, was: string|null}>, phone: array{set: bool, set_on: string|null}, can_reset: bool}
      */
     public function learner(Request $request, string $learner, LectureRecord $record): JsonResponse
     {

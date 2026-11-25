@@ -48,7 +48,7 @@ final class StudentLecturesController
     /**
      * The student's lecture attendance this semester.
      *
-     * @response array{semester: string|null, rate: int|null, held: int, missed: int, courses: list<array{code: string, title: string, held: int, missed: int, late: int, rate: int|null}>, marks: list<array{day: string, code: string, kind: string, mark: string, source: string, reason: string|null, by: string|null, was: string|null}>}
+     * @response array{semester: string|null, rate: int|null, held: int, missed: int, bar: int|null, courses: list<array{code: string, title: string, held: int, missed: int, late: int, rate: int|null}>, marks: list<array{day: string, code: string, kind: string, mark: string, source: string, reason: string|null, by: string|null, was: string|null}>}
      */
     public function attendance(Request $request, StudentLectures $lectures): JsonResponse
     {

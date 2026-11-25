@@ -356,9 +356,23 @@ def draw(docs: list, title: str) -> bytes:
         story += [Starts(i)] + story_of(d, main)
     out = io.BytesIO()
     pdf = SimpleDocTemplate(out, pagesize=A4, leftMargin=MARGIN, rightMargin=MARGIN, topMargin=14 * mm, bottomMargin=20 * mm,
-                            title=title, author=docs[0]['brand']['name'], creator='Acadly IQ-X')
+                            title=title, author=docs[0]['brand']['name'], creator='Acadly IQ-X', producer='Acadly IQ-X')
     pdf.build(story, canvasmaker=lambda *a, **k: Numbered(*a, docs=docs, main=main, **k))
-    return out.getvalue()
+    return unbranded(out.getvalue())
+
+
+# Comments the drawing library writes into every file, naming itself (D-113).
+_LIBRARY_COMMENTS = (
+    b'ReportLab Generated PDF document http://www.reportlab.com',
+    b'ReportLab generated PDF document -- digest (http://www.reportlab.com)',
+)
+
+
+def unbranded(pdf: bytes) -> bytes:
+    """Names the product only. Each comment is replaced by text of the same length, so every offset in the file stays true."""
+    for comment in _LIBRARY_COMMENTS:
+        pdf = pdf.replace(comment, b'Acadly IQ-X document'.ljust(len(comment)))
+    return pdf
 
 
 def build(doc: dict) -> bytes:

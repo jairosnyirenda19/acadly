@@ -55,9 +55,12 @@ final class ResultSignals implements LearnerSignals
         $below = $rules['assessment.below_pass'] ?? 0;
         $groups = [];
 
+        $places = $this->directory->placesOf($learnerIds);
+        $periods = [];
+
         foreach ($learnerIds as $id) {
-            $place = $this->directory->placeOf($id);
-            $period = $place === null ? null : $this->teaching->periodOn($place['division_id'], $today);
+            $place = $places[$id] ?? null;
+            $period = $place === null ? null : ($periods[$place['division_id']] ??= [$this->teaching->periodOn($place['division_id'], $today)])[0];
 
             if ($place !== null && $period !== null) {
                 $groups[$place['class_id'].'|'.$period['id']]['class'] = $place['class_id'];
@@ -71,6 +74,23 @@ final class ResultSignals implements LearnerSignals
         foreach ($groups as $g) {
             $now = $this->figures($g['class'], $g['period'], $g['learners']);
             $before = $this->teaching->periodAt($g['period']['division_id'], CarbonImmutable::parse($g['period']['starts_on'])->subDay()->toDateString());
+            $was = [];
+
+            // Last term's result of the learners with one now: one read of their classes, then once per class.
+            if ($drop > 0 && $before !== null) {
+                $withResult = array_values(array_filter($g['learners'], fn (string $id): bool => ($now[$id]['result'] ?? null) !== null));
+                $classes = [];
+
+                foreach ($this->directory->classesOn($withResult, $before['ends_on']) as $learner => $class) {
+                    $classes[$class][] = $learner;
+                }
+
+                foreach ($classes as $class => $learners) {
+                    foreach ($this->figures($class, $before, $learners) as $learner => $f) {
+                        $was[$learner] = $f['result'];
+                    }
+                }
+            }
 
             foreach ($g['learners'] as $id) {
                 $f = $now[$id] ?? null;
@@ -83,13 +103,10 @@ final class ResultSignals implements LearnerSignals
                     $out[$id][] = "{$f['below']} subjects below the pass mark.";
                 }
 
-                if ($drop > 0 && $f['result'] !== null && $before !== null) {
-                    $class = $this->directory->classOn($id, $before['ends_on']);
-                    $was = $class === null ? null : ($this->figures($class, $before, [$id])[$id]['result'] ?? null);
+                $then = $was[$id] ?? null;
 
-                    if ($was !== null && $was - $f['result'] >= $drop) {
-                        $out[$id][] = 'Term result '.round($f['result']).'%, down '.round($was - $f['result']).' points on last term.';
-                    }
+                if ($drop > 0 && $f['result'] !== null && $then !== null && $then - $f['result'] >= $drop) {
+                    $out[$id][] = 'Term result '.round($f['result']).'%, down '.round($then - $f['result']).' points on last term.';
                 }
             }
         }

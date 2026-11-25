@@ -34,9 +34,9 @@ export function LecturesSummary({ learner }: { learner: LearnerState }) {
         <>
           <p className="type-display text-[40px] leading-none">{`${d.rate ?? 0}%`}</p>
           <p className="mt-1.5 text-[13px]">{`${d.semester ?? ''} · ${d.held} ${r.held.toLowerCase()}`}</p>
-          {d.courses.some((c) => c.rate !== null && c.rate < 80) && (
+          {d.courses.some((c) => d.bar !== null && c.rate !== null && c.rate < d.bar) && (
             <p className="mt-1.5">
-              <Tag tone="attention">{r.belowTag}</Tag>
+              <Tag tone="attention">{r.belowTag(d.bar ?? 0)}</Tag>
             </p>
           )}
           <InLink href={tabHref(learner.id, 'lectures')}>{r.open}</InLink>
@@ -53,7 +53,7 @@ export function LecturesTab({ learner }: { learner: LearnerState }) {
 
   if ((loaded.phase === 'failed' || loaded.phase === 'missing')) return <p className="text-sm text-text-muted">{r.none}</p>
   if (d === undefined) return <Waiting phase={loaded.phase} what={titleOf(learner)} labels={copy.loading} rows={6} onRetry={loaded.reload} />
-  const below = d.courses.filter((c) => c.rate !== null && c.rate < 80).length
+  const below = d.courses.filter((c) => d.bar !== null && c.rate !== null && c.rate < d.bar).length
   const reset = async () => {
     const reason = window.prompt(t.reasonPrompt)
     if (reason === null) return
@@ -73,7 +73,7 @@ export function LecturesTab({ learner }: { learner: LearnerState }) {
               [r.rate, d.rate === null ? '' : `${d.rate}%`, 'ink'],
               [r.held, String(d.held), 'sheet'],
               [r.missed, String(d.missed), 'sheet'],
-              [r.below, r.courses(below), below > 0 ? 'attention' : 'sheet'],
+              [r.below(d.bar ?? 0), r.courses(below), below > 0 ? 'attention' : 'sheet'],
             ] as const
           ).map(([label, value, tone], i) => (
             <div key={label} className={`px-4 py-3 ${i > 0 ? 'md:border-l-2 md:border-ink' : ''} ${tone === 'ink' ? 'bg-ink text-sheet' : tone === 'attention' ? 'bg-marigold' : 'bg-sheet'}`}>
@@ -108,12 +108,12 @@ export function LecturesTab({ learner }: { learner: LearnerState }) {
                     <Td>
                       <span className="flex items-center gap-2.5">
                         <span className="h-2.5 flex-1 bg-field">
-                          <span className={`block h-2.5 ${c.rate !== null && c.rate < 80 ? 'bg-marigold' : 'bg-ink'}`} style={{ width: `${c.rate ?? 0}%` }} />
+                          <span className={`block h-2.5 ${d.bar !== null && c.rate !== null && c.rate < d.bar ? 'bg-marigold' : 'bg-ink'}`} style={{ width: `${c.rate ?? 0}%` }} />
                         </span>
                         <b className="w-12 text-right">{`${c.rate ?? 0}%`}</b>
                       </span>
                     </Td>
-                    <Td>{c.rate !== null && c.rate < 80 ? <Tag tone="attention">{r.belowTag}</Tag> : <Tag tone="done">{r.ok}</Tag>}</Td>
+                    <Td>{d.bar !== null && c.rate !== null && c.rate < d.bar ? <Tag tone="attention">{r.belowTag(d.bar ?? 0)}</Tag> : <Tag tone="done">{r.ok}</Tag>}</Td>
                   </tr>
                 ))}
               </tbody>

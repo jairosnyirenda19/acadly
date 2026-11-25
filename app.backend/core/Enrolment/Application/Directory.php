@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acadly\Core\Enrolment\Application;
 
 use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
+use Acadly\Kernel\Support\Ids;
 use Acadly\Kernel\Support\Row;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
@@ -82,6 +83,41 @@ final class Directory implements EnrolmentDirectory
     public function placedNow(): array
     {
         return array_values(array_filter(DB::table('placements')->whereNull('ends_on')->distinct()->pluck('learner_id')->all(), 'is_string'));
+    }
+
+    public function placesOf(array $learnerIds): array
+    {
+        $ids = array_values(array_filter(array_unique($learnerIds), fn (string $id): bool => Ids::isValid($id)));
+        $out = [];
+
+        // The same order as LearnerPlaces::current(): an open placement first, then the latest.
+        foreach (array_chunk($ids, 1000) as $chunk) {
+            foreach (DB::table('placements')->whereIn('learner_id', $chunk)
+                ->selectRaw('DISTINCT ON (learner_id) learner_id, class_id, division_id, campus_id, year_id, starts_on, ends_on')
+                ->orderBy('learner_id')->orderByRaw('ends_on is not null')->orderByDesc('starts_on')->orderByDesc('created_at')->get() as $row) {
+                $out[Row::text($row, 'learner_id')] = ['class_id' => Row::text($row, 'class_id'), 'division_id' => Row::text($row, 'division_id'),
+                    'campus_id' => Row::text($row, 'campus_id'), 'year_id' => Row::text($row, 'year_id'), 'open' => Row::maybeText($row, 'ends_on') === null,
+                    'since' => substr(Row::text($row, 'starts_on'), 0, 10)];
+            }
+        }
+
+        return $out;
+    }
+
+    public function classesOn(array $learnerIds, string $day): array
+    {
+        $ids = array_values(array_filter(array_unique($learnerIds), fn (string $id): bool => Ids::isValid($id)));
+        $out = [];
+
+        foreach (array_chunk($ids, 1000) as $chunk) {
+            foreach (DB::table('placements')->whereIn('learner_id', $chunk)->where('starts_on', '<=', $day)
+                ->where(fn (Builder $q) => $q->whereNull('ends_on')->orWhere('ends_on', '>=', $day))
+                ->selectRaw('DISTINCT ON (learner_id) learner_id, class_id')->orderBy('learner_id')->orderByDesc('starts_on')->get() as $row) {
+                $out[Row::text($row, 'learner_id')] = Row::text($row, 'class_id');
+            }
+        }
+
+        return $out;
     }
 
     public function placeOf(string $learnerId): ?array

@@ -35,10 +35,18 @@ final class SupportViews
     public function watch(User $viewer): array
     {
         $visible = [];
+        $places = $this->directory->placesOf($this->directory->placedNow());
+        $sees = [];
+        $leads = [];
 
-        foreach ($this->directory->placedNow() as $id) {
-            if ($this->reach->may($viewer, SupportPermission::View, $id) || $this->reach->may($viewer, SupportPermission::Lead, $id)) {
-                $visible[] = $id;
+        // Access is the same for every learner of a class: asked once per class (D-113).
+        foreach ($places as $id => $place) {
+            $class = $place['class_id'];
+            $leads[$class] ??= $this->reach->mayAtClass($viewer, SupportPermission::Lead, $class);
+            $sees[$class] ??= $leads[$class] || $this->reach->mayAtClass($viewer, SupportPermission::View, $class);
+
+            if ($sees[$class]) {
+                $visible[] = (string) $id;
             }
         }
 
@@ -60,9 +68,10 @@ final class SupportViews
             $id = (string) $id;
             $aside = $asides[$id] ?? null;
             $setAside = $aside !== null && count($reasons) <= Row::int($aside, 'signals');
-            $rows[] = ['learner_id' => $id, 'name' => $names[$id] ?? '', 'class' => $this->className((string) $this->reach->classOf($id)), 'reasons' => $reasons,
+            $class = $places[$id]['class_id'] ?? '';
+            $rows[] = ['learner_id' => $id, 'name' => $names[$id] ?? '', 'class' => $this->className($class), 'reasons' => $reasons,
                 'plan' => $plans[$id] ?? null, 'set_aside' => $setAside ? ['until' => Row::text($aside, 'until'), 'reason' => Row::text($aside, 'reason')] : null,
-                'can_lead' => $this->reach->may($viewer, SupportPermission::Lead, $id)];
+                'can_lead' => $leads[$class] ?? false];
         }
 
         usort($rows, fn (array $a, array $b): int => [$a['plan'] !== null, $a['set_aside'] !== null, -count($a['reasons']), $a['name']] <=> [$b['plan'] !== null, $b['set_aside'] !== null, -count($b['reasons']), $b['name']]);

@@ -168,3 +168,17 @@ it('keeps a phone the remember cookie brings back to the parent portal only', fu
     $this->getJson('/api/v1/portal/family')->assertOk();
     $this->getJson('/api/v1/learners')->assertForbidden()->assertJsonPath('code', 'password_required');
 });
+
+it('keeps each wrong try at a code to add a phone, and refuses the right code after five', function (): void {
+    $this->actingAs($this->teacher, 'web')->postJson('/api/v1/me/phone/code', ['phone' => '0884 771 900'])->assertOk();
+    $code = newestCode('+265884771900');
+    $wrong = $code === '000000' ? '111111' : '000000';
+
+    foreach (range(1, 5) as $try) {
+        $this->actingAs($this->teacher, 'web')->postJson('/api/v1/me/phone', ['phone' => '0884 771 900', 'code' => $wrong])->assertUnprocessable();
+    }
+
+    expect(DB::table('sign_in_codes')->where('purpose', 'like', 'link:%')->value('attempts'))->toBe(5);
+    $this->actingAs($this->teacher, 'web')->postJson('/api/v1/me/phone', ['phone' => '0884 771 900', 'code' => $code])->assertUnprocessable()->assertJsonValidationErrors(['code']);
+    expect($this->teacher->fresh()?->phone)->toBeNull();
+});

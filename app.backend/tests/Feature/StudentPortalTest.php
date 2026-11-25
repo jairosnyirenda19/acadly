@@ -124,6 +124,8 @@ it('sets up a student account with a code, signs in with the student number, and
     DB::table('sign_in_codes')->where('purpose', 'student_set_up')->update(['code_hash' => SendSignInCode::hash($phone, '482913')]);
     auth()->forgetGuards();
     $this->postJson('/api/v1/student/set-up', ['number' => 'AL-3000-0000', 'code' => '111111', 'password' => 'a long pass phrase'])->assertUnprocessable()->assertJsonValidationErrors(['code']);
+    // The wrong try is kept, though the request was refused.
+    expect(DB::table('sign_in_codes')->where('purpose', 'student_set_up')->value('attempts'))->toBe(1);
     $this->postJson('/api/v1/student/set-up', ['number' => 'AL-3000-0000', 'code' => '482913', 'password' => 'Chikondi long'])->assertUnprocessable()->assertJsonValidationErrors(['password']);
     $this->postJson('/api/v1/student/set-up', ['number' => 'al-3000-0000', 'code' => '482913', 'password' => 'a long pass phrase'])->assertOk()->assertJsonPath('signed_in', true);
     expect(DB::table('audit_events')->where('action', 'programmes.student_account_set_up')->count())->toBe(1);

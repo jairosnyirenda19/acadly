@@ -1,0 +1,16 @@
+# The scheduler of one school, run each minute by acadly-scheduler@.timer (D-112).
+# It runs the minute jobs (events, the message sweep, the heartbeat) and the nightly ones
+# (audit seal, document purge, year start).
+[Unit]
+Description=Acadly scheduled jobs (%i)
+After=network-online.target postgresql.service
+
+[Service]
+Type=oneshot
+User=acadly-%i
+Group=acadly-%i
+WorkingDirectory=/srv/acadly/%i/current/app.backend
+ExecStart=/usr/bin/php artisan schedule:run
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true

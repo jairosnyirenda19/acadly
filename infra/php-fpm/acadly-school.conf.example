@@ -1,0 +1,28 @@
+; One school's PHP pool (D-112). Copy to /etc/php/8.4/fpm/pool.d/acadly-sunrise.conf,
+; replace "sunrise", then: systemctl reload php8.4-fpm
+[acadly-sunrise]
+user = acadly-sunrise
+group = acadly-sunrise
+listen = /run/php/acadly-sunrise.sock
+listen.owner = www-data
+listen.group = www-data
+listen.mode = 0660
+
+pm = dynamic
+pm.max_children = 12
+pm.start_servers = 3
+pm.min_spare_servers = 2
+pm.max_spare_servers = 5
+pm.max_requests = 500
+
+; Each request sees only its own school.
+php_admin_value[open_basedir] = /srv/acadly/sunrise:/tmp:/usr/bin
+php_admin_value[upload_max_filesize] = 52M
+php_admin_value[post_max_size] = 55M
+php_admin_value[memory_limit] = 512M
+php_admin_value[max_execution_time] = 120
+php_admin_flag[expose_php] = off
+php_admin_flag[display_errors] = off
+php_admin_value[error_log] = /srv/acadly/sunrise/shared/storage/logs/php-fpm.log
+php_admin_value[opcache.validate_timestamps] = 0
+php_admin_value[date.timezone] = UTC

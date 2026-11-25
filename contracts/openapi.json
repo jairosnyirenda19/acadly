@@ -46701,7 +46701,7 @@
         "/v1/ready": {
             "get": {
                 "operationId": "kernel.ready",
-                "description": "Ready when the database has been brought into line with this release:\nthe notice catalogue it holds matches the one in the code (04 \u00a79). It\ndiscloses nothing else and requires no authentication.",
+                "description": "Ready when the database has been brought into line with this release\n(the notice catalogue it holds matches the one in the code, 04 \u00a79), the\napplication runs as a role that cannot change the database, and on a\nserver the scheduler and the queue worker are running (D-112). It\ndiscloses nothing else and requires no authentication.",
                 "summary": "Readiness",
                 "tags": [
                     "Readiness"

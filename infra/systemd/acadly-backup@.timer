@@ -1,0 +1,12 @@
+# Backs up one school every night at 03:15, after the audit seal (01:00) and the purges (02:00, 02:30).
+#   systemctl enable --now acadly-backup@sunrise.timer
+[Unit]
+Description=Acadly nightly backup (%i)
+
+[Timer]
+OnCalendar=*-*-* 03:15:00
+Persistent=true
+RandomizedDelaySec=10m
+
+[Install]
+WantedBy=timers.target

@@ -166,7 +166,8 @@ final class StudentAccountActions
         }
         $this->checkPassword($password, $number, $userId);
 
-        return DB::transaction(function () use ($phone, $code, $userId, $password, $learner, $row, $key, $wrong): User {
+        // A wrong code returns null, so the count of tries is committed before the refusal (a refusal thrown inside would undo it).
+        $user = DB::transaction(function () use ($phone, $code, $userId, $password, $learner, $row, $key): ?User {
             $now = $this->clock->now();
             $live = DB::table('sign_in_codes')->where('phone', $phone)->where('purpose', self::PURPOSE)->whereNull('used_at')->where('expires_at', '>', $now)
                 ->orderByDesc('created_at')->lockForUpdate()->first(['id', 'code_hash', 'attempts']);
@@ -176,7 +177,7 @@ final class StudentAccountActions
                 }
                 RateLimiter::hit($key, 600);
 
-                throw $wrong();
+                return null;
             }
             DB::table('sign_in_codes')->where('id', Row::text($live, 'id'))->update(['used_at' => $now]);
             $user = User::query()->findOrFail($userId);
@@ -187,6 +188,8 @@ final class StudentAccountActions
 
             return $user;
         });
+
+        return $user ?? throw $wrong();
     }
 
     /** A password the student may keep: 12 or more characters, not their number, not their name. */

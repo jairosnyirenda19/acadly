@@ -1,0 +1,11 @@
+# Keeps each school's logs for 30 days (D-112). Copy to /etc/logrotate.d/acadly.
+# With LOG_STACK=daily Laravel already writes one file a day; this also covers PHP-FPM.
+/srv/acadly/*/shared/storage/logs/*.log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    delaycompress
+    copytruncate
+}

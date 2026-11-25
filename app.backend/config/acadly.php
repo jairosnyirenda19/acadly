@@ -37,6 +37,21 @@ return [
     'timezone' => env('ACADLY_TIMEZONE', 'Africa/Blantyre'),
 
     /*
+    | D-112. The web server in front, trusted for the visitor's address and
+    | HTTPS (comma-separated addresses). Empty on a developer's machine.
+    */
+    'trusted_proxies' => array_values(array_filter(array_map('trim', explode(',', (string) env('ACADLY_TRUSTED_PROXIES', ''))))),
+
+    /*
+    | D-112. The readiness check also requires the scheduler and the queue
+    | worker to be running. On by default everywhere but a developer's
+    | machine and the tests.
+    */
+    'operations' => [
+        'watch_workers' => (bool) env('ACADLY_WATCH_WORKERS', ! in_array(env('APP_ENV', 'production'), ['local', 'testing'], true)),
+    ],
+
+    /*
     | How phone numbers are read: a national number takes this country code.
     */
     'phone' => [

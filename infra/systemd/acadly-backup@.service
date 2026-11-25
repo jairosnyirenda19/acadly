@@ -1,0 +1,13 @@
+# The nightly backup of one school (D-112): database, documents, audit seals, copied off the server.
+[Unit]
+Description=Acadly backup (%i)
+After=network-online.target postgresql.service
+
+[Service]
+Type=oneshot
+User=acadly-%i
+Group=acadly-%i
+Environment=ACADLY_BACKUP_ENV=/etc/acadly/%i.backup.env
+ExecStart=/srv/acadly/%i/current/infra/backup/acadly-backup.sh
+Nice=10
+IOSchedulingClass=idle

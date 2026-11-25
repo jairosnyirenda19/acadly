@@ -78,7 +78,8 @@ final class AccountPhone
         $code = (string) preg_replace('/\D/', '', $code);
         $now = $this->clock->now();
 
-        DB::transaction(function () use ($by, $phone, $code, $now): void {
+        // A wrong code returns false, so the count of tries is committed before the refusal (a refusal thrown inside would undo it).
+        $confirmed = DB::transaction(function () use ($by, $phone, $code, $now): bool {
             $row = DB::table('sign_in_codes')->where('phone', $phone)->where('purpose', self::PURPOSE.$by->id)->whereNull('used_at')->where('expires_at', '>', $now)
                 ->orderByDesc('created_at')->lockForUpdate()->first(['id', 'code_hash', 'attempts']);
 
@@ -87,7 +88,7 @@ final class AccountPhone
                     DB::table('sign_in_codes')->where('id', $row->id)->increment('attempts');
                 }
 
-                throw ValidationException::withMessages(['code' => ['The code is incorrect or has expired.']]);
+                return false;
             }
 
             DB::table('sign_in_codes')->where('id', $row->id)->update(['used_at' => $now]);
@@ -106,7 +107,13 @@ final class AccountPhone
 
             $this->audit->record(KernelAudit::AccountPhoneAdded, subject: $by, actor: $this->audit->actorFor($by), personal: ['phone' => $phone],
                 meta: ['closed' => $earlier?->id]);
+
+            return true;
         });
+
+        if (! $confirmed) {
+            throw ValidationException::withMessages(['code' => ['The code is incorrect or has expired.']]);
+        }
     }
 
     public function remove(User $by): void

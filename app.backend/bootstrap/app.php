@@ -5,10 +5,12 @@ use Acadly\Kernel\Http\Middleware\CodeSignInReachesPortalOnly;
 use Acadly\Kernel\Http\Middleware\EndViewAsWhenDue;
 use Acadly\Kernel\Http\Middleware\RemoveServerSignature;
 use Acadly\Kernel\Http\Middleware\StudentAccountsReachStudentPortalOnly;
+use Acadly\Kernel\Http\Middleware\TrustConfiguredProxies;
 use Acadly\Kernel\Http\ProblemRenderer;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\TrustProxies;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(RemoveServerSignature::class);
+
+        // Only the web server in front is trusted for the visitor's address and HTTPS (D-112).
+        $middleware->replace(TrustProxies::class, TrustConfiguredProxies::class);
 
         // The web apps sign in with a session cookie (Sanctum, stateful).
         $middleware->statefulApi();

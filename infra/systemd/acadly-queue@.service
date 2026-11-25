@@ -1,0 +1,24 @@
+# The queue worker of one school (D-112). Sends text messages and email,
+# makes page previews, publishes events. Without it nothing reaches families.
+#
+#   cp infra/systemd/acadly-*@.* /etc/systemd/system/ && systemctl daemon-reload
+#   systemctl enable --now acadly-queue@sunrise
+[Unit]
+Description=Acadly queue worker (%i)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+User=acadly-%i
+Group=acadly-%i
+WorkingDirectory=/srv/acadly/%i/current/app.backend
+ExecStart=/usr/bin/php artisan queue:work --sleep=2 --tries=3 --max-time=3600 --memory=256
+# A release runs "php artisan queue:restart"; the worker then exits and starts again here.
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

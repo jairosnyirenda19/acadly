@@ -1,0 +1,66 @@
+# One school's web server (D-112). Copy to /etc/nginx/sites-available/<school>.conf,
+# replace "sunrise" and the three host names, then link it into sites-enabled.
+#
+#   console.sunrise.example   staff console     (apps/console/dist)
+#   parents.sunrise.example   parent portal     (apps/portal/dist)
+#   students.sunrise.example  student portal    (apps/student/dist)
+#
+# Each host serves its own app and passes /api/ to the school's API.
+# Certificates: certbot --nginx -d console.sunrise.example -d parents.sunrise.example -d students.sunrise.example
+# Set ACADLY_TRUSTED_PROXIES=127.0.0.1 in the school's .env.
+
+# Plain HTTP only redirects.
+server {
+    listen 80;
+    listen [::]:80;
+    server_name console.sunrise.example parents.sunrise.example students.sunrise.example;
+    server_tokens off;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name console.sunrise.example;
+    root /srv/acadly/sunrise/current/app.frontend/apps/console/dist;
+
+    ssl_certificate     /etc/letsencrypt/live/console.sunrise.example/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/console.sunrise.example/privkey.pem;
+
+    # Camera and location are not used by staff.
+    set $acadly_school "sunrise";
+    set $acadly_permissions "camera=(), microphone=(), geolocation=(), payment=()";
+    include /etc/nginx/snippets/acadly-app.conf;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name parents.sunrise.example;
+    root /srv/acadly/sunrise/current/app.frontend/apps/portal/dist;
+
+    ssl_certificate     /etc/letsencrypt/live/console.sunrise.example/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/console.sunrise.example/privkey.pem;
+
+    set $acadly_school "sunrise";
+    set $acadly_permissions "camera=(), microphone=(), geolocation=(), payment=()";
+    include /etc/nginx/snippets/acadly-app.conf;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name students.sunrise.example;
+    root /srv/acadly/sunrise/current/app.frontend/apps/student/dist;
+
+    ssl_certificate     /etc/letsencrypt/live/console.sunrise.example/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/console.sunrise.example/privkey.pem;
+
+    # Scan-in reads the room's code with the camera and checks the location (D-102).
+    set $acadly_school "sunrise";
+    set $acadly_permissions "camera=(self), microphone=(), geolocation=(self), payment=()";
+    include /etc/nginx/snippets/acadly-app.conf;
+}

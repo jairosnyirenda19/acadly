@@ -1,0 +1,12 @@
+# Runs the scheduler of one school every minute (D-112).
+#   systemctl enable --now acadly-scheduler@sunrise.timer
+[Unit]
+Description=Acadly scheduler every minute (%i)
+
+[Timer]
+OnCalendar=*-*-* *:*:00
+AccuracySec=1s
+Persistent=true
+
+[Install]
+WantedBy=timers.target

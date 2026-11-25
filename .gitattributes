@@ -1,0 +1,4 @@
+
+# Server scripts and service files run on Linux (D-112).
+*.sh text eol=lf
+infra/** text eol=lf

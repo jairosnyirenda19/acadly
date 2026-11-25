@@ -69,6 +69,8 @@ use Acadly\Kernel\Notify\MessagesGrid;
 use Acadly\Kernel\Notify\NoticeCatalogue;
 use Acadly\Kernel\Notify\NoticeDispatcher;
 use Acadly\Kernel\Notify\Notifier;
+use Acadly\Kernel\Operations\HeartbeatCommand;
+use Acadly\Kernel\Operations\PreflightCommand;
 use Acadly\Kernel\School\ConfiguredSchool;
 use Acadly\Kernel\School\SchoolProfile;
 use Acadly\Kernel\Search\Search;
@@ -203,6 +205,7 @@ final class KernelServiceProvider extends ServiceProvider
             __DIR__.'/Documents/Database/migrations',
             __DIR__.'/Grid/Database/migrations',
             __DIR__.'/Approvals/Database/migrations',
+            __DIR__.'/Operations/Database/migrations',
         ]);
 
         $this->app->make('router')->aliasMiddleware('module', RequireModule::class);
@@ -225,12 +228,16 @@ final class KernelServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([SyncCommand::class, CreateAdministratorCommand::class, AuditVerifyCommand::class, AuditSealCommand::class, PublishEventsCommand::class, InstallLicenceCommand::class,
                 BlueprintCompileCommand::class, BlueprintLintCommand::class, BlueprintReleaseCommand::class, BlueprintDiagramCommand::class,
-                NotifySweepCommand::class, DocumentsPurgeCommand::class, DocumentsStorageCommand::class, PurgeExportsCommand::class]);
+                NotifySweepCommand::class, DocumentsPurgeCommand::class, DocumentsStorageCommand::class, PurgeExportsCommand::class,
+                HeartbeatCommand::class, PreflightCommand::class]);
         }
 
         // Every night: verify the audit trail, then seal its head.
         $this->callAfterResolving(Schedule::class, function (Schedule $schedule): void {
             $schedule->command('audit:seal')->dailyAt('01:00')->withoutOverlapping()->onOneServer();
+
+            // The scheduler and the queue worker show they are running (D-112).
+            $schedule->command('system:heartbeat')->everyMinute()->onOneServer();
 
             // Events are published after each commit; this catches anything a stopped worker left.
             $schedule->command('events:publish')->everyMinute()->withoutOverlapping()->onOneServer();

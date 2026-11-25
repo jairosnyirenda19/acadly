@@ -4873,8 +4873,10 @@ export interface paths {
         };
         /**
          * Readiness
-         * @description Ready when the database has been brought into line with this release:
-         *     the notice catalogue it holds matches the one in the code (04 §9). It
+         * @description Ready when the database has been brought into line with this release
+         *     (the notice catalogue it holds matches the one in the code, 04 §9), the
+         *     application runs as a role that cannot change the database, and on a
+         *     server the scheduler and the queue worker are running (D-112). It
          *     discloses nothing else and requires no authentication.
          */
         get: operations["kernel.ready"];

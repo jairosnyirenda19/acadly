@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Acadly\Modules\Assessment\Application\Actions;
 
-use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
@@ -18,6 +17,7 @@ use Acadly\Modules\Assessment\Application\MarkApproval;
 use Acadly\Modules\Assessment\Application\Marks;
 use Acadly\Modules\Assessment\Application\Requests;
 use Acadly\Modules\Assessment\Application\Sheets;
+use Acadly\Modules\Assessment\Application\SubjectChoices;
 use Acadly\Modules\Assessment\Contracts\AssessmentAudit;
 use Acadly\Modules\Assessment\Contracts\AssessmentPermission;
 use Acadly\Modules\Assessment\Journeys\Marks\State;
@@ -34,9 +34,9 @@ use Illuminate\Validation\ValidationException;
 final class CorrectMark
 {
     public function __construct(
+        private readonly SubjectChoices $choices,
         private readonly Access $access,
         private readonly Sheets $sheets,
-        private readonly EnrolmentDirectory $learners,
         private readonly Marks $marks,
         private readonly Audit $audit,
         private readonly Clock $clock,
@@ -56,7 +56,7 @@ final class CorrectMark
             throw ValidationException::withMessages(['learner_id' => ['Only locked marks are corrected. Until then, the teacher changes them on the marks sheet.']]);
         }
 
-        $inClass = in_array($learnerId, array_column($this->learners->learnersIn($a->class_id, $a->heldOn()), 'id'), true);
+        $inClass = in_array($learnerId, array_column($this->choices->learnersFor($a), 'id'), true);
         $parsed = SaveMarks::parse(['learner_id' => $learnerId, 'value' => $value, 'reason' => $reason], $a->out_of, $inClass);
         $note = trim($note);
 

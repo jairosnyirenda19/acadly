@@ -9,6 +9,7 @@ const API: string = import.meta.env.VITE_API_URL ?? '/api'
 type Done<T> = Promise<{ data?: T; error?: unknown; response: Response }>
 
 export type MineState = Json<'/v1/assessment/mine', 'get'>
+export type ChoicesState = Json<'/v1/assessment/choices', 'get'>
 export type MineRow = MineState['assessments'][number]
 export type OptionsState = Json<'/v1/assessment/options', 'get'>
 export type Choice = OptionsState['choices'][number]
@@ -71,6 +72,10 @@ export const assessmentApi = {
   movePaper: (pageId: string, earlier: boolean) => settle(api.POST('/v1/assessment/papers/{id}/move', { params: { path: { id: pageId } }, body: { earlier } as never }) as Done<SheetState>),
   removePaper: (pageId: string) => settle(api.DELETE('/v1/assessment/papers/{id}', { params: { path: { id: pageId } } }) as Done<SheetState>),
 
+  /** Subject choices of a class (D-117). */
+  choices: (classId: string | null) => read(api.GET('/v1/assessment/choices', { params: { query: (classId !== null ? { class_id: classId } : {}) as never } })),
+  saveChoices: (classId: string, learners: { learner_id: string; subject_ids: string[] }[]) =>
+    settle(api.PUT('/v1/assessment/choices/{class}', { params: { path: { class: classId } }, body: { learners } as never }) as Done<ChoicesState & { changed: number }>),
   results: (classId: string, periodId: string | null) =>
     read(api.GET('/v1/assessment/results', { params: { query: { class_id: classId, ...(periodId !== null ? { period_id: periodId } : {}) } as never } })),
   working: (q: { class_id: string; learner_id: string; subject_id: string; period_id: string }) => read(api.GET('/v1/assessment/results/working', { params: { query: q as never } })),

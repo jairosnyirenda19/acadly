@@ -18,7 +18,7 @@ final class RouteRules
     ];
 
     /** Routes about the account itself, not about a place. */
-    public const array OWN_ROUTES = ['auth.sign-out', 'me', 'me.context', 'me.account', 'me.account.notices', 'me.account.password', 'me.account.two-step', 'me.account.two-step.confirm', 'me.account.two-step.off', 'me.calendar', 'me.calendar.on', 'me.calendar.off', 'me.teaching', 'search', 'search.places', 'me.phone.code', 'me.phone.confirm', 'me.phone.remove', 'me.notifications', 'me.notifications.read', 'view-as.leave', 'approvals.waiting', 'portal.family', 'portal.confirm', 'portal.fees.family'];
+    public const array OWN_ROUTES = ['auth.sign-out', 'me', 'me.context', 'me.account', 'me.account.notices', 'me.account.password', 'me.account.two-step', 'me.account.two-step.confirm', 'me.account.two-step.off', 'me.calendar', 'me.calendar.on', 'me.calendar.off', 'me.teaching', 'search', 'search.places', 'me.phone.code', 'me.phone.confirm', 'me.phone.remove', 'me.notifications', 'me.notifications.read', 'view-as.leave', 'approvals.waiting', 'portal.family', 'portal.confirm', 'portal.fees.family', 'portal.notices'];
 
     /** Routes decided per record by the owning domain, and proved in its own tests. */
     public const array RECORD_ROUTES = [

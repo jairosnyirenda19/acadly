@@ -27,6 +27,7 @@ enum AssessmentAudit: string implements AuditAction
     case ReviewSaved = 'assessment.review_saved';
     case DocumentDownloaded = 'assessment.document_downloaded';
     case StepWordsSaved = 'assessment.step_words_saved';
+    case ChoicesSaved = 'assessment.choices_saved';
 
     public function key(): string
     {
@@ -51,6 +52,7 @@ enum AssessmentAudit: string implements AuditAction
             self::ReviewSaved => "Saved a child's progress review.",
             self::DocumentDownloaded => 'Downloaded a report card or a progress review as a PDF.',
             self::StepWordsSaved => 'Saved the words for the review steps.',
+            self::ChoicesSaved => 'Saved the subject choices of a class.',
         };
     }
 

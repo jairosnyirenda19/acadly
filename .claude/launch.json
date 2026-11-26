@@ -33,6 +33,26 @@
         "dev:student"
       ],
       "port": 5175
+    },
+    {
+      "name": "acadly-api-local",
+      "runtimeExecutable": "php",
+      "runtimeArgs": [
+        "app.backend/artisan",
+        "serve",
+        "--host=127.0.0.1",
+        "--port=8010"
+      ],
+      "port": 8010
+    },
+    {
+      "name": "acadly-console-local",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": [
+        "/c",
+        "set ACADLY_API=http://127.0.0.1:8010&& corepack pnpm --dir app.frontend dev"
+      ],
+      "port": 5173
     }
   ]
 }

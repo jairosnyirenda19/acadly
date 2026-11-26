@@ -264,6 +264,29 @@ final class Messages
     }
 
     /**
+     * How many messages carrying a value went out, and how many arrived (D-115): for a notice sent to many families.
+     *
+     * @return array{all: int, delivered: int, not_delivered: int}
+     */
+    public function tally(string $field, string $value): array
+    {
+        $out = ['all' => 0, 'delivered' => 0, 'not_delivered' => 0];
+
+        foreach (DB::table('notification_deliveries as d')->join('notification_requests as r', 'r.id', '=', 'd.request_id')
+            ->where('d.channel', '!=', 'none')->whereRaw('r.payload->>? = ?', [$field, $value])->get(['d.status', 'd.reason', 'd.channel']) as $row) {
+            $state = self::state($row);
+
+            if (in_array($state, ['delivered', 'sent', 'accepted', 'not_delivered'], true)) {
+                $out['all']++;
+                $out['delivered'] += $state === 'delivered' || $state === 'accepted' ? 1 : 0;
+                $out['not_delivered'] += $state === 'not_delivered' ? 1 : 0;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
      * The messages sent to one phone number about one record, newest first,
      * as the person who received them reads them (the parent portal).
      *

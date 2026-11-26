@@ -15,6 +15,7 @@ use Acadly\Modules\Fees\Application\Numbers;
 use Acadly\Modules\Fees\Application\TermFees;
 use Acadly\Modules\Fees\Contracts\FeesAudit;
 use Acadly\Modules\Fees\Contracts\FeesPermission;
+use Acadly\Modules\Fees\Contracts\StudentProgrammes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -66,8 +67,9 @@ final class TermFeeActions
      *
      * @param  list<array{item_id: string, level_code: string, amount: int}>  $amounts
      * @param  list<array{label: string, due_on: string, share_bp: int}>  $plan
+     * @param  list<array{item_id: string, programme_id: string, mode: string, level_code: string, amount: int}>  $byProgramme  a college's amounts by programme and mode (D-116)
      */
-    public function saveTerm(User $by, string $periodId, string $divisionId, array $amounts, array $plan): void
+    public function saveTerm(User $by, string $periodId, string $divisionId, array $amounts, array $plan, array $byProgramme = []): void
     {
         $this->access->check($by, FeesPermission::Manage, ScopeRef::of(ScopeType::Division, $divisionId));
         $term = $this->terms->term($periodId, $divisionId);
@@ -78,6 +80,14 @@ final class TermFeeActions
         foreach ($amounts as $a) {
             if (! in_array($a['level_code'], $levels, true) || ! in_array($a['item_id'], $items, true) || $a['amount'] < 0) {
                 $errors['amounts'] = ['Give an amount of nothing or more for each item and level.'];
+            }
+        }
+        $programmes = $byProgramme === [] || ! app()->bound(StudentProgrammes::class) ? [] : array_column(app(StudentProgrammes::class)->programmes($divisionId), 'id');
+
+        foreach ($byProgramme as $a) {
+            if (! in_array($a['programme_id'], $programmes, true) || ! in_array($a['mode'], ['full_time', 'part_time'], true) || ! in_array($a['item_id'], $items, true)
+                || ($a['level_code'] !== 'credit' && ! in_array($a['level_code'], $levels, true)) || $a['amount'] < 0) {
+                $errors['programme_amounts'] = ['Give an amount of nothing or more for each programme, mode and year of study.'];
             }
         }
         if ($plan === [] || count($plan) > 6) {
@@ -95,7 +105,7 @@ final class TermFeeActions
             throw ValidationException::withMessages($errors);
         }
 
-        DB::transaction(function () use ($by, $term, $amounts, $plan): void {
+        DB::transaction(function () use ($by, $term, $amounts, $plan, $byProgramme): void {
             $now = $this->clock->now();
             $schedule = $this->terms->scheduleId($term['period_id'], $term['division_id']);
 
@@ -109,6 +119,12 @@ final class TermFeeActions
             }
 
             DB::table('fee_schedule_amounts')->where('schedule_id', $schedule)->delete();
+            DB::table('fee_schedule_programme_amounts')->where('schedule_id', $schedule)->delete();
+
+            foreach ($byProgramme as $a) {
+                DB::table('fee_schedule_programme_amounts')->insert(['id' => Ids::next(), 'schedule_id' => $schedule, 'item_id' => $a['item_id'], 'programme_id' => $a['programme_id'],
+                    'mode' => $a['mode'], 'level_code' => $a['level_code'], 'amount_minor' => $a['amount']]);
+            }
             DB::table('fee_schedule_instalments')->where('schedule_id', $schedule)->delete();
 
             foreach ($amounts as $a) {

@@ -14,6 +14,7 @@ enum EnrolmentPermission: string implements Permission
     case Export = 'enrolment.export';
     case Families = 'enrolment.families';
     case Confidential = 'enrolment.documents.confidential';
+    case Notify = 'enrolment.notify';
 
     public function key(): string
     {
@@ -29,6 +30,7 @@ enum EnrolmentPermission: string implements Permission
             self::Export => 'Export learner lists',
             self::Families => 'Keep parent access',
             self::Confidential => 'Open confidential learner documents',
+            self::Notify => 'Send notices to families',
         };
     }
 
@@ -41,6 +43,7 @@ enum EnrolmentPermission: string implements Permission
             self::Export => 'Download a spreadsheet of the learners in the classes where the role is given, with their main contact.',
             self::Families => 'SEES EVERY FAMILY in the school by phone number: which children each parent sees in the parent portal. Suspend or end the access of a parent. Grant to the school office only.',
             self::Confidential => 'Open and add the learner documents whose type is confidential, such as medical and safeguarding records, for the learners in the classes where the role is given. Each opening is recorded.',
+            self::Notify => 'Write notices to the families of the learners where the role is given. Families read them in the parent portal; a notice may also go by text message, which uses the school\'s text credit.',
         };
     }
 

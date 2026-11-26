@@ -39,6 +39,7 @@ final class TermGrades
         private readonly Scales $scales,
         private readonly Marks $marks,
         private readonly Teaching $teaching,
+        private readonly SubjectChoices $choices,
     ) {}
 
     /**
@@ -46,7 +47,7 @@ final class TermGrades
      *
      * @param  ClassRow  $class
      * @param  list<string>  $learnerIds
-     * @return array{scale: Scale|null, subjects: list<array{id: string, name: string, short: string}>, grades: array<string, array<string, Working>>}
+     * @return array{scale: Scale|null, subjects: list<array{id: string, name: string, short: string}>, grades: array<string, array<string, Working>>, by_average: bool}
      */
     public function forClass(array $class, string $periodId, array $learnerIds, ?string $onlySubject = null): array
     {
@@ -61,6 +62,8 @@ final class TermGrades
         }
 
         $known = $this->teaching->subjects($ids);
+        // Only the learners who take a subject are graded in it (D-117).
+        $takers = $this->choices->takers($class, $ids, $learnerIds);
         $subjects = [];
         $grades = [];
 
@@ -75,12 +78,14 @@ final class TermGrades
             $plan = $this->plans->inForce($class['division_id'], $class['level_code'], $periodId, $subjectId);
             $own = array_values(array_filter($assessments, fn (array $a): bool => $a['subject_id'] === $subjectId));
 
-            foreach ($learnerIds as $learnerId) {
+            $grades[$subjectId] = [];
+
+            foreach ($takers[$subjectId] ?? $learnerIds as $learnerId) {
                 $grades[$subjectId][$learnerId] = self::working($plan, $own, $marks, $learnerId, $scale);
             }
         }
 
-        return ['scale' => $scale, 'subjects' => $subjects, 'grades' => $grades];
+        return ['scale' => $scale, 'subjects' => $subjects, 'grades' => $grades, 'by_average' => $this->choices->on($class)];
     }
 
     /**
@@ -277,6 +282,25 @@ final class TermGrades
     }
 
     /**
+     * One learner's grades in the subjects they take.
+     *
+     * @param  array<string, array<string, Working>>  $grades  subject => learner => working
+     * @return array<string, Working>
+     */
+    public static function taken(array $grades, string $learnerId): array
+    {
+        $out = [];
+
+        foreach ($grades as $subject => $byLearner) {
+            if (isset($byLearner[$learnerId])) {
+                $out[$subject] = $byLearner[$learnerId];
+            }
+        }
+
+        return $out;
+    }
+
+    /**
      * Total marks: the term percentages added up, each subject out of 100.
      * Complete only when every subject has a grade ready.
      *
@@ -299,14 +323,20 @@ final class TermGrades
     /**
      * Class positions by total marks: the highest total is first; equal totals
      * share a position and the next is skipped (1, 2, 2, 4). Only complete
-     * totals are ranked.
+     * totals are ranked. Where learners take different subjects (D-117), by
+     * the average of the subjects each takes instead.
      *
      * @param  array<string, array{total: float, out_of: int, complete: bool}>  $totals  by learner id
      * @return array<string, array{position: int, of: int, shared: bool}>
      */
-    public static function positions(array $totals): array
+    public static function positions(array $totals, bool $byAverage = false): array
     {
-        $ranked = array_filter($totals, fn (array $t): bool => $t['complete']);
+        $ranked = [];
+
+        foreach (array_filter($totals, fn (array $t): bool => $t['complete']) as $id => $t) {
+            $ranked[$id] = ['total' => $byAverage ? ($t['out_of'] > 0 ? round($t['total'] * 100 / $t['out_of'], 1) : 0.0) : $t['total']];
+        }
+
         uasort($ranked, fn (array $a, array $b): int => $b['total'] <=> $a['total']);
         $counts = array_count_values(array_map(fn (array $t): string => (string) $t['total'], $ranked));
         $out = [];

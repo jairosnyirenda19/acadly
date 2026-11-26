@@ -6,7 +6,7 @@ import { PickupPage, ReviewPage } from './EarlyPages'
 import { ConductPage, DocumentsPage, PlanPage } from './FamilyPages'
 import { FeesPage, PaymentsPage } from './FeesPages'
 import type { Language } from './copy'
-import { ChildScreen, Home } from './Family'
+import { ChildScreen, Home, NoticePage } from './Family'
 import { keepLanguage, LanguageContext, savedLanguage } from './parts'
 import { SignIn } from './SignIn'
 
@@ -51,6 +51,8 @@ export function App() {
         }}
       />
     )
+  } else if (/^\/notice\/[0-9a-f-]{36}$/.test(path)) {
+    screen = <NoticePage id={path.slice(8)} />
   } else if (child !== null && child[1] !== undefined) {
     const id = child[1]
     screen =

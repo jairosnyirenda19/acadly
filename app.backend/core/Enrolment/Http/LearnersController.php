@@ -8,10 +8,12 @@ use Acadly\Core\Enrolment\Application\Actions\AdmitLearner;
 use Acadly\Core\Enrolment\Application\Actions\ChangeClass;
 use Acadly\Core\Enrolment\Application\Actions\ContactActions;
 use Acadly\Core\Enrolment\Application\Actions\CorrectLearner;
+use Acadly\Core\Enrolment\Application\Actions\LeavingActions;
 use Acadly\Core\Enrolment\Application\Actions\ReplacePhoto;
 use Acadly\Core\Enrolment\Application\LearnerPlaces;
 use Acadly\Core\Enrolment\Application\Learners;
 use Acadly\Core\Enrolment\Application\Reach;
+use Acadly\Core\Enrolment\Application\TransferLetters;
 use Acadly\Core\Enrolment\Contracts\EnrolmentPermission;
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\ScopeRef;
@@ -24,6 +26,7 @@ use Acadly\Kernel\Notify\Messages;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
@@ -113,7 +116,7 @@ final class LearnersController
     /**
      * One learner's record.
      *
-     * @response array{id: string, acadly_id: string, admission_number: string|null, first_name: string, other_names: string|null, surname: string, name: string, sex: string, date_of_birth: string, has_photo: bool, status: string, admitted_on: string|null, word: string, word_plural: string, class: array{id: string, name: string}|null, level: string|null, division: string|null, division_id: string|null, campus: string|null, class_teacher: string|null, placements: list<array{class: string, campus: string, year: string, starts_on: string, ends_on: string|null, entry_reason: string, reason: string|null, now: bool}>, contacts: list<array{id: string, name: string, relationship: string, relationship_label: string, phone: string, email: string|null, notices_by: string, main: bool, also: list<array{id: string, name: string, class: string}>, in_portal: bool}>, activity: list<array{at: string, what: string, who: string, reason: string|null}>, possible_duplicate: bool, move_to: list<array{id: string, name: string, count: int}>, can_manage: bool, details_request: array{id: string, changes: list<array{field: string, label: string, from: string, to: string}>, reason: string, asked_by: string, asked_by_id: string, waiting_for: list<string>, mine: bool}|null, details_asks: bool, relationships: list<array{value: string, label: string}>, parts: list<array{key: string, title: string, band: list<array{label: string, value: string, note: string, tone: 'plain'|'attention'}>, attention: int}>, told: array{all: int, delivered: int, not_delivered: int}}
+     * @response array{id: string, acadly_id: string, admission_number: string|null, first_name: string, other_names: string|null, surname: string, name: string, sex: string, date_of_birth: string, has_photo: bool, status: string, admitted_on: string|null, word: string, word_plural: string, class: array{id: string, name: string}|null, level: string|null, division: string|null, division_id: string|null, campus: string|null, class_teacher: string|null, placements: list<array{class: string, campus: string, year: string, starts_on: string, ends_on: string|null, entry_reason: string, reason: string|null, now: bool}>, contacts: list<array{id: string, name: string, relationship: string, relationship_label: string, phone: string, email: string|null, notices_by: string, main: bool, also: list<array{id: string, name: string, class: string}>, in_portal: bool}>, activity: list<array{at: string, what: string, who: string, reason: string|null}>, possible_duplicate: bool, left: array{last_day: string, kind: string, kind_label: string, destination: string|null, note: string|null, by: string|null, at: string}|null, return_to: list<array{id: string, name: string}>, move_to: list<array{id: string, name: string, count: int}>, can_manage: bool, details_request: array{id: string, changes: list<array{field: string, label: string, from: string, to: string}>, reason: string, asked_by: string, asked_by_id: string, waiting_for: list<string>, mine: bool}|null, details_asks: bool, relationships: list<array{value: string, label: string}>, parts: list<array{key: string, title: string, band: list<array{label: string, value: string, note: string, tone: 'plain'|'attention'}>, attention: int}>, told: array{all: int, delivered: int, not_delivered: int}}
      */
     public function show(Request $request, string $id): JsonResponse
     {
@@ -121,6 +124,41 @@ final class LearnersController
         ['learner' => $learner] = $this->reach->learner($viewer, $id, EnrolmentPermission::View);
 
         return response()->json($this->learners->record($viewer, $learner));
+    }
+
+    /** Records that a learner leaves the school during the year: `{last_day, kind, destination, note, waive}`. Answers with the record. */
+    public function leave(Request $request, string $id, LeavingActions $leaving): JsonResponse
+    {
+        $this->show($request, $id); // a learner the viewer may not see is not found, before anything is checked
+        $request->validate(['last_day' => ['required', 'date_format:Y-m-d'], 'kind' => ['required', 'string', 'max:20'], 'destination' => ['nullable', 'string', 'max:160'],
+            'note' => ['nullable', 'string', 'max:500'], 'waive' => ['required', 'boolean']]);
+        $leaving->leave(self::user($request), $id, self::text($request, 'last_day'), self::text($request, 'kind'), self::text($request, 'destination'),
+            self::text($request, 'note'), $request->boolean('waive'));
+
+        return $this->show($request, $id);
+    }
+
+    /** Places a learner who left in a class again: `{class_id, from}`. Answers with the record. */
+    public function comeBack(Request $request, string $id, LeavingActions $leaving): JsonResponse
+    {
+        $this->show($request, $id);
+        $request->validate(['class_id' => ['required', 'uuid'], 'from' => ['required', 'date_format:Y-m-d']]);
+        $leaving->return(self::user($request), $id, self::text($request, 'class_id'), self::text($request, 'from'));
+
+        return $this->show($request, $id);
+    }
+
+    /** The transfer letter of a learner who left, as a PDF with its check code. */
+    public function transferLetter(Request $request, string $id, TransferLetters $letters): Response
+    {
+        $doc = $letters->for(self::user($request), $id);
+
+        return new Response($doc['pdf'], 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.str_replace('"', '', $doc['name']).'"',
+            'Cache-Control' => 'no-store',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
     }
 
     /**

@@ -55,7 +55,15 @@ export const feesApi = {
   sale: (body: { learner_id: string; lines: { item_id: string; quantity: number }[]; pay_now: Method | null; reference: string; payer_name: string }) =>
     settle(api.POST('/v1/fees/shop/sale', { body: body as never }) as Done<{ charge_id: string; payment_id: string | null }>),
 
-  saveTerm: (period: string, division: string, body: { amounts: { item_id: string; level_code: string; amount: number }[]; plan: { label: string; due_on: string; share_bp: number }[] }) =>
+  saveTerm: (
+    period: string,
+    division: string,
+    body: {
+      amounts: { item_id: string; level_code: string; amount: number }[]
+      plan: { label: string; due_on: string; share_bp: number }[]
+      programme_amounts: { item_id: string; programme_id: string; mode: string; level_code: string; amount: number }[]
+    },
+  ) =>
     settle(api.PUT('/v1/fees/terms/{period}/{division}', { params: { path: { period, division } }, body: body as never }) as Done<{ saved: boolean }>),
   bill: (period: string, division: string) => settle(api.POST('/v1/fees/terms/{period}/{division}/bill', { params: { path: { period, division } } }) as Done<{ learners: number; total: number }>),
   portal: () => read(api.GET('/v1/fees/portal')),

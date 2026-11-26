@@ -8,6 +8,8 @@ use Acadly\Core\Academics\AcademicsCore;
 use Acadly\Core\Enrolment\Contracts\EnrolmentAudit;
 use Acadly\Core\Enrolment\Contracts\EnrolmentDocument;
 use Acadly\Core\Enrolment\Contracts\EnrolmentPermission;
+use Acadly\Core\Enrolment\Contracts\Events\LearnerLeft;
+use Acadly\Core\Enrolment\Notifications\FamilyNoticeSent;
 use Acadly\Core\Enrolment\Notifications\PortalInvitation;
 use Acadly\Core\Institution\InstitutionCore;
 use Acadly\Kernel\Module\Module;
@@ -57,7 +59,7 @@ final class EnrolmentCore implements Module
 
     public function events(): array
     {
-        return [];
+        return [LearnerLeft::class];
     }
 
     public function subscriptions(): array
@@ -72,7 +74,7 @@ final class EnrolmentCore implements Module
 
     public function topics(): array
     {
-        return [PortalInvitation::class];
+        return [PortalInvitation::class, FamilyNoticeSent::class];
     }
 
     public function documentKinds(): array

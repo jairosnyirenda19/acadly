@@ -9,7 +9,7 @@ namespace Acadly\Core\Academics\Contracts;
  * each level (the approved Subjects and Teaching screens). Read-only.
  *
  * @phpstan-type Period array{id: string, name: string, division_id: string, year_id: string, starts_on: string, ends_on: string}
- * @phpstan-type Subject array{id: string, name: string, short: string, division_id: string}
+ * @phpstan-type Subject array{id: string, name: string, short: string, division_id: string, core: bool}
  */
 interface Teaching
 {

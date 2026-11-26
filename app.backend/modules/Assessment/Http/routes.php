@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Acadly\Modules\Assessment\Http\AssessmentController;
+use Acadly\Modules\Assessment\Http\ChoicesController;
 use Acadly\Modules\Assessment\Http\FamilyCardController;
 use Acadly\Modules\Assessment\Http\ObservationController;
 use Acadly\Modules\Assessment\Http\PublishController;
@@ -17,6 +18,8 @@ Route::middleware(['auth:sanctum', 'module:assessment'])->get('/portal/children/
 Route::middleware(['auth:sanctum', 'module:assessment'])->get('/portal/children/{id}/review/pdf', [ObservationController::class, 'familyPdf'])->whereUuid('id')->name('portal.review.pdf');
 
 Route::middleware(['auth:sanctum', 'module:assessment'])->prefix('assessment')->name('assessment.')->group(function (): void {
+    Route::get('/choices', [ChoicesController::class, 'index'])->name('choices.index');
+    Route::put('/choices/{class}', [ChoicesController::class, 'save'])->whereUuid('class')->name('choices.save');
     Route::get('/scales', [SettingsController::class, 'scales'])->name('scales.index');
     Route::put('/scales', [SettingsController::class, 'addScale'])->name('scales.store');
     Route::put('/scales/{id}', [SettingsController::class, 'saveScale'])->whereUuid('id')->name('scales.update');

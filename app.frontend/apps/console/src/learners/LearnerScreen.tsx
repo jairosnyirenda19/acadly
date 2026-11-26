@@ -21,7 +21,7 @@ const t = copy.learners
 const r = copy.learners.record
 const s = copy.settings
 
-type Panel = 'none' | 'correct' | 'move' | 'contact' | 'photo'
+type Panel = 'none' | 'correct' | 'move' | 'contact' | 'photo' | 'leave' | 'return'
 
 /** The figures of one part of the record, under its name. */
 interface BandGroup {
@@ -211,6 +211,12 @@ export function LearnerScreen({ id }: { id: string }) {
         {record.can_manage && (
           <div className="flex flex-wrap gap-2.5">
             {record.move_to.length > 0 && record.class !== null && <Button onClick={() => toggle('move')}>{t.changeClass}</Button>}
+            {record.left === null && record.class !== null && (
+              <Button variant="secondary" onClick={() => toggle('leave')}>
+                {t.leave.button}
+              </Button>
+            )}
+            {record.left !== null && record.return_to.length > 0 && <Button onClick={() => toggle('return')}>{t.leave.back}</Button>}
             <Button variant="secondary" onClick={() => toggle('correct')}>
               {t.correct}
             </Button>
@@ -250,6 +256,31 @@ export function LearnerScreen({ id }: { id: string }) {
       {panel === 'correct' && (
         <Box>
           <CorrectForm record={record} onDone={(next) => done(next, next.details_request !== null && record.details_request === null ? t.correctAsked : t.corrected)} onCancel={() => setPanel('none')} />
+        </Box>
+      )}
+      {record.left !== null && (
+        <div className="grid gap-3 px-4 pb-4 md:px-[clamp(16px,3vw,40px)]">
+          <Notice tone="done" title={t.leave.leftBanner(day(record.left.last_day), record.left.by ?? '')}>
+            {t.leave.reason(record.left.kind_label, record.left.destination)}
+          </Notice>
+          {record.can_manage && (
+            <div className="flex flex-wrap items-center gap-3 border-2 border-ink bg-sheet px-4 py-3">
+              <a href={learnersApi.transferLetterUrl(record.id)} target="_blank" rel="noopener" className="inline-flex min-h-11 items-center bg-teal px-4 font-extrabold text-sheet no-underline">
+                {t.leave.letter}
+              </a>
+              <span className="min-w-0 flex-[1_1_320px] text-[13px] text-text-muted">{t.leave.letterNote}</span>
+            </div>
+          )}
+        </div>
+      )}
+      {panel === 'leave' && record.left === null && (
+        <Box>
+          <LeaveForm record={record} onDone={(next) => done(next, t.leave.done)} onCancel={() => setPanel('none')} />
+        </Box>
+      )}
+      {panel === 'return' && record.left !== null && (
+        <Box>
+          <ReturnForm record={record} onDone={(next) => done(next, t.leave.backDone)} onCancel={() => setPanel('none')} />
         </Box>
       )}
       {panel === 'move' && record.class !== null && (
@@ -536,6 +567,110 @@ function MoveForm({ record, onDone, onCancel }: { record: LearnerState; onDone: 
             {s.cancel}
           </Button>
         </div>
+      </div>
+    </form>
+  )
+}
+
+/** A learner leaves during the year (D-114): the last day, why, where to, and the fees not yet due. */
+function LeaveForm({ record, onDone, onCancel }: { record: LearnerState; onDone: (next: LearnerState) => void; onCancel: () => void }) {
+  const l = t.leave
+  const [lastDay, setLastDay] = useState(today())
+  const [kind, setKind] = useState('moved_school')
+  const [destination, setDestination] = useState('')
+  const [note, setNote] = useState('')
+  const [waive, setWaive] = useState(false)
+  const save = useSave()
+  const e = save.errors
+
+  return (
+    <form
+      onSubmit={(ev) => {
+        ev.preventDefault()
+        void save.run(learnersApi.leave(record.id, { last_day: lastDay, kind, destination, note, waive }), onDone)
+      }}
+      className="mb-5.5 grid gap-4 border-2 border-ink bg-sheet px-4 pt-3.5 pb-4"
+    >
+      <h2 className="type-display text-[22px] leading-none">{l.title}</h2>
+      <Failed text={save.failed} />
+      <Input label={l.lastDay} required type="date" value={lastDay} onChange={(ev) => setLastDay(ev.target.value)} error={errorFor(e, 'last_day')} />
+      <fieldset className="grid gap-2">
+        <legend className="mb-1.5 text-[15px] font-extrabold">{l.why}</legend>
+        {Object.entries(l.kinds).map(([value, label]) => (
+          <label key={value} className={`flex items-start gap-2.5 bg-sheet px-3 py-2.5 ${kind === value ? 'border-[3px] border-ink' : 'border border-rule'}`}>
+            <input type="radio" name="leave-kind" checked={kind === value} onChange={() => setKind(value)} className="mt-0.5 size-5 accent-ink" />
+            <span>
+              <span className="block text-[15px] font-extrabold">{label}</span>
+              {value === 'other' && <span className="block text-[13px] text-text-muted">{l.otherHint}</span>}
+            </span>
+          </label>
+        ))}
+      </fieldset>
+      <Input label={l.destination} value={destination} onChange={(ev) => setDestination(ev.target.value)} error={errorFor(e, 'destination')} maxLength={160} />
+      <Input label={l.note} required={kind === 'other'} value={note} onChange={(ev) => setNote(ev.target.value)} error={errorFor(e, 'note')} maxLength={500} />
+      <fieldset className="grid gap-2">
+        <legend className="mb-1.5 text-[15px] font-extrabold">{l.fees}</legend>
+        {(
+          [
+            [false, l.keep, l.keepHint],
+            [true, l.waive, l.waiveHint],
+          ] as const
+        ).map(([value, label, hint]) => (
+          <label key={String(value)} className={`flex items-start gap-2.5 bg-sheet px-3 py-2.5 ${waive === value ? 'border-[3px] border-ink' : 'border border-rule'}`}>
+            <input type="radio" name="leave-fees" checked={waive === value} onChange={() => setWaive(value)} className="mt-0.5 size-5 accent-ink" />
+            <span>
+              <span className="block text-[15px] font-extrabold">{label}</span>
+              <span className="block text-[13px] text-text-muted">{hint}</span>
+            </span>
+          </label>
+        ))}
+      </fieldset>
+      <p className="text-[13px] text-text-muted">{l.happens}</p>
+      <div className="flex flex-wrap gap-2.5">
+        <Button type="submit" busy={save.working}>
+          {save.working ? s.saving : l.submit(record.first_name)}
+        </Button>
+        <Button variant="secondary" onClick={onCancel}>
+          {s.cancel}
+        </Button>
+      </div>
+    </form>
+  )
+}
+
+/** A learner who left comes back: a new placement from the first day back (D-114). */
+function ReturnForm({ record, onDone, onCancel }: { record: LearnerState; onDone: (next: LearnerState) => void; onCancel: () => void }) {
+  const l = t.leave
+  const [to, setTo] = useState('')
+  const [from, setFrom] = useState(today())
+  const save = useSave()
+
+  return (
+    <form
+      onSubmit={(ev) => {
+        ev.preventDefault()
+        void save.run(learnersApi.comeBack(record.id, { class_id: to, from }), onDone)
+      }}
+      className="mb-5.5 grid gap-3.5 border-2 border-ink bg-sheet px-4 pt-3.5 pb-4"
+    >
+      <h2 className="type-display text-[22px] leading-none">{l.backTitle}</h2>
+      <Failed text={save.failed} />
+      <Select label={l.backClass} required value={to} onChange={(ev) => setTo(ev.target.value)} error={errorFor(save.errors, 'class_id')}>
+        <option value="">{t.choose}</option>
+        {record.return_to.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
+          </option>
+        ))}
+      </Select>
+      <Input label={l.backFrom} required type="date" max={today()} value={from} onChange={(ev) => setFrom(ev.target.value)} error={errorFor(save.errors, 'from')} />
+      <div className="flex flex-wrap gap-2">
+        <Button type="submit" busy={save.working} disabled={to === ''}>
+          {save.working ? s.saving : l.backSubmit}
+        </Button>
+        <Button variant="secondary" onClick={onCancel}>
+          {s.cancel}
+        </Button>
       </div>
     </form>
   )

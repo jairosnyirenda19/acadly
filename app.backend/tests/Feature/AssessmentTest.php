@@ -643,3 +643,51 @@ it('asks before publishing when the school sets steps, publishes at the last yes
     $this->actingAs($people['ruth'])->postJson("/api/v1/approvals/{$again}/answer", ['approve' => true])->assertUnprocessable();
     expect($row()['state'])->toBe('changed');
 });
+
+it('lists only the learners who take an elective, and ranks by the average of the subjects each takes (D-117)', function (): void {
+    $admin = $this->people['admin'];
+    $agr = Ids::next();
+    DB::table('academic_subjects')->insert(['id' => $agr, 'division_id' => $this->school->id('secondary'), 'short' => 'AGR', 'name' => 'Agriculture',
+        'core' => false, 'levels' => json_encode(['F1']), 'position' => 3, 'created_at' => now(), 'updated_at' => now()]);
+    $this->subjects['AGR'] = $agr;
+
+    // Before choices are saved, everyone takes every subject.
+    $grid = $this->actingAs($admin)->getJson("/api/v1/assessment/choices?class_id={$this->class}")->assertOk();
+    expect($grid->json('on'))->toBeFalse()->and($grid->json('core'))->toBe(['Biology', 'Mathematics'])
+        ->and(array_column($grid->json('electives'), 'short'))->toBe(['AGR']);
+    $this->actingAs($this->people['tadala'])->putJson("/api/v1/assessment/choices/{$this->class}", ['learners' => [['learner_id' => $this->learners[2], 'subject_ids' => []]]])->assertForbidden();
+
+    // Alinafe and Chimwemwe take Agriculture; Dalitso does not.
+    $saved = $this->actingAs($admin)->putJson("/api/v1/assessment/choices/{$this->class}", ['learners' => [
+        ['learner_id' => $this->learners[0], 'subject_ids' => [$agr]], ['learner_id' => $this->learners[1], 'subject_ids' => [$agr]], ['learner_id' => $this->learners[2], 'subject_ids' => []],
+    ]])->assertOk();
+    expect($saved->json('changed'))->toBe(3)->and($saved->json('on'))->toBeTrue()->and($saved->json('electives.0.takers'))->toBe(2)->and($saved->json('none'))->toBe(1);
+    $this->actingAs($admin)->putJson("/api/v1/assessment/choices/{$this->class}", ['learners' => [['learner_id' => $this->learners[2], 'subject_ids' => [$this->subjects['BIO']]]]])
+        ->assertUnprocessable()->assertJsonValidationErrors(['learners']);
+
+    assessmentLocked($this->people['tadala'], assessmentSet($this->people['tadala'], 'weekly_test', 'Weekly test 1', 20), [16, 12, 16]);
+    assessmentLocked($this->people['tadala'], assessmentSet($this->people['tadala'], 'end_of_term', 'End-of-term exam', 100), [80, 60, 70]);
+    assessmentLocked($admin, assessmentSet($admin, 'weekly_test', 'Weekly test 1', 20, 'MAT'), [10, 10, 10]);
+    assessmentLocked($admin, assessmentSet($admin, 'end_of_term', 'End-of-term exam', 100, 'MAT'), [50, 90, 50]);
+
+    // The Agriculture sheet lists the two takers only, and refuses a mark for Dalitso.
+    foreach ([['weekly_test', 'Weekly test 1', 20, [20, 4]], ['end_of_term', 'End-of-term exam', 100, [100, 20]]] as [$kind, $title, $outOf, $marks]) {
+        $id = assessmentSet($admin, $kind, $title, $outOf, 'AGR');
+        expect(array_column($this->actingAs($admin)->getJson("/api/v1/assessment/assessments/{$id}")->assertOk()->json('learners'), 'id'))->toBe([$this->learners[0], $this->learners[1]]);
+        $this->actingAs($admin)->putJson("/api/v1/assessment/assessments/{$id}/marks", ['marks' => [['learner_id' => $this->learners[2], 'value' => 10, 'reason' => null]]])->assertUnprocessable();
+        $this->actingAs($admin)->putJson("/api/v1/assessment/assessments/{$id}/marks", ['marks' => [
+            ['learner_id' => $this->learners[0], 'value' => $marks[0], 'reason' => null], ['learner_id' => $this->learners[1], 'value' => $marks[1], 'reason' => null],
+        ]])->assertOk();
+        $this->actingAs($admin)->postJson("/api/v1/assessment/assessments/{$id}/submit")->assertOk();
+        $this->actingAs($this->people['mercy'])->postJson("/api/v1/assessment/assessments/{$id}/lock")->assertOk();
+    }
+
+    // Totals 230 of 300, 154 of 300, 124 of 200: by average 76.7, 51.3, 62.0.
+    $results = $this->actingAs($admin)->getJson("/api/v1/assessment/results?class_id={$this->class}")->assertOk();
+    $row = fn (int $i): array => collect($results->json('learners'))->firstWhere('id', $this->learners[$i]);
+    expect($results->json('ranked_by'))->toBe('average')->and($results->json('totals.ranked'))->toBe(3)
+        ->and($row(0)['position']['position'])->toBe(1)->and($row(2)['position']['position'])->toBe(2)->and($row(1)['position']['position'])->toBe(3)
+        ->and($row(2)['total'])->toEqual(['total' => 124, 'out_of' => 200, 'complete' => true])
+        ->and(array_column($row(2)['grades'], 'takes'))->toBe([true, true, false]);
+    expect($this->actingAs($admin)->getJson("/api/v1/assessment/learner/{$this->learners[2]}")->assertOk()->json('position.position'))->toBe(2);
+});

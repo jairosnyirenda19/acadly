@@ -7,12 +7,14 @@ namespace Acadly\Modules\Fees;
 use Acadly\Core\Enrolment\Contracts\LearnerRecordPart;
 use Acadly\Core\Institution\Contracts\DashboardPanels;
 use Acadly\Kernel\Access\PlaceGroups;
+use Acadly\Kernel\Approvals\ApprovalTopic;
 use Acadly\Kernel\Grid\Grids;
 use Acadly\Modules\Fees\Application\BehindGrid;
 use Acadly\Modules\Fees\Application\FeeOffices;
 use Acadly\Modules\Fees\Application\FeesDashboard;
 use Acadly\Modules\Fees\Application\FeesRecordPart;
 use Acadly\Modules\Fees\Application\FeesStandingReader;
+use Acadly\Modules\Fees\Application\LeavingWaivers;
 use Acadly\Modules\Fees\Application\PaymentsGrid;
 use Acadly\Modules\Fees\Contracts\FeesStanding;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +31,7 @@ final class FeesServiceProvider extends ServiceProvider
         $this->app->tag([FeesRecordPart::class], LearnerRecordPart::TAG);
         $this->app->tag([FeesDashboard::class], DashboardPanels::TAG);
         $this->app->tag([PaymentsGrid::class, BehindGrid::class], Grids::TAG);
+        $this->app->tag([LeavingWaivers::class], ApprovalTopic::TAG);
     }
 
     public function boot(): void

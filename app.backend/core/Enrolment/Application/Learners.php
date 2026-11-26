@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acadly\Core\Enrolment\Application;
 
 use Acadly\Core\Academics\Contracts\AcademicCalendar;
+use Acadly\Core\Enrolment\Application\Actions\LeavingActions;
 use Acadly\Core\Enrolment\Contracts\EnrolmentAudit;
 use Acadly\Core\Enrolment\Contracts\EnrolmentPermission;
 use Acadly\Core\Enrolment\Contracts\LearnerRecordPart;
@@ -115,6 +116,14 @@ final class Learners
         $siblingCounts = $siblings === [] ? [] : DB::table('placements')->whereIn('class_id', array_column($siblings, 'id'))->whereNull('ends_on')
             ->groupBy('class_id')->selectRaw('class_id, count(*) as n')->pluck('n', 'class_id')->all();
 
+        // Left during the year (D-114): the departure of the placement that ended, and where the learner may come back to.
+        $left = $place !== null && ! $place['open'] ? DB::table('learner_departures as d')->leftJoin('users as u', 'u.id', '=', 'd.recorded_by')
+            ->where('d.placement_id', $place['id'])->orderByDesc('d.created_at')->first(['d.last_day', 'd.kind', 'd.destination', 'd.note', 'd.created_at', 'u.name']) : null;
+        $year = $left !== null ? $this->calendar->currentYear() : null;
+        $returnTo = $year === null ? [] : array_values(array_map(fn (array $c): array => ['id' => $c['id'], 'name' => $c['name']],
+            array_filter($this->calendar->classesInYear($year['id']), fn (array $c): bool => $c['division_id'] === $place['division_id']
+                && $this->access->allows($viewer, EnrolmentPermission::Manage, ScopeRef::of(ScopeType::ClassGroup, $c['id'])))));
+
         return [
             'id' => $learner->id,
             'acadly_id' => $learner->acadly_id,
@@ -141,6 +150,10 @@ final class Learners
             'contacts' => array_map(fn (array $c): array => [...$c, 'also' => $this->families->alsoContactOf($viewer, $c['phone'], $learner->id),
                 'in_portal' => in_array(Phone::international($c['phone']), $inPortal, true)], $this->contacts->of($learner->id)),
             'activity' => $this->activity($learner->id),
+            'left' => $left === null ? null : ['last_day' => substr(Row::text($left, 'last_day'), 0, 10), 'kind' => Row::text($left, 'kind'),
+                'kind_label' => LeavingActions::KINDS[Row::text($left, 'kind')] ?? '', 'destination' => Row::maybeText($left, 'destination'), 'note' => Row::maybeText($left, 'note'),
+                'by' => Row::maybeText($left, 'name'), 'at' => Row::text($left, 'created_at')],
+            'return_to' => $returnTo,
             'possible_duplicate' => $this->duplicates->like($learner->first_name, $learner->surname, $learner->date_of_birth->toDateString(), $learner->id) !== null,
             'move_to' => array_map(fn (array $c): array => ['id' => $c['id'], 'name' => $c['name'], 'count' => is_numeric($siblingCounts[$c['id']] ?? null) ? (int) $siblingCounts[$c['id']] : 0], $siblings),
             'can_manage' => $at !== null && $this->access->allows($viewer, EnrolmentPermission::Manage, $at),

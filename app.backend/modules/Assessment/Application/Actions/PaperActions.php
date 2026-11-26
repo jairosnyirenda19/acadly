@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Acadly\Modules\Assessment\Application\Actions;
 
-use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
 use Acadly\Kernel\Audit\Audit;
@@ -15,6 +14,7 @@ use Acadly\Kernel\Support\Ids;
 use Acadly\Kernel\Support\Row;
 use Acadly\Modules\Assessment\Application\Reach;
 use Acadly\Modules\Assessment\Application\Sheets;
+use Acadly\Modules\Assessment\Application\SubjectChoices;
 use Acadly\Modules\Assessment\Contracts\AssessmentAudit;
 use Acadly\Modules\Assessment\Contracts\AssessmentDocument;
 use Acadly\Modules\Assessment\Contracts\AssessmentPermission;
@@ -36,9 +36,9 @@ final class PaperActions
     public const int MAX_PAGES = 12;
 
     public function __construct(
+        private readonly SubjectChoices $choices,
         private readonly Sheets $sheets,
         private readonly Reach $reach,
-        private readonly EnrolmentDirectory $learners,
         private readonly StoreDocument $store,
         private readonly Audit $audit,
         private readonly Clock $clock,
@@ -48,7 +48,7 @@ final class PaperActions
     {
         $a = $this->writable($by, $assessmentId);
 
-        if (! in_array($learnerId, array_column($this->learners->learnersIn($a->class_id, $a->heldOn()), 'id'), true)) {
+        if (! in_array($learnerId, array_column($this->choices->learnersFor($a), 'id'), true)) {
             throw ValidationException::withMessages(['learner_id' => ['This learner is not in the class for this assessment.']]);
         }
 

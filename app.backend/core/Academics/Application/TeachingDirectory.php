@@ -51,7 +51,7 @@ final class TeachingDirectory implements Teaching
 
         $out = [];
 
-        foreach (DB::table('academic_subjects')->whereIn('id', $ids)->get(['id', 'name', 'short', 'division_id']) as $row) {
+        foreach (DB::table('academic_subjects')->whereIn('id', $ids)->get(['id', 'name', 'short', 'division_id', 'core']) as $row) {
             $out[Row::text($row, 'id')] = self::subjectOf($row);
         }
 
@@ -62,7 +62,7 @@ final class TeachingDirectory implements Teaching
     {
         return array_values(DB::table('academic_subjects')->where('division_id', $divisionId)->whereNull('retired_at')
             ->whereRaw('levels @> ?::jsonb', [json_encode([$levelCode], JSON_THROW_ON_ERROR)])
-            ->orderBy('position')->orderBy('name')->get(['id', 'name', 'short', 'division_id'])
+            ->orderBy('position')->orderBy('name')->get(['id', 'name', 'short', 'division_id', 'core'])
             ->map(fn (object $row): array => self::subjectOf($row))->all());
     }
 
@@ -99,9 +99,9 @@ final class TeachingDirectory implements Teaching
         ];
     }
 
-    /** @return array{id: string, name: string, short: string, division_id: string} */
+    /** @return array{id: string, name: string, short: string, division_id: string, core: bool} */
     private static function subjectOf(object $row): array
     {
-        return ['id' => Row::text($row, 'id'), 'name' => Row::text($row, 'name'), 'short' => Row::text($row, 'short'), 'division_id' => Row::text($row, 'division_id')];
+        return ['id' => Row::text($row, 'id'), 'name' => Row::text($row, 'name'), 'short' => Row::text($row, 'short'), 'division_id' => Row::text($row, 'division_id'), 'core' => ($row->core ?? true) === true];
     }
 }

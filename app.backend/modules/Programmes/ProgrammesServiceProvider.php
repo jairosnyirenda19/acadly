@@ -7,7 +7,9 @@ namespace Acadly\Modules\Programmes;
 use Acadly\Core\Enrolment\Contracts\LearnerRecordPart;
 use Acadly\Core\Institution\Contracts\TodayItems;
 use Acadly\Kernel\Identity\StudentAccounts;
+use Acadly\Modules\Fees\Contracts\StudentProgrammes;
 use Acadly\Modules\Programmes\Application\CourseTeachingReader;
+use Acadly\Modules\Programmes\Application\ProgrammeFees;
 use Acadly\Modules\Programmes\Application\ProgrammesRecordPart;
 use Acadly\Modules\Programmes\Application\Registration\RegistrationToday;
 use Acadly\Modules\Programmes\Application\StudentAccountDirectory;
@@ -29,6 +31,7 @@ final class ProgrammesServiceProvider extends ServiceProvider
         $this->app->bind(StudentAccounts::class, StudentAccountDirectory::class);
         $this->app->bind(StudentPlaces::class, StudentPlacesReader::class);
         $this->app->bind(CourseTeaching::class, CourseTeachingReader::class);
+        $this->app->bind(StudentProgrammes::class, ProgrammeFees::class);
         $this->app->bind(StudentProgress::class, StudentProgressWriter::class);
     }
 

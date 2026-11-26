@@ -76,6 +76,7 @@ export const GROUPS: NavGroup[] = [
       { key: 'learners', where: 'division', label: t.nav.learners, path: '/learners', icon: 'learners', show: (c) => holdsAnywhere(c, 'enrolment.learners.view'), lights: under('/learners'), named: (c) => schoolWord(c, 'learner') },
       // D-100: the whole-school overview's read-only lists, in the school view.
       { key: 'all-learners', where: 'school', label: t.nav.allLearners, path: '/school/learners', icon: 'learners', show: (c) => holdsAnywhere(c, 'institution.overview') && holdsAnywhere(c, 'enrolment.learners.view') && c.divisions.length > 1, lights: under('/school/learners') },
+      { key: 'notices', label: t.nav.notices, path: '/notices', icon: 'messages', show: (c) => holdsAnywhere(c, 'enrolment.notify'), lights: under('/notices') },
       { key: 'support', where: 'division', module: 'support', label: t.nav.support, path: '/support', icon: 'support', show: (c) => moduleOn(c, 'support') && (holdsAnywhere(c, 'support.view') || holdsAnywhere(c, 'support.lead')), lights: under('/support') },
       { key: 'conduct', where: 'division', module: 'conduct', label: t.nav.conduct, path: '/conduct', icon: 'conduct', show: (c) => moduleOn(c, 'conduct') && (can(c, 'conduct.view') || can(c, 'conduct.follow_up')), lights: under('/conduct') },
     ],
@@ -215,6 +216,11 @@ export function seesAllMarks(context: AppContext): boolean {
 }
 
 /** Whether the account publishes term results somewhere, with the module on. */
+/** Whether the account sets subject choices somewhere (D-117), with the module on. */
+export function setsChoices(context: AppContext): boolean {
+  return moduleOn(context, 'assessment') && takesMarks(context) && holdsAnywhere(context, 'assessment.plan')
+}
+
 export function publishesResults(context: AppContext): boolean {
   return moduleOn(context, 'assessment') && takesMarks(context) && holdsAnywhere(context, 'assessment.publish')
 }

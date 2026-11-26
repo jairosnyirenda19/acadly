@@ -283,10 +283,10 @@ final class Publishing
         }
 
         foreach ($ids as $id) {
-            $totals[$id] = TermGrades::total(array_map(fn (array $bySubject): array => $bySubject[$id], $result['grades']));
+            $totals[$id] = TermGrades::total(TermGrades::taken($result['grades'], $id));
         }
 
-        $positions = TermGrades::positions($totals);
+        $positions = TermGrades::positions($totals, $result['by_average']);
         $cards = [];
 
         foreach ($learners as $learner) {
@@ -294,7 +294,13 @@ final class Publishing
             $bySubject = [];
 
             foreach ($result['subjects'] as $subject) {
-                $w = $result['grades'][$subject['id']][$learner['id']];
+                $w = $result['grades'][$subject['id']][$learner['id']] ?? null;
+
+                if ($w === null) {
+                    // A subject the learner does not take is not on the card (D-117).
+                    continue;
+                }
+
                 $bySubject[$subject['id']] = $w;
                 $subjects[] = [
                     'subject_id' => $subject['id'], 'subject' => $subject['name'], 'short' => $subject['short'],

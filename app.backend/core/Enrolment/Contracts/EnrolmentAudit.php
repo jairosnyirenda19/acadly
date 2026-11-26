@@ -25,6 +25,11 @@ enum EnrolmentAudit: string implements AuditAction
     case DocumentAdded = 'enrolment.document_added';
     case DocumentTypeSaved = 'enrolment.document_type_saved';
     case DocumentTypeRetired = 'enrolment.document_type_retired';
+    case LearnerLeft = 'enrolment.learner_left';
+    case LearnerReturned = 'enrolment.learner_returned';
+    case TransferLetterMade = 'enrolment.transfer_letter_made';
+    case NoticePublished = 'enrolment.notice_published';
+    case NoticeWithdrawn = 'enrolment.notice_withdrawn';
 
     public function key(): string
     {
@@ -51,11 +56,16 @@ enum EnrolmentAudit: string implements AuditAction
             self::DocumentAdded => 'Added a document to the record of a learner.',
             self::DocumentTypeSaved => 'Saved a learner document type.',
             self::DocumentTypeRetired => 'Retired a learner document type.',
+            self::LearnerLeft => 'Recorded that a learner leaves the school during the year.',
+            self::LearnerReturned => 'Placed a learner who had left in a class again.',
+            self::TransferLetterMade => 'Made the transfer letter of a learner who left.',
+            self::NoticePublished => 'Published a notice to families.',
+            self::NoticeWithdrawn => 'Withdrew a notice to families.',
         };
     }
 
     public function requiresReason(): bool
     {
-        return in_array($this, [self::DetailsCorrected, self::ClassChanged, self::ContactRemoved], true);
+        return in_array($this, [self::DetailsCorrected, self::ClassChanged, self::ContactRemoved, self::LearnerLeft, self::NoticeWithdrawn], true);
     }
 }

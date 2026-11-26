@@ -5,7 +5,8 @@ import { copy } from '../copy'
 import { gridsApi, type BulkAnswer } from '../grid/api'
 import { BulkResult } from '../grid/BulkResult'
 import { gridAddress, startExport, useGridPage, useGridPrefs, useGridQuery, useGridSelection } from '../grid/useGrid'
-import { publishesResults, seesAllMarks } from '../shell/navigation'
+import { publishesResults, seesAllMarks, setsChoices } from '../shell/navigation'
+import { ChoicesScreen } from './ChoicesScreen'
 import { PublishScreen } from './PublishScreen'
 import { assessmentApi, stateTone, type AssessRow, type MineRow } from './api'
 import { InLink, LockPanel, SmallBand, StateTag, follow } from './parts'
@@ -15,15 +16,16 @@ const t = a.marks
 const s = copy.settings
 const GRID = 'assessments'
 
-type View = 'mine' | 'all' | 'publish'
+type View = 'mine' | 'all' | 'publish' | 'choices'
 
 /** Marks (the approved designs): a teacher's assessments, phone first; for the office, every assessment with lock and return. */
 export function MarksScreen({ view }: { view: View }) {
   const context = useAppContext()
   const office = seesAllMarks(context)
   const publisher = publishesResults(context)
-  const shown: View = view === 'all' && office ? 'all' : view === 'publish' && publisher ? 'publish' : 'mine'
-  const tabs: View[] = ['mine', ...(office ? (['all'] as const) : []), ...(publisher ? (['publish'] as const) : [])]
+  const chooser = setsChoices(context)
+  const shown: View = view === 'all' && office ? 'all' : view === 'publish' && publisher ? 'publish' : view === 'choices' && chooser ? 'choices' : 'mine'
+  const tabs: View[] = ['mine', ...(office ? (['all'] as const) : []), ...(publisher ? (['publish'] as const) : []), ...(chooser ? (['choices'] as const) : [])]
 
   return (
     <>
@@ -31,7 +33,7 @@ export function MarksScreen({ view }: { view: View }) {
         <div className="min-w-0 flex-[1_1_420px]">
           <div className="label-caps text-text-muted">{t.kicker(context.user.name)}</div>
           <h1 className="type-display mt-1 mb-2 text-[clamp(48px,7vw,88px)]">{t.title}</h1>
-          <p className="hidden max-w-[680px] text-[15px] text-text-muted md:block">{shown === 'all' ? t.officeIntro : shown === 'publish' ? a.publish.intro : t.intro}</p>
+          <p className="hidden max-w-[680px] text-[15px] text-text-muted md:block">{shown === 'all' ? t.officeIntro : shown === 'publish' ? a.publish.intro : shown === 'choices' ? a.choices.intro : t.intro}</p>
         </div>
       </div>
       {tabs.length > 1 && (
@@ -53,7 +55,7 @@ export function MarksScreen({ view }: { view: View }) {
           })}
         </nav>
       )}
-      {shown === 'all' ? <AllAssessments /> : shown === 'publish' ? <PublishScreen /> : <Mine office={office} />}
+      {shown === 'all' ? <AllAssessments /> : shown === 'publish' ? <PublishScreen /> : shown === 'choices' ? <ChoicesScreen /> : <Mine office={office} />}
     </>
   )
 }

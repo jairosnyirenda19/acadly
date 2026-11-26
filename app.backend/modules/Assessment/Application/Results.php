@@ -54,9 +54,17 @@ final class Results
             $cells = [];
 
             foreach ($result['subjects'] as $subject) {
-                $w = $result['grades'][$subject['id']][$learner['id']];
+                $w = $result['grades'][$subject['id']][$learner['id']] ?? null;
+
+                if ($w === null) {
+                    // Does not take the subject (D-117).
+                    $cells[] = ['subject_id' => $subject['id'], 'percent' => null, 'grade' => null, 'ready' => true, 'passes' => null, 'takes' => false];
+
+                    continue;
+                }
+
                 $bySubject[$subject['id']] = $w;
-                $cells[] = ['subject_id' => $subject['id'], 'percent' => $w['percent'], 'grade' => $w['grade'], 'ready' => $w['ready'], 'passes' => $w['passes']];
+                $cells[] = ['subject_id' => $subject['id'], 'percent' => $w['percent'], 'grade' => $w['grade'], 'ready' => $w['ready'], 'passes' => $w['passes'], 'takes' => true];
             }
 
             $fails = count(array_filter($cells, fn (array $c): bool => $c['passes'] === false)) > 0;
@@ -66,7 +74,7 @@ final class Results
                 'total' => $totals[$learner['id']], 'position' => null, 'below_pass' => $fails];
         }
 
-        $positions = TermGrades::positions($totals);
+        $positions = TermGrades::positions($totals, $result['by_average']);
 
         foreach ($rows as $i => $row) {
             $rows[$i]['position'] = $positions[$row['id']] ?? null;
@@ -90,6 +98,7 @@ final class Results
             'period' => self::periodOut($period),
             'scale' => $scale !== null ? ['id' => $scale['id'], 'name' => $scale['name'], 'overall' => $scale['overall']->value, 'pass_from' => $scale['pass_from']] : null,
             'summary_kind' => ($scale['overall'] ?? OverallResult::AveragePercent)->value,
+            'ranked_by' => $result['by_average'] ? 'average' : 'total',
             'subjects' => $subjects,
             'learners' => $rows,
             'totals' => [
@@ -158,15 +167,20 @@ final class Results
         $totals = [];
 
         foreach ($result['subjects'] as $subject) {
-            $w = $result['grades'][$subject['id']][$learnerId];
-            $bySubject[$subject['id']] = $w;
             $names[$subject['id']] = $subject['name'];
+            $w = $result['grades'][$subject['id']][$learnerId] ?? null;
+
+            if ($w === null) {
+                continue;
+            }
+
+            $bySubject[$subject['id']] = $w;
             $grades[] = ['subject_id' => $subject['id'], 'subject' => $subject['name'], 'percent' => $w['percent'], 'grade' => $w['grade'], 'word' => $w['word'],
                 'ready' => $w['ready'], 'not_ready' => $w['not_ready'], 'passes' => $w['passes']];
         }
 
         foreach ($classmates as $id) {
-            $totals[$id] = TermGrades::total(array_map(fn (array $bySubjectOf): array => $bySubjectOf[$id], $result['grades']));
+            $totals[$id] = TermGrades::total(TermGrades::taken($result['grades'], $id));
         }
 
         $assessments = $this->grades->assessments($class['id'], $period['id']);
@@ -195,7 +209,7 @@ final class Results
             'grades' => $grades,
             'summary' => TermGrades::summary($scale, $bySubject),
             'total' => TermGrades::total($bySubject),
-            'position' => TermGrades::positions($totals)[$learnerId] ?? null,
+            'position' => TermGrades::positions($totals, $result['by_average'])[$learnerId] ?? null,
             'assessments' => $rows,
             'published' => $this->publishing->forLearner($learnerId, $class['id'], $period['id']),
         ];

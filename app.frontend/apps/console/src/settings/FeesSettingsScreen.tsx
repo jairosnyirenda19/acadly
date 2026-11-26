@@ -100,6 +100,14 @@ function TermEditor({ data, onSaved }: { data: TermFees; onSaved: () => void }) 
       ? data.plan.map((p) => ({ label: p.label, due_on: p.due_on, share: String(p.share_bp / 100) }))
       : [{ label: '', due_on: data.term.starts_on, share: '100' }],
   )
+  // A college's amounts by programme and mode (D-116): "item:programme:mode:level" → text; a level of 'credit' prices per credit.
+  const pcell = (item: string, programme: string, mode: string, level: string) => `${item}:${programme}:${mode}:${level}`
+  const [byProgramme, setByProgramme] = useState<Record<string, string>>(() =>
+    Object.fromEntries(data.programme_amounts.map((a) => [pcell(a.item_id, a.programme_id, a.mode, a.level_code), kwachaText(a.amount)])),
+  )
+  const [perCredit, setPerCredit] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(data.programme_amounts.filter((a) => a.level_code === 'credit').map((a) => [`${a.item_id}:${a.programme_id}:${a.mode}`, true])),
+  )
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [busy, setBusy] = useState(false)
   const locked = data.billed
@@ -112,6 +120,13 @@ function TermEditor({ data, onSaved }: { data: TermFees; onSaved: () => void }) 
     const result = await feesApi.saveTerm(data.term.period_id, data.term.division_id, {
       amounts: items.flatMap((i) => data.levels.map((l) => ({ item_id: i.id, level_code: l.code, amount: parseKwacha(amounts[cell(i.id, l.code)] ?? '') ?? 0 }))).filter((a) => a.amount > 0),
       plan: plan.map((p) => ({ label: p.label.trim(), due_on: p.due_on, share_bp: Math.round((Number(p.share) || 0) * 100) })),
+      programme_amounts: Object.entries(byProgramme).flatMap(([key, text]) => {
+        const [item_id = '', programme_id = '', mode = '', level_code = ''] = key.split(':')
+        const amount = parseKwacha(text)
+        const credit = perCredit[`${item_id}:${programme_id}:${mode}`] === true
+
+        return amount === null || text.trim() === '' || (level_code === 'credit') !== credit ? [] : [{ item_id, programme_id, mode, level_code, amount }]
+      }),
     })
     setBusy(false)
     if (result.kind === 'saved') {
@@ -195,7 +210,19 @@ function TermEditor({ data, onSaved }: { data: TermFees; onSaved: () => void }) 
         </div>
       </section>
 
-      <aside className="grid gap-5">
+      {data.programmes.length > 0 && (
+        <ByProgramme
+          data={data}
+          items={items}
+          locked={locked}
+          value={(item, programme, mode, level) => byProgramme[pcell(item, programme, mode, level)] ?? ''}
+          onValue={(item, programme, mode, level, text) => setByProgramme({ ...byProgramme, [pcell(item, programme, mode, level)]: text })}
+          perCredit={(item, programme, mode) => perCredit[`${item}:${programme}:${mode}`] === true}
+          onPerCredit={(item, programme, mode, on) => setPerCredit({ ...perCredit, [`${item}:${programme}:${mode}`]: on })}
+        />
+      )}
+
+      <aside className="grid gap-5 xl:col-start-2 xl:row-start-1 xl:row-span-2">
         <section aria-label={t.plan} className="grid gap-3 border-2 border-ink bg-sheet px-4 py-3.5">
           <h2 className="type-display text-[26px] leading-none">{t.plan}</h2>
           {plan.map((p, i) => (
@@ -247,6 +274,119 @@ function TermEditor({ data, onSaved }: { data: TermFees; onSaved: () => void }) 
         </section>
       </aside>
     </div>
+  )
+}
+
+/** A college's fees by programme and mode of study, per year of study or per credit (D-116), for one fee item at a time. */
+function ByProgramme({
+  data,
+  items,
+  locked,
+  value,
+  onValue,
+  perCredit,
+  onPerCredit,
+}: {
+  data: TermFees
+  items: FeeItem[]
+  locked: boolean
+  value: (item: string, programme: string, mode: string, level: string) => string
+  onValue: (item: string, programme: string, mode: string, level: string, text: string) => void
+  perCredit: (item: string, programme: string, mode: string) => boolean
+  onPerCredit: (item: string, programme: string, mode: string, on: boolean) => void
+}) {
+  const [item, setItem] = useState(() => data.programme_amounts[0]?.item_id ?? items.find((i) => !i.optional)?.id ?? items[0]?.id ?? '')
+  const rows = data.programmes.flatMap((p) => ['full_time', 'part_time'].map((mode) => ({ programme: p, mode })))
+  const field = 'ref h-10 w-full min-w-[90px] border-0 border-b-2 border-ink bg-field px-2 text-right text-sm outline-none focus:border-teal disabled:border-rule disabled:text-text-muted'
+
+  return (
+    <section aria-label={t.byProgramme} className="border-2 border-ink bg-sheet px-4 pt-3 pb-4">
+      <h2 className="type-display mb-1 text-[26px] leading-none">{t.byProgramme}</h2>
+      <p className="mb-3 max-w-[70ch] text-[13px] text-text-muted">{t.byProgrammeIntro}</p>
+      <div className="mb-3 max-w-[320px]">
+        <Select label={t.programmeItem} value={item} onChange={(e) => setItem(e.target.value)}>
+          {items.map((i) => (
+            <option key={i.id} value={i.id}>
+              {i.name}
+            </option>
+          ))}
+        </Select>
+      </div>
+      <div role="region" aria-label={t.byProgramme} tabIndex={0} className="overflow-x-auto">
+        <table className="w-full min-w-[720px] border-collapse">
+          <thead>
+            <tr>
+              <th scope="col" className="label-caps border-b-2 border-ink py-2 pr-3 text-left text-text-muted">
+                {t.programme}
+              </th>
+              <th scope="col" className="label-caps border-b-2 border-ink px-2 py-2 text-left text-text-muted">
+                {t.mode}
+              </th>
+              <th scope="col" className="label-caps border-b-2 border-ink px-2 py-2 text-left text-text-muted">
+                {t.perCredit}
+              </th>
+              {data.levels.map((l) => (
+                <th key={l.code} scope="col" className="label-caps border-b-2 border-ink px-2 py-2 text-right text-text-muted">
+                  {l.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(({ programme: p, mode }) => {
+              const credit = perCredit(item, p.id, mode)
+              const name = `${p.name} · ${t.modes[mode] ?? mode}`
+
+              return (
+                <tr key={`${p.id}:${mode}`}>
+                  <th scope="row" className="min-w-[220px] border-b border-rule py-2 pr-3 text-left align-middle">
+                    <span className="block text-[15px] font-extrabold">{p.name}</span>
+                    <span className="ref text-xs font-normal text-text-muted">{p.code}</span>
+                  </th>
+                  <td className="border-b border-rule px-2 py-1.5 text-sm">{t.modes[mode] ?? mode}</td>
+                  <td className="border-b border-rule px-2 py-1.5">
+                    <input
+                      type="checkbox"
+                      aria-label={`${name} · ${t.perCredit}`}
+                      checked={credit}
+                      disabled={locked}
+                      onChange={(e) => onPerCredit(item, p.id, mode, e.target.checked)}
+                      className="size-5 accent-ink"
+                    />
+                  </td>
+                  {credit ? (
+                    <td colSpan={data.levels.length} className="border-b border-rule px-2 py-1.5">
+                      <input
+                        aria-label={t.perCreditField(name)}
+                        inputMode="decimal"
+                        disabled={locked}
+                        value={value(item, p.id, mode, 'credit')}
+                        onChange={(e) => onValue(item, p.id, mode, 'credit', e.target.value)}
+                        className={`${field} max-w-[160px]`}
+                      />
+                    </td>
+                  ) : (
+                    data.levels.map((l) => (
+                      <td key={l.code} className="border-b border-rule px-2 py-1.5">
+                        <input
+                          aria-label={`${name} · ${l.label}`}
+                          inputMode="decimal"
+                          disabled={locked}
+                          value={value(item, p.id, mode, l.code)}
+                          onChange={(e) => onValue(item, p.id, mode, l.code, e.target.value)}
+                          className={field}
+                        />
+                      </td>
+                    ))
+                  )}
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-3 max-w-[70ch] text-[13px] text-text-muted">{t.perCreditNote}</p>
+    </section>
   )
 }
 

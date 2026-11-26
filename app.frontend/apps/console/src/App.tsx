@@ -1,3 +1,4 @@
+import { NoticesScreen } from './notices/NoticesScreen'
 import {
   can,
   CONTEXT_CHANGED,
@@ -237,6 +238,7 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (register !== undefined && registers) page = <RegisterScreen key={register} classId={register} />
   else if (path === '/learners' && seesLearners) page = <LearnersScreen />
   else if (path === '/learners/families' && holdsAnywhere(context, 'enrolment.families')) page = <FamiliesScreen />
+  else if (path === '/notices' && holdsAnywhere(context, 'enrolment.notify')) page = <NoticesScreen />
   else if (path === '/learners/admit' && holdsAnywhere(context, 'enrolment.admit')) page = <AdmitScreen />
   else if (path === '/learners/import' && holdsAnywhere(context, 'enrolment.admit')) page = <LearnerImportScreen />
   else if (learner !== undefined && seesLearners) page = <LearnerScreen key={learner} id={learner} />
@@ -257,6 +259,7 @@ function Console({ path, onSignedOut }: { path: string; onSignedOut: () => void 
   else if (path === '/marks/new' && marks) page = <NewAssessmentScreen />
   else if (path === '/marks/results' && marks) page = <ResultsScreen />
   else if (path === '/marks/publish' && marks) page = <MarksScreen view="publish" />
+  else if (path === '/marks/choices' && marks) page = <MarksScreen view="choices" />
   else if (path === '/marks/comments' && marks) page = <CommentsScreen />
   else if (sheet !== undefined && marks) page = <SheetScreen key={sheet} id={sheet} />
   else if (path === '/settings/assessment' && keepsGrading(context)) page = <AssessmentSettingsScreen view="plans" />

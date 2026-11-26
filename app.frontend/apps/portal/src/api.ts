@@ -15,6 +15,8 @@ export type FeesState = Json<'/v1/portal/children/{id}/fees', 'get'>
 export type FeeInstalment = FeesState['instalments'][number]
 export type FeePayment = FeesState['payments'][number]
 export type ConductState = Json<'/v1/portal/children/{id}/conduct', 'get'>
+export type NoticesState = Json<'/v1/portal/notices', 'get'>
+export type FamilyNotice = NoticesState['notices'][number]
 export type SupportState = Json<'/v1/portal/children/{id}/support', 'get'>
 export type DocumentsState = Json<'/v1/portal/children/{id}/documents', 'get'>
 
@@ -83,6 +85,9 @@ export const portalApi = {
   support: (id: string) => read(api.GET('/v1/portal/children/{id}/support', { params: { path: { id } } })),
   documents: (id: string) => read(api.GET('/v1/portal/children/{id}/documents', { params: { path: { id } } })),
   documentUrl: (id: string, document: string) => `${API}/v1/portal/children/${id}/documents/${document}`,
+  /** Notices to families (D-115); opening one counts it as read. */
+  notices: () => read(api.GET('/v1/portal/notices')),
+  notice: (id: string) => read(api.GET('/v1/portal/notices/{id}', { params: { path: { id } } })),
   /** The school's short name, as its text messages begin; null when it cannot be read. */
   shortName: async (): Promise<string | null> => (await getContext())?.school.short_name ?? null,
   /** Name someone to collect the child today; the code to give them, or null when it was not saved. */

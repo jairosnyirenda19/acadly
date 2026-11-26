@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Acadly\Modules\Fees;
 
 use Acadly\Core\Academics\AcademicsCore;
+use Acadly\Core\Enrolment\Contracts\Events\LearnerLeft;
 use Acadly\Core\Enrolment\EnrolmentCore;
 use Acadly\Core\Institution\InstitutionCore;
 use Acadly\Kernel\Module\Module;
 use Acadly\Kernel\Module\Tier;
+use Acadly\Modules\Fees\Application\LeavingWaivers;
 use Acadly\Modules\Fees\Contracts\FeesAudit;
 use Acadly\Modules\Fees\Contracts\FeesPermission;
 use Acadly\Modules\Fees\Notifications\FeeReminder;
@@ -64,7 +66,7 @@ final class FeesModule implements Module
 
     public function subscriptions(): array
     {
-        return [];
+        return [LearnerLeft::class => [LeavingWaivers::class]];
     }
 
     public function journeys(): array

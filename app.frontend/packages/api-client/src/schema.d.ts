@@ -839,6 +839,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/assessment/choices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** `?class_id=` chooses the class; the first the viewer may set otherwise */
+        get: operations["assessment.choices.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assessment/choices/{class}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** `{learners: [{learner_id, subject_ids}]}`: the electives each learner of the class takes */
+        put: operations["assessment.choices.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/classroom/learners/{learner}": {
         parameters: {
             query?: never;
@@ -1851,6 +1885,92 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/portal/notices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The notices for a parent's children, pinned first */
+        get: operations["portal.notices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/portal/notices/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One notice, opened by a parent: it now counts as read */
+        get: operations["portal.notices.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/notices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The notices in the place worked in, newest first, with how many families read each and the texts delivered */
+        get: operations["notices.index"];
+        put?: never;
+        /** Publishes a notice; with a text message when asked for, sent now */
+        post: operations["notices.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/notices/reach": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Who a notice would reach: learners, families, families in the portal, and the texts it would send */
+        get: operations["notices.reach"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/notices/{id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Withdraws a notice, with a reason. It leaves the portal at once; a text already sent stays sent */
+        post: operations["notices.withdraw"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/portal/children/{id}/support": {
         parameters: {
             query?: never;
@@ -2772,6 +2892,57 @@ export interface paths {
         put?: never;
         /** Moves the learner to another class: `{class_id, from, reason}` */
         post: operations["learners.move"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learners/{id}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Records that a learner leaves the school during the year: `{last_day, kind, destination, note, waive}`. Answers with the record */
+        post: operations["learners.leave"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learners/{id}/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Places a learner who left in a class again: `{class_id, from}`. Answers with the record */
+        post: operations["learners.return"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/learners/{id}/transfer-letter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The transfer letter of a learner who left, as a PDF with its check code */
+        get: operations["learners.transfer-letter"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -10209,6 +10380,90 @@ export interface operations {
             404: components["responses"]["NotFoundHttpException"];
         };
     };
+    "assessment.choices.index": {
+        parameters: {
+            query?: {
+                class_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        classes: {
+                            id: string;
+                            name: string;
+                            level: string;
+                        }[];
+                        class: {
+                            id: string;
+                            name: string;
+                            level: string;
+                        } | null;
+                        on: boolean;
+                        core: string[];
+                        electives: {
+                            id: string;
+                            short: string;
+                            name: string;
+                            takers: number;
+                        }[];
+                        learners: {
+                            id: string;
+                            name: string;
+                            takes: string[];
+                        }[];
+                        none: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["NotFoundHttpException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "assessment.choices.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                class: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    learners: {
+                        /** Format: uuid */
+                        learner_id: string;
+                        subject_ids: string[];
+                    }[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown[];
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
     "classroom.learner": {
         parameters: {
             query?: never;
@@ -12695,6 +12950,214 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "portal.notices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        notices: {
+                            id: string;
+                            title: string;
+                            body: string;
+                            for: string;
+                            publish_at: string;
+                            pinned: boolean;
+                            new: boolean;
+                            from: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "portal.notices.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        title: string;
+                        body: string;
+                        for: string;
+                        publish_at: string;
+                        pinned: boolean;
+                        new: boolean;
+                        from: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "notices.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        notices: {
+                            id: string;
+                            title: string;
+                            for: string;
+                            publish_at: string;
+                            scheduled: boolean;
+                            author: string;
+                            read: number;
+                            families: number;
+                            texts: {
+                                all: number;
+                                delivered: number;
+                                not_delivered: number;
+                            } | null;
+                            withdrawn: {
+                                reason: string;
+                                at: string;
+                            } | null;
+                        }[];
+                        text_room: number;
+                        choices: {
+                            school: boolean;
+                            divisions: {
+                                id: string;
+                                name: string;
+                                whole: boolean;
+                                levels: {
+                                    code: string;
+                                    label: string;
+                                }[];
+                                classes: {
+                                    id: string;
+                                    name: string;
+                                }[];
+                            }[];
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "notices.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    audience?: string | null;
+                    /** Format: uuid */
+                    division_id?: string | null;
+                    /** Format: uuid */
+                    class_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": 201;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "notices.reach": {
+        parameters: {
+            query?: {
+                audience?: string | null;
+                division_id?: string | null;
+                level_code?: string | null;
+                class_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        learners: number;
+                        families: number;
+                        in_portal: number;
+                        texts: number;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "notices.withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "portal.support": {
         parameters: {
             query?: never;
@@ -13780,6 +14243,18 @@ export interface operations {
                             learners: number;
                             total: number;
                         };
+                        programmes: {
+                            id: string;
+                            code: string;
+                            name: string;
+                        }[];
+                        programme_amounts: {
+                            item_id: string;
+                            programme_id: string;
+                            mode: string;
+                            level_code: string;
+                            amount: number;
+                        }[];
                     };
                 };
             };
@@ -13811,6 +14286,15 @@ export interface operations {
                         /** Format: date */
                         due_on: string;
                         share_bp: number;
+                    }[];
+                    programme_amounts?: {
+                        /** Format: uuid */
+                        item_id: string;
+                        /** Format: uuid */
+                        programme_id: string;
+                        mode: string;
+                        level_code: string;
+                        amount: number;
                     }[];
                 };
             };
@@ -15055,6 +15539,19 @@ export interface operations {
                             reason: string | null;
                         }[];
                         possible_duplicate: boolean;
+                        left: {
+                            last_day: string;
+                            kind: string;
+                            kind_label: string;
+                            destination: string | null;
+                            note: string | null;
+                            by: string | null;
+                            at: string;
+                        } | null;
+                        return_to: {
+                            id: string;
+                            name: string;
+                        }[];
                         move_to: {
                             id: string;
                             name: string;
@@ -15147,6 +15644,16 @@ export interface operations {
                         /** @description A contact who is also the contact of other learners: the family, found by phone (D-083). */
                         contacts: unknown[];
                         activity: unknown[];
+                        left: {
+                            last_day: string;
+                            kind: string;
+                            kind_label: string | "";
+                            destination: string | null;
+                            note: string | null;
+                            by: string | null;
+                            at: string;
+                        } | null;
+                        return_to: unknown[];
                         possible_duplicate: boolean;
                         move_to: unknown[];
                         can_manage: boolean;
@@ -15282,6 +15789,16 @@ export interface operations {
                         /** @description A contact who is also the contact of other learners: the family, found by phone (D-083). */
                         contacts: unknown[];
                         activity: unknown[];
+                        left: {
+                            last_day: string;
+                            kind: string;
+                            kind_label: string | "";
+                            destination: string | null;
+                            note: string | null;
+                            by: string | null;
+                            at: string;
+                        } | null;
+                        return_to: unknown[];
                         possible_duplicate: boolean;
                         move_to: unknown[];
                         can_manage: boolean;
@@ -15305,6 +15822,217 @@ export interface operations {
                             not_delivered: number;
                         };
                     };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "learners.leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: date */
+                    last_day: string;
+                    kind: string;
+                    destination?: string | null;
+                    note?: string | null;
+                    waive: boolean;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        acadly_id: string;
+                        admission_number: string | null;
+                        first_name: string;
+                        other_names: string | null;
+                        surname: string;
+                        name: string;
+                        sex: string;
+                        date_of_birth: string;
+                        has_photo: boolean;
+                        status: string;
+                        admitted_on: string | null;
+                        word: string;
+                        word_plural: string;
+                        class: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        level: string | null;
+                        division: string | null;
+                        division_id: string | null;
+                        campus: string | null;
+                        class_teacher: string | null;
+                        placements: unknown[];
+                        /** @description A contact who is also the contact of other learners: the family, found by phone (D-083). */
+                        contacts: unknown[];
+                        activity: unknown[];
+                        left: {
+                            last_day: string;
+                            kind: string;
+                            kind_label: string | "";
+                            destination: string | null;
+                            note: string | null;
+                            by: string | null;
+                            at: string;
+                        } | null;
+                        return_to: unknown[];
+                        possible_duplicate: boolean;
+                        move_to: unknown[];
+                        can_manage: boolean;
+                        /** @description A correction of the name, date of birth or sex waiting for a yes (D-081). */
+                        details_request: ({
+                            mine: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        }) | null;
+                        details_asks: boolean;
+                        relationships: unknown[];
+                        parts: {
+                            key: string;
+                            title: string;
+                            band: string;
+                            attention: string;
+                        }[];
+                        told: {
+                            all: number;
+                            delivered: number;
+                            not_delivered: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "learners.return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    class_id: string;
+                    /** Format: date */
+                    from: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        acadly_id: string;
+                        admission_number: string | null;
+                        first_name: string;
+                        other_names: string | null;
+                        surname: string;
+                        name: string;
+                        sex: string;
+                        date_of_birth: string;
+                        has_photo: boolean;
+                        status: string;
+                        admitted_on: string | null;
+                        word: string;
+                        word_plural: string;
+                        class: {
+                            id: string;
+                            name: string;
+                        } | null;
+                        level: string | null;
+                        division: string | null;
+                        division_id: string | null;
+                        campus: string | null;
+                        class_teacher: string | null;
+                        placements: unknown[];
+                        /** @description A contact who is also the contact of other learners: the family, found by phone (D-083). */
+                        contacts: unknown[];
+                        activity: unknown[];
+                        left: {
+                            last_day: string;
+                            kind: string;
+                            kind_label: string | "";
+                            destination: string | null;
+                            note: string | null;
+                            by: string | null;
+                            at: string;
+                        } | null;
+                        return_to: unknown[];
+                        possible_duplicate: boolean;
+                        move_to: unknown[];
+                        can_manage: boolean;
+                        /** @description A correction of the name, date of birth or sex waiting for a yes (D-081). */
+                        details_request: ({
+                            mine: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        }) | null;
+                        details_asks: boolean;
+                        relationships: unknown[];
+                        parts: {
+                            key: string;
+                            title: string;
+                            band: string;
+                            attention: string;
+                        }[];
+                        told: {
+                            all: number;
+                            delivered: number;
+                            not_delivered: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "learners.transfer-letter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Content-Disposition"?: string;
+                    "Cache-Control"?: "no-store";
+                    "X-Content-Type-Options"?: "nosniff";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
                 };
             };
             401: components["responses"]["AuthenticationException"];
@@ -15361,6 +16089,16 @@ export interface operations {
                         /** @description A contact who is also the contact of other learners: the family, found by phone (D-083). */
                         contacts: unknown[];
                         activity: unknown[];
+                        left: {
+                            last_day: string;
+                            kind: string;
+                            kind_label: string | "";
+                            destination: string | null;
+                            note: string | null;
+                            by: string | null;
+                            at: string;
+                        } | null;
+                        return_to: unknown[];
                         possible_duplicate: boolean;
                         move_to: unknown[];
                         can_manage: boolean;
@@ -15434,6 +16172,16 @@ export interface operations {
                         /** @description A contact who is also the contact of other learners: the family, found by phone (D-083). */
                         contacts: unknown[];
                         activity: unknown[];
+                        left: {
+                            last_day: string;
+                            kind: string;
+                            kind_label: string | "";
+                            destination: string | null;
+                            note: string | null;
+                            by: string | null;
+                            at: string;
+                        } | null;
+                        return_to: unknown[];
                         possible_duplicate: boolean;
                         move_to: unknown[];
                         can_manage: boolean;
@@ -15507,6 +16255,16 @@ export interface operations {
                         /** @description A contact who is also the contact of other learners: the family, found by phone (D-083). */
                         contacts: unknown[];
                         activity: unknown[];
+                        left: {
+                            last_day: string;
+                            kind: string;
+                            kind_label: string | "";
+                            destination: string | null;
+                            note: string | null;
+                            by: string | null;
+                            at: string;
+                        } | null;
+                        return_to: unknown[];
                         possible_duplicate: boolean;
                         move_to: unknown[];
                         can_manage: boolean;
@@ -15580,6 +16338,16 @@ export interface operations {
                         /** @description A contact who is also the contact of other learners: the family, found by phone (D-083). */
                         contacts: unknown[];
                         activity: unknown[];
+                        left: {
+                            last_day: string;
+                            kind: string;
+                            kind_label: string | "";
+                            destination: string | null;
+                            note: string | null;
+                            by: string | null;
+                            at: string;
+                        } | null;
+                        return_to: unknown[];
                         possible_duplicate: boolean;
                         move_to: unknown[];
                         can_manage: boolean;
@@ -15675,6 +16443,16 @@ export interface operations {
                         /** @description A contact who is also the contact of other learners: the family, found by phone (D-083). */
                         contacts: unknown[];
                         activity: unknown[];
+                        left: {
+                            last_day: string;
+                            kind: string;
+                            kind_label: string | "";
+                            destination: string | null;
+                            note: string | null;
+                            by: string | null;
+                            at: string;
+                        } | null;
+                        return_to: unknown[];
                         possible_duplicate: boolean;
                         move_to: unknown[];
                         can_manage: boolean;
@@ -23239,6 +24017,8 @@ export interface operations {
                         } | null;
                         /** @enum {string} */
                         summary_kind: "average_percent" | "average_grade" | "best_six";
+                        /** @enum {string} */
+                        ranked_by: "total" | "average";
                         subjects: {
                             id: string;
                             name: string;
@@ -23255,6 +24035,7 @@ export interface operations {
                                 grade: string | null;
                                 ready: boolean;
                                 passes: boolean | null;
+                                takes: boolean;
                             }[];
                             summary: {
                                 /** @enum {string} */

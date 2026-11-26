@@ -149,7 +149,7 @@ it('refuses every route pointed at Secondary, and keeps every list to Primary, f
         'roles.' => ['id' => $this->clerk->id],
         'learners.' => ['id' => $this->outside, 'contact' => $this->contacts[$this->outside]],
         'registers.' => ['id' => $school->id('class_secondary_b'), 'register' => $school->id('class_secondary_b'), 'learner' => $this->outside, 'slot' => $this->slot],
-        'assessment.' => ['id' => $this->assessment],
+        'assessment.' => ['id' => $this->assessment, 'class' => $school->id('class_secondary_b')],
         'assessment.learner' => ['id' => $this->outside],
         'portal.' => ['id' => $this->outside, 'day' => '2026-10-01', 'receipt' => $this->payment, 'document' => $this->outside],
         'year-end.' => ['division' => $school->id('secondary'), 'id' => $this->outside],

@@ -11014,6 +11014,253 @@
                 }
             }
         },
+        "/v1/assessment/choices": {
+            "get": {
+                "operationId": "assessment.choices.index",
+                "summary": "`?class_id=` chooses the class; the first the viewer may set otherwise",
+                "tags": [
+                    "Choices"
+                ],
+                "parameters": [
+                    {
+                        "name": "class_id",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "classes": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "level": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "level"
+                                                ]
+                                            }
+                                        },
+                                        "class": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "level": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "level"
+                                            ]
+                                        },
+                                        "on": {
+                                            "type": "boolean"
+                                        },
+                                        "core": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "electives": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "short": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "takers": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "short",
+                                                    "name",
+                                                    "takers"
+                                                ]
+                                            }
+                                        },
+                                        "learners": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "takes": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "takes"
+                                                ]
+                                            }
+                                        },
+                                        "none": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "classes",
+                                        "class",
+                                        "on",
+                                        "core",
+                                        "electives",
+                                        "learners",
+                                        "none"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundHttpException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/assessment/choices/{class}": {
+            "put": {
+                "operationId": "assessment.choices.save",
+                "summary": "`{learners: [{learner_id, subject_ids}]}`: the electives each learner of the class takes",
+                "tags": [
+                    "Choices"
+                ],
+                "parameters": [
+                    {
+                        "name": "class",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "learners": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "learner_id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "subject_ids": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "format": "uuid"
+                                                    },
+                                                    "maxItems": 30
+                                                }
+                                            },
+                                            "required": [
+                                                "learner_id",
+                                                "subject_ids"
+                                            ]
+                                        },
+                                        "minItems": 1,
+                                        "maxItems": 200,
+                                        "uniqueItems": true
+                                    }
+                                },
+                                "required": [
+                                    "learners"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {}
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/classroom/learners/{learner}": {
             "get": {
                 "operationId": "classroom.learner",
@@ -18485,6 +18732,539 @@
                 }
             }
         },
+        "/v1/portal/notices": {
+            "get": {
+                "operationId": "portal.notices",
+                "summary": "The notices for a parent's children, pinned first",
+                "tags": [
+                    "FamilyNotices"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "notices": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "body": {
+                                                        "type": "string"
+                                                    },
+                                                    "for": {
+                                                        "type": "string"
+                                                    },
+                                                    "publish_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "pinned": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "new": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "from": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "title",
+                                                    "body",
+                                                    "for",
+                                                    "publish_at",
+                                                    "pinned",
+                                                    "new",
+                                                    "from"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "notices"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/portal/notices/{id}": {
+            "get": {
+                "operationId": "portal.notices.show",
+                "summary": "One notice, opened by a parent: it now counts as read",
+                "tags": [
+                    "FamilyNotices"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "title": {
+                                            "type": "string"
+                                        },
+                                        "body": {
+                                            "type": "string"
+                                        },
+                                        "for": {
+                                            "type": "string"
+                                        },
+                                        "publish_at": {
+                                            "type": "string"
+                                        },
+                                        "pinned": {
+                                            "type": "boolean"
+                                        },
+                                        "new": {
+                                            "type": "boolean"
+                                        },
+                                        "from": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "title",
+                                        "body",
+                                        "for",
+                                        "publish_at",
+                                        "pinned",
+                                        "new",
+                                        "from"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/notices": {
+            "get": {
+                "operationId": "notices.index",
+                "summary": "The notices in the place worked in, newest first, with how many families read each and the texts delivered",
+                "tags": [
+                    "FamilyNotices"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "notices": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "for": {
+                                                        "type": "string"
+                                                    },
+                                                    "publish_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "scheduled": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "author": {
+                                                        "type": "string"
+                                                    },
+                                                    "read": {
+                                                        "type": "integer"
+                                                    },
+                                                    "families": {
+                                                        "type": "integer"
+                                                    },
+                                                    "texts": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "all": {
+                                                                "type": "integer"
+                                                            },
+                                                            "delivered": {
+                                                                "type": "integer"
+                                                            },
+                                                            "not_delivered": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "all",
+                                                            "delivered",
+                                                            "not_delivered"
+                                                        ]
+                                                    },
+                                                    "withdrawn": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "reason": {
+                                                                "type": "string"
+                                                            },
+                                                            "at": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "reason",
+                                                            "at"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "title",
+                                                    "for",
+                                                    "publish_at",
+                                                    "scheduled",
+                                                    "author",
+                                                    "read",
+                                                    "families",
+                                                    "texts",
+                                                    "withdrawn"
+                                                ]
+                                            }
+                                        },
+                                        "text_room": {
+                                            "type": "integer"
+                                        },
+                                        "choices": {
+                                            "type": "object",
+                                            "properties": {
+                                                "school": {
+                                                    "type": "boolean"
+                                                },
+                                                "divisions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "whole": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "levels": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "code": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "label": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "code",
+                                                                        "label"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "classes": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "name": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "required": [
+                                                                        "id",
+                                                                        "name"
+                                                                    ]
+                                                                }
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name",
+                                                            "whole",
+                                                            "levels",
+                                                            "classes"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "school",
+                                                "divisions"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "notices",
+                                        "text_room",
+                                        "choices"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "notices.store",
+                "summary": "Publishes a notice; with a text message when asked for, sent now",
+                "tags": [
+                    "FamilyNotices"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "audience": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 10
+                                    },
+                                    "division_id": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "uuid"
+                                    },
+                                    "class_id": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "uuid"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "const": 201
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/notices/reach": {
+            "get": {
+                "operationId": "notices.reach",
+                "summary": "Who a notice would reach: learners, families, families in the portal, and the texts it would send",
+                "tags": [
+                    "FamilyNotices"
+                ],
+                "parameters": [
+                    {
+                        "name": "audience",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 10
+                        }
+                    },
+                    {
+                        "name": "division_id",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "level_code",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 16
+                        }
+                    },
+                    {
+                        "name": "class_id",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "learners": {
+                                            "type": "integer"
+                                        },
+                                        "families": {
+                                            "type": "integer"
+                                        },
+                                        "in_portal": {
+                                            "type": "integer"
+                                        },
+                                        "texts": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "learners",
+                                        "families",
+                                        "in_portal",
+                                        "texts"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/notices/{id}/withdraw": {
+            "post": {
+                "operationId": "notices.withdraw",
+                "summary": "Withdraws a notice, with a reason. It leaves the portal at once; a text already sent stays sent",
+                "tags": [
+                    "FamilyNotices"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/portal/children/{id}/support": {
             "get": {
                 "operationId": "portal.support",
@@ -21503,6 +22283,58 @@
                                                 "learners",
                                                 "total"
                                             ]
+                                        },
+                                        "programmes": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "code": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "code",
+                                                    "name"
+                                                ]
+                                            }
+                                        },
+                                        "programme_amounts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "item_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "programme_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "mode": {
+                                                        "type": "string"
+                                                    },
+                                                    "level_code": {
+                                                        "type": "string"
+                                                    },
+                                                    "amount": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "item_id",
+                                                    "programme_id",
+                                                    "mode",
+                                                    "level_code",
+                                                    "amount"
+                                                ]
+                                            }
                                         }
                                     },
                                     "required": [
@@ -21513,7 +22345,9 @@
                                         "plan",
                                         "billed",
                                         "billed_learners",
-                                        "to_bill"
+                                        "to_bill",
+                                        "programmes",
+                                        "programme_amounts"
                                     ]
                                 }
                             }
@@ -21610,6 +22444,41 @@
                                         },
                                         "minItems": 1,
                                         "maxItems": 6
+                                    },
+                                    "programme_amounts": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "item_id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "programme_id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "mode": {
+                                                    "type": "string",
+                                                    "maxLength": 12
+                                                },
+                                                "level_code": {
+                                                    "type": "string",
+                                                    "maxLength": 20
+                                                },
+                                                "amount": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "item_id",
+                                                "programme_id",
+                                                "mode",
+                                                "level_code",
+                                                "amount"
+                                            ]
+                                        }
                                     }
                                 },
                                 "required": [
@@ -25057,6 +25926,71 @@
                                         "possible_duplicate": {
                                             "type": "boolean"
                                         },
+                                        "left": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "last_day": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "kind_label": {
+                                                    "type": "string"
+                                                },
+                                                "destination": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "note": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "last_day",
+                                                "kind",
+                                                "kind_label",
+                                                "destination",
+                                                "note",
+                                                "by",
+                                                "at"
+                                            ]
+                                        },
+                                        "return_to": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name"
+                                                ]
+                                            }
+                                        },
                                         "move_to": {
                                             "type": "array",
                                             "items": {
@@ -25265,6 +26199,8 @@
                                         "contacts",
                                         "activity",
                                         "possible_duplicate",
+                                        "left",
+                                        "return_to",
                                         "move_to",
                                         "can_manage",
                                         "details_request",
@@ -25418,6 +26354,67 @@
                                             "type": "array",
                                             "items": {}
                                         },
+                                        "left": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "last_day": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "kind_label": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                ""
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                "destination": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "note": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "last_day",
+                                                "kind",
+                                                "kind_label",
+                                                "destination",
+                                                "note",
+                                                "by",
+                                                "at"
+                                            ]
+                                        },
+                                        "return_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
                                         "possible_duplicate": {
                                             "type": "boolean"
                                         },
@@ -25521,6 +26518,8 @@
                                         "placements",
                                         "contacts",
                                         "activity",
+                                        "left",
+                                        "return_to",
                                         "possible_duplicate",
                                         "move_to",
                                         "can_manage",
@@ -25835,6 +26834,67 @@
                                             "type": "array",
                                             "items": {}
                                         },
+                                        "left": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "last_day": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "kind_label": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                ""
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                "destination": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "note": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "last_day",
+                                                "kind",
+                                                "kind_label",
+                                                "destination",
+                                                "note",
+                                                "by",
+                                                "at"
+                                            ]
+                                        },
+                                        "return_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
                                         "possible_duplicate": {
                                             "type": "boolean"
                                         },
@@ -25938,6 +26998,8 @@
                                         "placements",
                                         "contacts",
                                         "activity",
+                                        "left",
+                                        "return_to",
                                         "possible_duplicate",
                                         "move_to",
                                         "can_manage",
@@ -25947,6 +27009,775 @@
                                         "parts",
                                         "told"
                                     ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/learners/{id}/leave": {
+            "post": {
+                "operationId": "learners.leave",
+                "summary": "Records that a learner leaves the school during the year: `{last_day, kind, destination, note, waive}`. Answers with the record",
+                "tags": [
+                    "Learners"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "last_day": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "kind": {
+                                        "type": "string",
+                                        "maxLength": 20
+                                    },
+                                    "destination": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 160
+                                    },
+                                    "note": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 500
+                                    },
+                                    "waive": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "last_day",
+                                    "kind",
+                                    "waive"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "acadly_id": {
+                                            "type": "string"
+                                        },
+                                        "admission_number": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "first_name": {
+                                            "type": "string"
+                                        },
+                                        "other_names": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "surname": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "sex": {
+                                            "type": "string"
+                                        },
+                                        "date_of_birth": {
+                                            "type": "string"
+                                        },
+                                        "has_photo": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "admitted_on": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "word": {
+                                            "type": "string"
+                                        },
+                                        "word_plural": {
+                                            "type": "string"
+                                        },
+                                        "class": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "level": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "division": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "division_id": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "campus": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "class_teacher": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "placements": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "contacts": {
+                                            "type": "array",
+                                            "description": "A contact who is also the contact of other learners: the family, found by phone (D-083).",
+                                            "items": {}
+                                        },
+                                        "activity": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "left": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "last_day": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "kind_label": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                ""
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                "destination": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "note": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "last_day",
+                                                "kind",
+                                                "kind_label",
+                                                "destination",
+                                                "note",
+                                                "by",
+                                                "at"
+                                            ]
+                                        },
+                                        "return_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "possible_duplicate": {
+                                            "type": "boolean"
+                                        },
+                                        "move_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "can_manage": {
+                                            "type": "boolean"
+                                        },
+                                        "details_request": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "description": "A correction of the name, date of birth or sex waiting for a yes (D-081).",
+                                            "properties": {
+                                                "mine": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "mine"
+                                            ],
+                                            "additionalProperties": {}
+                                        },
+                                        "details_asks": {
+                                            "type": "boolean"
+                                        },
+                                        "relationships": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "parts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "band": {
+                                                        "type": "string"
+                                                    },
+                                                    "attention": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "title",
+                                                    "band",
+                                                    "attention"
+                                                ]
+                                            }
+                                        },
+                                        "told": {
+                                            "type": "object",
+                                            "properties": {
+                                                "all": {
+                                                    "type": "integer"
+                                                },
+                                                "delivered": {
+                                                    "type": "integer"
+                                                },
+                                                "not_delivered": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "all",
+                                                "delivered",
+                                                "not_delivered"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "acadly_id",
+                                        "admission_number",
+                                        "first_name",
+                                        "other_names",
+                                        "surname",
+                                        "name",
+                                        "sex",
+                                        "date_of_birth",
+                                        "has_photo",
+                                        "status",
+                                        "admitted_on",
+                                        "word",
+                                        "word_plural",
+                                        "class",
+                                        "level",
+                                        "division",
+                                        "division_id",
+                                        "campus",
+                                        "class_teacher",
+                                        "placements",
+                                        "contacts",
+                                        "activity",
+                                        "left",
+                                        "return_to",
+                                        "possible_duplicate",
+                                        "move_to",
+                                        "can_manage",
+                                        "details_request",
+                                        "details_asks",
+                                        "relationships",
+                                        "parts",
+                                        "told"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/learners/{id}/return": {
+            "post": {
+                "operationId": "learners.return",
+                "summary": "Places a learner who left in a class again: `{class_id, from}`. Answers with the record",
+                "tags": [
+                    "Learners"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "class_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "from": {
+                                        "type": "string",
+                                        "format": "date"
+                                    }
+                                },
+                                "required": [
+                                    "class_id",
+                                    "from"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "acadly_id": {
+                                            "type": "string"
+                                        },
+                                        "admission_number": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "first_name": {
+                                            "type": "string"
+                                        },
+                                        "other_names": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "surname": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "sex": {
+                                            "type": "string"
+                                        },
+                                        "date_of_birth": {
+                                            "type": "string"
+                                        },
+                                        "has_photo": {
+                                            "type": "boolean"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        },
+                                        "admitted_on": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "word": {
+                                            "type": "string"
+                                        },
+                                        "word_plural": {
+                                            "type": "string"
+                                        },
+                                        "class": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name"
+                                            ]
+                                        },
+                                        "level": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "division": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "division_id": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "campus": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "class_teacher": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "placements": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "contacts": {
+                                            "type": "array",
+                                            "description": "A contact who is also the contact of other learners: the family, found by phone (D-083).",
+                                            "items": {}
+                                        },
+                                        "activity": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "left": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "last_day": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "kind_label": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                ""
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                "destination": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "note": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "last_day",
+                                                "kind",
+                                                "kind_label",
+                                                "destination",
+                                                "note",
+                                                "by",
+                                                "at"
+                                            ]
+                                        },
+                                        "return_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "possible_duplicate": {
+                                            "type": "boolean"
+                                        },
+                                        "move_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "can_manage": {
+                                            "type": "boolean"
+                                        },
+                                        "details_request": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "description": "A correction of the name, date of birth or sex waiting for a yes (D-081).",
+                                            "properties": {
+                                                "mine": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "mine"
+                                            ],
+                                            "additionalProperties": {}
+                                        },
+                                        "details_asks": {
+                                            "type": "boolean"
+                                        },
+                                        "relationships": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
+                                        "parts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "band": {
+                                                        "type": "string"
+                                                    },
+                                                    "attention": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "key",
+                                                    "title",
+                                                    "band",
+                                                    "attention"
+                                                ]
+                                            }
+                                        },
+                                        "told": {
+                                            "type": "object",
+                                            "properties": {
+                                                "all": {
+                                                    "type": "integer"
+                                                },
+                                                "delivered": {
+                                                    "type": "integer"
+                                                },
+                                                "not_delivered": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "all",
+                                                "delivered",
+                                                "not_delivered"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "acadly_id",
+                                        "admission_number",
+                                        "first_name",
+                                        "other_names",
+                                        "surname",
+                                        "name",
+                                        "sex",
+                                        "date_of_birth",
+                                        "has_photo",
+                                        "status",
+                                        "admitted_on",
+                                        "word",
+                                        "word_plural",
+                                        "class",
+                                        "level",
+                                        "division",
+                                        "division_id",
+                                        "campus",
+                                        "class_teacher",
+                                        "placements",
+                                        "contacts",
+                                        "activity",
+                                        "left",
+                                        "return_to",
+                                        "possible_duplicate",
+                                        "move_to",
+                                        "can_manage",
+                                        "details_request",
+                                        "details_asks",
+                                        "relationships",
+                                        "parts",
+                                        "told"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/learners/{id}/transfer-letter": {
+            "get": {
+                "operationId": "learners.transfer-letter",
+                "summary": "The transfer letter of a learner who left, as a PDF with its check code",
+                "tags": [
+                    "Learners"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "no-store"
+                                }
+                            },
+                            "X-Content-Type-Options": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "nosniff"
                                 }
                             }
                         }
@@ -26109,6 +27940,67 @@
                                             "type": "array",
                                             "items": {}
                                         },
+                                        "left": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "last_day": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "kind_label": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                ""
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                "destination": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "note": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "last_day",
+                                                "kind",
+                                                "kind_label",
+                                                "destination",
+                                                "note",
+                                                "by",
+                                                "at"
+                                            ]
+                                        },
+                                        "return_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
                                         "possible_duplicate": {
                                             "type": "boolean"
                                         },
@@ -26212,6 +28104,8 @@
                                         "placements",
                                         "contacts",
                                         "activity",
+                                        "left",
+                                        "return_to",
                                         "possible_duplicate",
                                         "move_to",
                                         "can_manage",
@@ -26376,6 +28270,67 @@
                                             "type": "array",
                                             "items": {}
                                         },
+                                        "left": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "last_day": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "kind_label": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                ""
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                "destination": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "note": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "last_day",
+                                                "kind",
+                                                "kind_label",
+                                                "destination",
+                                                "note",
+                                                "by",
+                                                "at"
+                                            ]
+                                        },
+                                        "return_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
                                         "possible_duplicate": {
                                             "type": "boolean"
                                         },
@@ -26479,6 +28434,8 @@
                                         "placements",
                                         "contacts",
                                         "activity",
+                                        "left",
+                                        "return_to",
                                         "possible_duplicate",
                                         "move_to",
                                         "can_manage",
@@ -26643,6 +28600,67 @@
                                             "type": "array",
                                             "items": {}
                                         },
+                                        "left": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "last_day": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "kind_label": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                ""
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                "destination": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "note": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "last_day",
+                                                "kind",
+                                                "kind_label",
+                                                "destination",
+                                                "note",
+                                                "by",
+                                                "at"
+                                            ]
+                                        },
+                                        "return_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
                                         "possible_duplicate": {
                                             "type": "boolean"
                                         },
@@ -26746,6 +28764,8 @@
                                         "placements",
                                         "contacts",
                                         "activity",
+                                        "left",
+                                        "return_to",
                                         "possible_duplicate",
                                         "move_to",
                                         "can_manage",
@@ -26910,6 +28930,67 @@
                                             "type": "array",
                                             "items": {}
                                         },
+                                        "left": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "last_day": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "kind_label": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                ""
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                "destination": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "note": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "last_day",
+                                                "kind",
+                                                "kind_label",
+                                                "destination",
+                                                "note",
+                                                "by",
+                                                "at"
+                                            ]
+                                        },
+                                        "return_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
                                         "possible_duplicate": {
                                             "type": "boolean"
                                         },
@@ -27013,6 +29094,8 @@
                                         "placements",
                                         "contacts",
                                         "activity",
+                                        "left",
+                                        "return_to",
                                         "possible_duplicate",
                                         "move_to",
                                         "can_manage",
@@ -27169,6 +29252,67 @@
                                             "type": "array",
                                             "items": {}
                                         },
+                                        "left": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "last_day": {
+                                                    "type": "string"
+                                                },
+                                                "kind": {
+                                                    "type": "string"
+                                                },
+                                                "kind_label": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                ""
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                "destination": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "note": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "by": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "last_day",
+                                                "kind",
+                                                "kind_label",
+                                                "destination",
+                                                "note",
+                                                "by",
+                                                "at"
+                                            ]
+                                        },
+                                        "return_to": {
+                                            "type": "array",
+                                            "items": {}
+                                        },
                                         "possible_duplicate": {
                                             "type": "boolean"
                                         },
@@ -27272,6 +29416,8 @@
                                         "placements",
                                         "contacts",
                                         "activity",
+                                        "left",
+                                        "return_to",
                                         "possible_duplicate",
                                         "move_to",
                                         "can_manage",
@@ -51743,6 +53889,13 @@
                                                 "best_six"
                                             ]
                                         },
+                                        "ranked_by": {
+                                            "type": "string",
+                                            "enum": [
+                                                "total",
+                                                "average"
+                                            ]
+                                        },
                                         "subjects": {
                                             "type": "array",
                                             "items": {
@@ -51815,6 +53968,9 @@
                                                                         "boolean",
                                                                         "null"
                                                                     ]
+                                                                },
+                                                                "takes": {
+                                                                    "type": "boolean"
                                                                 }
                                                             },
                                                             "required": [
@@ -51822,7 +53978,8 @@
                                                                 "percent",
                                                                 "grade",
                                                                 "ready",
-                                                                "passes"
+                                                                "passes",
+                                                                "takes"
                                                             ]
                                                         }
                                                     },
@@ -51942,6 +54099,7 @@
                                         "period",
                                         "scale",
                                         "summary_kind",
+                                        "ranked_by",
                                         "subjects",
                                         "learners",
                                         "totals"

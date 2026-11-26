@@ -6,7 +6,6 @@ namespace Acadly\Modules\Assessment\Application;
 
 use Acadly\Core\Academics\Contracts\AcademicCalendar;
 use Acadly\Core\Academics\Contracts\Teaching;
-use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
 use Acadly\Kernel\Approvals\ApprovalRequests;
 use Acadly\Kernel\Approvals\Approvals;
 use Acadly\Kernel\Blueprint\Engine\JourneyEngine;
@@ -26,7 +25,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * The marks sheet of one assessment (the approved Marks sheet): one row per
- * learner in the class on the day, the mark in force, the numbers, the
+ * learner in the class on the day who takes the subject (D-117), the mark in force, the numbers, the
  * journey ladder and what the viewer may do.
  *
  * @phpstan-import-type ClassRow from Reach
@@ -34,10 +33,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 final class Sheets
 {
     public function __construct(
+        private readonly SubjectChoices $choices,
         private readonly Reach $reach,
         private readonly AcademicCalendar $calendar,
         private readonly Teaching $teaching,
-        private readonly EnrolmentDirectory $learners,
         private readonly Marks $marks,
         private readonly Plans $plans,
         private readonly Scales $scales,
@@ -80,7 +79,7 @@ final class Sheets
         $missing = 0;
         $undecided = 0;
 
-        foreach ($this->learners->learnersIn($assessment->class_id, $assessment->heldOn()) as $learner) {
+        foreach ($this->choices->learnersFor($assessment) as $learner) {
             $mark = $marks[$learner['id']] ?? null;
             $missing += $mark === null ? 1 : 0;
             $undecided += $asks && $mark !== null && $mark['reason'] === MissingReason::Absent->value ? 1 : 0;
@@ -94,7 +93,7 @@ final class Sheets
     {
         $a = $this->find($viewer, $id);
         $class = $this->classOf($a);
-        $learners = $this->learners->learnersIn($a->class_id, $a->heldOn());
+        $learners = $this->choices->learnersFor($a);
         $marks = $this->marks->inForce([$a->id])[$a->id] ?? [];
         $scale = $this->scales->forLevel($class['division_id'], $class['level_code']);
         $plan = $this->plans->inForce($class['division_id'], $class['level_code'], $a->period_id, $a->subject_id);

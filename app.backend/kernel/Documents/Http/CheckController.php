@@ -17,6 +17,7 @@ final class CheckController
         'fees.receipt' => 'Receipt',
         'fees.statement' => 'Fee statement',
         'programmes.registration_slip' => 'Registration slip',
+        'enrolment.transfer' => 'Transfer letter',
     ];
 
     /**

@@ -62,7 +62,25 @@ final class Families implements Guardianship, PhoneHolders
     public function sees(User $parent, string $learnerId): bool
     {
         return Ids::isValid($learnerId) && DB::table('learner_guardian_relationships')
-            ->where('held_by', $parent->id)->where('learner_id', $learnerId)->where('state', State::Active->value)->exists();
+            ->where('held_by', $parent->id)->where('learner_id', $learnerId)->where('state', State::Active->value)->exists()
+            && $this->stillShown($learnerId);
+    }
+
+    /**
+     * A child who left during the year stays readable by the family for a year
+     * after the last day: report cards, fees, documents (D-114). Then it goes.
+     */
+    private function stillShown(string $learnerId): bool
+    {
+        $place = $this->places->current($learnerId);
+
+        if ($place === null || $place['open']) {
+            return true;
+        }
+
+        $last = DB::table('learner_departures')->where('placement_id', $place['id'])->max('last_day');
+
+        return ! is_string($last) || substr($last, 0, 10) >= CarbonImmutable::parse($this->clock->today())->subYear()->toDateString();
     }
 
     public function child(User $parent, string $learnerId): ?array
@@ -75,7 +93,7 @@ final class Families implements Guardianship, PhoneHolders
         $out = [];
 
         foreach ($this->linksOf($parent) as $learnerId => $link) {
-            $card = $link['state'] === State::Active->value ? $this->learnerCard((string) $learnerId) : null;
+            $card = $link['state'] === State::Active->value && $this->stillShown((string) $learnerId) ? $this->learnerCard((string) $learnerId) : null;
 
             if ($card !== null) {
                 $out[] = $card;
@@ -97,7 +115,7 @@ final class Families implements Guardianship, PhoneHolders
         $children = [];
 
         foreach ($links as $learnerId => $link) {
-            if ($link['state'] !== State::Active->value && $link['state'] !== State::Suspended->value) {
+            if (($link['state'] !== State::Active->value && $link['state'] !== State::Suspended->value) || ! $this->stillShown((string) $learnerId)) {
                 continue;
             }
 

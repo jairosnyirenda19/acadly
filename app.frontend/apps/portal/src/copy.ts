@@ -66,6 +66,17 @@ const en = {
     card: (term: string) => `${term} report card`,
     newCard: (term: string) => `New: ${term} report card`,
     newReview: (term: string) => `New: ${term} progress review`,
+    fromSchool: 'From the school',
+    newNotice: 'New',
+  },
+
+  notice: {
+    from: 'From',
+    for: 'For',
+    questions: 'Questions? Call the school.',
+    questionsPhone: (phone: string) => `Questions? Call the school on ${phone}.`,
+    gone: 'This notice is not available.',
+    goneNote: 'The school may have withdrawn it.',
   },
 
   child: {
@@ -79,6 +90,7 @@ const en = {
     seeMessages: 'From the school',
     review: 'Progress review',
     pickup: 'Pick-up',
+    left: (day: string) => `Left the school on ${day}`,
   },
 
   card: {
@@ -369,6 +381,17 @@ const ny: Words = {
     card: (term: string) => `Lipoti la ${term}`,
     newCard: (term: string) => `Chatsopano: lipoti la ${term}`,
     newReview: (term: string) => `Chatsopano: lipoti la kukula la ${term}`,
+    fromSchool: 'Kuchokera ku sukulu',
+    newNotice: 'Chatsopano',
+  },
+
+  notice: {
+    from: 'Kuchokera kwa',
+    for: 'Kwa',
+    questions: 'Muli ndi funso? Imbirani sukulu.',
+    questionsPhone: (phone: string) => `Muli ndi funso? Imbirani sukulu pa ${phone}.`,
+    gone: 'Chidziwitsochi palibe.',
+    goneNote: 'Sukulu mwina yachichotsa.',
   },
 
   child: {
@@ -382,6 +405,7 @@ const ny: Words = {
     seeMessages: 'Kuchokera ku sukulu',
     review: 'Lipoti la kukula',
     pickup: 'Kutenga mwana',
+    left: (day: string) => `Anachoka pa sukulu pa ${day}`,
   },
 
   card: {

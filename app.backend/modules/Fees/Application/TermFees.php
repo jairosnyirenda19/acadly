@@ -9,6 +9,7 @@ use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
 use Acadly\Core\Institution\Contracts\SchoolDirectory;
 use Acadly\Kernel\Support\Clock;
 use Acadly\Kernel\Support\Row;
+use Acadly\Modules\Fees\Contracts\StudentProgrammes;
 use Acadly\Modules\Fees\Domain\Money;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -144,6 +145,10 @@ final class TermFees
             }
         }
 
+        // A college's fees by programme and mode (D-116): they replace the default amount of their item.
+        $byProgramme = $this->programmeAmounts($schedule);
+        $students = $byProgramme === [] || $learners === [] || ! app()->bound(StudentProgrammes::class) ? []
+            : app(StudentProgrammes::class)->students(array_map('strval', array_keys($learners)), $term['period_id']);
         $takes = [];
 
         foreach ($learners === [] ? [] : DB::table('fee_item_takers')->whereIn('learner_id', array_keys($learners))->whereNull('ended_at')->get(['learner_id', 'item_id']) as $t) {
@@ -152,11 +157,32 @@ final class TermFees
 
         foreach ($learners as $id => $level) {
             $lines = [];
+            $own = isset($students[$id]) ? ($byProgramme[$students[$id]['programme_id'].'|'.$students[$id]['mode']] ?? []) : [];
+            $waiting = false;
 
             foreach ($amounts[$level] ?? [] as $line) {
-                if ($line['amount'] > 0 && (! $line['optional'] || isset($takes[$id][$line['item_id']]))) {
-                    $lines[] = ['item_id' => $line['item_id'], 'label' => $line['label'], 'amount' => $line['amount']];
+                $amount = $line['amount'];
+
+                if (isset($own[$line['item_id']])) {
+                    $p = $own[$line['item_id']];
+                    $credits = $students[$id]['credits'] ?? null;
+
+                    if (isset($p['credit'])) {
+                        // Per registered credit: billed once a registration is approved.
+                        $waiting = $waiting || $credits === null;
+                        $amount = $p['credit'] * ($credits ?? 0);
+                    } else {
+                        $amount = $p[$level] ?? $amount;
+                    }
                 }
+
+                if ($amount > 0 && (! $line['optional'] || isset($takes[$id][$line['item_id']]))) {
+                    $lines[] = ['item_id' => $line['item_id'], 'label' => $line['label'], 'amount' => $amount];
+                }
+            }
+
+            if ($waiting) {
+                continue;
             }
 
             $total = array_sum(array_column($lines, 'amount'));
@@ -167,6 +193,22 @@ final class TermFees
         }
 
         return $bills;
+    }
+
+    /**
+     * A schedule's amounts by programme and mode, by item: per year of study, or 'credit' for an amount per credit.
+     *
+     * @return array<string, array<string, array<string, int>>> "programme|mode" => item id => level code or 'credit' => amount
+     */
+    public function programmeAmounts(string $scheduleId): array
+    {
+        $out = [];
+
+        foreach (DB::table('fee_schedule_programme_amounts')->where('schedule_id', $scheduleId)->get(['item_id', 'programme_id', 'mode', 'level_code', 'amount_minor']) as $a) {
+            $out[Row::text($a, 'programme_id').'|'.Row::text($a, 'mode')][Row::text($a, 'item_id')][Row::text($a, 'level_code')] = Row::int($a, 'amount_minor');
+        }
+
+        return $out;
     }
 
     /**

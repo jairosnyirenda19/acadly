@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Acadly\Core\Enrolment\Http\DivisionsController;
 use Acadly\Core\Enrolment\Http\FamiliesController;
 use Acadly\Core\Enrolment\Http\FamilyDocumentsController;
+use Acadly\Core\Enrolment\Http\FamilyNoticesController;
 use Acadly\Core\Enrolment\Http\LearnerDocumentsController;
 use Acadly\Core\Enrolment\Http\LearnerImportController;
 use Acadly\Core\Enrolment\Http\LearnersController;
@@ -24,6 +25,13 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/portal/family', [FamiliesController::class, 'family'])->name('portal.family');
     Route::post('/portal/family/confirm', [FamiliesController::class, 'confirm'])->name('portal.confirm');
     Route::get('/portal/children/{id}/messages', [FamiliesController::class, 'messages'])->whereUuid('id')->name('portal.messages');
+    // Notices to families (D-115): the office writes them; families read them in the portal.
+    Route::get('/portal/notices', [FamilyNoticesController::class, 'family'])->name('portal.notices');
+    Route::get('/portal/notices/{id}', [FamilyNoticesController::class, 'open'])->whereUuid('id')->name('portal.notices.show');
+    Route::get('/notices', [FamilyNoticesController::class, 'index'])->name('notices.index');
+    Route::get('/notices/reach', [FamilyNoticesController::class, 'reach'])->name('notices.reach');
+    Route::post('/notices', [FamilyNoticesController::class, 'store'])->middleware('throttle:30,1')->name('notices.store');
+    Route::post('/notices/{id}/withdraw', [FamilyNoticesController::class, 'withdraw'])->whereUuid('id')->name('notices.withdraw');
     // The documents the school shows to families (D-110). None shown answers not found.
     Route::get('/portal/children/{id}/documents', [FamilyDocumentsController::class, 'index'])->whereUuid('id')->name('portal.documents');
     Route::get('/portal/children/{id}/documents/{document}', [FamilyDocumentsController::class, 'content'])->whereUuid(['id', 'document'])->middleware('throttle:60,1')->name('portal.documents.content');
@@ -51,6 +59,10 @@ Route::middleware('auth:sanctum')->prefix('learners')->name('learners.')->group(
     Route::put('/{id}', [LearnersController::class, 'update'])->whereUuid('id')->name('update');
     Route::get('/{id}/messages', [LearnersController::class, 'messages'])->whereUuid('id')->name('messages');
     Route::post('/{id}/class', [LearnersController::class, 'move'])->whereUuid('id')->name('move');
+    // Leaving during the year, coming back, and the transfer letter (D-114).
+    Route::post('/{id}/leave', [LearnersController::class, 'leave'])->whereUuid('id')->name('leave');
+    Route::post('/{id}/return', [LearnersController::class, 'comeBack'])->whereUuid('id')->name('return');
+    Route::get('/{id}/transfer-letter', [LearnersController::class, 'transferLetter'])->whereUuid('id')->middleware('throttle:30,1')->name('transfer-letter');
     Route::post('/{id}/contacts', [LearnersController::class, 'addContact'])->whereUuid('id')->name('contacts.store');
     Route::post('/{id}/contacts/{contact}/notices', [LearnersController::class, 'contactNotices'])->whereUuid(['id', 'contact'])->name('contacts.notices');
     Route::post('/{id}/contacts/{contact}/main', [LearnersController::class, 'mainContact'])->whereUuid(['id', 'contact'])->name('contacts.main');

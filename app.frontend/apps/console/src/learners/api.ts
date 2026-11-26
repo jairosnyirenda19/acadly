@@ -39,6 +39,11 @@ export const learnersApi = {
   correct: (id: string, body: { first_name: string; other_names: string; surname: string; sex: string; date_of_birth: string; admission_number: string; reason: string }) =>
     settle(api.PUT('/v1/learners/{id}', { params: { path: { id } }, body: body as never }) as Done<LearnerState>),
 
+  leave: (id: string, body: { last_day: string; kind: string; destination: string; note: string; waive: boolean }) =>
+    settle(api.POST('/v1/learners/{id}/leave', { params: { path: { id } }, body: body as never }) as Done<LearnerState>),
+  comeBack: (id: string, body: { class_id: string; from: string }) =>
+    settle(api.POST('/v1/learners/{id}/return', { params: { path: { id } }, body: body as never }) as Done<LearnerState>),
+  transferLetterUrl: (id: string) => `/api/v1/learners/${id}/transfer-letter`,
   move: (id: string, body: { class_id: string; from: string; reason: string }) =>
     settle(api.POST('/v1/learners/{id}/class', { params: { path: { id } }, body: body as never }) as Done<LearnerState>),
 

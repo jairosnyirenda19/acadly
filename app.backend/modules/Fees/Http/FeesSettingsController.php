@@ -22,6 +22,7 @@ use Acadly\Modules\Fees\Application\FeesViews;
 use Acadly\Modules\Fees\Application\TermFees;
 use Acadly\Modules\Fees\Contracts\FeesAudit;
 use Acadly\Modules\Fees\Contracts\FeesPermission;
+use Acadly\Modules\Fees\Contracts\StudentProgrammes;
 use Acadly\Modules\Fees\Domain\PaymentMethod;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Query\Builder;
@@ -62,7 +63,7 @@ final class FeesSettingsController
     /**
      * The fees of one term: items, levels, amounts, the plan, and what billing would do.
      *
-     * @response array{term: array{period_id: string, division_id: string, division: string, year: string, name: string, starts_on: string, ends_on: string}, items: list<array{id: string, name: string, optional: bool, retired: bool}>, levels: list<array{code: string, label: string}>, amounts: list<array{item_id: string, level_code: string, amount: int}>, plan: list<array{label: string, due_on: string, share_bp: int}>, billed: bool, billed_learners: int, to_bill: array{learners: int, total: int}}
+     * @response array{term: array{period_id: string, division_id: string, division: string, year: string, name: string, starts_on: string, ends_on: string}, items: list<array{id: string, name: string, optional: bool, retired: bool}>, levels: list<array{code: string, label: string}>, amounts: list<array{item_id: string, level_code: string, amount: int}>, plan: list<array{label: string, due_on: string, share_bp: int}>, billed: bool, billed_learners: int, to_bill: array{learners: int, total: int}, programmes: list<array{id: string, code: string, name: string}>, programme_amounts: list<array{item_id: string, programme_id: string, mode: string, level_code: string, amount: int}>}
      */
     public function term(Request $request, string $period, string $division, Access $access, TermFees $terms): JsonResponse
     {
@@ -82,6 +83,18 @@ final class FeesSettingsController
             }
         }
 
+        $byProgramme = [];
+
+        foreach ($schedule === null ? [] : $terms->programmeAmounts($schedule) as $key => $items) {
+            [$programme, $mode] = explode('|', $key);
+
+            foreach ($items as $item => $levels) {
+                foreach ($levels as $level => $amount) {
+                    $byProgramme[] = ['item_id' => $item, 'programme_id' => $programme, 'mode' => $mode, 'level_code' => $level, 'amount' => $amount];
+                }
+            }
+        }
+
         $bills = $terms->bills($term);
         unset($term['year_id']);
 
@@ -94,6 +107,9 @@ final class FeesSettingsController
             'billed' => $schedule !== null && DB::table('fee_schedules')->where('id', $schedule)->whereNotNull('billed_at')->exists(),
             'billed_learners' => $schedule === null ? 0 : DB::table('fee_charges')->where('schedule_id', $schedule)->count(),
             'to_bill' => ['learners' => count($bills), 'total' => array_sum(array_column($bills, 'total'))],
+            // A college's programmes (D-116); none for a school.
+            'programmes' => app()->bound(StudentProgrammes::class) ? app(StudentProgrammes::class)->programmes($division) : [],
+            'programme_amounts' => $byProgramme,
         ]);
     }
 
@@ -114,6 +130,12 @@ final class FeesSettingsController
             'plan.*.label' => ['required', 'string', 'max:60'],
             'plan.*.due_on' => ['required', 'date_format:Y-m-d'],
             'plan.*.share_bp' => ['required', 'integer', 'min:1', 'max:10000'],
+            'programme_amounts' => ['sometimes', 'array'],
+            'programme_amounts.*.item_id' => ['required', 'uuid'],
+            'programme_amounts.*.programme_id' => ['required', 'uuid'],
+            'programme_amounts.*.mode' => ['required', 'string', 'max:12'],
+            'programme_amounts.*.level_code' => ['required', 'string', 'max:20'],
+            'programme_amounts.*.amount' => ['required', 'integer', 'min:0'],
         ]);
 
         $amounts = [];
@@ -127,7 +149,14 @@ final class FeesSettingsController
             $plan[] = ['label' => Form::text($p, 'label'), 'due_on' => Form::text($p, 'due_on'), 'share_bp' => Form::int($p, 'share_bp')];
         }
 
-        $actions->saveTerm(self::user($request), $period, $division, $amounts, $plan);
+        $byProgramme = [];
+
+        foreach (Form::rows($request, 'programme_amounts') as $a) {
+            $byProgramme[] = ['item_id' => Form::text($a, 'item_id'), 'programme_id' => Form::text($a, 'programme_id'), 'mode' => Form::text($a, 'mode'),
+                'level_code' => Form::text($a, 'level_code'), 'amount' => Form::int($a, 'amount')];
+        }
+
+        $actions->saveTerm(self::user($request), $period, $division, $amounts, $plan, $byProgramme);
 
         return response()->json(['saved' => true]);
     }

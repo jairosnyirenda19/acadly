@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Acadly\Modules\Assessment\Application\Actions;
 
-use Acadly\Core\Enrolment\Contracts\EnrolmentDirectory;
 use Acadly\Kernel\Access\Access;
 use Acadly\Kernel\Access\ScopeRef;
 use Acadly\Kernel\Access\ScopeType;
@@ -15,6 +14,7 @@ use Acadly\Kernel\Support\Ids;
 use Acadly\Modules\Assessment\Application\Marks;
 use Acadly\Modules\Assessment\Application\Reach;
 use Acadly\Modules\Assessment\Application\Sheets;
+use Acadly\Modules\Assessment\Application\SubjectChoices;
 use Acadly\Modules\Assessment\Contracts\AssessmentAudit;
 use Acadly\Modules\Assessment\Contracts\AssessmentPermission;
 use Acadly\Modules\Assessment\Contracts\MissingReason;
@@ -34,10 +34,10 @@ final class SaveMarks
     public const int MOST = 500;
 
     public function __construct(
+        private readonly SubjectChoices $choices,
         private readonly Access $access,
         private readonly Sheets $sheets,
         private readonly Reach $reach,
-        private readonly EnrolmentDirectory $learners,
         private readonly Marks $marks,
         private readonly Audit $audit,
         private readonly Clock $clock,
@@ -69,7 +69,7 @@ final class SaveMarks
             throw ValidationException::withMessages(['marks' => ['Send from 1 to '.self::MOST.' marks.']]);
         }
 
-        $names = array_column($this->learners->learnersIn($a->class_id, $a->heldOn()), 'name', 'id');
+        $names = array_column($this->choices->learnersFor($a), 'name', 'id');
         $clean = [];
         $errors = [];
 

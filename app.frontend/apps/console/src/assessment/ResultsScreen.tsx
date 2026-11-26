@@ -50,7 +50,7 @@ export function ResultsScreen() {
       <div className="flex flex-1 flex-wrap items-stretch bg-sheet">
         <section aria-label={t.tableLabel} className="min-w-0 flex-[3_1_560px] px-4 pt-4 pb-6 md:px-[clamp(16px,3vw,40px)]">
           <Grid data={data} chosen={learner !== null && subject !== null ? { learner, subject } : null} onChoose={choose} />
-          {data.scale !== null && <p className="mt-3 max-w-[70ch] text-[13px] text-text-muted">{t.legend(data.scale.name, data.scale.overall)}</p>}
+          {data.scale !== null && <p className="mt-3 max-w-[70ch] text-[13px] text-text-muted">{t.legend(data.scale.name, data.scale.overall)}{data.ranked_by === 'average' ? ` ${t.byAverage}` : ''}</p>}
         </section>
         {learner !== null && subject !== null && (
           <aside className="min-w-0 flex-[1_1_340px] border-ink bg-paper px-4 pt-4.5 pb-6 max-[1023px]:border-t-2 md:px-7 min-[1024px]:border-l-2">
@@ -112,6 +112,17 @@ function Grid({ data, chosen, onChoose }: { data: ResultsState; chosen: { learne
               </th>
               {data.subjects.map((x) => {
                 const g = l.grades.find((grade) => grade.subject_id === x.id)
+
+                if (g?.takes === false) {
+                  return (
+                    <td key={x.id} className="border-b border-rule bg-paper px-1 py-1 text-center text-text-muted">
+                      <span role="img" aria-label={t.notTaken(l.name, x.name)}>
+                        {copy.dash}
+                      </span>
+                    </td>
+                  )
+                }
+
                 const on = chosen?.learner === l.id && chosen.subject === x.id
                 const ready = g !== undefined && g.ready && g.grade !== null
 

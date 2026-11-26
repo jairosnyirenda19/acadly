@@ -134,7 +134,7 @@ it('refuses every place-bound route to an account that holds everything, but onl
         'roles.' => ['id' => $clerk->id],
         'learners.' => ['id' => $learner, 'contact' => $contact],
         'registers.' => ['id' => $school->id('class_secondary_b'), 'register' => $school->id('class_secondary_b'), 'learner' => $learner, 'slot' => $slot],
-        'assessment.' => ['id' => $assessment],
+        'assessment.' => ['id' => $assessment, 'class' => $school->id('class_secondary_b')],
         'assessment.learner' => ['id' => $learner],
         'portal.' => ['id' => $learner, 'day' => '2026-10-01', 'receipt' => $learner, 'document' => $learner],
         'year-end.' => ['division' => $school->id('secondary'), 'id' => $learner],

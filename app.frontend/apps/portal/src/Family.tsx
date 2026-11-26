@@ -2,7 +2,7 @@ import { useLoad } from '@acadly/kernel'
 import { Button, Notice } from '@acadly/ui'
 import { useState } from 'react'
 import { portalApi, type Child, type FamilyFeesState, type FamilyState, type Proposed } from './api'
-import { Badge, Bar, go, Loading, Mark, Screen, shortDay, Tile, useWords, type Tone, Note } from './parts'
+import { Badge, Bar, go, Loading, longDay, Mark, Screen, shortDay, Tile, useWords, type Tone, Note } from './parts'
 
 /** The family, loaded once and shared by every screen of the portal. */
 export function useFamily() {
@@ -58,6 +58,7 @@ export function Home({ onSignOut }: { onSignOut: () => void }) {
             {t.home.noneNote}
           </Note>
         )}
+        <Notices />
         {data.children.map((c) => (
           <ChildCard key={c.id} child={c} fees={fees?.children.find((x) => x.id === c.id)} />
         ))}
@@ -77,6 +78,7 @@ function ChildCard({ child, fees }: { child: Child; fees: FamilyFeesState['child
   const card = child.lines.find((l) => l.key === 'card')
   const review = child.lines.find((l) => l.key === 'review')
   const pickup = child.lines.find((l) => l.key === 'pickup')
+  const left = child.lines.find((l) => l.key === 'left')
   const reason = `/child/${child.id}/reason`
   const ask = today !== undefined && today.word === 'absent_ask' && child.state !== 'suspended'
 
@@ -87,7 +89,7 @@ function ChildCard({ child, fees }: { child: Child; fees: FamilyFeesState['child
         <Badge name={child.name} />
         <span className="min-w-0 flex-1">
           <span className="block text-xl font-extrabold">{child.first_name}</span>
-          <span className="block text-sm">{child.class}</span>
+          <span className="block text-sm">{left !== undefined ? t.child.left(longDay(left.label ?? '')) : child.class}</span>
         </span>
         <span aria-hidden="true" className="text-[26px] font-extrabold">
           ›
@@ -259,6 +261,7 @@ export function ChildScreen({ id }: { id: string }) {
   const conduct = child.lines.find((l) => l.key === 'conduct')
   const plan = child.lines.find((l) => l.key === 'plan')
   const documents = child.lines.find((l) => l.key === 'documents')
+  const left = child.lines.find((l) => l.key === 'left')
   // The doors' labels (D-110): "3 2" (commendations, incidents), "2027-02-20 Reading support", "3".
   const [commendations = 0, incidents = 0] = (conduct?.label ?? '').split(' ').map(Number)
   const base = `/child/${child.id}`
@@ -278,7 +281,7 @@ export function ChildScreen({ id }: { id: string }) {
         <Badge name={child.name} />
         <span>
           <span className="type-display block text-[30px] leading-[0.9]">{child.name}</span>
-          <span className="block text-[15px]">{child.class}</span>
+          <span className="block text-[15px]">{left !== undefined ? t.child.left(longDay(left.label ?? '')) : child.class}</span>
         </span>
       </div>
       <div className="px-4 pb-6">
@@ -316,6 +319,78 @@ export function ChildScreen({ id }: { id: string }) {
         <Tile icon="bell" title={t.child.messages} note={t.child.seeMessages} href={`${base}/messages`} />
         {data.school.phone !== null && <Tile icon="call" title={t.child.call} note={data.school.phone} href={`tel:${data.school.phone.replace(/\s/g, '')}`} />}
       </div>
+    </Screen>
+  )
+}
+
+/** Notices from the school for this family's children (D-115), newest first, pinned at the top. */
+function Notices() {
+  const t = useWords()
+  const loaded = useLoad('portal:notices', () => portalApi.notices())
+  const list = loaded.data?.notices ?? []
+
+  if (list.length === 0) return null
+
+  return (
+    <section aria-label={t.home.fromSchool} className="mb-4">
+      <h2 className="label-caps mb-1.5 text-[11px] text-text-muted">{t.home.fromSchool}</h2>
+      <ul className="border-2 border-ink bg-sheet">
+        {list.slice(0, 5).map((n, i) => {
+          const href = `/notice/${n.id}`
+
+          return (
+            <li key={n.id} className={i > 0 ? 'border-t border-rule' : ''}>
+              <a href={href} onClick={(e) => go(e, href)} className="flex min-h-[60px] items-center gap-3 px-3.5 py-2 text-ink no-underline">
+                <span className="min-w-0 flex-1">
+                  <span className={`block text-[17px] ${n.new ? 'font-extrabold' : 'font-bold'}`}>{n.title}</span>
+                  <span className="block text-[13px] text-text-muted">
+                    {shortDay(n.publish_at)} · {n.for}
+                  </span>
+                </span>
+                {n.new && <span className="bg-marigold px-1.5 py-0.5 text-[13px] font-extrabold text-ink">● {t.home.newNotice}</span>}
+              </a>
+            </li>
+          )
+        })}
+      </ul>
+    </section>
+  )
+}
+
+/** One notice (D-115). Opening it counts it as read. */
+export function NoticePage({ id }: { id: string }) {
+  const t = useWords()
+  const family = useFamily().data
+  const loaded = useLoad(`portal:notice:${id}`, () => portalApi.notice(id))
+  const n = loaded.data
+  const phone = family?.school.phone ?? null
+
+  return (
+    <Screen bar={<Bar school={family?.school.name ?? ''} back={{ to: '/', label: t.home.title }} />}>
+      {loaded.phase === 'refused' ? (
+        <div className="p-4">
+          <Note tone="attention" title={t.notice.gone}>
+            {t.notice.goneNote}
+          </Note>
+        </div>
+      ) : n === undefined ? (
+        <Loading failed={loaded.phase === 'failed'} onRetry={loaded.reload} />
+      ) : (
+        <div className="px-4 pt-4 pb-6">
+          <div className="label-caps text-[11px] text-text-muted">
+            {longDay(n.publish_at)} · {n.for}
+          </div>
+          <h1 className="type-display mt-1 mb-3 text-[34px] leading-[0.9]">{n.title}</h1>
+          <div className="mb-3 border-2 border-ink bg-sheet px-4 py-3.5 text-[17px] leading-relaxed whitespace-pre-line">{n.body}</div>
+          <dl className="mb-3 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 border-2 border-ink bg-sheet px-4 py-3 text-[15px]">
+            <dt className="font-extrabold">{t.notice.from}</dt>
+            <dd>{n.from}</dd>
+            <dt className="font-extrabold">{t.notice.for}</dt>
+            <dd>{n.for}</dd>
+          </dl>
+          <p className="text-[13px] text-text-muted">{phone !== null ? t.notice.questionsPhone(phone) : t.notice.questions}</p>
+        </div>
+      )}
     </Screen>
   )
 }
